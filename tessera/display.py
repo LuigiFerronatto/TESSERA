@@ -147,7 +147,7 @@ def render_list_table(rows: List[tuple], console) -> None:
 # `tessera query`
 # ---------------------------------------------------------------------------
 
-def render_query_results(results: List[Dict[str, Any]], console, *, show_related: bool, show_body: bool) -> None:
+def render_query_results(results: List[Dict[str, Any]], console, *, show_related: bool, show_body: bool, show_debug: bool = False) -> None:
     """
     One Rich Panel per hit. Panel title = colored [type | id | score] header
     (this is the "context/content" identity). The filepath is rendered
@@ -168,14 +168,36 @@ def render_query_results(results: List[Dict[str, Any]], console, *, show_related
         header.append(f"  score={r['score']:.4f}", style="dim")
 
         body = Text()
+        
+        # Relevant Evidence Section (Phase 2)
+        if r.get("relevant_evidence"):
+            body.append("Relevant evidence\n", style="bold underline")
+            body.append(f"\"{r['relevant_evidence']}\"\n\n", style="italic")
+
         filepath = r.get("filepath") or r.get("filename") or ""
         if filepath:
-            body.append(f"📄 {filepath}\n", style="dim italic")
+            body.append(f"📄 Source: {filepath}\n", style="dim")
+            
         if r.get("related_ids"):
-            body.append(f"🔗 relacionadas: {', '.join(r['related_ids'])}\n", style="dim cyan")
+            body.append(f"🔗 Related: {', '.join(r['related_ids'])}\n", style="dim cyan")
+            
+        # Debug Explanations (Phase 1)
+        if show_debug and r.get("score_explain"):
+            exp = r["score_explain"]
+            body.append("\nScore Explanation\n", style="bold yellow")
+            body.append(f" ├─ final:         {r['score']:.3f}\n", style="yellow")
+            body.append(f" ├─ lexical:       {exp['lexical']:.2f}\n", style="dim yellow")
+            body.append(f" ├─ title:         {exp['title']:.2f}\n", style="dim yellow")
+            body.append(f" ├─ metadata:      {exp['metadata']:.2f}\n", style="dim yellow")
+            body.append(f" ├─ relations:     {exp['relations']:.2f}\n", style="dim yellow")
+            body.append(f" ├─ type_boost:    {exp['type_boost']:.1f}x\n", style="dim yellow")
+            body.append(f" └─ recency_boost: {exp['recency_boost']:.1f}x\n", style="dim yellow")
+
         if show_body:
-            if filepath or r.get("related_ids"):
+            if filepath or r.get("related_ids") or r.get("relevant_evidence") or (show_debug and r.get("score_explain")):
                 body.append("\n")
+            body.append("Full memory\n", style="bold")
+            body.append("───────────\n", style="dim")
             body.append(r.get("body", ""))
 
         console.print(Panel(body, title=header, border_style=style, title_align="left"))
