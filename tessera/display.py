@@ -185,13 +185,17 @@ def render_query_results(results: List[Dict[str, Any]], console, *, show_related
         if show_debug and r.get("score_explain"):
             exp = r["score_explain"]
             body.append("\nScore Explanation\n", style="bold yellow")
-            body.append(f" ├─ final:         {r['score']:.3f}\n", style="yellow")
-            body.append(f" ├─ lexical:       {exp['lexical']:.2f}\n", style="dim yellow")
-            body.append(f" ├─ title:         {exp['title']:.2f}\n", style="dim yellow")
-            body.append(f" ├─ metadata:      {exp['metadata']:.2f}\n", style="dim yellow")
-            body.append(f" ├─ relations:     {exp['relations']:.2f}\n", style="dim yellow")
-            body.append(f" ├─ type_boost:    {exp['type_boost']:.1f}x\n", style="dim yellow")
-            body.append(f" └─ recency_boost: {exp['recency_boost']:.1f}x\n", style="dim yellow")
+            body.append(f" ├─ final score:    {r['score']:.3f}\n", style="yellow")
+            body.append(f" ├─ lexical tfidf:  {exp.get('lexical_tfidf', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ lexical overlap:{exp.get('lexical_overlap', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ composite lex:  {exp.get('lexical_score', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ title:          {exp.get('title', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ metadata:       {exp.get('metadata', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ raw pagerank:   {exp.get('raw_pagerank', 0.0):.4f}\n", style="dim yellow")
+            body.append(f" ├─ normalized rel: {exp.get('normalized_relations', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ relations contr:{exp.get('relations_contribution', 0.0):.2f}\n", style="dim yellow")
+            body.append(f" ├─ type_boost:     {exp.get('type_boost', 1.0):.1f}x\n", style="dim yellow")
+            body.append(f" └─ recency_boost:  {exp.get('recency_boost', 1.0):.1f}x\n", style="dim yellow")
 
         if show_body:
             if filepath or r.get("related_ids") or r.get("relevant_evidence") or (show_debug and r.get("score_explain")):

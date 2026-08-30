@@ -159,7 +159,7 @@ def cmd_query(args):
         print(f"\n[{i}] {r['id']} ({r['type']}) — score={r['score']:.4f}  [{r.get('filename', '')}]")
         if getattr(args, "debug", False) and r.get("score_explain"):
             exp = r["score_explain"]
-            print(f"    debug: final={r['score']:.3f} | lexical={exp['lexical']:.2f} | title={exp['title']:.2f} | metadata={exp['metadata']:.2f} | relations={exp['relations']:.2f} | type_boost={exp['type_boost']:.1f} | recency_boost={exp['recency_boost']:.1f}")
+            print(f"    debug: final={r['score']:.3f} | tfidf={exp.get('lexical_tfidf', 0.0):.2f} | overlap={exp.get('lexical_overlap', 0.0):.2f} | title={exp.get('title', 0.0):.2f} | metadata={exp.get('metadata', 0.0):.2f} | raw_pr={exp.get('raw_pagerank', 0.0):.4f} | relations={exp.get('normalized_relations', 0.0):.2f} | type_boost={exp.get('type_boost', 1.0):.1f} | recency_boost={exp.get('recency_boost', 1.0):.1f}")
         if r.get("related_ids"):
             print(f"    relacionadas: {', '.join(r['related_ids'])}")
         if not args.no_body:
