@@ -9,6 +9,22 @@ assignees: ''
 ## Executive takeaway
 <!-- 2–4 lines: why this matters to TESSERA and what decision this card should enable. -->
 
+## Portfolio routing
+- **Type:** test-card | bug | benchmark | ADR | documentation
+- **Status:** triage | ready | running | blocked | decision
+- **Priority:** P0 | P1 | P2 | P3
+- **Phase:** M0 | M1 | M2 | M3 | M4 | M5
+- **Owner:**
+- **Parent epic:**
+- **Research source:**
+- **Depends on:** <!-- Closed Issues only when status=ready. -->
+- **Unlocks:**
+- **Timebox:**
+- **Compute budget:**
+
+## Decision question
+<!-- One binary or explicit multi-option decision. If there are several decisions, split the card. -->
+
 ## Em linguagem simples
 <!-- Explain the problem as if you were telling another engineer why we are trying this. -->
 
@@ -29,14 +45,26 @@ assignees: ''
 ### Experiment
 <!-- What will change, what stays fixed and what is the comparison/control? -->
 
+### Controls and fixed variables
+<!-- Dataset/version, fixture, seed, reader, candidate set, token budget and environment. -->
+
 ### Metrics
 <!-- Examples: Hit@k, MRR, nDCG, QA accuracy, evidence hit, tokens, latency, provenance correctness. -->
+
+- **Primary decision metric:**
+- **Quality/safety guardrails:**
+- **Cost:** p50/p95, tokens, storage growth and write amplification when applicable.
 
 ### Success criteria
 - [ ]
 
 ### Failure signals
 - [ ]
+
+### Stop criteria
+- [ ] Dependency, baseline or metric becomes ambiguous.
+- [ ] Timebox/compute budget is exhausted without new evidence.
+- [ ] A high-risk silent behavior or source mutation is found.
 
 ### Evidence
 <!-- Links to CI runs, benchmark artifacts, query outputs, screenshots or reproducible commands. -->
@@ -63,6 +91,9 @@ assignees: ''
 
 ## Dependencies
 <!-- Link Issues, not hidden TODOs. -->
+
+## Rollback
+<!-- Feature flag, data migration/rebuild and exact revert path. -->
 
 ## Example / expected behavior
 ```text
