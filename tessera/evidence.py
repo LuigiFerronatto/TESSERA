@@ -41,11 +41,11 @@ class EvidenceExtraction:
 
 @dataclass(frozen=True)
 class EvidenceRecord:
-    """One traceable claim-to-source record.
+    """One traceable claim-to-source-version record.
 
     ``evidence_id`` is deterministic for a memory/source-version/span tuple.
-    Editing the source creates a new evidence version while preserving the
-    stable memory and document identities supplied by Canonical Metadata.
+    Any source-document version change creates a new evidence version while
+    stable memory/document identity can remain unchanged.
     """
 
     schema_version: int
@@ -78,14 +78,19 @@ class EvidenceFreshness:
 def _evidence_fingerprint(
     memory_id: str,
     document_id: str,
+    document_hash: str,
     content_hash: str,
     start_line: Optional[int],
     end_line: Optional[int],
 ) -> str:
+    # document_hash is deliberately included: provenance identifies the exact
+    # source version, not merely an unchanged body. Frontmatter-only changes
+    # can alter semantics/retrieval and must therefore yield a new record.
     payload = "|".join(
         [
             memory_id,
             document_id,
+            document_hash,
             content_hash,
             str(start_line or ""),
             str(end_line or ""),
@@ -112,6 +117,7 @@ def evidence_from_canonical(
     fingerprint = _evidence_fingerprint(
         metadata.identity.id,
         source.document_id,
+        source.document_hash,
         source.content_hash,
         resolved_span.start_line,
         resolved_span.end_line,
@@ -134,15 +140,18 @@ def evidence_from_canonical(
 
 
 def locate_evidence_span(raw_text: str, evidence_text: str) -> EvidenceSpan:
-    """Resolve an exact 1-based line span for evidence text in a source file.
+    """Resolve an exact unambiguous 1-based line span for evidence text.
 
-    The match is literal and deterministic. If the exact evidence text cannot
-    be located, precision is not invented: ``(None, None)`` is returned.
+    Precision is never guessed. If the text is absent *or appears more than
+    once*, ``(None, None)`` is returned because the available evidence cannot
+    prove which occurrence the retriever intended.
     """
     if not evidence_text:
         return EvidenceSpan(None, None)
     start_offset = raw_text.find(evidence_text)
     if start_offset < 0:
+        return EvidenceSpan(None, None)
+    if raw_text.find(evidence_text, start_offset + 1) >= 0:
         return EvidenceSpan(None, None)
     end_offset = start_offset + len(evidence_text)
     start_line = raw_text.count("\n", 0, start_offset) + 1
@@ -157,7 +166,7 @@ def evidence_for_text(
     *,
     extraction_method: str = "paragraph_lexical",
 ) -> EvidenceRecord:
-    """Create query-aware evidence with exact span when it can be proven."""
+    """Create query-aware evidence with an exact span only when provable."""
     span = locate_evidence_span(raw_text, evidence_text)
     return evidence_from_canonical(
         metadata,
@@ -168,12 +177,7 @@ def evidence_for_text(
 
 
 def ledger_from_graph(graph: Any) -> "EvidenceLedger":
-    """Rebuild document-level evidence records from an indexed TESSERA graph.
-
-    Nodes without Canonical Metadata (tags/entities/legacy graph auxiliaries)
-    are intentionally ignored. This function proves the ledger is derived from
-    the index/source pipeline rather than becoming a second source of truth.
-    """
+    """Rebuild document-level evidence records from an indexed TESSERA graph."""
     ledger = EvidenceLedger()
     for _node_id, data in graph.nodes(data=True):
         canonical = data.get("canonical_metadata")
@@ -185,10 +189,9 @@ def ledger_from_graph(graph: Any) -> "EvidenceLedger":
 def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Attach structured provenance to real retrieval results without mutation.
 
-    This is the bridge used while Evidence Ledger is being integrated into the
-    engine contract. Every returned memory gets document-level ``provenance``.
-    A query-specific ``evidence`` record is present only when
-    ``relevant_evidence`` exists; no evidence snippet means ``evidence=None``.
+    Every canonical memory gets document-level ``provenance``. Query-specific
+    ``evidence`` exists only when ``relevant_evidence`` exists; an unresolved
+    or ambiguous source span remains explicitly null rather than fabricated.
     """
     enriched: List[Dict[str, Any]] = []
     for result in results:
@@ -221,7 +224,6 @@ def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> 
                 )
                 item["evidence"] = evidence.to_dict()
             except (OSError, UnicodeError):
-                # Never fabricate a span if the source cannot be read.
                 item["evidence"] = evidence_from_canonical(
                     canonical,
                     extraction_method=(item.get("evidence_info") or {}).get(
@@ -247,17 +249,10 @@ def verify_evidence_freshness(
     record: EvidenceRecord,
     storage_dir: str,
 ) -> EvidenceFreshness:
-    """Verify whether source evidence still points to the same source version.
+    """Verify whether evidence still points to the same exact source version.
 
-    Statuses:
-      - ``fresh``: file exists and both document/content hashes match.
-      - ``content_changed``: body changed.
-      - ``metadata_changed``: whole document changed but body stayed identical.
-      - ``missing_source``: source path no longer exists at the recorded path.
-
-    Rename/move reconciliation is intentionally handled by Canonical stable
-    identity before ledger reconstruction; this verifier audits one recorded
-    evidence version and does not guess alternate paths.
+    Statuses: ``fresh``, ``metadata_changed``, ``content_changed``,
+    ``missing_source``.
     """
     full_path = os.path.join(storage_dir, record.source.path.replace("/", os.sep))
     if not os.path.exists(full_path):
@@ -296,12 +291,7 @@ def verify_evidence_freshness(
 
 
 class EvidenceLedger:
-    """Small deterministic in-memory ledger with stable serialization.
-
-    It is intentionally storage-agnostic in Foundation v0.1. Persisting a
-    separate authoritative ledger database would violate TESSERA's contract:
-    the source files are authoritative and this index must be reconstructible.
-    """
+    """Deterministic, derived in-memory ledger with stable serialization."""
 
     def __init__(self, records: Optional[Iterable[EvidenceRecord]] = None) -> None:
         self._records: Dict[str, EvidenceRecord] = {}
