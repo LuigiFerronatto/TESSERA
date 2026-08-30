@@ -242,6 +242,7 @@ jobs:
               print(f"- Gating regressions: **{comparison['summary']['gating_regressions']}**")
               print(f"- Query-level regressions: **{len(comparison['query_level']['regressions'])}**")
               print(f"- Retrieval signature match: **{comparison['determinism']['retrieval_signature_match']}**")
+              print(f"- Canonical-record environment drift: **{not comparison['baseline_runtime_drift']['retrieval_signature_match_versioned_record']}**")
           else:
               print("- Result: infrastructure or benchmark failure; inspect the failed step.")
           PY

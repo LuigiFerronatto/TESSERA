@@ -253,8 +253,11 @@ def compare_query_artifacts(
 
 
 def validate_artifacts_match_record(
-    record: Mapping[str, Any], directory: Path
-) -> None:
+    record: Mapping[str, Any],
+    directory: Path,
+    *,
+    require_result_equivalence: bool,
+) -> Mapping[str, Any]:
     derived = record_from_artifacts(
         directory,
         record_id="runtime-validation",
@@ -270,13 +273,14 @@ def validate_artifacts_match_record(
             f"record={record['measured_commit']!r}, "
             f"artifact={derived['measured_commit']!r}"
         )
-    if record["metrics"] != derived["metrics"]:
+    if require_result_equivalence and record["metrics"] != derived["metrics"]:
         raise ValueError("artifact non-latency metrics do not match record")
-    if (
+    if require_result_equivalence and (
         record["determinism"]["retrieval_result_sha256"]
         != derived["determinism"]["retrieval_result_sha256"]
     ):
         raise ValueError("artifact retrieval-result signature does not match record")
+    return derived
 
 
 def compare_records(
@@ -334,9 +338,30 @@ def compare_records(
     if baseline_artifacts is not None or candidate_artifacts is not None:
         if baseline_artifacts is None or candidate_artifacts is None:
             raise ValueError("query-level comparison requires both artifact directories")
-        validate_artifacts_match_record(baseline, baseline_artifacts)
-        validate_artifacts_match_record(candidate, candidate_artifacts)
+        baseline_runtime = validate_artifacts_match_record(
+            baseline,
+            baseline_artifacts,
+            require_result_equivalence=False,
+        )
+        validate_artifacts_match_record(
+            candidate,
+            candidate_artifacts,
+            require_result_equivalence=True,
+        )
         query_level = compare_query_artifacts(baseline_artifacts, candidate_artifacts)
+        baseline_runtime_drift = {
+            "available": True,
+            "metrics_match_versioned_record": (
+                baseline_runtime["metrics"] == baseline["metrics"]
+            ),
+            "retrieval_signature_match_versioned_record": (
+                baseline_runtime["determinism"]["retrieval_result_sha256"]
+                == baseline["determinism"]["retrieval_result_sha256"]
+            ),
+            "runtime_retrieval_result_sha256": baseline_runtime["determinism"][
+                "retrieval_result_sha256"
+            ],
+        }
     else:
         query_level = {
             "available": False,
@@ -345,6 +370,12 @@ def compare_records(
             "improvements": [],
             "regressions": [],
             "no_semantic_change_count": 0,
+        }
+        baseline_runtime_drift = {
+            "available": False,
+            "metrics_match_versioned_record": None,
+            "retrieval_signature_match_versioned_record": None,
+            "runtime_retrieval_result_sha256": None,
         }
     provenance_regression = (
         candidate["metrics"]["provenance_coverage"]
@@ -402,6 +433,7 @@ def compare_records(
         },
         "provenance": {"regression": provenance_regression},
         "query_level": query_level,
+        "baseline_runtime_drift": baseline_runtime_drift,
         "summary": {
             "gating_regressions": gating_regressions,
             "threshold_failures": threshold_failures,

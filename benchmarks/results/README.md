@@ -36,6 +36,12 @@ definitions, token counting, and adapter version must match exactly. Errors name
 the incompatible field. Same-commit repeatability compares normalized hashes;
 cross-commit evaluation compares compatible metrics and the retrieval-result
 signature because Git provenance legitimately changes the normalized payload.
+When query-level artifacts are requested, CI reconstructs the frozen baseline
+commit in the candidate runner and compares the two implementations in the same
+environment. Any difference between that reconstruction and the historical
+compact record is reported separately as environment/dependency drift; #96 did
+not record enough dependency/platform detail to claim those environments are
+identical.
 
 Recall@K measures expected evidence sessions recovered, not answer accuracy.
 Evidence hit rate measures positive questions with at least one expected session

@@ -340,6 +340,26 @@ def test_candidate_artifact_ingestion_repeatability_and_query_deltas(tmp_path):
     )
     assert equivalent["query_level"]["no_semantic_change_count"] == 50
 
+    historical_drift = changed(first, "metrics.average_context_characters", 101.0)
+    historical_drift = changed(
+        historical_drift,
+        "determinism.retrieval_result_sha256",
+        "0" * 64,
+    )
+    drift_comparison = compare_records(
+        historical_drift,
+        second,
+        baseline_artifacts=first_dir,
+        candidate_artifacts=second_dir,
+    )
+    assert drift_comparison["baseline_runtime_drift"] == {
+        "available": True,
+        "metrics_match_versioned_record": False,
+        "retrieval_signature_match_versioned_record": False,
+        "runtime_retrieval_result_sha256": retrieval_result_sha256(first_dir),
+    }
+    assert drift_comparison["decision"] == "KEEP"
+
     changed_dir = _write_artifacts(
         tmp_path / "changed",
         retrieved_session="session-b",

@@ -58,7 +58,10 @@ Same-commit runs compare normalized payload hashes after removing only creation
 timestamps, latency fields, and absolute temporary paths. Cross-commit runs may
 have different provenance hashes, so they compare compatible configuration,
 selected-query order, aggregate metrics, and provenance-aware retrieval-result
-signatures.
+signatures. For query-level isolation, CI reruns the frozen baseline commit in
+the candidate environment. Drift between that reconstruction and the historical
+record is reported separately because #96 did not record a fully pinned package
+and platform environment; it is not silently attributed to candidate code.
 
 Recall measures expected evidence sessions recovered; it is not answer
 accuracy. Abstention retrieval emptiness is diagnostic only. The 50-query slice
