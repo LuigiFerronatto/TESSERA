@@ -101,6 +101,111 @@ TESSERA use:
 
 ---
 
+# Additional long-term memory research
+
+## LiveMem
+
+**Paper:** *LiveMem: Maintaining Memory State Continuity in Long-Running LLM Inference*  
+ArXiv: https://arxiv.org/abs/2608.02515  
+Published: 2026-08-03
+
+Source signal:
+- treats state continuity under context turnover as distinct from retrieving selected history;
+- maintains a fixed-capacity recurrent memory state while the active KV context remains bounded;
+- combines context turnover, memory-oriented post-training and state-aware serving.
+
+TESSERA interpretation:
+- distinguishes intrinsic model-state continuity from TESSERA's external, text-first evidence layer;
+- motivates lifecycle tests in which supporting evidence leaves the active context but must remain recoverable;
+- does not justify coupling TESSERA to one model architecture or serving stack.
+
+Status: reference for future continuity evaluation; not an implemented intrinsic-memory capability.
+
+---
+
+## FinPerMA
+
+**Paper:** *FinPerMA: A Theory-Informed, Event-Grounded Personalized-Memory Benchmark for LLM Agents*  
+ArXiv: https://arxiv.org/abs/2608.04095  
+Published: 2026-08-04
+
+Source signal:
+- event-grounded evaluation over frozen longitudinal investor trajectories;
+- a Post-Shock checkpoint tests whether a material event updates the persistent user model;
+- 2,994 questions from 276 personas;
+- reported results show factual summaries can preserve details while losing preference signals needed after shocks.
+
+TESSERA interpretation:
+- personalized memory must be evaluated on state transitions, not only fact recall;
+- preference updates need temporal evidence, explicit supersession/conflict handling and before/after checkpoints;
+- the financial domain is a benchmark setting, not a claim that TESSERA is a financial-advice system.
+
+Status: candidate benchmark pattern for temporal preference-update tests; no FinPerMA adapter implemented.
+
+---
+
+## Persistent Memory and User Profiles
+
+**Paper:** *Enabling Personalized Long-term Interactions in LLM-based Agents through Persistent Memory and User Profiles*  
+ArXiv: https://arxiv.org/abs/2510.07925  
+Published: 2025-10-09
+
+Source signal:
+- derives technical requirements from a unified personalization definition;
+- combines persistent memory, evolving user profiles, multi-source retrieval, dynamic coordination and self-validation;
+- evaluates the framework on three public datasets and a five-day pilot user study.
+
+TESSERA interpretation:
+- a user profile is a derived, evolving view over evidence rather than a replacement for source memories;
+- profile updates should preserve provenance, validation state and the evidence that caused the change;
+- response personalization remains the consuming agent's responsibility.
+
+Status: architecture reference for future user-state/profile synthesis; not implemented as a profile engine.
+
+---
+
+## State Contamination
+
+**Paper:** *State Contamination in Memory-Augmented LLM Agents*  
+ArXiv: https://arxiv.org/abs/2605.16746  
+Published: 2026-05-16
+
+Source signal:
+- persistent transcripts, summaries, retrieved context and memory buffers create a state-control safety surface;
+- unsafe influence can survive compression in a less visibly toxic summary, described as memory laundering;
+- sanitizing state before summarization is reported as more effective than cleaning only the completed summary.
+
+TESSERA interpretation:
+- provenance alone is insufficient if contaminated content is normalized into trusted persistent state;
+- ingestion, derivation and retrieval need separate safety assessments and lineage;
+- derived summaries must not silently gain more authority than their source evidence.
+
+Status: safety reference for future contamination and derivation-lineage Test Cards; no complete sanitization policy implemented.
+
+---
+
+## MemORAI
+
+**Paper:** *MemORAI: Memory Organization and Retrieval via Adaptive Graph Intelligence for LLM Conversational Agents*  
+ACL Anthology: https://aclanthology.org/2026.findings-acl.1408/  
+ArXiv: https://arxiv.org/abs/2605.01386  
+Published: Findings of ACL 2026
+
+Source signal:
+- selective memory filtering with dual-layer compression;
+- provenance-enriched multi-relational graphs with turn-level factual origins;
+- query-adaptive subgraph retrieval using dynamically weighted PageRank;
+- evaluation on LOCOMO and LongMemEval.
+
+TESSERA interpretation:
+- selective storage, evidence provenance and query-conditioned traversal are separable controls;
+- turn-level origin supports the Evidence Ledger direction;
+- adaptive graph weighting should be compared against lexical, no-expansion and bounded-expansion baselines before adoption.
+
+Status: research reference for #25/#26 and future storage-gating experiments; adaptive PageRank is not implemented.
+
+---
+
 # Recent research signals mapped to Test Cards
 
 ## GraphMemix
