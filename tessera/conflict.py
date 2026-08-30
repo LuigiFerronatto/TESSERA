@@ -30,8 +30,8 @@ class ConflictResolver:
             mem_type = memory.get("type")
             frontmatter = memory.get("frontmatter", {})
 
-            # Procedural anchors don't suffer temporal obsolescence like preferences do.
-            if mem_type == "procedural_anchor":
+            # Procedural anchors and non-memory instructions do not suffer temporal obsolescence like facts/preferences.
+            if mem_type not in ("factual", "preference") or frontmatter.get("drawer") is None:
                 resolved.append(memory)
                 continue
 

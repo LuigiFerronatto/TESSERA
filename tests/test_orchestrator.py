@@ -19,12 +19,12 @@ def test_install_default_skills_are_retrievable():
         assert results[0]["id"] == "sk_docker_environment"
 
 
-def test_orchestrator_full_pipeline_with_simulated_llm():
+def test_orchestrator_full_pipeline_with_simulated_llm(fake_llm):
     with tempfile.TemporaryDirectory() as tmp:
         engine = TesseraEngine(storage_dir=tmp)
         install_default_skills(engine)
 
-        orchestrator = TesseraOrchestrator(engine)
+        orchestrator = TesseraOrchestrator(engine, llm_fn=fake_llm)
         result = orchestrator.run("Como faço deploy seguro de um container docker?", top_n=2)
 
         assert result.information_need
