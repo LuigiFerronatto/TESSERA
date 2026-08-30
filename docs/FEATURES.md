@@ -109,13 +109,7 @@ Current ranking combines inspectable signals such as:
 
 The purpose is not to claim full semantic retrieval. The purpose is to make ranking behavior measurable and debuggable.
 
-Known limitation:
-
-```text
-pq o LAO existe?
-```
-
-can still place the intended `lao/charter` result at #2 instead of #1. This remains visible in the sanity baseline rather than being hidden by query-specific tuning.
+The project-agnostic sanity fixture includes both direct and colloquial purpose queries. A paraphrase can still rank the intended charter memory below another relevant candidate because the current retrieval path remains strongly lexical. That limitation is kept visible rather than hidden by query-specific tuning.
 
 ---
 
@@ -145,10 +139,10 @@ Every canonical indexed memory can be mapped to deterministic evidence records.
 
 ```yaml
 evidence_id: ev_...
-memory_id: mem_...
+memory_id: project/charter
 source:
   document_id: doc_...
-  path: ...
+  path: project/charter.md
   document_hash: ...
   content_hash: ...
   format: markdown
@@ -238,15 +232,6 @@ should it become durable memory at all?
 
 Those broader questions are the planned #19 **evidence-aware memory admission / advanced write gating** Test Card.
 
-So:
-
-```text
-basic heuristic hostile-pattern sanitization  IMPLEMENTED
-full evidence-aware memory admission           PLANNED (#19)
-```
-
-This distinction matters because documenting all write gating as “future” understates current behavior, while calling the current regex/tag gate a complete memory-admission system would overstate it.
-
 ---
 
 ## 9. Deterministic CI and sanity evaluation
@@ -264,17 +249,7 @@ sanity retrieval evaluation
 
 The sanity evaluator measures Hit@1/3/5, MRR, evidence hit rate, latency, returned context size and missing-evidence behavior.
 
-Current regression baseline:
-
-```text
-Hit@1          75%
-Hit@3         100%
-Hit@5         100%
-MRR           0.875
-Evidence hit  100%
-```
-
-This is a regression guard, **not** a competitive benchmark. LongMemEval is tracked separately in #18.
+The public fixture is synthetic and project-agnostic. Its metrics are regression guards, **not** competitive benchmark claims. LongMemEval is tracked separately in #18.
 
 ---
 
@@ -301,20 +276,26 @@ write_memory_note
 Still experimental/planned:
 
 ```text
-incremental indexing                          #12
-metadata doctor                               #13
-query-aware graph expansion                   #25
-relation confidence                           #26
-temporal state / state keys                   #15
-conflict resolution                           #16
-evidence/source arbitration                   #27
-authority + instruction precedence            #32
-4-state sufficiency / abstention               #20
-LongMemEval                                    #18
-renderer ablation                              #28
-adaptive retrieval                             #17
-evidence-aware memory admission / advanced gate #19
-experience learning                            #21
+Engine/CLI/MCP contract parity              #68
+incremental indexing                         #12
+plain-text ingestion                         #69
+structural segmentation                      #70
+metadata doctor                              #13
+query-aware graph expansion                  #25
+relation confidence                          #26
+temporal state / state keys                  #15
+harness adapters / instruction resolver      #71/#72
+authority + instruction precedence           #32
+source revision history                      #73
+conflict resolution                          #16
+evidence/source arbitration                  #27
+4-state sufficiency / abstention              #20
+LongMemEval                                   #18
+renderer ablation                             #28
+adaptive retrieval                            #17
+core vs optional LLM orchestrator boundary   #74
+evidence-aware memory admission              #19
+experience learning                           #21
 ```
 
 ---
