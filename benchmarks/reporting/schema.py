@@ -5,8 +5,12 @@ import re
 from datetime import datetime
 from typing import Any, Dict, Mapping, Optional, Sequence, Set
 
+from .environment import environment_fingerprint
 
-SCHEMA_VERSION = "1.0.0"
+
+HISTORICAL_SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+SUPPORTED_SCHEMA_VERSIONS = {HISTORICAL_SCHEMA_VERSION, SCHEMA_VERSION}
 BENCHMARK = "LongMemEval V1"
 PROFILE = "longmemeval-v1-dev-50"
 DECISIONS = {"KEEP", "ITERATE", "REVERT", "DROP", "PENDING"}
@@ -27,13 +31,14 @@ METRIC_RANGES = {
     "average_context_tokens": (0.0, None),
 }
 
-RECORD_FIELDS = {
+HISTORICAL_RECORD_FIELDS = {
     "schema_version", "record_id", "benchmark", "profile", "issue",
     "pull_request", "decision", "measured_commit", "merge_commit",
     "parent_record_id", "retrieval_contract_commit", "dataset",
     "configuration", "selection", "determinism", "metrics", "latency",
     "cost", "environment", "limitations", "created_at",
 }
+RECORD_FIELDS = HISTORICAL_RECORD_FIELDS | {"parent_commit", "execution"}
 DATASET_FIELDS = {
     "name", "revision", "source_url", "upstream_commit", "sha256",
     "query_count", "positive_count", "abstention_count",
@@ -52,7 +57,17 @@ LATENCY_FIELDS = {
     "total_indexing_latency_ms", "query_latency_p50_ms", "query_latency_p95_ms",
 }
 COST_FIELDS = {"api_calls", "llm_calls", "estimated_usd"}
-ENVIRONMENT_FIELDS = {"python_version", "platform", "repository_dirty"}
+HISTORICAL_ENVIRONMENT_FIELDS = {"python_version", "platform", "repository_dirty"}
+ENVIRONMENT_FIELDS = {
+    "python_implementation", "python_version", "python_full_version", "os",
+    "platform", "architecture", "numpy_version", "scipy_version",
+    "scikit_learn_version", "networkx_version", "pyyaml_version",
+    "repository_dirty", "repository_root", "constraints_file",
+    "constraints_sha256", "fingerprint_sha256", "complete",
+}
+EXECUTION_FIELDS = {"role", "event_name", "event_identity", "run_id", "run_attempt"}
+EXECUTION_ROLES = {"candidate", "parent", "canonical", "forward", "local"}
+EVENT_NAMES = {"pull_request", "push", "schedule", "workflow_dispatch", "local"}
 
 
 def _fail(path: str, message: str) -> None:
@@ -148,12 +163,21 @@ def validate_record(record: Mapping[str, Any]) -> None:
     the complete runtime configuration of future retrieval experiments; it must
     still contain only deterministic JSON values and is compared by exact value.
     """
-    record = _object(record, "record", RECORD_FIELDS)
-    if record["schema_version"] != SCHEMA_VERSION:
+    if not isinstance(record, Mapping):
+        _fail("record", "must be an object")
+    schema_version = record.get("schema_version")
+    if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         _fail(
             "record.schema_version",
-            f"unsupported version {record['schema_version']!r}; expected {SCHEMA_VERSION!r}",
+            f"unsupported version {schema_version!r}; expected one of "
+            f"{sorted(SUPPORTED_SCHEMA_VERSIONS)!r}",
         )
+    historical = schema_version == HISTORICAL_SCHEMA_VERSION
+    record = _object(
+        record,
+        "record",
+        HISTORICAL_RECORD_FIELDS if historical else RECORD_FIELDS,
+    )
     _string(record["record_id"], "record.record_id")
     if record["benchmark"] != BENCHMARK:
         _fail("record.benchmark", f"must be {BENCHMARK!r}")
@@ -166,7 +190,33 @@ def validate_record(record: Mapping[str, Any]) -> None:
     _git_sha(record["measured_commit"], "record.measured_commit")
     _git_sha(record["merge_commit"], "record.merge_commit", nullable=True)
     _string(record["parent_record_id"], "record.parent_record_id", nullable=True)
+    if not historical:
+        _git_sha(record["parent_commit"], "record.parent_commit", nullable=True)
     _git_sha(record["retrieval_contract_commit"], "record.retrieval_contract_commit")
+
+    if not historical:
+        execution = _object(record["execution"], "record.execution", EXECUTION_FIELDS)
+        if execution["role"] not in EXECUTION_ROLES:
+            _fail("record.execution.role", f"unsupported role {execution['role']!r}")
+        if execution["event_name"] not in EVENT_NAMES:
+            _fail(
+                "record.execution.event_name",
+                f"unsupported event {execution['event_name']!r}",
+            )
+        _string(execution["event_identity"], "record.execution.event_identity")
+        _string(execution["run_id"], "record.execution.run_id", nullable=True)
+        if execution["run_attempt"] is not None:
+            _integer(execution["run_attempt"], "record.execution.run_attempt", 1)
+        if execution["event_name"] == "pull_request":
+            _integer(record["issue"], "record.issue", 1)
+            _integer(record["pull_request"], "record.pull_request", 1)
+        elif execution["event_name"] != "local" and (
+            record["issue"] != 0 or record["pull_request"] != 0
+        ):
+            _fail(
+                "record.execution",
+                "non-PR events must use issue=0 and pull_request=0 with event identity",
+            )
 
     dataset = _object(record["dataset"], "record.dataset", DATASET_FIELDS)
     _string(dataset["name"], "record.dataset.name")
@@ -265,15 +315,43 @@ def validate_record(record: Mapping[str, Any]) -> None:
         _fail("record.cost.estimated_usd", "must be >= 0")
 
     environment = _object(
-        record["environment"], "record.environment", ENVIRONMENT_FIELDS
+        record["environment"],
+        "record.environment",
+        HISTORICAL_ENVIRONMENT_FIELDS if historical else ENVIRONMENT_FIELDS,
     )
-    _string(environment["python_version"], "record.environment.python_version", nullable=True)
-    _string(environment["platform"], "record.environment.platform", nullable=True)
-    _boolean(
-        environment["repository_dirty"],
-        "record.environment.repository_dirty",
-        nullable=True,
-    )
+    if historical:
+        _string(
+            environment["python_version"],
+            "record.environment.python_version",
+            nullable=True,
+        )
+        _string(environment["platform"], "record.environment.platform", nullable=True)
+        _boolean(
+            environment["repository_dirty"],
+            "record.environment.repository_dirty",
+            nullable=True,
+        )
+    else:
+        for name in ENVIRONMENT_FIELDS - {
+            "repository_dirty", "constraints_sha256", "fingerprint_sha256", "complete"
+        }:
+            _string(environment[name], f"record.environment.{name}")
+        _boolean(environment["repository_dirty"], "record.environment.repository_dirty")
+        if environment["repository_dirty"]:
+            _fail("record.environment.repository_dirty", "must be false for ledger records")
+        _boolean(environment["complete"], "record.environment.complete")
+        if not environment["complete"]:
+            _fail("record.environment.complete", "must be true for schema 1.1.0 records")
+        _sha256(environment["constraints_sha256"], "record.environment.constraints_sha256")
+        _sha256(environment["fingerprint_sha256"], "record.environment.fingerprint_sha256")
+        expected_fingerprint = environment_fingerprint(environment)
+        if environment["fingerprint_sha256"] != expected_fingerprint:
+            _fail(
+                "record.environment.fingerprint_sha256",
+                "does not match normalized environment fields",
+            )
+        if environment["repository_root"] != ".":
+            _fail("record.environment.repository_root", "must be the stable identifier '.'")
     if not isinstance(record["limitations"], list) or not all(
         isinstance(item, str) and item for item in record["limitations"]
     ):

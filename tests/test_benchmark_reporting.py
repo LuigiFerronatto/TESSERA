@@ -14,6 +14,11 @@ from benchmarks.reporting.compare import (
     metric_delta,
     validate_compatibility,
 )
+from benchmarks.reporting.environment import (
+    collect_environment,
+    environment_fingerprint,
+    validate_environment_reference,
+)
 from benchmarks.reporting.records import (
     assert_no_restricted_content,
     load_record,
@@ -23,7 +28,11 @@ from benchmarks.reporting.records import (
     validate_output_path,
 )
 from benchmarks.reporting.render import render_comparison, render_record
-from benchmarks.reporting.schema import SCHEMA_VERSION, validate_record
+from benchmarks.reporting.schema import (
+    HISTORICAL_SCHEMA_VERSION,
+    SCHEMA_VERSION,
+    validate_record,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -213,7 +222,8 @@ def _record(directory: Path, *, record_id: str, repeat: Path = None):
 
 
 def test_baseline_json_schema_validation_and_closed_contract(baseline):
-    assert baseline["schema_version"] == SCHEMA_VERSION
+    assert baseline["schema_version"] == HISTORICAL_SCHEMA_VERSION
+    assert SCHEMA_VERSION == "1.1.0"
     schema = json.loads((ROOT / "benchmarks/results/schema.json").read_text())
     assert schema["$schema"].endswith("2020-12/schema")
     assert schema["additionalProperties"] is False
@@ -406,8 +416,11 @@ def test_versioned_outputs_contain_no_restricted_benchmark_content(baseline):
     ],
 )
 def test_pr_applicability_parsing(level, rationale):
-    body = f"Benchmark applicability: {level}\nBenchmark rationale: {rationale}\n"
-    assert parse_applicability(body)["applicability"] == level
+    issue = "Benchmark issue: #100\n" if level == "REQUIRED" else ""
+    body = f"Benchmark applicability: {level}\n{issue}Benchmark rationale: {rationale}\n"
+    parsed = parse_applicability(body)
+    assert parsed["applicability"] == level
+    assert parsed["benchmark_issue"] == (100 if level == "REQUIRED" else None)
 
 
 @pytest.mark.parametrize(
@@ -422,6 +435,24 @@ def test_pr_applicability_parsing(level, rationale):
         ("Benchmark applicability: NOT_APPLICABLE\n", "rationale is required"),
         ("Benchmark applicability: required\n", "missing benchmark applicability"),
         ("Benchmark applicability: REQUIRED\x00\n", "NUL byte"),
+        ("Benchmark applicability: REQUIRED\n", "missing Benchmark issue"),
+        (
+            "Benchmark applicability: REQUIRED\nBenchmark issue: #100\n"
+            "Benchmark issue: #101\n",
+            "multiple Benchmark issue",
+        ),
+        (
+            "Benchmark applicability: REQUIRED\nBenchmark issue: issue-100\n",
+            "malformed Benchmark issue",
+        ),
+        (
+            "Benchmark applicability: REQUIRED\nBenchmark issue: #abc\n",
+            "malformed Benchmark issue",
+        ),
+        (
+            "Benchmark applicability: REQUIRED\nBenchmark issue: #0\n",
+            "malformed Benchmark issue",
+        ),
     ],
 )
 def test_invalid_or_malformed_pr_applicability_is_rejected(body, message):
@@ -439,6 +470,12 @@ def test_ci_workflow_syntax_and_least_privilege():
     assert "prepare_dataset" in text
     assert DATASET_SHA256 in text
     assert "ref: ${{ env.CANDIDATE_SHA }}" in text
+    assert "github.event.pull_request.base.sha" in text
+    assert "parent-comparison.json" in text
+    assert "canonical-comparison.json" in text
+    assert 'python-version: "3.12.14"' in text
+    assert 'pip install -c "$CONSTRAINTS_PATH"' in text
+    assert "--issue 100" not in text
 
 
 def test_artifact_path_validation_rejects_escape_and_symlink(tmp_path):
@@ -464,3 +501,103 @@ def test_pr_template_requires_benchmark_declaration():
     template = (ROOT / ".github/pull_request_template.md").read_text(encoding="utf-8")
     assert "Benchmark applicability: REQUIRED | SMOKE_ONLY | NOT_APPLICABLE" in template
     assert "Benchmark rationale:" in template
+    assert "Benchmark issue: #" in template
+
+
+def test_current_record_captures_complete_injectable_environment(tmp_path):
+    directory = _write_artifacts(tmp_path / "artifacts")
+    probe_values = {
+        "python_implementation": "CPython",
+        "python_version": "3.12.14",
+        "python_full_version": "3.12.14 pinned",
+        "os": "Linux",
+        "platform": "Linux-test",
+        "architecture": "x86_64",
+        "numpy_version": "2.5.2",
+        "scipy_version": "1.18.1",
+        "scikit_learn_version": "1.9.0",
+        "networkx_version": "3.6.1",
+        "pyyaml_version": "6.0.3",
+    }
+    environment = collect_environment(
+        ROOT / "benchmarks/longmemeval_v1/constraints-ci.txt",
+        repository_dirty=False,
+        repository_root=ROOT,
+        probe=lambda: probe_values,
+    )
+    first = record_from_artifacts(
+        directory,
+        record_id="candidate/injected",
+        issue=100,
+        pull_request=102,
+        decision="PENDING",
+        parent_record_id="parent/one",
+        parent_commit="a" * 40,
+        execution_role="candidate",
+        event_name="pull_request",
+        event_identity="pull_request:123:1:commit",
+        run_id="123",
+        run_attempt=1,
+        environment=environment,
+    )
+    second = record_from_artifacts(
+        directory,
+        record_id="candidate/injected",
+        issue=100,
+        pull_request=102,
+        decision="PENDING",
+        parent_record_id="parent/one",
+        parent_commit="a" * 40,
+        execution_role="candidate",
+        event_name="pull_request",
+        event_identity="pull_request:123:1:commit",
+        run_id="123",
+        run_attempt=1,
+        environment=environment,
+    )
+    assert first == second
+    assert first["schema_version"] == SCHEMA_VERSION
+    assert first["issue"] == 100
+    assert first["pull_request"] == 102
+    assert first["parent_commit"] == "a" * 40
+    assert first["environment"]["complete"] is True
+    assert first["environment"]["fingerprint_sha256"] == environment_fingerprint(
+        first["environment"]
+    )
+    validate_record(first)
+
+
+def test_non_pr_identity_cannot_be_misattributed_to_an_issue(tmp_path):
+    directory = _write_artifacts(tmp_path / "artifacts")
+    record = _record(directory, record_id="local/record")
+    record["execution"]["event_name"] = "schedule"
+    record["execution"]["event_identity"] = "schedule:123:1:commit"
+    with pytest.raises(ValueError, match="non-PR events must use issue=0"):
+        validate_record(record)
+
+
+def test_immediate_parent_gate_rejects_regression_hidden_by_canonical(baseline):
+    canonical = changed(baseline, "metrics.recall_at_10", 0.80)
+    parent = changed(canonical, "metrics.recall_at_10", 0.95)
+    parent = changed(parent, "measured_commit", "a" * 40)
+    parent = changed(parent, "record_id", "parent/a")
+    candidate = changed(parent, "metrics.recall_at_10", 0.90)
+    candidate = changed(candidate, "measured_commit", "b" * 40)
+    candidate = changed(candidate, "record_id", "candidate/b")
+    assert compare_records(canonical, candidate)["decision"] == "KEEP"
+    assert compare_records(parent, candidate)["decision"] == "ITERATE"
+
+
+def test_shared_runner_drift_cannot_hide_from_forward_reference(tmp_path):
+    first_dir = _write_artifacts(tmp_path / "first")
+    parent = _record(first_dir, record_id="parent/current")
+    candidate = copy.deepcopy(parent)
+    candidate["record_id"] = "candidate/current"
+    forward = copy.deepcopy(parent)
+    forward["record_id"] = "forward/pinned"
+
+    parent["environment"]["fingerprint_sha256"] = "0" * 64
+    candidate["environment"]["fingerprint_sha256"] = "0" * 64
+    assert compare_records(parent, candidate)["decision"] == "KEEP"
+    with pytest.raises(ValueError, match="forward benchmark environment drift"):
+        validate_environment_reference(candidate, forward)

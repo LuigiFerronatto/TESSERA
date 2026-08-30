@@ -31,8 +31,10 @@ def _value(value: Any) -> str:
 
 def render_record(record: Mapping[str, Any]) -> str:
     metrics = record["metrics"]
+    role = record.get("execution", {}).get("role")
+    title_kind = "canonical dev-50 baseline" if role is None else f"{role} dev-50 record"
     lines = [
-        f"# {record['benchmark']} — canonical dev-50 baseline",
+        f"# {record['benchmark']} — {title_kind}",
         "",
         "> Retrieval-only development record. It does not measure final-answer correctness,",
         "> run a reader, call an LLM judge, or represent the official full-500 result.",
@@ -63,6 +65,21 @@ def render_record(record: Mapping[str, Any]) -> str:
         "| Metric | Value |",
         "| --- | ---: |",
     ]
+    if role is not None:
+        insertion = lines.index("## Experimental profile")
+        environment = record["environment"]
+        lines[insertion:insertion] = [
+            f"- Parent commit: `{record['parent_commit']}`",
+            f"- Execution: `{record['execution']['event_name']}` / "
+            f"`{record['execution']['event_identity']}` / `{role}`",
+            f"- Python: `{environment['python_implementation']} "
+            f"{environment['python_version']}`",
+            f"- Platform: `{environment['platform']}` / "
+            f"`{environment['architecture']}`",
+            f"- Constraints SHA-256: `{environment['constraints_sha256']}`",
+            f"- Environment fingerprint: `{environment['fingerprint_sha256']}`",
+            "",
+        ]
     for name, label in METRIC_LABELS.items():
         lines.append(f"| {label} | {_value(metrics[name])} |")
     lines.extend(
@@ -179,7 +196,15 @@ def render_comparison(comparison: Mapping[str, Any]) -> str:
             f"- Determinism regression: `{_value(comparison['determinism']['regression'])}`",
             f"- Reconstructed baseline metrics match the versioned record: `{_value(comparison['baseline_runtime_drift']['metrics_match_versioned_record'])}`",
             f"- Reconstructed baseline retrieval signature matches the versioned record: `{_value(comparison['baseline_runtime_drift']['retrieval_signature_match_versioned_record'])}`",
-            "- A reconstructed-baseline drift is reported separately from candidate code deltas because the canonical record did not capture a fully pinned dependency/platform environment.",
+            f"- Baseline environment complete: `{_value(comparison['environment_context']['baseline_complete'])}`",
+            f"- Candidate environment complete: `{_value(comparison['environment_context']['candidate_complete'])}`",
+            f"- Environment fingerprint match: `{_value(comparison['environment_context']['fingerprint_match'])}`",
+            (
+                "- Historical context drift is reported separately because the #96 "
+                "record did not capture a fully pinned dependency/platform environment."
+                if comparison["environment_context"]["historical_context_incomplete"]
+                else "- Both records use the same complete pinned environment fingerprint."
+            ),
             "",
             "## 9. Provenance",
             "",

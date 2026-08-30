@@ -8,6 +8,7 @@ from typing import Any, Dict, Mapping, Optional
 from benchmarks.longmemeval_v1.run import compare_runs, reproducibility_payload
 from benchmarks.longmemeval_v1.schemas import validate_artifact_bundle
 
+from .environment import collect_environment
 from .schema import METRIC_RANGES, PROFILE, SCHEMA_VERSION, validate_record
 
 
@@ -154,8 +155,17 @@ def record_from_artifacts(
     pull_request: int,
     decision: str,
     parent_record_id: Optional[str],
+    parent_commit: Optional[str] = None,
     merge_commit: Optional[str] = None,
     repeat_directory: Optional[Path] = None,
+    execution_role: str = "local",
+    event_name: str = "local",
+    event_identity: str = "local-unspecified",
+    run_id: Optional[str] = None,
+    run_attempt: Optional[int] = None,
+    constraints_path: Optional[Path] = None,
+    repository_root: Optional[Path] = None,
+    environment: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     artifacts = load_artifact_bundle(directory)
     manifest = artifacts["manifest"]
@@ -169,6 +179,16 @@ def record_from_artifacts(
         equivalent = compare_runs(directory, repeat_directory)
         run_count = 2
 
+    root = repository_root or Path(__file__).resolve().parents[2]
+    constraints = constraints_path or (
+        root / "benchmarks/longmemeval_v1/constraints-ci.txt"
+    )
+    captured_environment = dict(environment) if environment is not None else collect_environment(
+        constraints,
+        repository_dirty=bool(manifest.get("repository_dirty")),
+        repository_root=root,
+    )
+
     record = {
         "schema_version": SCHEMA_VERSION,
         "record_id": record_id,
@@ -180,7 +200,15 @@ def record_from_artifacts(
         "measured_commit": manifest["tessera_commit"],
         "merge_commit": merge_commit,
         "parent_record_id": parent_record_id,
+        "parent_commit": parent_commit,
         "retrieval_contract_commit": manifest["retrieval_contract_commit"],
+        "execution": {
+            "role": execution_role,
+            "event_name": event_name,
+            "event_identity": event_identity,
+            "run_id": run_id,
+            "run_attempt": run_attempt,
+        },
         "dataset": {
             "name": manifest["dataset_file"],
             "revision": manifest["benchmark_version"],
@@ -225,11 +253,7 @@ def record_from_artifacts(
             "query_latency_p95_ms": metrics.get("query_latency_p95_ms"),
         },
         "cost": {"api_calls": 0, "llm_calls": 0, "estimated_usd": 0},
-        "environment": {
-            "python_version": manifest.get("python_version"),
-            "platform": None,
-            "repository_dirty": manifest.get("repository_dirty"),
-        },
+        "environment": captured_environment,
         "limitations": list(scorecard.get("limitations", [])),
         "created_at": manifest["created_at"],
     }

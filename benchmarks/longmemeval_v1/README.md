@@ -115,6 +115,12 @@ dataset, selection, adapter, metric, and retrieval configuration, then compare
 metrics and a retrieval-result signature that excludes timestamps and Git
 provenance.
 
+Benchmark CI installs with the versioned `constraints-ci.txt` under Python
+3.12.14. New ledger records capture the complete forward environment
+fingerprint. The #96 record remains the unchanged historical retrieval baseline
+with an explicitly incomplete environment; `forward.json` is the separate
+pinned-environment drift reference.
+
 CI prepares the dataset through `prepare_dataset.py`, the single authoritative
 atomic download/checksum path. Cache hits are verified just like downloads, and
 network, cache, upstream, or checksum failures remain explicit infrastructure

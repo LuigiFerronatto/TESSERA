@@ -160,10 +160,11 @@ metrics, frozen inputs, configuration, commit provenance, cost, and hashes; it
 does not commit the dataset, questions, answers, ground-truth mappings, or full
 result bundles.
 
-Every pull request declares benchmark applicability. Offline reporting checks
-run for every PR, while retrieval-affecting `REQUIRED` changes run the frozen
-50-query profile twice and compare it with the canonical baseline. Main and a
-weekly schedule provide drift detection. These scores measure evidence
+Every pull request declares benchmark applicability and, when `REQUIRED`, its
+Test Card issue. Offline reporting checks run for every PR; the frozen 50-query
+profile runs twice, gates against the exact PR base SHA, and reports the
+historical #96 comparison separately. A pinned forward-environment fingerprint
+supports main and weekly drift detection. These scores measure evidence
 retrieval, not final-answer correctness; reader and judge evaluation remain
 separate future layers.
 

@@ -32,7 +32,6 @@ LATENCY_METRICS = {
 GATING_METRICS = set(HIGHER_IS_BETTER)
 
 COMPATIBILITY_PATHS = (
-    "schema_version",
     "benchmark",
     "profile",
     "dataset.name",
@@ -66,7 +65,15 @@ def _path(record: Mapping[str, Any], dotted: str) -> Any:
 def validate_compatibility(
     baseline: Mapping[str, Any], candidate: Mapping[str, Any]
 ) -> Sequence[str]:
-    checked = []
+    baseline_major = baseline["schema_version"].split(".", 1)[0]
+    candidate_major = candidate["schema_version"].split(".", 1)[0]
+    if baseline_major != candidate_major:
+        raise ValueError(
+            "incompatible field schema_version: "
+            f"baseline={baseline['schema_version']!r}, "
+            f"candidate={candidate['schema_version']!r}"
+        )
+    checked = ["schema_version (compatible 1.x ledger contracts)"]
     for dotted in COMPATIBILITY_PATHS:
         baseline_value = _path(baseline, dotted)
         candidate_value = _path(candidate, dotted)
@@ -76,6 +83,18 @@ def validate_compatibility(
                 f"candidate={candidate_value!r}"
             )
         checked.append(dotted)
+    baseline_environment = baseline["environment"]
+    candidate_environment = candidate["environment"]
+    if baseline_environment.get("complete") and candidate_environment.get("complete"):
+        for field in ("constraints_sha256", "fingerprint_sha256"):
+            dotted = f"environment.{field}"
+            if baseline_environment[field] != candidate_environment[field]:
+                raise ValueError(
+                    f"incompatible field {dotted}: "
+                    f"baseline={baseline_environment[field]!r}, "
+                    f"candidate={candidate_environment[field]!r}"
+                )
+            checked.append(dotted)
     return checked
 
 
@@ -310,6 +329,14 @@ def compare_records(
         and candidate["latency"]["comparable_environment"]
         and baseline["environment"] == candidate["environment"]
     )
+    baseline_environment_complete = bool(baseline["environment"].get("complete"))
+    candidate_environment_complete = bool(candidate["environment"].get("complete"))
+    environment_fingerprint_match = (
+        baseline["environment"].get("fingerprint_sha256")
+        == candidate["environment"].get("fingerprint_sha256")
+        if baseline_environment_complete and candidate_environment_complete
+        else None
+    )
     latency = {"comparable_environment": comparable_latency, "metrics": {}}
     for name in baseline["latency"]:
         if name == "comparable_environment":
@@ -417,6 +444,12 @@ def compare_records(
             "measured_commit": candidate["measured_commit"],
         },
         "compatibility": {"compatible": True, "checked_fields": list(checked)},
+        "environment_context": {
+            "baseline_complete": baseline_environment_complete,
+            "candidate_complete": candidate_environment_complete,
+            "fingerprint_match": environment_fingerprint_match,
+            "historical_context_incomplete": not baseline_environment_complete,
+        },
         "metrics": metrics,
         "latency": latency,
         "cost": cost,

@@ -1,0 +1,18 @@
+# LongMemEval V1 dev-50 CI environment (Python 3.12.14, Linux x86_64).
+# Update deliberately and establish a new forward reference in the same PR.
+iniconfig==2.3.0
+joblib==1.5.3
+markdown-it-py==4.2.0
+mdurl==0.1.2
+narwhals==2.25.0
+networkx==3.6.1
+numpy==2.5.2
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+pytest==9.1.1
+PyYAML==6.0.3
+rich==15.0.0
+scikit-learn==1.9.0
+scipy==1.18.1
+threadpoolctl==3.6.0

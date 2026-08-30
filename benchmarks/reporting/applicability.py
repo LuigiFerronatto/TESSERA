@@ -4,7 +4,7 @@ import argparse
 import os
 import re
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 
 LEVELS = {"REQUIRED", "SMOKE_ONLY", "NOT_APPLICABLE"}
@@ -13,9 +13,11 @@ DECLARATION_RE = re.compile(
     re.MULTILINE,
 )
 RATIONALE_RE = re.compile(r"^\s*Benchmark rationale:\s*(.+?)\s*$", re.MULTILINE)
+ISSUE_RE = re.compile(r"^\s*Benchmark issue:\s*#([1-9][0-9]*)\s*$", re.MULTILINE)
+ISSUE_PREFIX_RE = re.compile(r"^\s*Benchmark issue\s*:", re.MULTILINE | re.IGNORECASE)
 
 
-def parse_applicability(body: str) -> Dict[str, str]:
+def parse_applicability(body: str) -> Dict[str, Any]:
     if not isinstance(body, str):
         raise ValueError("PR body must be text")
     if len(body.encode("utf-8")) > 1_000_000:
@@ -39,7 +41,24 @@ def parse_applicability(body: str) -> Dict[str, str]:
     rationale = rationales[-1].strip() if rationales else ""
     if level in {"SMOKE_ONLY", "NOT_APPLICABLE"} and not rationale:
         raise ValueError(f"Benchmark rationale is required for {level}")
-    return {"applicability": level, "rationale": rationale}
+    issue_lines = ISSUE_PREFIX_RE.findall(body)
+    issues = ISSUE_RE.findall(body)
+    if len(issue_lines) != len(issues):
+        raise ValueError(
+            "malformed Benchmark issue metadata; use exactly: Benchmark issue: #<number>"
+        )
+    if len(issues) > 1:
+        raise ValueError(f"multiple Benchmark issue declarations found: {len(issues)}")
+    if level == "REQUIRED" and not issues:
+        raise ValueError(
+            "missing Benchmark issue metadata for REQUIRED; add exactly: "
+            "Benchmark issue: #<number>"
+        )
+    return {
+        "applicability": level,
+        "rationale": rationale,
+        "benchmark_issue": int(issues[0]) if issues else None,
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -62,6 +81,7 @@ def main() -> None:
     if args.github_output:
         with args.github_output.open("a", encoding="utf-8") as handle:
             handle.write(f"applicability={parsed['applicability']}\n")
+            handle.write(f"benchmark_issue={parsed['benchmark_issue'] or 0}\n")
     print(parsed["applicability"])
 
 

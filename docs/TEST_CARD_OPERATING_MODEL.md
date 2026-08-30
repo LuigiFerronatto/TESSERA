@@ -68,6 +68,11 @@ Every pull request declares exactly one benchmark level:
 - `NOT_APPLICABLE` for documentation, governance, branding, or non-executable
   repository metadata. A rationale is mandatory.
 
+A `REQUIRED` PR also declares exactly one validated numeric Test Card identity
+as `Benchmark issue: #<number>`. CI records that issue and the actual PR number.
+Push, schedule, and manual runs instead record their explicit GitHub event/run
+identity and do not inherit a historical Test Card number.
+
 The declaration and PR evidence are authoritative and reviewable; a filename by
 itself does not decide applicability. See [`BENCHMARK_CI.md`](BENCHMARK_CI.md)
 for CI tiers, frozen inputs, and failure semantics.

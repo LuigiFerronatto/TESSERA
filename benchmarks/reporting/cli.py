@@ -6,6 +6,7 @@ from pathlib import Path
 
 from benchmarks.longmemeval_v1.run import compare_runs
 
+from .environment import validate_environment_reference
 from .records import (
     load_record,
     normalized_artifact_sha256,
@@ -43,8 +44,15 @@ def _record(args: argparse.Namespace) -> None:
         pull_request=args.pull_request,
         decision=args.decision,
         parent_record_id=args.parent_record_id,
+        parent_commit=args.parent_commit,
         merge_commit=args.merge_commit,
         repeat_directory=args.repeat_artifact_dir,
+        execution_role=args.execution_role,
+        event_name=args.event_name,
+        event_identity=args.event_identity,
+        run_id=args.run_id,
+        run_attempt=args.run_attempt,
+        constraints_path=args.constraints,
     )
     write_json(args.output, record)
     if not record["determinism"]["equivalent"]:
@@ -75,6 +83,15 @@ def _path(args: argparse.Namespace) -> None:
     print(validate_output_path(args.path, args.allowed_root))
 
 
+def _environment(args: argparse.Namespace) -> None:
+    record = load_record(args.record)
+    reference = load_record(args.reference)
+    result = validate_environment_reference(record, reference)
+    if args.output:
+        write_json(args.output, result)
+    print(json.dumps(result, sort_keys=True))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -100,7 +117,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="PENDING",
     )
     record.add_argument("--parent-record-id")
+    record.add_argument("--parent-commit")
     record.add_argument("--merge-commit")
+    record.add_argument(
+        "--execution-role",
+        choices=("candidate", "parent", "canonical", "forward", "local"),
+        default="local",
+    )
+    record.add_argument(
+        "--event-name",
+        choices=("pull_request", "push", "schedule", "workflow_dispatch", "local"),
+        default="local",
+    )
+    record.add_argument("--event-identity", default="local-unspecified")
+    record.add_argument("--run-id")
+    record.add_argument("--run-attempt", type=int)
+    record.add_argument(
+        "--constraints",
+        type=Path,
+        default=Path("benchmarks/longmemeval_v1/constraints-ci.txt"),
+    )
     record.add_argument("--output", type=Path, required=True)
     record.set_defaults(function=_record)
 
@@ -114,6 +150,12 @@ def build_parser() -> argparse.ArgumentParser:
     path.add_argument("--path", type=Path, required=True)
     path.add_argument("--allowed-root", type=Path, required=True)
     path.set_defaults(function=_path)
+
+    environment = commands.add_parser("validate-environment")
+    environment.add_argument("--record", type=Path, required=True)
+    environment.add_argument("--reference", type=Path, required=True)
+    environment.add_argument("--output", type=Path)
+    environment.set_defaults(function=_environment)
     return parser
 
 

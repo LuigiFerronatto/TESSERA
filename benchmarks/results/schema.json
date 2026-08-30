@@ -11,8 +11,14 @@
     "configuration", "selection", "determinism", "metrics", "latency",
     "cost", "environment", "limitations", "created_at"
   ],
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": "1.1.0"}}},
+      "then": {"required": ["parent_commit", "execution"]}
+    }
+  ],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"enum": ["1.0.0", "1.1.0"]},
     "record_id": {"type": "string", "minLength": 1},
     "benchmark": {"const": "LongMemEval V1"},
     "profile": {"const": "longmemeval-v1-dev-50"},
@@ -22,7 +28,9 @@
     "measured_commit": {"$ref": "#/$defs/gitSha"},
     "merge_commit": {"anyOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
     "parent_record_id": {"type": ["string", "null"], "minLength": 1},
+    "parent_commit": {"anyOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
     "retrieval_contract_commit": {"$ref": "#/$defs/gitSha"},
+    "execution": {"$ref": "#/$defs/execution"},
     "dataset": {"$ref": "#/$defs/dataset"},
     "configuration": {"$ref": "#/$defs/configuration"},
     "selection": {"$ref": "#/$defs/selection"},
@@ -140,7 +148,25 @@
         "estimated_usd": {"$ref": "#/$defs/nonNegativeNumber"}
       }
     },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "event_name", "event_identity", "run_id", "run_attempt"],
+      "properties": {
+        "role": {"enum": ["candidate", "parent", "canonical", "forward", "local"]},
+        "event_name": {"enum": ["pull_request", "push", "schedule", "workflow_dispatch", "local"]},
+        "event_identity": {"type": "string", "minLength": 1},
+        "run_id": {"type": ["string", "null"], "minLength": 1},
+        "run_attempt": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
     "environment": {
+      "oneOf": [
+        {"$ref": "#/$defs/historicalEnvironment"},
+        {"$ref": "#/$defs/forwardEnvironment"}
+      ]
+    },
+    "historicalEnvironment": {
       "type": "object",
       "additionalProperties": false,
       "required": ["python_version", "platform", "repository_dirty"],
@@ -148,6 +174,30 @@
         "python_version": {"type": ["string", "null"]},
         "platform": {"type": ["string", "null"]},
         "repository_dirty": {"type": ["boolean", "null"]}
+      }
+    },
+    "forwardEnvironment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_implementation", "python_version", "python_full_version", "os", "platform", "architecture", "numpy_version", "scipy_version", "scikit_learn_version", "networkx_version", "pyyaml_version", "repository_dirty", "repository_root", "constraints_file", "constraints_sha256", "fingerprint_sha256", "complete"],
+      "properties": {
+        "python_implementation": {"type": "string", "minLength": 1},
+        "python_version": {"type": "string", "minLength": 1},
+        "python_full_version": {"type": "string", "minLength": 1},
+        "os": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "numpy_version": {"type": "string", "minLength": 1},
+        "scipy_version": {"type": "string", "minLength": 1},
+        "scikit_learn_version": {"type": "string", "minLength": 1},
+        "networkx_version": {"type": "string", "minLength": 1},
+        "pyyaml_version": {"type": "string", "minLength": 1},
+        "repository_dirty": {"const": false},
+        "repository_root": {"const": "."},
+        "constraints_file": {"type": "string", "minLength": 1},
+        "constraints_sha256": {"$ref": "#/$defs/sha256"},
+        "fingerprint_sha256": {"$ref": "#/$defs/sha256"},
+        "complete": {"const": true}
       }
     }
   }
