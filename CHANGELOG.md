@@ -14,6 +14,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ### Changed
 - Root README is now the progressive product entrypoint: executive first, plain-language explanation next, technical details and experimental roadmap deeper down. ([#82](https://github.com/LuigiFerronatto/TESSERA/pull/82))
 - Package metadata and MCP runtime configuration are TESSERA-native and standalone. The canonical MCP storage variable is now `TESSERA_STORAGE_DIR`. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
+- Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
 - Public package metadata no longer points to an external development repository or publishes an external project identity as the package author. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
@@ -29,8 +30,9 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Architecture Decisions
 - TESSERA's public product boundary is project-agnostic: public docs, examples, fixtures, benchmarks and runtime-facing configuration must describe TESSERA itself rather than a development environment. ([#62](https://github.com/LuigiFerronatto/TESSERA/issues/62))
-- Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
+- Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
 - The root README describes **implemented capabilities separately from hypotheses/Test Cards**. ([#63](https://github.com/LuigiFerronatto/TESSERA/issues/63))
+- Product-history updates are curated manually; CI may enforce explicit changelog consideration but must not synthesize entries from commits. ([#65](https://github.com/LuigiFerronatto/TESSERA/issues/65))
 
 ---
 
