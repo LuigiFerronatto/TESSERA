@@ -1,121 +1,471 @@
-# Arquitetura do Tessera
+# TESSERA — Architecture
 
-> Este documento consolida o racional científico e o design técnico do Tessera.
-> Para o "como usar" (instalação, CLI, exemplos), veja o [README](../README.md).
-> Para a explicação linha a linha das classes/métodos, veja [CODE_EXPLANATION.md](CODE_EXPLANATION.md).
-> Para o conceito de âncoras procedimentais em detalhe, veja [PROCEDURAL_ANCHORS.md](PROCEDURAL_ANCHORS.md).
+> Current architecture reference for the Foundation on `main`.
+>
+> - Product overview: [OVERVIEW.md](OVERVIEW.md)
+> - Implemented capabilities: [FEATURES.md](FEATURES.md)
+> - Core vocabulary: [CONCEPTS.md](CONCEPTS.md)
+> - Query examples: [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md)
+> - Experimental roadmap: [ROADMAP.md](ROADMAP.md)
+> - Research / competitors: [research/](research/)
 
-## Por que não RAG plano
+## Executive takeaway
 
-Buscas vetoriais planas (RAG tradicional) sofrem três problemas em agentes de
-longa duração como o LAO:
+TESSERA is not a final-answer engine and it is not “GraphRAG with a different name”. It is a **text-first, agent-agnostic memory and evidence layer**.
 
-1. **Saturação de contexto** — histórico bruto de diálogo cresce sem limite.
-2. **Desalinhamento temporal** — preferências antigas competem com as atuais
-   sem nenhum critério de recência.
-3. **Propagação de ruído** — blocos de texto isolados, sem estrutura de
-   relacionamento, poluem a recuperação com resultados semanticamente
-   próximos mas irrelevantes.
+The current Foundation does four things especially deliberately:
 
-O Tessera responde a isso com uma abordagem híbrida: cada memória é um **cartão
-atômico** (Markdown + YAML frontmatter) e a recuperação usa um **grafo de
-conhecimento heterogêneo** com PageRank ponderado dinamicamente, não apenas
-similaridade de cosseno.
+1. understands heterogeneous text through a canonical model;
+2. keeps memory identity separate from file location and source version;
+3. retrieves with inspectable multi-signal ranking and query-specific evidence;
+4. can prove where retrieved evidence came from through the Evidence Ledger.
 
-## Os quatro pilares científicos
+Advanced graph expansion, temporal state, authority, conflict arbitration, abstention and adaptive retrieval remain Test Cards — they are not represented here as implemented capabilities.
 
-| # | Pilar | Problema de origem | Solução no Tessera |
-|---|-------|---------------------|------------------|
-| 1 | **Decomposição de Memória Tipada** (QUMem) | Logs brutos saturam o contexto | Notas classificadas em `factual`, `preference`, `procedural_anchor` |
-| 2 | **Âncoras Procedimentais** (Skills as Anchors) | Agentes falham em setup/sintaxe básicos | Nós `procedural_anchor` com checklists e known pitfalls |
-| 3 | **Recuperação Adaptativa por Subgrafo (DW-PR)** (MemORAI) | RAG plano traz ruído irrelevante | Seed nodes → expansão 1-hop → PageRank ponderado dinamicamente |
-| 4 | **Gating de Escrita** (anti State Contamination) | "Memory laundering" contamina o agente | Sanitização e auditoria antes de qualquer escrita em disco |
+---
 
-## Fluxo de dados
+# Product contract
 
-```
-[ Ingestão / Escrita ]
-Conteúdo bruto ──► WriteGatingEngine (audit_and_sanitize)
-                 ──► MemoryFrontmatter (YAML)
-                 ──► Gravação física em memories/{id}.md
-
-[ Recuperação ]
-Query ──► TF-IDF cosine similarity (seed nodes, top 30)
-       ──► Expansão de subgrafo 1-hop (successors + predecessors)
-       ──► Pesos dinâmicos de aresta (DW-PR, boost 1.35x em relações procedurais)
-       ──► PageRank personalizado nos seed nodes
-       ──► Filtro: apenas nós factual/preference/procedural_anchor
-       ──► ConflictResolver (mantém só a nota mais recente por assunto)
-       ──► top_n memórias retornadas
+```text
+AGENT
+  │ natural-language information need
+  ▼
+TESSERA
+  │ hides storage/index/graph/provenance mechanics
+  ▼
+STRUCTURED EVIDENCE
+  │ evidence + source + relations + score/provenance
+  ▼
+AGENT
+  └─ reasons / acts / answers
 ```
 
-## Mapeamento código → conceito
+TESSERA abstracts memory architecture away from the consuming agent while preserving enough evidence and provenance for the agent to audit and navigate what was retrieved.
 
-| Classe / módulo | Responsabilidade |
+---
+
+# Architectural invariants
+
+- Source text remains the source of truth.
+- Indexes, manifests, graph snapshots and evidence ledgers are derived/rebuildable state.
+- Exactly three semantic drawers exist: `facts`, `preferences`, `insights`.
+- Non-memory documents may be indexed with `drawer: null`.
+- `document_type`, scope, authority, confidence, temporal state, relations, quality and utility are facets — not new drawers.
+- Retrieval relevance is not semantic confidence, authority or utility.
+- A file path is location, not identity.
+- A hash represents a version/fingerprint, not identity.
+- No generative LLM is mandatory for the basic Foundation path.
+- TESSERA does not silently rewrite user source files during indexing.
+
+---
+
+# Current data pipeline
+
+```text
+TEXT FILES
+   │
+   ▼
+DISCOVER
+   │
+   ▼
+PARSE + CANONICAL NORMALIZATION
+   ├─ complete / partial / absent frontmatter
+   ├─ document classification
+   ├─ semantic drawer when applicable
+   ├─ metadata_origin
+   ├─ scope
+   └─ explicit/local relations
+   │
+   ▼
+STABLE IDENTITY
+   ├─ identity.id
+   ├─ source.document_id
+   ├─ source.path
+   ├─ document_hash
+   └─ content_hash
+   │
+   ▼
+GRAPH / INDEX
+   ├─ memory/document nodes
+   ├─ tag/entity structure
+   ├─ explicit relations
+   └─ lexical corpus / TF-IDF
+   │
+   ▼
+RETRIEVAL
+   ├─ lexical TF-IDF
+   ├─ token overlap
+   ├─ title / ID relevance
+   ├─ metadata relevance
+   ├─ graph/PageRank structural signal
+   └─ deterministic intent/type boost
+   │
+   ▼
+QUERY-AWARE EVIDENCE
+   ├─ relevant paragraph when supported
+   └─ None instead of arbitrary evidence when unsupported
+   │
+   ▼
+EVIDENCE LEDGER / PROVENANCE
+   ├─ evidence_id
+   ├─ source document identity
+   ├─ source version hashes
+   ├─ exact span when uniquely provable
+   └─ freshness state
+   │
+   ▼
+STRUCTURED RETRIEVAL RESULT
+```
+
+---
+
+# 1. Canonical Metadata Layer
+
+**Tracking:** Issue #9 / PR #3
+
+Projects contain heterogeneous text: normal Markdown, notes without frontmatter, harness instructions, project context and other reference documents. TESSERA normalizes these into one canonical representation before indexing.
+
+Conceptually:
+
+```yaml
+identity:
+  id: lao/charter
+
+classification:
+  document_type: memory
+  kind: factual
+  drawer: facts
+
+source:
+  document_id: doc_...
+  path: lao/charter.md
+  format: markdown
+
+metadata_origin:
+  drawer: inferred
+  document_type: inferred
+```
+
+For harness instructions:
+
+```yaml
+classification:
+  document_type: harness_instructions
+  kind: instruction
+  drawer: null
+```
+
+This lets `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` participate in the knowledge layer without being forced into a semantic memory drawer.
+
+---
+
+# 2. Stable identity model
+
+The architecture separates four axes:
+
+```text
+identity.id
+→ persistent knowledge/memory identity
+
+source.document_id
+→ persistent source-document identity
+
+source.path
+→ current source location
+
+document_hash / content_hash
+→ current source/content version
+```
+
+Expected lifecycle:
+
+```text
+MOVE / RENAME
+identity.id        SAME
+source.document_id SAME
+source.path        CHANGED
+content_hash       SAME
+```
+
+```text
+CONTENT EDIT
+identity.id        SAME
+source.document_id SAME
+source.path        SAME
+content_hash       CHANGED
+```
+
+This separation is the substrate for provenance today and for incremental/temporal lifecycle later.
+
+---
+
+# 3. Graph representation
+
+TESSERA already represents explicit relations and graph structure, but the graph is **not the final relevance engine**.
+
+Current role:
+
+```text
+explicit/local relations
+        ↓
+knowledge graph
+        ↓
+PageRank / structural signal
+        ↓
+one component of retrieval ranking
+```
+
+Not implemented yet:
+
+```text
+query-aware graph expansion      #25
+relation confidence/validation   #26
+controlled evidence budget       #25
+typed-relation ablations          #14
+```
+
+The architecture intentionally separates:
+
+```text
+relation_type
+≠ relation_origin
+≠ relation_confidence
+≠ query_relevance
+```
+
+---
+
+# 4. Explainable retrieval
+
+**Tracking:** Issue #8 / PR #2
+
+The Foundation retrieval ranker combines inspectable signals instead of allowing PageRank alone to determine relevance.
+
+Conceptually:
+
+```text
+FINAL RANKING
+  ← lexical TF-IDF
+  ← direct overlap
+  ← title / ID
+  ← metadata
+  ← normalized relation/PageRank signal
+  ← deterministic type/intent behavior
+```
+
+Recency is disabled by default because recent information is not necessarily current truth.
+
+The debug path exposes individual scoring signals so changes can be measured rather than guessed.
+
+### Known limitation
+
+The paraphrase:
+
+```text
+pq o LAO existe?
+```
+
+can still rank the intended charter memory at #2 instead of #1. This is deliberately retained as a sanity-baseline limitation; semantic/adaptive retrieval must prove itself through later ablations rather than query-specific tuning.
+
+---
+
+# 5. Query-aware Relevant Evidence
+
+Instead of forcing the consuming agent to treat an entire memory as equally relevant, TESSERA foregrounds a query-specific evidence span when lexical support exists.
+
+```text
+retrieved memory
+├─ relevant_evidence
+└─ full body
+```
+
+If evidence cannot be supported, the field remains `None`.
+
+This is **not yet** full Evidence Sufficiency/Abstention. The future four-state contract is tracked in #20:
+
+```text
+sufficient
+insufficient
+conflicting
+ambiguous
+```
+
+---
+
+# 6. Evidence Ledger
+
+**Tracking:** Issue #11 / PR #6
+
+The Evidence Ledger is an immutable/rebuildable provenance substrate derived from source files and Canonical Metadata.
+
+Example shape:
+
+```yaml
+evidence_id: ev_...
+memory_id: lao/charter
+source:
+  document_id: doc_...
+  path: lao/charter.md
+  document_hash: sha256:...
+  content_hash: sha256:...
+span:
+  start_line: 31
+  end_line: 37
+extraction:
+  method: paragraph_lexical
+```
+
+It answers:
+
+> Where did this evidence come from, and which source version supports it?
+
+It does **not** decide:
+
+- authority;
+- truth;
+- arbitration winner;
+- query relevance;
+- temporal validity.
+
+Those belong to later assessment/arbitration layers if their Test Cards succeed.
+
+### Precision rule
+
+If the same evidence text appears multiple times and the exact occurrence cannot be proven uniquely, TESSERA returns a null span rather than inventing precision.
+
+---
+
+# 7. Derived state and source of truth
+
+Conceptually:
+
+```text
+SOURCE FILES
+   │
+   ├─ canonical metadata
+   ├─ identity manifest
+   ├─ graph/index cache
+   └─ evidence ledger
+```
+
+Everything under the derived indexing layer must be rebuildable from source files.
+
+Current indexing still uses coarse rebuild/cache behavior. **Incremental and idempotent indexing is #12, not a current capability.**
+
+---
+
+# 8. CI and experimental governance
+
+**Tracking:** Issue #10 / PR #4 and Issue #22 / PR #24
+
+Every meaningful change is expected to go through:
+
+```text
+Issue / Test Card
+→ implementation PR
+→ unit / contract tests
+→ CLI smoke
+→ sanity retrieval evaluation
+→ evidence + learnings
+→ KEEP | ITERATE | REVERT | DROP | DEFER
+```
+
+Current deterministic sanity baseline:
+
+```text
+Hit@1          75%
+Hit@3         100%
+Hit@5         100%
+MRR           0.875
+Evidence hit  100%
+```
+
+These are regression metrics, not competitive quality claims.
+
+---
+
+# Current module map
+
+| Module | Current architectural role |
 |---|---|
-| `tessera.models.Entity`, `Connection`, `MemoryFrontmatter` | Modelo de domínio dos cartões atômicos |
-| `tessera.security.WriteGatingEngine` | Auditoria e sanitização antes da escrita física |
-| `tessera.conflict.ConflictResolver` | Resolução cronológica de preferências/fatos conflitantes |
-| `tessera.engine.TesseraEngine` | Orquestra escrita, indexação do grafo e recuperação (DW-PR) |
-| `tessera.cli` | Interface de linha de comando (`tessera init/write/index/query`) |
+| `tessera/canonical.py` | Canonical parsing, classification, normalization and stable metadata semantics |
+| `tessera/engine_core.py` | Core indexing, graph construction and retrieval implementation |
+| `tessera/engine.py` | Evidence-aware engine facade integrating core retrieval with provenance |
+| `tessera/evidence.py` | Evidence records, ledger construction, freshness and span/provenance helpers |
+| `tessera/conflict.py` | Existing conflict compatibility logic; future state/arbitration redesign remains experimental |
+| `tessera/models.py` | Core domain models used by memory/write paths |
+| `tessera/cli.py` | Human CLI surface |
+| `benchmarks/sanity/` | Deterministic regression evaluation, not competitive benchmark |
 
-## Estrutura física de memórias em disco
-
-```
-minha-app/
-└── memories/
-    ├── mem_fact_0312a.md      # Notas Factuais
-    ├── mem_pref_0892f.md      # Notas de Preferências
-    ├── sk_docker_setup_01.md  # Âncoras Procedimentais (Skills)
-```
-
-O índice do grafo é reconstruído em memória a cada `build_index()` — não há
-banco de dados externo. **Se você apagar o índice, os `.md` continuam
-100% legíveis e editáveis manualmente.** Essa é uma decisão deliberada de
-design (desacoplamento leitura/escrita).
-
-## Exemplo de nota física (`.md` com frontmatter)
-
-```markdown
----
-id: sk_docker_setup_01
-node_type: procedural_anchor
-tags: [docker, devops]
-entities:
-  - name: Docker
-    description: Motor de containers.
-active_connections:
-  - target_memory_id: ent_docker_daemon
-    relation_type: stabilizes_service
-security:
-  gating_status: passed
-  toxicity_score: 0.012
-  sanitized: true
 ---
 
-# Fluxo de Configuração de Containers Docker
+# What is implemented vs planned
 
-1. Verificar se o daemon está ativo (`docker info`).
-2. Validar presença do `docker-compose.yml`.
-3. Subir serviços com `docker-compose up -d --build`.
-4. Testar saúde do serviço (`curl localhost:8080/health`).
+## Implemented Foundation
 
-## Known Pitfalls
-* Rodar build antes do daemon estar ativo.
-* Conflito de hostnames locais com as pontes de rede do container.
+```text
+canonical text normalization
+stable memory identity
+stable source-document identity
+explicit relation parsing
+graph representation
+explainable multi-signal ranking
+query-aware relevant evidence
+Evidence Ledger / provenance
+CI + sanity evaluation
+Test Card governance
 ```
 
-## Diferenciais de produção
+## Planned / experimental
 
-- **Desacoplamento leitura/escrita** — o grafo é só um índice; os arquivos
-  `.md` são a fonte de verdade e sobrevivem à perda do índice.
-- **Alinhamento temporal (FinPerMA)** — trajetórias ordenadas de preferência
-  evitam que o agente regrida a escolhas obsoletas.
-- **Estabilidade de execução de tools** — âncoras procedimentais reduzem
-  drasticamente erros de setup/sintaxe comparado a injetar logs de erro brutos.
+```text
+#12 incremental/idempotent indexing
+#13 metadata doctor
+#14/#25/#26 controlled relations/graph intelligence
+#15 temporal model + state keys
+#16 conflict/supersession
+#27 Evidence Arbitration
+#32 source authority + instruction precedence
+#20 four-state evidence sufficiency/abstention
+#18 LongMemEval
+#28 rendering ablation
+#17 adaptive retrieval
+#19 write gating / memory admission
+#21 experience learning / utility feedback
+```
 
-## Histórico de versões
+Historical documents may describe some of these ideas as older prototypes. The current source of truth for product status is `FEATURES.md` + `ROADMAP.md` + the linked Test Cards.
 
-Veja [`archive/README.md`](../archive/README.md) para o histórico de v1 → v2 → v3
-e o que mudou em cada uma. O pacote `tessera/` atual consolida a v3 (a mais madura),
-dividida em módulos (`models.py`, `security.py`, `conflict.py`, `engine.py`, `cli.py`).
+---
+
+# Target architecture — only if experiments justify it
+
+```text
+QUERY
+  ↓
+Candidate Retrieval
+  ↓
+Seed Evidence
+  ↓
+Query-Aware Graph Expansion
+  ↓
+Relation Reliability
+  ↓
+Temporal Validity / State Keys
+  ↓
+Authority / Scope / Precedence
+  ↓
+Conflict Detection
+  ↓
+Evidence Arbitration
+  ↓
+Evidence Status
+  ↓
+Structured Renderer
+  ↓
+CONSUMING AGENT
+```
+
+This is a roadmap target, not current runtime behavior.
+
+The point of the Test Card process is that individual layers may be simplified or dropped if they do not improve measurable outcomes.
