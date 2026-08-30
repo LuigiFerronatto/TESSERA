@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">TESSERA repository social card</title>
+  <desc id="desc">Minimal dark repository card with the TESSERA logo, title and expanded name.</desc>
+  <defs>
+    <radialGradient id="bg" cx="82%" cy="18%" r="90%">
+      <stop offset="0" stop-color="#17143A"/>
+      <stop offset="0.35" stop-color="#0A0918"/>
+      <stop offset="1" stop-color="#030307"/>
+    </radialGradient>
+    <linearGradient id="tessera-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D7C9FF"/>
+      <stop offset="0.45" stop-color="#A988FF"/>
+      <stop offset="0.75" stop-color="#7F93FF"/>
+      <stop offset="1" stop-color="#6D4DFF"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <g transform="translate(105,115) scale(.72)">
+    <path d="M 256,66 L 247,195.3 L 230.5,206.5 L 166.1,214.8 L 248.1,216.3 L 252.3,245.5 L 93,249.6 L 252.3,253.8 L 250.8,285.6 L 166.1,286.7 L 232.4,296.1 L 246.6,306.2 L 256,446 L 265.4,306.6 L 281.1,295.7 L 345.9,286.7 L 261.2,286 L 259.7,253.8 L 419,249.6 L 259.7,245.5 L 262.7,216.7 L 345.9,214.8 L 281.5,206.5 L 265.7,196.4 Z" fill="url(#tessera-gradient)" filter="url(#glow)"/>
+  </g>
+  <text x="520" y="305" font-family="Michroma, Eurostile, Arial, sans-serif" font-size="100" letter-spacing="17" fill="url(#tessera-gradient)">TESSERA</text>
+  <text x="525" y="370" font-family="Inter, Manrope, Arial, sans-serif" font-size="25" letter-spacing="1.5" fill="#D8D4E5">Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories</text>
+</svg>
