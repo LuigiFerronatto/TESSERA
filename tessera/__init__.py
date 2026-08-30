@@ -52,7 +52,9 @@ from .evidence import (
     EvidenceRecord,
     EvidenceSource,
     EvidenceSpan,
+    evidence_for_text,
     evidence_from_canonical,
+    locate_evidence_span,
     verify_evidence_freshness,
 )
 
@@ -85,7 +87,9 @@ __all__ = [
     "EvidenceRecord",
     "EvidenceSource",
     "EvidenceSpan",
+    "evidence_for_text",
     "evidence_from_canonical",
+    "locate_evidence_span",
     "verify_evidence_freshness",
     "__version__",
 ]
