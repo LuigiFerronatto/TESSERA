@@ -1,17 +1,31 @@
-"""Canonical Metadata Model and Normalization for TESSERA.
+"""Canonical Metadata Model and normalization for TESSERA.
 
-Fulfills F2 (Canonical Metadata Model), F3 (Document Classification),
-F4 (Parser without Frontmatter), F5 (Stable Identity), and F7 (Explicit Relations).
+The source document remains the source of truth. This module provides a
+rebuildable, deterministic normalization layer for Markdown/TXT documents,
+including legacy/foreign frontmatter shapes used by existing projects.
 """
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 import datetime
 import hashlib
 import os
 import posixpath
 import re
 from typing import Any, Dict, List, Optional, Tuple
+
 import yaml
+
+
+DRAWERS = {"facts", "preferences", "insights"}
+NON_MEMORY_TYPES = {
+    "harness_instructions",
+    "skill_instructions",
+    "project_context",
+    "decision_record",
+    "experiment_record",
+    "report",
+    "reference",
+}
 
 
 @dataclass
@@ -22,9 +36,9 @@ class IdentityMetadata:
 
 @dataclass
 class ClassificationMetadata:
-    drawer: Optional[str]  # facts | preferences | insights | None (for non-memory documents)
-    kind: str    # e.g. factual, preference, procedural_anchor, instruction
-    document_type: str  # memory | harness_instructions | skill_instructions | project_context | decision_record | experiment_record | report | reference
+    drawer: Optional[str]
+    kind: str
+    document_type: str
 
 
 @dataclass
@@ -44,7 +58,7 @@ class SourceSpan:
 class SourceMetadata:
     document_id: str
     path: str
-    format: str  # markdown | text
+    format: str
     span: SourceSpan = field(default_factory=SourceSpan)
     document_hash: str = ""
     content_hash: str = ""
@@ -69,437 +83,444 @@ class QualityMetadata:
 class RelationMetadata:
     type: str
     target: str
-    origin: str  # explicit | inferred | generated
+    origin: str
 
 
 @dataclass
 class CanonicalMetadata:
     schema_version: int = 1
     identity: IdentityMetadata = field(default_factory=lambda: IdentityMetadata("", ""))
-    classification: ClassificationMetadata = field(default_factory=lambda: ClassificationMetadata("facts", "factual", "memory"))
+    classification: ClassificationMetadata = field(
+        default_factory=lambda: ClassificationMetadata("facts", "factual", "memory")
+    )
     scope: ScopeMetadata = field(default_factory=ScopeMetadata)
     source: SourceMetadata = field(default_factory=lambda: SourceMetadata("", "", "markdown"))
     temporal: TemporalMetadata = field(default_factory=TemporalMetadata)
     quality: QualityMetadata = field(default_factory=QualityMetadata)
     relations: List[RelationMetadata] = field(default_factory=list)
-    metadata_origin: Dict[str, str] = field(default_factory=dict)  # field_name -> explicit | inferred | default
-    
-    # Reserved optional fields
+    metadata_origin: Dict[str, str] = field(default_factory=dict)
     state_key: Optional[str] = None
     superseded_at: Optional[str] = None
     utility: Optional[float] = None
-    
-    # Preserve other fields from original frontmatter
     raw_frontmatter: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert canonical metadata to a clean nested dictionary structure."""
         return asdict(self)
 
     def is_content_equivalent(self, other: "CanonicalMetadata") -> bool:
-        """Compares body and content_hash only."""
-        if not isinstance(other, CanonicalMetadata):
-            return False
-        return self.source.content_hash == other.source.content_hash
+        return isinstance(other, CanonicalMetadata) and self.source.content_hash == other.source.content_hash
 
     def is_semantically_equivalent(self, other: "CanonicalMetadata") -> bool:
-        """
-        Compares semantic identity/content without considering operational metadata (indexed_at).
-        Considers body content, classification, scope, relevant temporal data, quality,
-        relations, state_key, superseded_at, utility, and relevant frontmatter metadata (tags/entities)
-        utilized by retrieval.
-        """
         if not isinstance(other, CanonicalMetadata):
             return False
-        
-        # Identity
-        if self.identity.id != other.identity.id or self.identity.name != other.identity.name:
+        if self.identity != other.identity or not self.is_content_equivalent(other):
             return False
-            
-        # Body content
-        if not self.is_content_equivalent(other):
+        if self.classification != other.classification or self.scope != other.scope:
             return False
-            
-        # Classification
-        if (self.classification.drawer != other.classification.drawer or 
-            self.classification.kind != other.classification.kind or 
-            self.classification.document_type != other.classification.document_type):
+        if (
+            self.temporal.observed_at,
+            self.temporal.valid_from,
+            self.temporal.valid_until,
+            self.temporal.recorded_at,
+        ) != (
+            other.temporal.observed_at,
+            other.temporal.valid_from,
+            other.temporal.valid_until,
+            other.temporal.recorded_at,
+        ):
             return False
-            
-        # Scope
-        if (self.scope.level != other.scope.level or 
-            self.scope.path != other.scope.path or 
-            self.scope.harness != other.scope.harness):
+        if self.quality != other.quality:
             return False
-            
-        # Temporal (except indexed_at)
-        if (self.temporal.observed_at != other.temporal.observed_at or 
-            self.temporal.valid_from != other.temporal.valid_from or 
-            self.temporal.valid_until != other.temporal.valid_until or 
-            self.temporal.recorded_at != other.temporal.recorded_at):
+        if sorted((r.type, r.target, r.origin) for r in self.relations) != sorted(
+            (r.type, r.target, r.origin) for r in other.relations
+        ):
             return False
-            
-        # Quality
-        if (self.quality.confidence != other.quality.confidence or 
-            self.quality.authority != other.quality.authority):
+        if (self.state_key, self.superseded_at, self.utility) != (
+            other.state_key,
+            other.superseded_at,
+            other.utility,
+        ):
             return False
-            
-        # Relations (ignoring order)
-        self_rels = sorted([(r.type, r.target, r.origin) for r in self.relations])
-        other_rels = sorted([(r.type, r.target, r.origin) for r in other.relations])
-        if self_rels != other_rels:
-            return False
-            
-        # State properties
-        if (self.state_key != other.state_key or 
-            self.superseded_at != other.superseded_at or 
-            self.utility != other.utility):
-            return False
-            
-        # Frontmatter tags/entities
-        self_tags = sorted(self.raw_frontmatter.get("tags", []))
-        other_tags = sorted(other.raw_frontmatter.get("tags", []))
-        if self_tags != other_tags:
-            return False
-            
-        self_ents = sorted([str(e.get("name", "")) for e in self.raw_frontmatter.get("entities", []) if isinstance(e, dict)])
-        other_ents = sorted([str(e.get("name", "")) for e in other.raw_frontmatter.get("entities", []) if isinstance(e, dict)])
-        if self_ents != other_ents:
-            return False
-            
-        return True
+        # Retrieval consumes tags/entities, including values supplied by legacy
+        # nested metadata. Compare the effective values, not only top-level YAML.
+        return _effective_tags(self.raw_frontmatter) == _effective_tags(other.raw_frontmatter) and _effective_entities(
+            self.raw_frontmatter
+        ) == _effective_entities(other.raw_frontmatter)
 
     def is_index_equivalent(self, other: "CanonicalMetadata") -> bool:
-        """Compares everything required for indexing (all semantic fields plus file paths and version hashes)."""
-        if not isinstance(other, CanonicalMetadata):
+        if not isinstance(other, CanonicalMetadata) or not self.is_semantically_equivalent(other):
             return False
-        if not self.is_semantically_equivalent(other):
-            return False
-        # Index parameters
-        if (self.source.document_id != other.source.document_id or
-            self.source.path != other.source.path or
-            self.source.format != other.source.format or
-            self.source.document_hash != other.source.document_hash):
-            return False
-        return True
+        return (
+            self.source.document_id,
+            self.source.path,
+            self.source.format,
+            self.source.document_hash,
+        ) == (
+            other.source.document_id,
+            other.source.path,
+            other.source.format,
+            other.source.document_hash,
+        )
 
 
 def compute_sha256(text: str) -> str:
-    """Computes the SHA-256 hash of a string."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persistent_id: Optional[str] = None, persistent_doc_id: Optional[str] = None) -> CanonicalMetadata:
+def _nested_metadata(frontmatter: Dict[str, Any]) -> Dict[str, Any]:
+    value = frontmatter.get("metadata")
+    return value if isinstance(value, dict) else {}
+
+
+def _first(frontmatter: Dict[str, Any], *keys: str) -> Any:
+    """Top-level canonical/native values win; nested metadata is compatibility fallback."""
+    nested = _nested_metadata(frontmatter)
+    for key in keys:
+        value = frontmatter.get(key)
+        if value is not None:
+            return value
+    for key in keys:
+        value = nested.get(key)
+        if value is not None:
+            return value
+    return None
+
+
+def _normalize_kind(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    raw = str(value).strip().lower().replace("-", "_").replace(" ", "_")
+    mapping = {
+        "fact": "factual",
+        "facts": "factual",
+        "factual": "factual",
+        "preference": "preference",
+        "preferences": "preference",
+        "learning": "procedural_anchor",
+        "insight": "procedural_anchor",
+        "insights": "procedural_anchor",
+        "procedure": "procedural_anchor",
+        "procedural": "procedural_anchor",
+        "procedural_anchor": "procedural_anchor",
+        "instruction": "instruction",
+        "instructions": "instruction",
+    }
+    return mapping.get(raw, raw)
+
+
+def _effective_tags(frontmatter: Dict[str, Any]) -> List[str]:
+    tags: List[str] = []
+    raw_tags = _first(frontmatter, "tags")
+    if isinstance(raw_tags, str):
+        tags.extend(t.strip() for t in raw_tags.split(",") if t.strip())
+    elif isinstance(raw_tags, list):
+        tags.extend(str(t).strip() for t in raw_tags if str(t).strip())
+
+    nested = _nested_metadata(frontmatter)
+    # Preserve the old foreign-frontmatter behavior where useful categorical
+    # metadata became searchable facets/tags.
+    for key in ("category", "phase", "topic"):
+        value = nested.get(key)
+        if isinstance(value, str) and value.strip():
+            tags.append(value.strip())
+        elif isinstance(value, list):
+            tags.extend(str(v).strip() for v in value if str(v).strip())
+    return sorted(set(tags))
+
+
+def _effective_entities(frontmatter: Dict[str, Any]) -> List[str]:
+    raw = _first(frontmatter, "entities")
+    values: List[str] = []
+    if isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, dict) and item.get("name"):
+                values.append(str(item["name"]).strip())
+            elif isinstance(item, str) and item.strip():
+                values.append(item.strip())
+    return sorted(set(values))
+
+
+def _split_markdown(raw_text: str) -> Tuple[Dict[str, Any], str]:
+    """Split YAML frontmatter from body without silently discarding malformed YAML.
+
+    Documents without a frontmatter opener remain valid. If a frontmatter block
+    is explicitly present but malformed, raise ValueError: silently treating it
+    as absent can change identity, drawer and graph relations.
     """
-    Parses raw text (with or without frontmatter) and builds a fully normalized
-    CanonicalMetadata model deterministically. Fulfills F3, F4, F5, F7.
-    """
-    # 1. Parse markdown frontmatter if present
+    # Preserve original body bytes/text as much as possible; do not strip the
+    # entire document before locating delimiters.
+    lines = raw_text.splitlines(keepends=True)
+    if not lines or lines[0].strip() != "---":
+        return {}, raw_text
+
+    closing = None
+    for idx in range(1, len(lines)):
+        if lines[idx].strip() == "---":
+            closing = idx
+            break
+    if closing is None:
+        raise ValueError("Malformed YAML frontmatter: opening '---' has no closing delimiter")
+
+    frontmatter_raw = "".join(lines[1:closing])
+    body = "".join(lines[closing + 1 :])
+    try:
+        parsed = yaml.safe_load(frontmatter_raw)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Malformed YAML frontmatter: {exc}") from exc
+    if parsed is None:
+        parsed = {}
+    if not isinstance(parsed, dict):
+        raise ValueError("Malformed YAML frontmatter: root must be a mapping")
+    return parsed, body
+
+
+def _infer_document_type(filename_lower: str) -> str:
+    harness_files = {
+        "claude.md",
+        "agents.md",
+        "gemini.md",
+        "copilot-instructions.md",
+    }
+    if filename_lower in harness_files:
+        return "harness_instructions"
+    if (
+        filename_lower == "skill.md"
+        or filename_lower.endswith(".skill.md")
+        or filename_lower.startswith("sk_")
+    ):
+        return "skill_instructions"
+    if "decision" in filename_lower or filename_lower.startswith("adr"):
+        return "decision_record"
+    if "experiment" in filename_lower:
+        return "experiment_record"
+    if "report" in filename_lower:
+        return "report"
+    if filename_lower == "readme.md":
+        return "project_context"
+    return "memory"
+
+
+def parse_and_normalize(
+    raw_text: str,
+    filepath: str,
+    storage_dir: str,
+    persistent_id: Optional[str] = None,
+    persistent_doc_id: Optional[str] = None,
+) -> CanonicalMetadata:
     frontmatter, body = _split_markdown(raw_text)
-    
-    # Get relative path for stable hash and ID generation
+    nested = _nested_metadata(frontmatter)
+
     rel_path = os.path.relpath(filepath, storage_dir)
     rel_path_posix = rel_path.replace(os.sep, "/")
     filename = os.path.basename(filepath)
     filename_lower = filename.lower()
-    
-    # Hashes (F6 / F5)
     doc_hash = compute_sha256(raw_text)
     body_hash = compute_sha256(body)
-    
-    # Stable Document ID (F5)
     doc_id = persistent_doc_id or f"doc_{compute_sha256(rel_path_posix)[:12]}"
-    
-    # Initialize origin tracking dictionary
     origin: Dict[str, str] = {}
-    
-    # A. IDENTITY (F5)
-    # Rules: Explicit ID -> frontmatter ID -> persistent_id -> inferred ID from file layout.
+
     explicit_id = frontmatter.get("id") or frontmatter.get("memory_id")
-    if explicit_id:
+    nested_id = nested.get("id") or nested.get("memory_id")
+    if explicit_id is not None:
         mem_id = str(explicit_id).strip()
+        origin["id"] = "explicit"
+    elif nested_id is not None:
+        mem_id = str(nested_id).strip()
         origin["id"] = "explicit"
     elif persistent_id:
         mem_id = persistent_id
         origin["id"] = "system"
     else:
-        # Infer stable ID based on relative path structure (F5)
-        slug = os.path.splitext(rel_path_posix)[0]
-        slug = re.sub(r'^\.+/', '', slug)
-        slug = re.sub(r'/+', '/', slug)
-        mem_id = slug
+        mem_id = re.sub(r"/+", "/", os.path.splitext(rel_path_posix)[0]).lstrip("./")
         origin["id"] = "inferred"
-        
-    explicit_name = frontmatter.get("name") or frontmatter.get("title")
+
+    explicit_name = _first(frontmatter, "name", "title")
     if explicit_name:
         name = str(explicit_name).strip()
         origin["name"] = "explicit"
     else:
-        # Base name without extension
         name = os.path.splitext(filename)[0]
         origin["name"] = "inferred"
-        
-    identity = IdentityMetadata(id=mem_id, name=name)
-    
-    # B. CLASSIFICATION (F3)
-    # Document Type Inference
-    explicit_doc_type = frontmatter.get("document_type")
+    identity = IdentityMetadata(mem_id, name)
+
+    explicit_doc_type = _first(frontmatter, "document_type")
     if explicit_doc_type:
         doc_type = str(explicit_doc_type).strip()
         origin["document_type"] = "explicit"
     else:
-        if filename_lower in ("claude.md", "gemini.md", "copilot-instructions.md"):
-            doc_type = "harness_instructions"
-        elif filename_lower == "skill.md" or filename_lower.startswith("sk_"):
-            doc_type = "skill_instructions"
-        elif "decision" in filename_lower or filename_lower.startswith("adr"):
-            doc_type = "decision_record"
-        elif "experiment" in filename_lower:
-            doc_type = "experiment_record"
-        elif "report" in filename_lower:
-            doc_type = "report"
-        elif filename_lower == "readme.md":
-            doc_type = "project_context"
-        else:
-            doc_type = "memory"
+        doc_type = _infer_document_type(filename_lower)
         origin["document_type"] = "inferred"
-        
-    # Kind (F3)
-    explicit_kind = frontmatter.get("kind") or frontmatter.get("node_type") or frontmatter.get("memory_type") or frontmatter.get("type")
-    if explicit_kind:
-        kind = str(explicit_kind).strip()
+
+    raw_kind = _first(frontmatter, "kind", "node_type", "memory_type", "type")
+    normalized_kind = _normalize_kind(raw_kind)
+    if normalized_kind:
+        kind = normalized_kind
         origin["kind"] = "explicit"
     else:
-        if doc_type in ("harness_instructions", "skill_instructions"):
-            kind = "instruction"
-        else:
-            kind = "factual"
+        kind = "instruction" if doc_type in {"harness_instructions", "skill_instructions"} else "factual"
         origin["kind"] = "inferred"
-        
-    # Semantic Drawer (F3 / Facts, Preferences, Insights)
-    explicit_drawer = frontmatter.get("drawer")
-    if explicit_drawer and str(explicit_drawer).strip() in ("facts", "preferences", "insights"):
-        drawer = str(explicit_drawer).strip()
+
+    explicit_drawer = _first(frontmatter, "drawer")
+    if explicit_drawer and str(explicit_drawer).strip() in DRAWERS:
+        drawer: Optional[str] = str(explicit_drawer).strip()
         origin["drawer"] = "explicit"
+    elif doc_type in NON_MEMORY_TYPES:
+        drawer = None
+        origin["drawer"] = "default"
+    elif kind == "procedural_anchor":
+        drawer = "insights"
+        origin["drawer"] = "inferred"
+    elif kind == "preference":
+        drawer = "preferences"
+        origin["drawer"] = "inferred"
     else:
-        # Non-memory documents do NOT belong to a semantic drawer by default (F3)
-        if doc_type in ("harness_instructions", "skill_instructions", "project_context", "decision_record", "experiment_record", "report", "reference"):
-            drawer = None
-            origin["drawer"] = "default"
-        else:
-            # Resolve drawer based on kind for memories
-            if kind == "procedural_anchor":
-                drawer = "insights"
-            elif kind == "preference":
-                drawer = "preferences"
-            else:
-                drawer = "facts"
-            origin["drawer"] = "inferred"
-        
-    classification = ClassificationMetadata(drawer=drawer, kind=kind, document_type=doc_type)
-    
-    # C. SCOPE (F3)
-    explicit_scope_level = None
-    explicit_scope_path = None
-    explicit_scope_harness = None
-    
-    if isinstance(frontmatter.get("scope"), dict):
-        scope_dict = frontmatter["scope"]
-        explicit_scope_level = scope_dict.get("level")
-        explicit_scope_path = scope_dict.get("path")
-        explicit_scope_harness = scope_dict.get("harness")
-    elif isinstance(frontmatter.get("scope"), str):
-        # Flattened scope string
-        explicit_scope_path = frontmatter["scope"]
-        
+        drawer = "facts"
+        origin["drawer"] = "inferred"
+    classification = ClassificationMetadata(drawer, kind, doc_type)
+
+    scope_value = frontmatter.get("scope")
+    nested_scope = nested.get("scope")
+    scope_obj = scope_value if isinstance(scope_value, dict) else nested_scope if isinstance(nested_scope, dict) else {}
+    explicit_scope_level = scope_obj.get("level")
+    explicit_scope_path = scope_obj.get("path")
+    if not explicit_scope_path:
+        if isinstance(scope_value, str):
+            explicit_scope_path = scope_value
+        elif isinstance(nested_scope, str):
+            explicit_scope_path = nested_scope
+    explicit_scope_harness = scope_obj.get("harness")
+
     if explicit_scope_level:
         level = str(explicit_scope_level)
         origin["scope.level"] = "explicit"
     else:
-        level = "project" if rel_path_posix.count("/") == 0 else "folder"
+        level = "project" if "/" not in rel_path_posix else "folder"
         origin["scope.level"] = "default"
-        
     if explicit_scope_path:
-        path = str(explicit_scope_path)
+        scope_path = str(explicit_scope_path)
         origin["scope.path"] = "explicit"
     else:
-        # Default to root or directory pattern
-        if level == "project":
-            path = "./**"
-        else:
-            path = f"./{os.path.dirname(rel_path_posix)}/**"
+        scope_path = "./**" if level == "project" else f"./{posixpath.dirname(rel_path_posix)}/**"
         origin["scope.path"] = "default"
-        
-    explicit_harness = explicit_scope_harness or frontmatter.get("harness")
+
+    explicit_harness = explicit_scope_harness or _first(frontmatter, "harness")
     if explicit_harness:
         harness = str(explicit_harness)
         origin["scope.harness"] = "explicit"
     else:
-        if filename_lower == "claude.md":
-            harness = "claude"
-        elif filename_lower == "gemini.md":
-            harness = "gemini"
-        elif filename_lower == "copilot-instructions.md":
-            harness = "copilot"
-        else:
-            harness = None
-        origin["scope.harness"] = harness and "inferred" or "default"
-        
-    scope = ScopeMetadata(level=level, path=path, harness=harness)
-    
-    # D. SOURCE (F4 / F6)
-    lines_count = len(raw_text.splitlines())
-    span = SourceSpan(start_line=1, end_line=lines_count if lines_count > 0 else 1)
-    
-    # Format
-    file_format = "markdown" if filename_lower.endswith((".md", ".markdown")) else "text"
-    
+        harness_map = {
+            "claude.md": "claude",
+            "gemini.md": "gemini",
+            "copilot-instructions.md": "copilot",
+        }
+        # AGENTS.md is intentionally harness-agnostic: it is normative agent
+        # instruction knowledge but not tied to a single vendor/runtime.
+        harness = harness_map.get(filename_lower)
+        origin["scope.harness"] = "inferred" if harness else "default"
+    scope = ScopeMetadata(level, scope_path, harness)
+
     source = SourceMetadata(
         document_id=doc_id,
         path=rel_path_posix,
-        format=file_format,
-        span=span,
+        format="markdown" if filename_lower.endswith((".md", ".markdown")) else "text",
+        span=SourceSpan(1, max(1, len(raw_text.splitlines()))),
         document_hash=doc_hash,
-        content_hash=body_hash
+        content_hash=body_hash,
     )
-    # Using 'system' origin for observed/calculated files metrics (F6)
-    origin["source.document_id"] = "system"
-    origin["source.path"] = "system"
-    origin["source.format"] = "system"
-    origin["source.span"] = "system"
-    origin["source.document_hash"] = "system"
-    origin["source.content_hash"] = "system"
-    
-    # E. TEMPORAL
-    observed_at = frontmatter.get("observed_at")
-    if observed_at:
-        observed_at = str(observed_at)
-        origin["temporal.observed_at"] = "explicit"
-    else:
-        origin["temporal.observed_at"] = "default"
-        
-    valid_from = frontmatter.get("valid_from")
-    if valid_from:
-        valid_from = str(valid_from)
-        origin["temporal.valid_from"] = "explicit"
-    else:
-        origin["temporal.valid_from"] = "default"
-        
-    valid_until = frontmatter.get("valid_until")
-    if valid_until:
-        valid_until = str(valid_until)
-        origin["temporal.valid_until"] = "explicit"
-    else:
-        origin["temporal.valid_until"] = "default"
-        
-    recorded_at = frontmatter.get("recorded_at") or frontmatter.get("created_at") or frontmatter.get("date")
-    if recorded_at:
-        recorded_at = str(recorded_at)
-        origin["temporal.recorded_at"] = "explicit"
-    else:
-        origin["temporal.recorded_at"] = "default"
-        
-    # Always set current index time
-    indexed_at = datetime.datetime.now().isoformat()
-    origin["temporal.indexed_at"] = "system"
-    
+    for key in (
+        "source.document_id",
+        "source.path",
+        "source.format",
+        "source.span",
+        "source.document_hash",
+        "source.content_hash",
+    ):
+        origin[key] = "system"
+
+    def temporal_field(*keys: str) -> Optional[str]:
+        value = _first(frontmatter, *keys)
+        return str(value) if value is not None else None
+
     temporal = TemporalMetadata(
-        observed_at=observed_at,
-        valid_from=valid_from,
-        valid_until=valid_until,
-        recorded_at=recorded_at,
-        indexed_at=indexed_at
+        observed_at=temporal_field("observed_at"),
+        valid_from=temporal_field("valid_from"),
+        valid_until=temporal_field("valid_until"),
+        recorded_at=temporal_field("recorded_at", "created_at", "date"),
+        indexed_at=datetime.datetime.now().isoformat(),
     )
-    
-    # F. QUALITY
-    confidence = frontmatter.get("confidence")
-    if confidence is not None:
-        origin["quality.confidence"] = "explicit"
-    else:
-        confidence = None
-        origin["quality.confidence"] = "default"
-        
-    authority = frontmatter.get("authority")
-    if authority is not None:
-        origin["quality.authority"] = "explicit"
-    else:
-        authority = None
-        origin["quality.authority"] = "default"
-        
-    quality = QualityMetadata(confidence=confidence, authority=authority)
-    
-    # G. RELATIONS (F7 - Explicit Relations first, with relative POSIX resolution and deduplication)
+    for attr in ("observed_at", "valid_from", "valid_until", "recorded_at"):
+        origin[f"temporal.{attr}"] = "explicit" if getattr(temporal, attr) is not None else "default"
+    origin["temporal.indexed_at"] = "system"
+
+    confidence = _first(frontmatter, "confidence")
+    authority = _first(frontmatter, "authority")
+    quality = QualityMetadata(confidence, authority)
+    origin["quality.confidence"] = "explicit" if confidence is not None else "default"
+    origin["quality.authority"] = "explicit" if authority is not None else "default"
+
     relations: List[RelationMetadata] = []
     seen_relations = set()
 
-    def add_relation(rel_type: str, target_id: str, origin_val: str):
-        # Normalize backslashes, strip slashes
-        target_norm = target_id.replace("\\", "/").strip("/")
-        # Resolve target ID to posix normpath if it is relative
+    def add_relation(rel_type: str, target_id: str, origin_value: str = "explicit") -> None:
+        target_norm = str(target_id).replace("\\", "/").strip()
+        if not target_norm:
+            return
+        if target_norm.startswith(("http://", "https://", "mailto:", "ftp:")):
+            return
         if target_norm.startswith(("./", "../")) or "/../" in target_norm or "/./" in target_norm:
-            doc_dir = posixpath.dirname(rel_path_posix)
-            target_norm = posixpath.normpath(posixpath.join(doc_dir, target_norm))
-        
-        # Strip leading dots or slashes from resolved path to get clean ID
-        target_norm = re.sub(r'^\.+/', '', target_norm)
-        target_norm = re.sub(r'/+', '/', target_norm)
-        
+            target_norm = posixpath.normpath(posixpath.join(posixpath.dirname(rel_path_posix), target_norm))
+        target_norm = re.sub(r"^\.+/", "", target_norm.strip("/"))
+        target_norm = re.sub(r"/+", "/", target_norm)
         key = (rel_type, target_norm)
         if key not in seen_relations:
             seen_relations.add(key)
-            relations.append(RelationMetadata(type=rel_type, target=target_norm, origin=origin_val))
+            relations.append(RelationMetadata(rel_type, target_norm, origin_value))
 
-    # 1. Relations from frontmatter Connections
-    active_conns = frontmatter.get("active_connections") or frontmatter.get("connections") or []
-    for conn in active_conns:
-        if isinstance(conn, dict):
-            target = conn.get("target_memory_id") or conn.get("target")
-            rel_type = conn.get("relation_type") or conn.get("type") or "related_to"
-            if target:
-                add_relation(str(rel_type), str(target), "explicit")
-        elif isinstance(conn, str) and ":" in conn:
-            target, rel_type = conn.split(":", 1)
-            add_relation(rel_type, target, "explicit")
-            
-    # Frontmatter related_to
-    related_to = frontmatter.get("related_to")
-    if related_to:
-        if isinstance(related_to, list):
-            for target in related_to:
-                add_relation("related_to", str(target), "explicit")
-        elif isinstance(related_to, str):
-            add_relation("related_to", related_to, "explicit")
-            
-    # 2. Relations from Body [[wikilinks]]
-    wikilink_pattern = re.compile(r"\[\[([a-zA-Z0-9_\-/]+)\]\]")
-    for match in wikilink_pattern.finditer(body):
-        target = match.group(1)
-        add_relation("related_to", target, "explicit")
-        
-    # Standard markdown links pointing to local markdown files
-    md_link_pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
-    for match in md_link_pattern.finditer(body):
-        link_target = match.group(1).split('#')[0]
-        if link_target.startswith(("http://", "https://", "mailto:", "ftp:")):
-            continue
-        if link_target.endswith((".md", ".markdown")):
-            # Resolve relative POSIX path safely (F5)
-            doc_dir = posixpath.dirname(rel_path_posix)
-            target_path = posixpath.normpath(posixpath.join(doc_dir, link_target))
-            target_clean = target_path.replace(".md", "").replace(".markdown", "")
-            add_relation("related_to", target_clean, "explicit")
-        
-    # H. RESERVED OPTIONAL FIELDS
-    state_key = frontmatter.get("state_key")
-    superseded_at = frontmatter.get("superseded_at")
-    utility = frontmatter.get("utility")
+    active = _first(frontmatter, "active_connections", "connections") or []
+    if isinstance(active, list):
+        for conn in active:
+            if isinstance(conn, dict):
+                target = conn.get("target_memory_id") or conn.get("target")
+                rel_type = conn.get("relation_type") or conn.get("type") or "related_to"
+                if target:
+                    add_relation(str(rel_type), str(target))
+            elif isinstance(conn, str):
+                if ":" in conn:
+                    target, rel_type = conn.split(":", 1)
+                    add_relation(rel_type, target)
+                else:
+                    add_relation("related_to", conn)
+
+    related_to = _first(frontmatter, "related_to")
+    if isinstance(related_to, list):
+        for target in related_to:
+            if isinstance(target, str) and target.strip():
+                add_relation("related_to", target)
+    elif isinstance(related_to, str):
+        add_relation("related_to", related_to)
+
+    for match in re.finditer(r"\[\[([a-zA-Z0-9_\-/.]+)\]\]", body):
+        add_relation("related_to", match.group(1))
+    for match in re.finditer(r"\[[^\]]+\]\(([^)]+)\)", body):
+        link_target = match.group(1).split("#", 1)[0].strip()
+        if link_target.lower().endswith((".md", ".markdown")):
+            resolved = posixpath.normpath(posixpath.join(posixpath.dirname(rel_path_posix), link_target))
+            if resolved.endswith(".markdown"):
+                resolved = resolved[: -len(".markdown")]
+            elif resolved.endswith(".md"):
+                resolved = resolved[:-3]
+            add_relation("related_to", resolved)
+
+    utility = _first(frontmatter, "utility")
     if utility is not None:
         try:
             utility = float(utility)
-        except ValueError:
+        except (TypeError, ValueError):
             utility = None
-            
-    return CanonicalMetadata(
+
+    # Preserve exactly what the author supplied. Effective compatibility tags
+    # are materialized below by the engine adapter, not written back here.
+    canonical = CanonicalMetadata(
         schema_version=1,
         identity=identity,
         classification=classification,
@@ -509,27 +530,18 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persiste
         quality=quality,
         relations=relations,
         metadata_origin=origin,
-        state_key=state_key,
-        superseded_at=superseded_at,
+        state_key=_first(frontmatter, "state_key"),
+        superseded_at=_first(frontmatter, "superseded_at"),
         utility=utility,
-        raw_frontmatter=frontmatter
+        raw_frontmatter=frontmatter,
     )
+    return canonical
 
 
-def _split_markdown(raw_text: str) -> Tuple[Dict[str, Any], str]:
-    """Splits markdown into (frontmatter dictionary, body text)."""
-    text = raw_text.strip()
-    if not text.startswith("---"):
-        return {}, raw_text
+# Public compatibility helpers used by the engine's legacy adapter.
+def effective_tags(frontmatter: Dict[str, Any]) -> List[str]:
+    return _effective_tags(frontmatter)
 
-    parts = text.split("---", 2)
-    if len(parts) >= 3:
-        frontmatter_raw = parts[1]
-        body = parts[2]
-        try:
-            frontmatter = yaml.safe_load(frontmatter_raw)
-            if isinstance(frontmatter, dict):
-                return frontmatter, body
-        except Exception:
-            pass
-    return {}, raw_text
+
+def effective_entities(frontmatter: Dict[str, Any]) -> List[str]:
+    return _effective_entities(frontmatter)
