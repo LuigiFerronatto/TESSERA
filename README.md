@@ -1,111 +1,141 @@
+<p align="center">
+  <img src="docs/assets/brand/tessera-lockup-light.svg" alt="TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories" width="900" />
+</p>
+
+<p align="center">
+  <strong>Auditable memory infrastructure for agents.</strong><br/>
+  Keep knowledge in text. Preserve where it came from. Retrieve evidence without forcing the agent to understand the memory system underneath.
+</p>
+
+---
+
 # TESSERA
 
-**Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories**
+**Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories.**
 
 TESSERA is a **text-first, agent-agnostic memory and evidence layer** for long-running AI agents.
 
-Its job is not to answer for the agent. Its job is to hide memory-system complexity — storage, indexing, relations, source tracking and retrieval — while returning enough **structured evidence, provenance and navigation** for the consuming agent to reason safely.
-
-> **TESSERA abstracts memory architecture away from the agent. It does not replace the cognition of the agent; it hides memory complexity so the agent can focus on cognition.**
-
----
-
-## Executive takeaway
-
-The current Foundation already provides:
+It sits between an agent and the project knowledge the agent needs to remember:
 
 ```text
-text documents
-→ canonical understanding
-→ stable memory + source identity
-→ graph/index
-→ explainable multi-signal retrieval
-→ query-aware relevant evidence
-→ Evidence Ledger / provenance
-→ structured retrieval result
+Agent
+  │
+  │ natural-language memory need
+  ▼
+TESSERA
+  │
+  ├─ discovers textual knowledge
+  ├─ normalizes metadata
+  ├─ preserves memory + source identity
+  ├─ indexes and ranks candidates
+  ├─ extracts query-relevant evidence
+  ├─ preserves relations and navigation
+  └─ proves where evidence came from
+  │
+  ▼
+Structured Evidence
+  │
+  ▼
+Agent reasons and acts
 ```
 
-TESSERA deliberately does **not** claim that temporal reasoning, confidence-aware graph traversal, source arbitration, abstention or adaptive retrieval are solved. Those capabilities live in Test Cards and must earn their way into the architecture through measurable experiments.
+> **TESSERA abstracts memory architecture away from the agent. It does not replace the cognition of the agent.**
+
+## The problem in plain language
+
+Saving notes is easy. Remembering the **right** thing later is not.
+
+As an agent works for days, weeks or months, knowledge starts to spread across memory cards, research notes, project instructions, decisions and reference files. Then the hard questions appear:
+
+- Is this still the same memory after the file moved?
+- Which source version supports this evidence?
+- Why did this result rank above another one?
+- Which paragraph actually matched the query?
+- Is a relationship explicit, inferred or derived?
+- Which instruction applies to the current scope?
+- Are two sources conflicting?
+- Is there enough evidence to continue?
+
+TESSERA exists to make those questions **explicit, inspectable and progressively testable** instead of hiding them inside a prompt or a black-box database.
+
+## What TESSERA is — and is not
+
+| TESSERA does | TESSERA does not |
+| --- | --- |
+| Organize and index textual knowledge | Replace the reasoning of the consuming agent |
+| Preserve stable memory and source identity | Treat retrieval score as truth/confidence |
+| Return query-aware evidence and provenance | Silently rewrite source files while indexing |
+| Expose relations and navigation | Require a generative LLM for basic retrieval |
+| Keep source text as the source of truth | Claim unfinished roadmap experiments already work |
+| Make memory behavior measurable | Index source code as primary memory |
+
+TESSERA is deliberately **evidence infrastructure**, not a final-answer chatbot.
 
 ---
 
-# In plain language
+## A 30-second example
 
-An agent may have hundreds or thousands of Markdown notes, instructions and learnings spread across a project:
+Suppose a repository contains:
 
 ```text
-memories/
-research/
-CLAUDE.md
+memories/project-direction.md
+memories/runtime-migration.md
 AGENTS.md
-*.SKILL.md
-project notes
+research/architecture-notes.md
 ```
 
-The agent should not need to understand:
+The agent asks:
 
 ```text
-where every memory is stored
-how files are normalized
-how identity survives a rename
-how the graph is built
-how evidence is traced to a source version
-which retrieval signals are combined
+"what runtime strategy is currently documented for this project?"
 ```
 
-It should be able to ask something like:
+TESSERA can return a structured result containing:
+
+```yaml
+id: project/runtime-strategy
+type: factual
+score: 0.81
+
+relevant_evidence: >
+  The project now uses a multi-runtime strategy for tool execution.
+
+source:
+  document_id: doc_...
+  path: memories/runtime-migration.md
+
+provenance:
+  document_hash: ...
+  content_hash: ...
+  span:
+    start_line: 18
+    end_line: 21
+
+related_ids:
+  - project/runtime-history
+
+body: |
+  ...full original memory remains available...
+```
+
+The important boundary is simple:
 
 ```text
-"qual é o propósito deste projeto?"
+TESSERA finds, structures and proves the evidence.
+The consuming agent decides what to do with it.
 ```
-
-and receive an evidence-rich result containing roughly:
-
-```text
-memory identity
-relevance score + explanation
-relevant evidence for this query
-full original memory
-source path
-stable source-document identity
-source version hashes
-exact evidence span when provable
-direct related memories
-```
-
-Then **the agent decides what that evidence means**.
 
 ---
 
-# Why TESSERA exists
+# Current Foundation
 
-Long-term agent memory is not only a retrieval problem.
-
-A useful memory layer eventually needs to deal with questions such as:
-
-```text
-Is this the same memory after a file moves?
-Which version of the source supports this evidence?
-Is this paragraph actually relevant to this query?
-Why did this memory rank above another one?
-Are these two memories related?
-Is a relation trustworthy?
-Which source is authoritative for this scope?
-Do two sources conflict?
-Is there enough evidence to continue?
-```
-
-The current Foundation focuses on making the first group of those questions **auditable and deterministic** before adding more intelligence.
-
----
-
-# Current capabilities
+The current implementation already provides the substrate needed to build more advanced memory behavior without losing auditability.
 
 ## Canonical text understanding
 
-TESSERA can index heterogeneous Markdown with complete, partial or absent frontmatter and normalize it into Canonical Metadata.
+Markdown may have complete, partial or no frontmatter. TESSERA normalizes it into one Canonical Metadata contract while preserving the original source metadata.
 
-It distinguishes semantic memories from other useful text documents.
+It distinguishes semantic memory from other useful textual artifacts:
 
 ```yaml
 # semantic memory
@@ -116,14 +146,14 @@ classification:
 ```
 
 ```yaml
-# harness instruction
+# instruction document
 classification:
   document_type: harness_instructions
   kind: instruction
   drawer: null
 ```
 
-TESSERA keeps exactly three semantic drawers:
+TESSERA intentionally keeps exactly **three semantic drawers**:
 
 ```text
 facts
@@ -131,11 +161,11 @@ preferences
 insights
 ```
 
-Harness instructions, scope, confidence, authority, temporal state and relations are metadata/facets — not new drawers.
+Scope, relations, authority, confidence, temporal state and document type are **facets**, not additional drawers.
 
 ## Stable identity
 
-TESSERA separates:
+TESSERA separates identity from location and version:
 
 ```text
 identity.id
@@ -148,83 +178,112 @@ source.path
 → current location
 
 document_hash / content_hash
-→ current version
+→ current version fingerprints
 ```
 
-A rename/move can therefore preserve identity while changing only location.
+A rename or move can therefore preserve knowledge/source identity while changing only the path.
 
 ## Explainable retrieval
 
-The current ranker combines inspectable signals such as:
+The current ranker uses inspectable local signals such as:
 
 ```text
 TF-IDF lexical similarity
-direct token overlap
-title / ID relevance
-metadata relevance
-normalized graph/PageRank signal
-deterministic type/intent boost
++ token overlap
++ title / ID relevance
++ metadata relevance
++ graph/PageRank contribution
++ deterministic type/intent boost
 ```
 
-PageRank is a **structural signal**, not the final answer.
+`score` means **retrieval relevance for this query**. It does not mean truth, confidence or authority.
 
-Recency is disabled by default because “newer” is not equivalent to “currently true”.
+Global recency is disabled by default because **newer is not the same as currently valid**.
 
 ## Query-aware evidence
 
-TESSERA can foreground the paragraph most relevant to the current query while preserving the original full memory:
+TESSERA can foreground the paragraph most relevant to the query while preserving the complete memory:
 
 ```text
-retrieved memory
-├─ relevant_evidence
-└─ full body
+retrieval result
+├─ relevant_evidence   ← query-specific
+├─ evidence_info
+└─ body                ← original full memory
 ```
 
-If no paragraph has enough support, `relevant_evidence` is `None` rather than an arbitrary paragraph.
+If a useful paragraph cannot be supported, `relevant_evidence` remains `None` rather than fabricating a match.
 
 ## Evidence Ledger / provenance
 
-Every canonical result can be traced to its source version.
+Evidence is traceable to an exact source version:
 
 ```yaml
 evidence_id: ev_...
-memory_id: project/charter
+memory_id: project/runtime-strategy
 source:
   document_id: doc_...
-  path: project/charter.md
+  path: memories/runtime-migration.md
   document_hash: ...
   content_hash: ...
 span:
-  start_line: 31
-  end_line: 37
+  start_line: 18
+  end_line: 21
 ```
 
-If an exact evidence occurrence cannot be proven — for example the same text appears multiple times — TESSERA returns a null span instead of fabricating precision.
+If the exact occurrence cannot be proven — for example because identical text appears more than once — the span remains null instead of pretending to know more than the source supports.
 
-## Basic write-side sanitization
+## Basic write sanitization
 
-`write_memory_note()` currently runs a small deterministic `WriteGatingEngine` that checks known hostile-instruction patterns and suspicious tags before persistence.
+The current write path includes a small deterministic sanitization gate for known hostile-instruction patterns and suspicious tags.
 
-This is **not** the full future memory-admission layer. The broader #19 experiment will test whether a candidate is new, duplicated, stable, useful and sufficiently evidence-backed before becoming durable memory.
+This is **not** the future memory-admission system. The broader admission experiment is still a Test Card and must prove whether novelty, duplication, evidence and state checks are worth the added complexity.
 
-## CI and sanity evaluation
+---
 
-Every meaningful change is expected to pass:
+# How it works today
 
 ```text
-Python 3.9 tests
-Python 3.12 tests
-CLI smoke
-sanity retrieval evaluation
+TEXT SOURCES
+   │
+   ▼
+DISCOVER
+   │
+   ▼
+CANONICALIZE
+   ├─ classification
+   ├─ scope
+   ├─ metadata
+   └─ stable identity
+   │
+   ▼
+TRACE
+   ├─ source document
+   ├─ hashes / source version
+   └─ Evidence Ledger
+   │
+   ▼
+INDEX + GRAPH
+   │
+   ▼
+EXPLAINABLE RETRIEVAL
+   │
+   ▼
+QUERY-AWARE EVIDENCE
+   │
+   ▼
+STRUCTURED RESULT
+   │
+   ▼
+CONSUMING AGENT
 ```
 
-The sanity suite is a small synthetic **regression alarm**, not a competitive benchmark. Its exact baseline is versioned with the fixture and should only move with an explicit behavioral explanation.
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the detailed current architecture and [`docs/ROADMAP.md`](docs/ROADMAP.md) for experiments that have **not** been promoted to product capabilities yet.
 
 ---
 
 # Quickstart
 
-Requires Python **3.9+**.
+TESSERA currently supports Python **3.9+**.
 
 ## Install for development
 
@@ -234,13 +293,13 @@ cd TESSERA
 pip install -e ".[dev]"
 ```
 
-Or use the repository installer:
+Or:
 
 ```bash
 ./install.sh --venv --dev
 ```
 
-## Create and query memory
+## Python API
 
 ```python
 from tessera import TesseraEngine, Entity
@@ -251,15 +310,15 @@ engine.write_memory_note(
     mem_id="project/postgres-replication",
     mem_type="factual",
     episode_id="ep_001",
-    content="Maria configured PostgreSQL read replication.",
+    content="The data team configured PostgreSQL read replication.",
     tags=["postgresql", "infra"],
-    entities=[Entity("Maria", "Data engineer")],
+    entities=[Entity("Data team", "Engineering")],
 )
 
 engine.build_index()
 
 results = engine.retrieve_context(
-    "quem configurou a replicação do PostgreSQL?",
+    "who configured PostgreSQL read replication?",
     top_n=3,
 )
 
@@ -278,29 +337,23 @@ tessera write ./memories \
   --id project/postgres-replication \
   --type factual \
   --episode ep_001 \
-  --content "Maria configured PostgreSQL read replication." \
+  --content "The data team configured PostgreSQL read replication." \
   --tags postgresql,infra
 
 tessera index ./memories
 
-tessera query ./memories "quem configurou a replicação do PostgreSQL?"
+tessera query ./memories "who configured PostgreSQL read replication?"
 
-tessera query ./memories "como o projeto funciona?" --debug
+tessera query ./memories "how does this project work?" --debug
 ```
 
-The source Markdown files remain the source of truth. Derived index artifacts live under `.tessera_index/` and can be rebuilt.
+Source text remains authoritative. Derived index data lives under `.tessera_index/` and can be rebuilt.
 
 ---
 
-# What TESSERA returns
+# The retrieval contract
 
-The semantic retrieval contract is the structured result returned by:
-
-```python
-engine.retrieve_context(...)
-```
-
-Typical fields include:
+The Python engine currently exposes fields such as:
 
 ```text
 id
@@ -319,164 +372,109 @@ evidence
 
 See [`docs/OUTPUT_CONTRACT.md`](docs/OUTPUT_CONTRACT.md) for field semantics and nullability.
 
-Important:
-
-```text
-retrieval score
-≠ confidence
-≠ authority
-≠ truth
-```
+One of the next Foundation experiments is transport parity so Python, CLI/JSON and MCP can expose the **same semantic result** rather than silently dropping evidence depending on the integration surface.
 
 ---
 
-# Architecture
+# Quality gate
 
-Current read path:
+TESSERA treats behavior as part of the product contract.
 
-```text
-TEXT
-  ↓
-Canonical Metadata
-  ↓
-Stable Identity
-  ↓
-Graph / Index
-  ↓
-Explainable Retrieval
-  ↓
-Relevant Evidence
-  ↓
-Evidence Ledger / Provenance
-  ↓
-Structured Evidence
-  ↓
-AGENT
-```
-
-Future architecture is intentionally conditional on experiments.
+The repository already runs:
 
 ```text
-Query-aware Graph Expansion
-Relation Confidence
-Temporal State / State Keys
-Authority / Scope / Precedence
-Conflict Detection
-Evidence Arbitration
-Evidence Sufficiency
-Adaptive Retrieval
+CODE
+ ↓
+UNIT / CONTRACT TESTS
+ ↓
+CLI SMOKE
+ ↓
+SANITY RETRIEVAL EVAL
+ ↓
+OUTPUT ARTIFACTS
+ ↓
+CI GREEN
 ```
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md).
+The sanity suite is intentionally small and synthetic. It is a **regression alarm**, not a competitive benchmark claim.
+
+LongMemEval and competitive comparisons live in the benchmark roadmap, not in per-PR CI.
 
 ---
 
 # Research-driven development
 
-TESSERA uses papers as **research signals**, not as implementation instructions.
-
-Examples:
+TESSERA does not turn papers directly into features.
 
 ```text
-GraphMemix
-→ query-aware evidence graph / budget
-→ Test Card #25
-
-CaSKG
-→ edge reliability / validation
-→ Test Card #26
-
-MemToC
-→ source conflict / arbitration / abstention
-→ Test Cards #27 / #20 / #32
-
-RENDER
-→ reader-facing format as evaluation variable
-→ Test Card #28
+research signal
+   ↓
+hypothesis
+   ↓
+Test Card
+   ↓
+controlled experiment
+   ↓
+evidence
+   ↓
+KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-The rule is:
+Examples currently informing experiments include:
 
-```text
-paper
-→ insight
-→ hypothesis
-→ Test Card
-→ controlled experiment
-→ evidence
-→ KEEP | ITERATE | REVERT | DROP | DEFER
-```
+| Research signal | TESSERA question |
+| --- | --- |
+| GraphMemix | Does query-aware, budgeted graph expansion beat indiscriminate expansion? |
+| CaSKG | Does relation confidence reduce harmful graph traversal without killing recall? |
+| MemToC | Does explicit evidence arbitration improve source selection and abstention? |
+| RENDER | Does structured evidence presentation improve downstream use when retrieval is fixed? |
+| LongMemEval | Which memory capabilities actually improve extraction, updates, temporal reasoning and abstention? |
 
-See [`docs/research/`](docs/research/).
+See [`docs/research/`](docs/research/) for source notes, references, competitive landscape and decision trace.
 
 ---
 
-# Competitive landscape
+# Experimental roadmap
 
-TESSERA is evaluated against architectural ideas from systems/frameworks such as:
+TESSERA deliberately distinguishes **implemented** from **hypothesized**.
 
-```text
-Mem0
-Zep / Graphiti
-Letta
-LangGraph / LangMem
-MemOS
-MemPalace
-```
-
-The current differentiating thesis is not “TESSERA has a graph”. It is the combination of:
-
-```text
-text-first source of truth
-+ stable memory/source identity
-+ source-version-aware provenance
-+ explainable retrieval
-+ query-specific evidence
-+ strict separation of relevance / confidence / authority / utility
-+ experimental governance before adding intelligence
-```
-
-Those are architectural characteristics, **not proof that TESSERA is better**. Competitive quality claims wait for controlled benchmarks such as LongMemEval (#18).
-
-See [`docs/research/COMPETITIVE_LANDSCAPE.md`](docs/research/COMPETITIVE_LANDSCAPE.md).
-
----
-
-# Roadmap
-
-The living roadmap intentionally separates what exists from what is still being tested. Current near-term order:
+Near-term sequence:
 
 ```text
 PUBLIC / GOVERNANCE HARDENING
-→ project-agnostic public surface
-→ README + visual docs
-→ changelog / PR contract / CI v2
+  → project-agnostic public surface
+  → README + visual assets
+  → changelog + PR contract + CI v2
 
-FOUNDATION CONTRACT
-→ Engine / CLI / MCP parity
-→ incremental indexing
-→ text ingestion / segmentation
-→ diagnostics
+FOUNDATION
+  → Engine / CLI / MCP contract parity
+  → incremental + idempotent indexing
+  → text ingestion coverage
+  → structural segmentation
+  → metadata/corpus diagnostics
 
 MEASURE EARLY
-→ LongMemEval + renderer controls
+  → LongMemEval baseline + renderer controls
 
-THEN
-→ relations
-→ temporal state
-→ authority / conflict
-→ adaptive retrieval
-→ state / abstention
-→ learning
+THEN TEST
+  → typed relations / query-aware graph expansion
+  → temporal state / state keys
+  → instruction applicability / authority
+  → conflict + evidence arbitration
+  → adaptive retrieval
+  → evidence sufficiency / abstention
+  → experiential learning
 ```
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the living experimental roadmap.
+Nothing in that second half is considered solved until its Test Card earns a **KEEP** decision.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ---
 
-# Test Card development model
+# Development model
 
-Every meaningful task should follow:
+Every meaningful change follows:
 
 ```text
 1 Issue
@@ -485,16 +483,18 @@ Every meaningful task should follow:
   ↓
 linked PR
   ↓
-CI / benchmark / real outputs
+Tests + Evaluation Card
   ↓
-Evidence + Learnings
+real CI / benchmark evidence
+  ↓
+Learnings
   ↓
 KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-A technically correct feature can still end in **DROP** if it does not improve measurable outcomes.
+A feature can be technically correct and still end in **DROP** if the experiment shows no measurable value.
 
-This is intentional.
+That is intentional.
 
 ---
 
@@ -502,54 +502,58 @@ This is intentional.
 
 Start with [`docs/README.md`](docs/README.md).
 
-Recommended path:
-
-```text
-OVERVIEW.md
-  ↓
-FEATURES.md + CONCEPTS.md
-  ↓
-ARCHITECTURE.md
-  ↓
-QUERY_EXAMPLES.md + OUTPUT_CONTRACT.md
-  ↓
-ROADMAP.md
-```
-
-Research and competitors live under [`docs/research/`](docs/research/).
-
-Historical/demo documents are not the current architecture source of truth; the documentation map explains their role and precedence.
+| Need | Document |
+| --- | --- |
+| Executive + product overview | [`docs/OVERVIEW.md`](docs/OVERVIEW.md) |
+| Implemented capabilities | [`docs/FEATURES.md`](docs/FEATURES.md) |
+| Vocabulary and semantic distinctions | [`docs/CONCEPTS.md`](docs/CONCEPTS.md) |
+| Current architecture | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| Query examples | [`docs/QUERY_EXAMPLES.md`](docs/QUERY_EXAMPLES.md) |
+| Retrieval output contract | [`docs/OUTPUT_CONTRACT.md`](docs/OUTPUT_CONTRACT.md) |
+| Experimental roadmap | [`docs/ROADMAP.md`](docs/ROADMAP.md) |
+| Papers / references / competitors | [`docs/research/`](docs/research/) |
+| Brand assets | [`docs/assets/brand/`](docs/assets/brand/) |
 
 ---
 
 # Project status
 
-TESSERA is currently an evolving Foundation, not a finished long-term-memory product.
+TESSERA is an evolving Foundation, not a finished long-term-memory product.
 
-What is already strong enough to build on:
+**Implemented today:**
 
 ```text
-identity
 canonical metadata
-explainable retrieval
+stable memory/source identity
+explainable local retrieval
 query-aware evidence
-provenance
-CI / Test Card discipline
+Evidence Ledger / provenance
+basic graph navigation
+CLI + MCP surfaces
+CI + sanity regression evaluation
 ```
 
-What we still need to prove:
+**Still being tested:**
 
 ```text
 incremental state correctness
+transport contract parity
+plain-text ingestion / segmentation
 external benchmark quality
-graph expansion value
+query-aware graph expansion
 relation reliability
-temporal state accuracy
-source arbitration
-authority / precedence
+temporal state
+source authority / instruction precedence
+conflict / evidence arbitration
 abstention semantics
 adaptive retrieval
 learning / utility feedback
 ```
 
-That distinction — **implemented vs hypothesized** — is part of the product design, not just project management.
+That distinction — **what exists vs what we are trying to prove** — is part of TESSERA's engineering philosophy.
+
+---
+
+<p align="center">
+  <img src="docs/assets/brand/tessera-repo-card.svg" alt="TESSERA repository card" width="720" />
+</p>
