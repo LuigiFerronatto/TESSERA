@@ -53,10 +53,10 @@ how evidence is traced to a source version
 which retrieval signals are combined
 ```
 
-It should be able to ask:
+It should be able to ask something like:
 
 ```text
-"qual o propósito do LAO?"
+"qual é o propósito deste projeto?"
 ```
 
 and receive an evidence-rich result containing roughly:
@@ -188,10 +188,10 @@ Every canonical result can be traced to its source version.
 
 ```yaml
 evidence_id: ev_...
-memory_id: lao/charter
+memory_id: project/charter
 source:
   document_id: doc_...
-  path: lao/charter.md
+  path: project/charter.md
   document_hash: ...
   content_hash: ...
 span:
@@ -218,33 +218,7 @@ CLI smoke
 sanity retrieval evaluation
 ```
 
-Current regression baseline:
-
-```text
-Hit@1          75%
-Hit@3         100%
-Hit@5         100%
-MRR           0.875
-Evidence hit  100%
-```
-
-These numbers are a **regression alarm**, not a competitive benchmark claim.
-
----
-
-# A real known limitation
-
-The current lexical-heavy Foundation can still miss a paraphrase at Top-1.
-
-For example:
-
-```text
-query: "pq o LAO existe?"
-```
-
-may place the intended `lao/charter` memory at #2 instead of #1.
-
-We intentionally keep that failure visible instead of adding a query-specific hack. Semantic/adaptive retrieval must prove itself later through controlled benchmark ablations.
+The sanity suite is a small synthetic **regression alarm**, not a competitive benchmark. Its exact baseline is versioned with the fixture and should only move with an explicit behavioral explanation.
 
 ---
 
@@ -255,8 +229,8 @@ Requires Python **3.9+**.
 ## Install for development
 
 ```bash
-git clone https://github.com/LuigiFerronatto/tessera.git
-cd tessera
+git clone https://github.com/LuigiFerronatto/TESSERA.git
+cd TESSERA
 pip install -e ".[dev]"
 ```
 
@@ -470,35 +444,30 @@ See [`docs/research/COMPETITIVE_LANDSCAPE.md`](docs/research/COMPETITIVE_LANDSCA
 
 # Roadmap
 
-Current sequence:
+The living roadmap intentionally separates what exists from what is still being tested. Current near-term order:
 
 ```text
-FOUNDATION
-#12 Incremental & Idempotent Indexing
-  ↓
-#13 Metadata Doctor
-  ↓
+PUBLIC / GOVERNANCE HARDENING
+→ project-agnostic public surface
+→ README + visual docs
+→ changelog / PR contract / CI v2
+
+FOUNDATION CONTRACT
+→ Engine / CLI / MCP parity
+→ incremental indexing
+→ text ingestion / segmentation
+→ diagnostics
+
 MEASURE EARLY
-#18 LongMemEval baseline
-└─ #28 renderer control
-  ↓
-RELATIONS
-#14 / #25 / #26
-  ↓
-TEMPORAL
-#15
-  ↓
-CONFLICT / TRUST
-#16 / #27 / #32
-  ↓
-ADAPTIVE
-#17 / #19
-  ↓
-STATE / ABSTENTION
-#20
-  ↓
-LEARNING
-#21
+→ LongMemEval + renderer controls
+
+THEN
+→ relations
+→ temporal state
+→ authority / conflict
+→ adaptive retrieval
+→ state / abstention
+→ learning
 ```
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the living experimental roadmap.
@@ -549,7 +518,7 @@ ROADMAP.md
 
 Research and competitors live under [`docs/research/`](docs/research/).
 
-Historical/demo documents are preserved but are not the current architecture source of truth; the documentation map explains their role and precedence.
+Historical/demo documents are not the current architecture source of truth; the documentation map explains their role and precedence.
 
 ---
 
