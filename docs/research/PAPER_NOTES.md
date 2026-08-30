@@ -110,6 +110,189 @@ Planned. Current sanity metrics are internal regression checks only.
 
 ---
 
+## LiveMem — Maintaining Memory State Continuity
+
+Source: https://arxiv.org/abs/2608.02515  
+Published: 2026-08-03
+
+### What the paper says
+
+LiveMem frames long-running inference as a state-continuity problem: an agent needs useful computation to survive when old tokens leave its bounded working context. It augments a pretrained full-attention model with a fixed-capacity recurrent memory state and supports it through memory-oriented post-training and state-aware serving.
+
+### TESSERA interpretation
+
+LiveMem and TESSERA address complementary layers:
+
+```text
+LiveMem
+→ intrinsic model state across context turnover
+
+TESSERA
+→ external, inspectable evidence across files, versions and queries
+```
+
+The paper gives TESSERA a useful lifecycle test: evidence that has left the active context should remain recoverable without pretending the external index is an intrinsic neural state.
+
+### Derived experiment
+
+Build continuity cases with context turnover and measure retrieval/answer quality by evidence distance, while keeping model context budget and reader policy fixed.
+
+### Difference / caution
+
+TESSERA does not modify model weights, attention, KV-cache behavior or serving infrastructure.
+
+### Status
+
+Research reference. No intrinsic recurrent memory implemented.
+
+---
+
+## FinPerMA — Event-Grounded Personalized Memory Benchmark
+
+Source: https://arxiv.org/abs/2608.04095  
+Published: 2026-08-04
+
+### What the paper says
+
+FinPerMA evaluates whether memory systems update individualized user models after material events. It uses frozen longitudinal investor trajectories, deterministic theory-informed impact rules and a Post-Shock checkpoint. The benchmark contains 2,994 questions across 276 personas and reports that factual summaries can lose preference signals needed for personalization.
+
+### TESSERA interpretation
+
+A memory can retrieve yesterday's facts and still fail to represent today's user state. Preference-memory evaluation should therefore include:
+
+```text
+state before event
+→ material event + evidence
+→ state after event
+→ supersession / conflict / temporal validity
+```
+
+### Derived experiment
+
+Create domain-neutral preference-shock cases and compare raw evidence, summaries and typed memories on pre/post-event accuracy, evidence citation and obsolete-preference abstention.
+
+### Difference / caution
+
+The behavioral-finance rules are part of FinPerMA's benchmark construction; TESSERA should reuse the evaluation pattern without claiming financial-domain validity.
+
+### Status
+
+Candidate benchmark pattern. No FinPerMA adapter implemented.
+
+---
+
+## Persistent Memory and User Profiles — Personalized Long-Term Interaction
+
+Source: https://arxiv.org/abs/2510.07925  
+Published: 2025-10-09
+
+### What the paper says
+
+The paper derives requirements for adaptive personalized agents and proposes a framework combining persistent memory, evolving user profiles, multi-source retrieval, dynamic coordination and self-validation. It evaluates the approach on three public datasets and complements that evaluation with a five-day pilot user study.
+
+### TESSERA interpretation
+
+TESSERA should treat a user profile as a derived state view:
+
+```text
+source memories + temporal evidence
+→ profile synthesis
+→ validation
+→ versioned profile view
+```
+
+The profile must not replace or erase the evidence from which it was inferred.
+
+### Derived experiment
+
+Compare retrieval-only personalization with versioned profile synthesis. Measure correctness, consistency after updates, provenance completeness and recovery from an incorrect profile update.
+
+### Difference / caution
+
+TESSERA provides memory/evidence infrastructure; final personalization, coordination and response generation remain outside its current product boundary.
+
+### Status
+
+Planned research direction. No profile-synthesis engine implemented.
+
+---
+
+## State Contamination — Safety in Evolving Memory
+
+Source: https://arxiv.org/abs/2605.16746  
+Published: 2026-05-16
+
+### What the paper says
+
+The paper studies how unsafe content can persist through transcripts, summaries, retrieved context and memory buffers. It calls the hidden survival of influence through apparently cleaner summaries memory laundering and reports that sanitizing before summarization reduces contamination more effectively than filtering only the completed summary.
+
+### TESSERA interpretation
+
+Memory safety is a lifecycle property:
+
+```text
+ingest
+→ assess source
+→ derive / summarize
+→ reassess derived state
+→ persist with lineage
+→ retrieve with status visible
+```
+
+A derived summary should never silently receive greater authority than contaminated or unverified source evidence.
+
+### Derived experiment
+
+Inject controlled unsafe or misleading state before and after summarization. Measure propagation, laundering, false-positive sanitization, lineage preservation and whether retrieval exposes the safety status.
+
+### Difference / caution
+
+The paper's results do not establish that one generic filter is sufficient. TESSERA needs explicit policy boundaries and reproducible threat models before implementation claims.
+
+### Status
+
+Planned safety Test Card. Provenance exists; end-to-end contamination control does not.
+
+---
+
+## MemORAI — Adaptive Graph Intelligence
+
+Sources:
+- https://aclanthology.org/2026.findings-acl.1408/
+- https://arxiv.org/abs/2605.01386
+
+Published: Findings of ACL 2026
+
+### What the paper says
+
+MemORAI combines selective memory filtering and dual-layer compression with a provenance-enriched multi-relational graph. It retains turn-level factual origins and retrieves query-adaptive subgraphs using Dynamic Weighted PageRank. The paper evaluates retrieval and personalized generation on LOCOMO and LongMemEval.
+
+### TESSERA interpretation
+
+MemORAI reinforces three controls that must remain separate:
+
+```text
+storage gate
+≠ provenance model
+≠ query-adaptive graph retrieval
+```
+
+TESSERA can study each independently rather than importing a monolithic graph pipeline.
+
+### Derived experiment
+
+Extend #25/#26 with a graph-ranking arm and a selective-storage arm. Compare against no graph, unweighted expansion and current explainable retrieval using answer quality, recall, tokens, latency, provenance coverage and update cost.
+
+### Difference / caution
+
+Reported MemORAI results are not TESSERA results. Dynamic Weighted PageRank and its compression pipeline are not current TESSERA capabilities.
+
+### Status
+
+Research reference for planned graph and storage-gating experiments.
+
+---
+
 ## GraphMemix — Query-Aware Evidence Forests
 
 Source: https://arxiv.org/abs/2608.26983  
