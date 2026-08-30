@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/brand/tessera-lockup-light.svg" alt="TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories" width="760" />
+  <img src="docs/assets/brand/tessera-hero.webp" alt="TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories" />
 </p>
 
 # TESSERA
@@ -13,7 +13,7 @@ TESSERA turns project knowledge into structured evidence an agent can query with
 - **Explainable** — retrieval signals and relevant evidence are inspectable instead of hidden behind one opaque score.
 - **Agent-agnostic** — use the Python API, CLI, or MCP surface without coupling memory to one agent runtime.
 
-[Install](#install) · [Quickstart](#quickstart) · [Python API](#python-api) · [How it works](#how-it-works) · [Documentation](#documentation) · [Project status](#project-status)
+[Install](#install) · [Quickstart](#quickstart) · [Python API](#python-api) · [Features](#features) · [How it works](#how-it-works) · [Research](#research-references) · [Documentation](#documentation) · [Contributors](#contributors)
 
 [![TESSERA CI](https://github.com/LuigiFerronatto/TESSERA/actions/workflows/tessera-ci.yml/badge.svg)](https://github.com/LuigiFerronatto/TESSERA/actions/workflows/tessera-ci.yml)
 
@@ -121,25 +121,23 @@ An agent eventually needs to answer questions such as:
 
 TESSERA makes those concerns part of the memory layer instead of pushing them into prompts, ad-hoc file conventions, or opaque retrieval infrastructure.
 
-## What TESSERA does
+## Features
 
 | Capability | Current behavior |
 | --- | --- |
 | Text ingestion | Canonicalizes Markdown with complete, partial, or absent frontmatter |
 | Memory model | Preserves exactly three semantic drawers: `facts`, `preferences`, `insights` |
-| Identity | Separates persistent memory/source identity from file path and content version |
-| Retrieval | Combines inspectable lexical, metadata, title, relation, and type signals |
-| Evidence | Surfaces query-relevant evidence while preserving the full original memory |
+| Stable identity | Separates persistent memory/source identity from file path and content version |
+| Explainable retrieval | Combines inspectable lexical, metadata, title, relation, and type signals |
+| Query-aware evidence | Surfaces relevant evidence while preserving the full original memory |
 | Provenance | Tracks source document, source version hashes, and exact spans when provable |
-| Relations | Preserves explicit relationships and direct navigation between memories |
-| Interfaces | Python API, CLI, and MCP surface |
+| Explicit relations | Preserves relationships and direct navigation between memories |
+| Interfaces | Python API, CLI, and MCP |
 | Evaluation | Python 3.9/3.12 tests, CLI smoke, and deterministic sanity retrieval evaluation |
 
-## What TESSERA does not do
+### Deliberate boundaries
 
-TESSERA is memory infrastructure, not the final reasoning agent.
-
-It does not:
+TESSERA is memory infrastructure, not the final reasoning agent. It does not:
 
 - generate the final answer on behalf of the consuming agent;
 - treat retrieval relevance as truth, confidence, or authority;
@@ -217,6 +215,36 @@ TESSERA is an evolving Foundation. The current implementation is usable, but sev
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the experimental sequence and linked Test Cards.
 
+## Research references
+
+TESSERA is research-driven, but a cited paper is a **reference signal**, not proof that its approach is implemented or validated here. The detailed source → interpretation → Test Card trace lives in [`docs/research/REFERENCES.md`](docs/research/REFERENCES.md).
+
+| Reference | What it informs in TESSERA |
+| --- | --- |
+| [QUMem: Personalized Memory for Query-Conditioned User-State Inference in LLM Agents](https://arxiv.org/abs/2608.16168) | Three semantic drawers, query-conditioned memory use, temporal/source evidence |
+| [A-MEM: Agentic Memory for LLM Agents](https://arxiv.org/abs/2502.12110) | Atomic structured memories, interconnected notes, memory evolution |
+| [LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory](https://arxiv.org/abs/2410.10813) | Extraction, multi-session reasoning, updates, temporal reasoning, abstention |
+| [LongMemEval V2](https://github.com/xiaowu0162/LongMemEval-V2) | Static/dynamic state, workflow knowledge, environment gotchas, premise awareness |
+| [GraphMemix: Query-Aware Evidence Forests for Long-Term Multimodal Agent Memory](https://arxiv.org/abs/2608.26983) | Query-aware graph expansion and bounded evidence budgets |
+| [CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval](https://arxiv.org/abs/2608.25500) | Relation confidence, edge validation, controlled graph traversal |
+| [MemToC: Benchmarking Memory-Tool Conflict Resolution in Large Language Models](https://arxiv.org/abs/2608.26295) | Source arbitration, disagreement visibility, abstention |
+| [RENDER: Controlling Reader-Facing Evidence in LLM Memory Evaluation](https://arxiv.org/abs/2608.23568) | Structured evidence rendering as an independent evaluation variable |
+| [Mem0 paper](https://arxiv.org/abs/2504.19413) | Scalable long-term memory and hybrid retrieval comparison |
+| [Zep / Graphiti paper](https://arxiv.org/abs/2501.13956) | Temporal context graphs, fact validity, provenance, incremental graph updates |
+
+## Acknowledgements
+
+TESSERA is informed by a broader ecosystem of memory systems, agent runtimes, benchmarks, and retrieval architectures. In addition to the papers above, the project actively studies and compares ideas from:
+
+- [Mem0](https://docs.mem0.ai/)
+- [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview)
+- [Letta](https://docs.letta.com/)
+- [LangGraph / LangChain memory](https://docs.langchain.com/oss/python/langchain/long-term-memory)
+- [MemOS](https://github.com/MemTensor/MemOS)
+- [MemPalace](https://github.com/bassemhalawani/memorypalace)
+
+These references are acknowledgements of useful research and engineering ideas. They do not imply endorsement, dependency, architectural equivalence, or benchmark superiority.
+
 ## Documentation
 
 | If you need | Read |
@@ -248,4 +276,10 @@ Repository changes follow an Issue/Test Card → PR → evaluation → decision 
 
 Issues and pull requests are welcome. Behavior changes should be linked to an Issue/Test Card and include reproducible evidence rather than relying only on “tests passed.”
 
-A dedicated `CONTRIBUTING.md` is not yet versioned; until then, the PR contract above is the repository contribution baseline.
+A dedicated `CONTRIBUTING.md` is tracked separately; until it is versioned, the PR contract above is the repository contribution baseline.
+
+## Contributors
+
+TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
+
+See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
