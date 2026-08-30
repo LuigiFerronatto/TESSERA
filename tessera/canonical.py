@@ -8,6 +8,7 @@ from dataclasses import dataclass, field, asdict
 import datetime
 import hashlib
 import os
+import posixpath
 import re
 from typing import Any, Dict, List, Optional, Tuple
 import yaml
@@ -21,8 +22,8 @@ class IdentityMetadata:
 
 @dataclass
 class ClassificationMetadata:
-    drawer: str  # facts | preferences | insights
-    kind: str    # e.g. factual, preference, procedural_anchor
+    drawer: Optional[str]  # facts | preferences | insights | None (for non-memory documents)
+    kind: str    # e.g. factual, preference, procedural_anchor, instruction
     document_type: str  # memory | harness_instructions | skill_instructions | project_context | decision_record | experiment_record | report | reference
 
 
@@ -95,16 +96,61 @@ class CanonicalMetadata:
         """Convert canonical metadata to a clean nested dictionary structure."""
         return asdict(self)
 
+    def is_semantically_equivalent(self, other: "CanonicalMetadata") -> bool:
+        """Compares semantic identity/content without considering operational metadata (indexed_at)."""
+        if not isinstance(other, CanonicalMetadata):
+            return False
+        
+        # Compare identity
+        if self.identity.id != other.identity.id or self.identity.name != other.identity.name:
+            return False
+            
+        # Compare classification
+        if (self.classification.drawer != other.classification.drawer or 
+            self.classification.kind != other.classification.kind or 
+            self.classification.document_type != other.classification.document_type):
+            return False
+            
+        # Compare scope
+        if (self.scope.level != other.scope.level or 
+            self.scope.path != other.scope.path or 
+            self.scope.harness != other.scope.harness):
+            return False
+            
+        # Compare content hash
+        if self.source.content_hash != other.source.content_hash:
+            return False
+            
+        # Compare temporal (except indexed_at)
+        if (self.temporal.observed_at != other.temporal.observed_at or 
+            self.temporal.valid_from != other.temporal.valid_from or 
+            self.temporal.valid_until != other.temporal.valid_until or 
+            self.temporal.recorded_at != other.temporal.recorded_at):
+            return False
+            
+        # Compare quality
+        if (self.quality.confidence != other.quality.confidence or 
+            self.quality.authority != other.quality.authority):
+            return False
+            
+        # Compare relations (ignoring order)
+        self_rels = sorted([(r.type, r.target, r.origin) for r in self.relations])
+        other_rels = sorted([(r.type, r.target, r.origin) for r in other.relations])
+        if self_rels != other_rels:
+            return False
+            
+        return True
+
 
 def compute_sha256(text: str) -> str:
     """Computes the SHA-256 hash of a string."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> CanonicalMetadata:
+def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persistent_id: Optional[str] = None) -> CanonicalMetadata:
     """
     Parses raw text (with or without frontmatter) and builds a fully normalized
-    CanonicalMetadata model deterministically. Fulfills F4, F5, F7.
+    CanonicalMetadata model deterministically. Fulfills F3, F4, F5, F7.
     """
     # 1. Parse markdown frontmatter if present
     frontmatter, body = _split_markdown(raw_text)
@@ -126,16 +172,17 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
     origin: Dict[str, str] = {}
     
     # A. IDENTITY (F5)
-    # Rules: Explicit ID -> frontmatter ID -> inferred ID from file layout.
+    # Rules: Explicit ID -> frontmatter ID -> persistent_id -> inferred ID from file layout.
     explicit_id = frontmatter.get("id") or frontmatter.get("memory_id")
     if explicit_id:
         mem_id = str(explicit_id).strip()
         origin["id"] = "explicit"
+    elif persistent_id:
+        mem_id = persistent_id
+        origin["id"] = "system"
     else:
         # Infer stable ID based on relative path structure (F5)
-        # e.g., learnings/openai-tts -> learnings/openai-tts
         slug = os.path.splitext(rel_path_posix)[0]
-        # Clean up any potential double slashes or leading dots
         slug = re.sub(r'^\.+/', '', slug)
         slug = re.sub(r'/+', '/', slug)
         mem_id = slug
@@ -181,10 +228,8 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
         kind = str(explicit_kind).strip()
         origin["kind"] = "explicit"
     else:
-        if doc_type == "skill_instructions":
-            kind = "procedural_anchor"
-        elif doc_type == "harness_instructions":
-            kind = "preference"
+        if doc_type in ("harness_instructions", "skill_instructions"):
+            kind = "instruction"
         else:
             kind = "factual"
         origin["kind"] = "inferred"
@@ -195,14 +240,19 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
         drawer = str(explicit_drawer).strip()
         origin["drawer"] = "explicit"
     else:
-        # Resolve drawer based on kind
-        if kind == "procedural_anchor":
-            drawer = "insights"
-        elif kind == "preference":
-            drawer = "preferences"
+        # Non-memory documents do NOT belong to a semantic drawer by default (F3)
+        if doc_type in ("harness_instructions", "skill_instructions", "project_context", "decision_record", "experiment_record", "report", "reference"):
+            drawer = None
+            origin["drawer"] = "default"
         else:
-            drawer = "facts"
-        origin["drawer"] = "inferred"
+            # Resolve drawer based on kind for memories
+            if kind == "procedural_anchor":
+                drawer = "insights"
+            elif kind == "preference":
+                drawer = "preferences"
+            else:
+                drawer = "facts"
+            origin["drawer"] = "inferred"
         
     classification = ClassificationMetadata(drawer=drawer, kind=kind, document_type=doc_type)
     
@@ -270,12 +320,13 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
         document_hash=doc_hash,
         content_hash=body_hash
     )
-    origin["source.document_id"] = "inferred"
-    origin["source.path"] = "explicit"
-    origin["source.format"] = "inferred"
-    origin["source.span"] = "inferred"
-    origin["source.document_hash"] = "inferred"
-    origin["source.content_hash"] = "inferred"
+    # Using 'system' origin for observed/calculated files metrics (F6)
+    origin["source.document_id"] = "system"
+    origin["source.path"] = "system"
+    origin["source.format"] = "system"
+    origin["source.span"] = "system"
+    origin["source.document_hash"] = "system"
+    origin["source.content_hash"] = "system"
     
     # E. TEMPORAL
     observed_at = frontmatter.get("observed_at")
@@ -308,7 +359,7 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
         
     # Always set current index time
     indexed_at = datetime.datetime.now().isoformat()
-    origin["temporal.indexed_at"] = "inferred"
+    origin["temporal.indexed_at"] = "system"
     
     temporal = TemporalMetadata(
         observed_at=observed_at,
@@ -323,60 +374,78 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str) -> Canon
     if confidence is not None:
         origin["quality.confidence"] = "explicit"
     else:
-        confidence = "high"
+        confidence = None
         origin["quality.confidence"] = "default"
         
     authority = frontmatter.get("authority")
     if authority is not None:
         origin["quality.authority"] = "explicit"
     else:
+        authority = None
         origin["quality.authority"] = "default"
         
     quality = QualityMetadata(confidence=confidence, authority=authority)
     
-    # G. RELATIONS (F7 - Explicit Relations first)
+    # G. RELATIONS (F7 - Explicit Relations first, with relative POSIX resolution and deduplication)
     relations: List[RelationMetadata] = []
-    
+    seen_relations = set()
+
+    def add_relation(rel_type: str, target_id: str, origin_val: str):
+        # Normalize backslashes, strip slashes
+        target_norm = target_id.replace("\\", "/").strip("/")
+        # Resolve target ID to posix normpath if it is relative
+        if target_norm.startswith(("./", "../")) or "/../" in target_norm or "/./" in target_norm:
+            doc_dir = posixpath.dirname(rel_path_posix)
+            target_norm = posixpath.normpath(posixpath.join(doc_dir, target_norm))
+        
+        # Strip leading dots or slashes from resolved path to get clean ID
+        target_norm = re.sub(r'^\.+/', '', target_norm)
+        target_norm = re.sub(r'/+', '/', target_norm)
+        
+        key = (rel_type, target_norm)
+        if key not in seen_relations:
+            seen_relations.add(key)
+            relations.append(RelationMetadata(type=rel_type, target=target_norm, origin=origin_val))
+
     # 1. Relations from frontmatter Connections
-    # Parse connections
     active_conns = frontmatter.get("active_connections") or frontmatter.get("connections") or []
     for conn in active_conns:
         if isinstance(conn, dict):
             target = conn.get("target_memory_id") or conn.get("target")
             rel_type = conn.get("relation_type") or conn.get("type") or "related_to"
             if target:
-                relations.append(RelationMetadata(type=str(rel_type), target=str(target), origin="explicit"))
+                add_relation(str(rel_type), str(target), "explicit")
         elif isinstance(conn, str) and ":" in conn:
-            # Format "target:type"
             target, rel_type = conn.split(":", 1)
-            relations.append(RelationMetadata(type=rel_type, target=target, origin="explicit"))
+            add_relation(rel_type, target, "explicit")
             
     # Frontmatter related_to
     related_to = frontmatter.get("related_to")
     if related_to:
         if isinstance(related_to, list):
             for target in related_to:
-                relations.append(RelationMetadata(type="related_to", target=str(target), origin="explicit"))
+                add_relation("related_to", str(target), "explicit")
         elif isinstance(related_to, str):
-            relations.append(RelationMetadata(type="related_to", target=related_to, origin="explicit"))
+            add_relation("related_to", related_to, "explicit")
             
-    # 2. Relations from Body [[wikilinks]] (F7)
+    # 2. Relations from Body [[wikilinks]]
     wikilink_pattern = re.compile(r"\[\[([a-zA-Z0-9_\-/]+)\]\]")
     for match in wikilink_pattern.finditer(body):
         target = match.group(1)
-        relations.append(RelationMetadata(type="related_to", target=target, origin="explicit"))
+        add_relation("related_to", target, "explicit")
         
     # Standard markdown links pointing to local markdown files
-    md_link_pattern = re.compile(r"\[[^\]]+\]\(([^)]+\.md)\)")
+    md_link_pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
     for match in md_link_pattern.finditer(body):
-        target_path = match.group(1)
-        # Normalize relative path to target ID
-        # e.g., ../learnings/foo.md -> learnings/foo
-        target_clean = target_path.replace(".md", "")
-        # Remove relative dot segments
-        target_clean = re.sub(r'^\.+/', '', target_clean)
-        target_clean = re.sub(r'/+', '/', target_clean)
-        relations.append(RelationMetadata(type="related_to", target=target_clean, origin="explicit"))
+        link_target = match.group(1).split('#')[0]
+        if link_target.startswith(("http://", "https://", "mailto:", "ftp:")):
+            continue
+        if link_target.endswith((".md", ".markdown")):
+            # Resolve relative POSIX path safely (F5)
+            doc_dir = posixpath.dirname(rel_path_posix)
+            target_path = posixpath.normpath(posixpath.join(doc_dir, link_target))
+            target_clean = target_path.replace(".md", "").replace(".markdown", "")
+            add_relation("related_to", target_clean, "explicit")
         
     # H. RESERVED OPTIONAL FIELDS
     state_key = frontmatter.get("state_key")
