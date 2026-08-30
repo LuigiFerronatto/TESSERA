@@ -96,49 +96,91 @@ class CanonicalMetadata:
         """Convert canonical metadata to a clean nested dictionary structure."""
         return asdict(self)
 
+    def is_content_equivalent(self, other: "CanonicalMetadata") -> bool:
+        """Compares body and content_hash only."""
+        if not isinstance(other, CanonicalMetadata):
+            return False
+        return self.source.content_hash == other.source.content_hash
+
     def is_semantically_equivalent(self, other: "CanonicalMetadata") -> bool:
-        """Compares semantic identity/content without considering operational metadata (indexed_at)."""
+        """
+        Compares semantic identity/content without considering operational metadata (indexed_at).
+        Considers body content, classification, scope, relevant temporal data, quality,
+        relations, state_key, superseded_at, utility, and relevant frontmatter metadata (tags/entities)
+        utilized by retrieval.
+        """
         if not isinstance(other, CanonicalMetadata):
             return False
         
-        # Compare identity
+        # Identity
         if self.identity.id != other.identity.id or self.identity.name != other.identity.name:
             return False
             
-        # Compare classification
+        # Body content
+        if not self.is_content_equivalent(other):
+            return False
+            
+        # Classification
         if (self.classification.drawer != other.classification.drawer or 
             self.classification.kind != other.classification.kind or 
             self.classification.document_type != other.classification.document_type):
             return False
             
-        # Compare scope
+        # Scope
         if (self.scope.level != other.scope.level or 
             self.scope.path != other.scope.path or 
             self.scope.harness != other.scope.harness):
             return False
             
-        # Compare content hash
-        if self.source.content_hash != other.source.content_hash:
-            return False
-            
-        # Compare temporal (except indexed_at)
+        # Temporal (except indexed_at)
         if (self.temporal.observed_at != other.temporal.observed_at or 
             self.temporal.valid_from != other.temporal.valid_from or 
             self.temporal.valid_until != other.temporal.valid_until or 
             self.temporal.recorded_at != other.temporal.recorded_at):
             return False
             
-        # Compare quality
+        # Quality
         if (self.quality.confidence != other.quality.confidence or 
             self.quality.authority != other.quality.authority):
             return False
             
-        # Compare relations (ignoring order)
+        # Relations (ignoring order)
         self_rels = sorted([(r.type, r.target, r.origin) for r in self.relations])
         other_rels = sorted([(r.type, r.target, r.origin) for r in other.relations])
         if self_rels != other_rels:
             return False
             
+        # State properties
+        if (self.state_key != other.state_key or 
+            self.superseded_at != other.superseded_at or 
+            self.utility != other.utility):
+            return False
+            
+        # Frontmatter tags/entities
+        self_tags = sorted(self.raw_frontmatter.get("tags", []))
+        other_tags = sorted(other.raw_frontmatter.get("tags", []))
+        if self_tags != other_tags:
+            return False
+            
+        self_ents = sorted([str(e.get("name", "")) for e in self.raw_frontmatter.get("entities", []) if isinstance(e, dict)])
+        other_ents = sorted([str(e.get("name", "")) for e in other.raw_frontmatter.get("entities", []) if isinstance(e, dict)])
+        if self_ents != other_ents:
+            return False
+            
+        return True
+
+    def is_index_equivalent(self, other: "CanonicalMetadata") -> bool:
+        """Compares everything required for indexing (all semantic fields plus file paths and version hashes)."""
+        if not isinstance(other, CanonicalMetadata):
+            return False
+        if not self.is_semantically_equivalent(other):
+            return False
+        # Index parameters
+        if (self.source.document_id != other.source.document_id or
+            self.source.path != other.source.path or
+            self.source.format != other.source.format or
+            self.source.document_hash != other.source.document_hash):
+            return False
         return True
 
 
@@ -147,7 +189,7 @@ def compute_sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persistent_id: Optional[str] = None) -> CanonicalMetadata:
+def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persistent_id: Optional[str] = None, persistent_doc_id: Optional[str] = None) -> CanonicalMetadata:
     """
     Parses raw text (with or without frontmatter) and builds a fully normalized
     CanonicalMetadata model deterministically. Fulfills F3, F4, F5, F7.
@@ -166,7 +208,7 @@ def parse_and_normalize(raw_text: str, filepath: str, storage_dir: str, persiste
     body_hash = compute_sha256(body)
     
     # Stable Document ID (F5)
-    doc_id = f"doc_{compute_sha256(rel_path_posix)[:12]}"
+    doc_id = persistent_doc_id or f"doc_{compute_sha256(rel_path_posix)[:12]}"
     
     # Initialize origin tracking dictionary
     origin: Dict[str, str] = {}
