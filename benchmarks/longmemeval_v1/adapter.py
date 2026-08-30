@@ -44,7 +44,6 @@ def session_document(
     dataset_sha256: str = DATASET_SHA256,
 ) -> SessionDocument:
     question_id = instance["question_id"]
-    answer_ids = {str(value) for value in instance["answer_session_ids"]}
     session_id = str(session_id)
     memory_id = stable_memory_id(question_id, session_id)
     frontmatter = {
@@ -53,7 +52,6 @@ def session_document(
         "dataset_sha256": dataset_sha256,
         "entities": [],
         "episode_id": question_id,
-        "has_answer": session_id in answer_ids,
         "id": memory_id,
         "node_type": "factual",
         "question_id": question_id,

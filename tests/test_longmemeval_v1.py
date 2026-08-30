@@ -2,10 +2,11 @@ import hashlib
 import json
 import random
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
-from benchmarks.longmemeval_v1 import run as run_module
+from benchmarks.longmemeval_v1 import RETRIEVAL_CONTRACT_COMMIT, run as run_module
 from benchmarks.longmemeval_v1.adapter import (
     project_instance,
     stable_memory_id,
@@ -25,7 +26,11 @@ from benchmarks.longmemeval_v1.metrics import (
     recall_at_k,
     reciprocal_rank,
 )
-from benchmarks.longmemeval_v1.run import compare_runs, run_baseline
+from benchmarks.longmemeval_v1.run import (
+    compare_runs,
+    resolve_git_provenance,
+    run_baseline,
+)
 from benchmarks.longmemeval_v1.schemas import validate_artifact_bundle
 from tessera import TesseraEngine
 
@@ -147,21 +152,43 @@ def test_duplicate_session_ids_are_deduplicated_by_first_occurrence():
     assert documents[0].frontmatter["session_date"] == "2025-01-01"
 
 
-def test_answer_labels_do_not_leak_into_searchable_projection(tmp_path):
+def test_answer_labels_are_absent_from_source_storage_index_and_raw_results(tmp_path):
     value = instance()
+    value["answer"] = "EVALUATOR-ONLY-ANSWER-SENTINEL"
     document = project_instance(value, "b" * 64)[0]
-    assert document.frontmatter["has_answer"] is True
-    assert "has_answer" not in document.body
-    assert "answer_session_ids" not in document.body
+    forbidden_fields = {
+        "has_answer", "answer_session_ids", "answer", "expected_answer", "is_relevant"
+    }
+    assert forbidden_fields.isdisjoint(document.frontmatter)
+    for forbidden in forbidden_fields:
+        assert forbidden not in document.text
+    assert value["answer"] not in document.text
     assert document.frontmatter["tags"] == []
     assert document.frontmatter["entities"] == []
     corpus = tmp_path / "corpus"
     write_instance_corpus(value, corpus, "b" * 64)
+    markdown_files = sorted(corpus.glob("*.md"))
+    assert len(markdown_files) == 2
+    for markdown_path in markdown_files:
+        stored = markdown_path.read_text(encoding="utf-8")
+        for forbidden in forbidden_fields:
+            assert forbidden not in stored
+        assert value["answer"] not in stored
     engine = TesseraEngine(storage_dir=str(corpus))
     engine.build_index(use_cache=False, persist=False)
     indexed_text = engine.node_corpus[document.memory_id]
-    assert "has_answer" not in indexed_text
-    assert value["answer_session_ids"][0] not in indexed_text
+    for forbidden in forbidden_fields:
+        assert forbidden not in indexed_text
+    assert value["answer"] not in indexed_text
+    engine_record = engine.graph.nodes[document.memory_id]
+    assert forbidden_fields.isdisjoint(engine_record["frontmatter"])
+    assert value["answer"] not in repr(engine_record)
+    raw_hits = engine.retrieve_context_contract(value["question"], top_n=2)
+    assert raw_hits
+    for hit in raw_hits:
+        assert forbidden_fields.isdisjoint(hit)
+        assert forbidden_fields.isdisjoint(hit["frontmatter"])
+        assert value["answer"] not in repr(hit)
 
 
 def test_question_corpora_are_isolated(tmp_path):
@@ -208,6 +235,48 @@ def test_empty_corpus_and_query_without_result(tmp_path):
     assert engine.retrieve_context_contract("zzzxxyy unmatched gibberish") == []
 
 
+def _git_runner(head, status):
+    def run(command, **_kwargs):
+        stdout = f"{head}\n" if command[-1] == "HEAD" else status
+        return SimpleNamespace(stdout=stdout)
+
+    return run
+
+
+def test_git_provenance_resolves_clean_head_and_frozen_contract(tmp_path):
+    run_commit = "c" * 40
+    provenance = resolve_git_provenance(
+        tmp_path, command_runner=_git_runner(run_commit, "")
+    )
+    assert provenance == {
+        "repository_root": ".",
+        "repository_dirty": False,
+        "dirty_worktree_override": False,
+        "tessera_commit": run_commit,
+        "retrieval_contract_commit": RETRIEVAL_CONTRACT_COMMIT,
+    }
+    assert provenance["tessera_commit"] != provenance["retrieval_contract_commit"]
+
+
+def test_git_provenance_rejects_dirty_repository_by_default(tmp_path):
+    with pytest.raises(RuntimeError, match="worktree is dirty"):
+        resolve_git_provenance(
+            tmp_path,
+            command_runner=_git_runner("d" * 40, " M benchmark.py\n"),
+        )
+
+
+def test_git_provenance_records_explicit_dirty_override(tmp_path):
+    provenance = resolve_git_provenance(
+        tmp_path,
+        allow_dirty=True,
+        command_runner=_git_runner("e" * 40, " M benchmark.py\n"),
+    )
+    assert provenance["repository_dirty"] is True
+    assert provenance["dirty_worktree_override"] is True
+    assert provenance["repository_root"] == "."
+
+
 def test_artifact_schema_and_two_run_equivalence(tmp_path, monkeypatch):
     data = [instance("q-positive"), instance("q-abstention_abs", answer=False)]
     dataset_path = tmp_path / "synthetic.json"
@@ -217,9 +286,30 @@ def test_artifact_schema_and_two_run_equivalence(tmp_path, monkeypatch):
     monkeypatch.setattr(run_module, "load_dataset", lambda _path: data)
     first = tmp_path / "run-1"
     second = tmp_path / "run-2"
-    first_bundle = run_baseline(dataset_path, "deterministic-small", 2, 10, first)
-    run_baseline(dataset_path, "deterministic-small", 2, 10, second)
+    run_commit = "f" * 40
+
+    def provenance(_root, _allow_dirty):
+        return {
+            "repository_root": ".",
+            "repository_dirty": False,
+            "dirty_worktree_override": False,
+            "tessera_commit": run_commit,
+            "retrieval_contract_commit": RETRIEVAL_CONTRACT_COMMIT,
+        }
+
+    first_bundle = run_baseline(
+        dataset_path, "deterministic-small", 2, 10, first,
+        provenance_resolver=provenance,
+    )
+    run_baseline(
+        dataset_path, "deterministic-small", 2, 10, second,
+        provenance_resolver=provenance,
+    )
     validate_artifact_bundle(first_bundle)
+    assert first_bundle["manifest"]["tessera_commit"] == run_commit
+    assert first_bundle["manifest"]["retrieval_contract_commit"] == RETRIEVAL_CONTRACT_COMMIT
+    assert first_bundle["manifest"]["repository_dirty"] is False
+    assert first_bundle["manifest"]["reproducible"] is True
     assert compare_runs(first, second)
     assert {path.name for path in first.iterdir()} == {
         "manifest.json", "selected_questions.json", "results.json",
@@ -232,3 +322,25 @@ def test_artifact_schema_and_two_run_equivalence(tmp_path, monkeypatch):
             (second / "results.json").read_text(encoding="utf-8")
         )[0]["retrieved"]
     ]
+
+    def dirty_provenance(_root, allow_dirty):
+        assert allow_dirty is True
+        return {
+            "repository_root": ".",
+            "repository_dirty": True,
+            "dirty_worktree_override": True,
+            "tessera_commit": run_commit,
+            "retrieval_contract_commit": RETRIEVAL_CONTRACT_COMMIT,
+        }
+
+    dirty_bundle = run_baseline(
+        dataset_path,
+        "deterministic-small",
+        2,
+        10,
+        tmp_path / "dirty-run",
+        allow_dirty_worktree=True,
+        provenance_resolver=dirty_provenance,
+    )
+    assert dirty_bundle["manifest"]["reproducible"] is False
+    assert "non-reproducible dirty-worktree" in dirty_bundle["scorecard"]["limitations"][-1]

@@ -12,7 +12,8 @@ This adapter measures the current TESSERA retrieval contract at session granular
 | Dataset | `longmemeval_s_cleaned.json` from `xiaowu0162/longmemeval-cleaned` |
 | Dataset SHA-256 | `d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442` |
 | Dataset revision label | `cleaned-2025-09` |
-| TESSERA retrieval baseline | `fb23012ba4b2fddc3912d7cb593391a04fe45ae7` (PR #98 merged) |
+| Frozen retrieval contract | `fb23012ba4b2fddc3912d7cb593391a04fe45ae7` (PR #98 merged) |
+| TESSERA implementation measured | Resolved from checked-out Git `HEAD` at run time |
 
 LongMemEval V2 is future context only: `https://github.com/xiaowu0162/LongMemEval-V2` at `2cc8c540bdb87fe6761629b585e727e1c4704520`. The setup does not clone, download, install, or execute V2.
 
@@ -67,7 +68,7 @@ Each question receives a fresh temporary corpus. Every haystack session becomes 
 longmemeval-v1/<question_id>/<session_id>
 ```
 
-The body preserves the session timestamp, turn order, role, and complete content. `has_answer` is evaluation metadata in native frontmatter only; neither it nor `answer_session_ids` is included in the indexed body, tags, or entities. Labels are used only after retrieval to score returned session IDs. The temporary corpus is destroyed before the next question.
+The body preserves the session timestamp, turn order, role, and complete content. Ground-truth fields and derived relevance labels—including `has_answer`, `answer_session_ids`, expected answers, `is_relevant`, and evidence labels—are absent from frontmatter, serialized Markdown, tags, entities, provenance, and searchable/indexed text. The evaluator retains ground truth separately and joins it to stable session IDs only after retrieval. The temporary corpus is destroyed before the next question.
 
 Official `_abs` rows may still carry evaluation-reference `answer_session_ids`. Per the abstention contract, the adapter never treats them as positive retrieval locations and normalizes result `ground_truth_session_ids` to `[]`.
 
@@ -88,6 +89,8 @@ scorecard.md
 Metrics are Recall@1/3/5/10, MRR, binary nDCG@10, evidence hit rate, first evidence position, provenance coverage, average context characters/tokens, indexing latency, query latency p50/p95, and abstention retrieval empty rate. Whitespace counting is deterministic and is not presented as model-token usage. Abstention questions are excluded from Recall/MRR/nDCG and reported separately.
 
 ## Reproducibility
+
+The runner resolves the checked-out Git `HEAD` as `tessera_commit` and records the frozen PR #98 contract separately as `retrieval_contract_commit`. It serializes `repository_root` as stable `.` rather than an absolute machine path. A dirty worktree fails by default because a commit SHA could not identify the code measured. `--allow-dirty-worktree` is an explicit escape hatch that records `repository_dirty: true`, `dirty_worktree_override: true`, and `reproducible: false`; such an artifact must not be presented as a reproducible baseline.
 
 Run twice into different directories and compare with `compare_runs`:
 
