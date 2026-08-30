@@ -94,7 +94,7 @@ AGENTS.md
 *.SKILL.md
 ```
 
-Future authority/precedence work (#32) will test how document type + scope + validity should interact.
+Future adapter/resolver/authority work (#71/#72/#32) will test how document type + scope + validity should interact.
 
 ---
 
@@ -389,7 +389,7 @@ A future `state_key` groups memories that represent different versions of the sa
 Example:
 
 ```yaml
-state_key: lao.runtime.strategy
+state_key: project.runtime.strategy
 ```
 
 This enables deterministic temporal/supersession experiments without relying on generic recency.

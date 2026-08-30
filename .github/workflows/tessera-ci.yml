@@ -74,27 +74,27 @@ jobs:
           mkdir -p artifacts
 
           tessera write "$corpus" \
-            --id "lao/charter" \
+            --id "project/charter" \
             --type factual \
             --episode "ci-purpose" \
-            --content "O propósito do LAO é funcionar como um runtime de inovação para agentes autônomos." \
-            --tags "lao,purpose,charter"
+            --content "O propósito do projeto é oferecer uma camada de memória auditável para agentes." \
+            --tags "project,purpose,charter,memory"
 
           tessera write "$corpus" \
-            --id "lao/learning-process" \
+            --id "project/learning-process" \
             --type procedural_anchor \
             --episode "ci-learning" \
-            --content "O LAO aprende registrando episódios no TESSERA e recuperando memórias nas execuções seguintes." \
-            --tags "lao,learning,tessera"
+            --content "O projeto aprende registrando evidências verificadas no TESSERA e recuperando memórias relevantes nas execuções seguintes." \
+            --tags "project,learning,tessera,evidence"
 
           tessera index "$corpus"
 
           # Smoke the real human/scriptable CLI. These assertions deliberately
           # match the current plain-output contract rather than Rich-only labels.
-          tessera query "$corpus" "qual o propósito do LAO?" --top-n 2 --plain | tee artifacts/cli-smoke.txt
-          tessera query "$corpus" "como o LAO aprende?" --top-n 2 --debug --plain | tee -a artifacts/cli-smoke.txt
-          grep -q "lao/charter" artifacts/cli-smoke.txt
-          grep -q "lao/learning-process" artifacts/cli-smoke.txt
+          tessera query "$corpus" "qual o propósito do projeto?" --top-n 2 --plain | tee artifacts/cli-smoke.txt
+          tessera query "$corpus" "como o projeto aprende?" --top-n 2 --debug --plain | tee -a artifacts/cli-smoke.txt
+          grep -q "project/charter" artifacts/cli-smoke.txt
+          grep -q "project/learning-process" artifacts/cli-smoke.txt
           grep -q "raw_pr=" artifacts/cli-smoke.txt
 
           # Validate the structured engine contract directly. CI must not infer
@@ -109,11 +109,11 @@ jobs:
           corpus = os.environ["TESSERA_SMOKE_CORPUS"]
           engine = TesseraEngine(storage_dir=corpus)
           engine.build_index()
-          results = engine.retrieve_context("como o LAO aprende?", top_n=2)
+          results = engine.retrieve_context("como o projeto aprende?", top_n=2)
 
           assert isinstance(results, list) and results
           top = results[0]
-          assert top["id"] == "lao/learning-process"
+          assert top["id"] == "project/learning-process"
           assert isinstance(top["score"], (int, float))
           assert top["relevant_evidence"]
           assert top["evidence_info"]["strategy"] == "paragraph_lexical"
@@ -131,10 +131,10 @@ jobs:
           # exposes the raw recency signal under the historical name.
           default_score = top["score"]
           zero_recency = engine.retrieve_context(
-              "como o LAO aprende?", top_n=2, weights={"recency": 0.0}
+              "como o projeto aprende?", top_n=2, weights={"recency": 0.0}
           )[0]["score"]
           enabled_recency = engine.retrieve_context(
-              "como o LAO aprende?", top_n=2, weights={"recency": 1.0}
+              "como o projeto aprende?", top_n=2, weights={"recency": 1.0}
           )[0]["score"]
           assert abs(default_score - zero_recency) < 1e-12
           assert enabled_recency >= zero_recency

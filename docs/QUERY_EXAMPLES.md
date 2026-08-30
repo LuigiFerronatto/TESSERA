@@ -16,7 +16,7 @@ The consuming agent remains responsible for reasoning and answering.
 
 # Current retrieval result shape
 
-The exact Python result object may evolve, but current retrieval semantics include fields in these categories:
+Current retrieval semantics include fields in these categories:
 
 ```text
 identity
@@ -29,21 +29,21 @@ score explanation
 provenance/evidence record
 ```
 
-A representative current result looks conceptually like:
+A representative result looks conceptually like:
 
 ```yaml
-id: lao/charter
+id: project/charter
 type: factual
 score: 0.43
 
-filepath: /.../lao/charter.md
+filepath: /.../project/charter.md
 filename: charter.md
 
 related_ids:
-  - lao/learning-process
+  - project/learning-process
 
 relevant_evidence: >
-  O propósito do LAO é ...
+  The project exists to provide an auditable memory layer for agents.
 
 evidence_info:
   strategy: paragraph_lexical
@@ -60,10 +60,10 @@ score_explain:
 
 provenance:
   evidence_id: ev_...
-  memory_id: lao/charter
+  memory_id: project/charter
   source:
     document_id: doc_...
-    path: lao/charter.md
+    path: project/charter.md
     document_hash: ...
     content_hash: ...
     format: markdown
@@ -91,17 +91,15 @@ Not every field is guaranteed to be non-null. In particular, `relevant_evidence`
 # Example 1 — direct purpose query
 
 ```bash
-tessera query ./memories "qual o propósito do LAO?"
+tessera query ./memories "qual o propósito do projeto?"
 ```
 
-This kind of query has strong lexical support for a charter/purpose memory.
-
-The expected behavior is:
+Expected current behavior:
 
 ```text
 query
   ↓
-charter/purpose memory ranks highly
+purpose/charter memory ranks highly
   ↓
 query-relevant paragraph is foregrounded
   ↓
@@ -110,28 +108,26 @@ full body remains available
 source/provenance remain inspectable
 ```
 
-The important point is that the agent is not forced to trust a score alone. It can inspect both evidence and source.
+The agent is not forced to trust a score alone. It can inspect both evidence and source.
 
 ---
 
-# Example 2 — known paraphrase limitation
+# Example 2 — paraphrase robustness
 
 ```bash
-tessera query ./memories "pq o LAO existe?"
+tessera query ./memories "pq esse projeto existe?"
 ```
 
-The current deterministic sanity fixture records a known limitation: the gold charter memory can appear at **#2 instead of #1** because the current retrieval path remains strongly lexical.
-
-This is intentional as a benchmark baseline.
+The deterministic sanity fixture contains both direct and colloquial purpose queries so paraphrase behavior remains observable.
 
 We do **not** want code like:
 
 ```python
-if query == "pq o LAO existe?":
-    boost("lao/charter")
+if query == "pq esse projeto existe?":
+    boost("project/charter")
 ```
 
-Future semantic/adaptive retrieval should improve paraphrase recall through generalizable ablations (#17/#18), not by overfitting this query.
+Future semantic/adaptive retrieval should improve paraphrase recall through generalizable ablations (#17/#18), not by overfitting one sentence.
 
 ---
 
@@ -140,17 +136,17 @@ Future semantic/adaptive retrieval should improve paraphrase recall through gene
 Suppose a memory contains several paragraphs:
 
 ```text
-The LAO experiments with multiple runtimes.
+The project supports multiple execution environments.
 
-The current architecture persists learnings in TESSERA.
+Verified learnings are persisted as source-backed memory and retrieved later.
 
-The team also publishes a weekly AI radar.
+The repository also publishes periodic research notes.
 ```
 
 For:
 
 ```text
-como o LAO aprende?
+como o projeto aprende?
 ```
 
 TESSERA should foreground the paragraph that overlaps with the learning/memory question rather than blindly returning the first paragraph.
@@ -171,24 +167,22 @@ This is preferable to fabricating an evidence span.
 Before:
 
 ```text
-identity.id:        learnings_old
+identity.id:        project/deployment-policy
 source.document_id: doc_970ff13b932d
-source.path:        learnings_old.md
+source.path:        project/deployment-policy.md
 content_hash:       e8a6...
 ```
 
 After rename/move:
 
 ```text
-identity.id:        learnings_old
+identity.id:        project/deployment-policy
 source.document_id: doc_970ff13b932d
-source.path:        sub/learnings_moved.md
+source.path:        archive/deployment-policy.md
 content_hash:       e8a6...
 ```
 
 The knowledge identity and source-document identity survive the move; only location changes.
-
-That means Evidence Ledger records can continue to refer to the same source entity rather than treating a rename as new knowledge.
 
 ---
 
@@ -237,13 +231,11 @@ drawer: null
 scope: ./**
 ```
 
-The future instruction-precedence experiment (#32) will test authority/scope resolution. That precedence behavior is **not** implemented today.
+Future #71/#72/#32 experiments will test harness adapters, applicability, authority and scope precedence. Those behaviors are **not** implemented today.
 
 ---
 
 # Example 7 — what the agent should receive today
-
-A consuming agent can use current TESSERA results approximately like this:
 
 ```text
 TESSERA RESULT
@@ -269,21 +261,19 @@ TESSERA is not the final answer generator in this contract.
 
 # Future target example — NOT IMPLEMENTED
 
-The following demonstrates where the roadmap is heading, not current output.
-
 Query:
 
 ```text
-qual runtime o LAO usa atualmente?
+qual runtime o projeto usa atualmente?
 ```
 
-Future target:
+Possible future target:
 
 ```yaml
 results:
-  - memory: M3
+  - memory: project/runtime/current
     relevance: 0.91
-    evidence: "LAO agora utiliza arquitetura multi-runtime..."
+    evidence: "The project now uses a multi-runtime execution strategy."
 
     provenance:
       document_id: doc_182
@@ -294,7 +284,7 @@ results:
 
     relations:
       - type: supersedes
-        target: M1
+        target: project/runtime/legacy
         confidence: 0.98
         origin: derived
 
@@ -309,33 +299,13 @@ evidence_status:
   status: sufficient
 ```
 
-This requires future Test Cards:
-
-```text
-#15 temporal model/state keys
-#16 conflict/supersession
-#26 relation confidence
-#27 evidence arbitration
-#20 evidence sufficiency
-```
-
-It is included here to make the architectural direction understandable without confusing it with the current Foundation.
+This requires future Test Cards including temporal state, conflict/supersession, relation confidence, Evidence Arbitration and evidence sufficiency. It is included to make the architectural direction understandable without confusing it with the current Foundation.
 
 ---
 
-# Current sanity baseline
+# Current sanity evaluation
 
-The CI sanity dataset is intentionally small and deterministic.
-
-Current project baseline:
-
-```text
-Hit@1          75%
-Hit@3         100%
-Hit@5         100%
-MRR           0.875
-Evidence hit  100%
-```
+The CI sanity dataset is intentionally small, synthetic and deterministic. It covers direct retrieval, paraphrase robustness, procedural retrieval, an operational gotcha and missing evidence.
 
 Use it to detect regressions, not to claim competitive superiority.
 
