@@ -39,7 +39,7 @@ Claude Desktop / Cursor config example:
 """
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from .engine import TesseraEngine
 from .hooks import TesseraTaskHook
@@ -98,7 +98,7 @@ def write_memory(
     connect_to: Optional[List[str]] = None,
     relation_type: str = "related_to",
     description: str = "",
-    persist_format: str = "md",
+    persist_format: Literal["md"] = "md",
 ) -> Dict[str, Any]:
     """
     Writes (or overwrites) a memory note. Content is passed through the
@@ -117,8 +117,10 @@ def write_memory(
     string containing the full Markdown body. Do not persist empty or anemic
     memory bodies.
 
-    PERSIST FORMAT — By default `persist_format` is "md", generating a Markdown
-    file. Pass "json" only when a JSON persistence payload is explicitly wanted.
+    PERSIST FORMAT — `persist_format` accepts exactly "md", the canonical
+    writable format discovered by TESSERA's source pipeline. Unsupported values
+    fail before persistence and before the MCP-triggered index rebuild. Arbitrary
+    JSON persistence/ingestion is not supported.
 
     `connect_to` accepts target memory IDs to create explicit graph edges
     (`active_connections`) using `relation_type`. Omit it when there are no

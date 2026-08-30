@@ -58,6 +58,12 @@ tessera query ./memories "what database does the project use?"
 
 Source files remain the source of truth. Derived index data is rebuildable under `.tessera_index/`.
 
+Markdown is the only canonical writable persistence format. Every successful
+Engine, CLI, or MCP write creates a `.md` source that the current indexer can
+discover. Unsupported formats are rejected before sanitization or any storage,
+registry, graph, index, or Evidence Ledger mutation; arbitrary JSON ingestion is
+not supported.
+
 ### Query existing project knowledge
 
 TESSERA can also index existing Markdown with complete, partial, or absent frontmatter. It recognizes textual artifacts such as:

@@ -97,6 +97,10 @@ STRUCTURED RETRIEVAL RESULT
 The existing `write_memory_note()` path already contains a **basic heuristic security gate**:
 
 ```text
+persistence format validation (`md` only)
+   ├─ unsupported → deterministic failure, no mutation
+   └─ supported
+   ↓
 candidate memory content
    ↓
 WriteGatingEngine.audit_and_sanitize()
@@ -108,6 +112,12 @@ MemoryFrontmatter
    ↓
 Markdown source file
 ```
+
+Markdown is the only canonical writable persistence format because it is the
+format discovered by the current source iterator. Acknowledged writes are
+therefore indexable after rebuild. JSON writing and arbitrary JSON ingestion
+are not supported; unsupported format values fail before the security gate or
+any filesystem/runtime mutation.
 
 This is different from roadmap #19:
 

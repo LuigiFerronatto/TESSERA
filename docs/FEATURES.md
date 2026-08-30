@@ -192,6 +192,14 @@ new entity
 
 **Tracking:** existing write path; documentation correction Issue #54
 
+### Persistence-format contract
+
+Markdown (`md`) is the only canonical writable format. The Engine and MCP
+reject every other `persist_format` value before sanitization, warnings,
+timestamps, source writes, registry/graph changes, index rebuilds, or Evidence
+Ledger changes. This keeps every acknowledged write discoverable by the current
+Markdown source pipeline. Arbitrary JSON persistence/ingestion is not supported.
+
 The current `write_memory_note()` path instantiates `WriteGatingEngine` and runs:
 
 ```python
@@ -269,8 +277,9 @@ source text
 → structured retrieval result
 
 write_memory_note
+→ validate `persist_format == "md"`
 → basic heuristic audit/sanitization
-→ persistence
+→ Markdown persistence
 ```
 
 Still experimental/planned:
