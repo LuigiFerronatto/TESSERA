@@ -2,7 +2,7 @@
 
 > Current architecture reference for the Foundation on `main`.
 >
-> See also: [OVERVIEW.md](OVERVIEW.md), [FEATURES.md](FEATURES.md), [CONCEPTS.md](CONCEPTS.md), [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md), [ROADMAP.md](ROADMAP.md), and [research/](research/).
+> See also: [OVERVIEW.md](OVERVIEW.md), [FEATURES.md](FEATURES.md), [CONCEPTS.md](CONCEPTS.md), [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md), [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md), [ROADMAP.md](ROADMAP.md), and [research/](research/).
 
 ## Executive takeaway
 
@@ -10,7 +10,7 @@ TESSERA is a **text-first, agent-agnostic memory and evidence layer**. It is not
 
 The current Foundation provides canonical understanding of heterogeneous text, stable knowledge/source identity, explicit graph structure, explainable multi-signal retrieval, query-aware evidence, source-version-aware provenance, a basic heuristic write-side sanitization gate, and CI/Test Card governance.
 
-Advanced memory admission, query-aware graph expansion, relation confidence, temporal state, authority, Evidence Arbitration and abstention remain experiments.
+Advanced memory admission, query-aware graph expansion, relation confidence, temporal state, instruction resolution, authority, Evidence Arbitration and abstention remain experiments.
 
 ## Product contract
 
@@ -40,6 +40,7 @@ AGENT
 - Hash = version/fingerprint, not identity.
 - No generative LLM is mandatory for the basic Foundation path.
 - User source files are not silently rewritten during indexing.
+- Public examples/fixtures are project-agnostic.
 
 ## Current read / retrieval pipeline
 
@@ -108,7 +109,7 @@ MemoryFrontmatter
 Markdown source file
 ```
 
-This is different from roadmap #19.
+This is different from roadmap #19:
 
 ```text
 basic heuristic sanitization          IMPLEMENTED
@@ -123,14 +124,14 @@ TESSERA normalizes heterogeneous project text into one canonical representation 
 
 ```yaml
 identity:
-  id: lao/charter
+  id: project/charter
 classification:
   document_type: memory
   kind: factual
   drawer: facts
 source:
   document_id: doc_...
-  path: lao/charter.md
+  path: project/charter.md
 metadata_origin:
   drawer: inferred
 ```
@@ -144,7 +145,7 @@ classification:
   drawer: null
 ```
 
-This allows `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` to participate without being forced into facts/preferences/insights.
+This allows `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` to participate without being forced into facts/preferences/insights. Adapter/precedence behavior remains experimental (#71/#72/#32).
 
 # 2. Stable identity model
 
@@ -179,6 +180,8 @@ source.document_id SAME
 source.path        SAME
 content_hash       CHANGED
 ```
+
+Source revision history beyond the current version is a separate experiment (#73); stable hashes alone are not presented as a full immutable history.
 
 # 3. Graph representation
 
@@ -223,14 +226,7 @@ ranking
 
 Recency is disabled by default because recent information is not necessarily current truth.
 
-Known baseline limitation:
-
-```text
-pq o LAO existe?
-→ intended charter memory can still appear at #2
-```
-
-That remains benchmark evidence rather than a reason for per-query tuning.
+The sanity corpus intentionally contains a colloquial purpose paraphrase so lexical limitations remain visible. We do not add query-specific boosts to hide a bad ranking.
 
 # 5. Query-aware Relevant Evidence
 
@@ -261,10 +257,10 @@ The Evidence Ledger is an immutable/rebuildable provenance substrate derived fro
 
 ```yaml
 evidence_id: ev_...
-memory_id: lao/charter
+memory_id: project/charter
 source:
   document_id: doc_...
-  path: lao/charter.md
+  path: project/charter.md
   document_hash: sha256:...
   content_hash: sha256:...
 span:
@@ -290,9 +286,28 @@ SOURCE FILES
 
 Derived state must be reconstructible from source files. Current indexing still uses coarse cache/rebuild semantics; **incremental/idempotent indexing remains #12**.
 
-# 8. CI and experimental governance
+Two additional Foundation gaps are explicit rather than implied:
 
-**Tracking:** Issue #10 / PR #4 and Issue #22 / PR #24
+```text
+#69 plain-text ingestion beyond Markdown
+#70 structure-aware segmentation of long documents
+```
+
+# 8. Interface boundary
+
+The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
+
+A currently audited gap is that the MCP adapter exposes a smaller subset than the engine's evidence-rich result. Contract parity is tracked in #68 rather than being silently treated as solved.
+
+# 9. Optional orchestration boundary
+
+The repository contains an assisted orchestration path for information-need analysis, retrieval planning and state inference. TESSERA's core product identity remains the deterministic evidence layer.
+
+Whether assisted planning/synthesis belongs as an optional adapter, and what value it adds over direct structured evidence, is tracked explicitly in #74/#17/#28.
+
+# 10. CI and experimental governance
+
+**Tracking:** Issue #10 / PR #4, governance PRs, and #67 for Quality Gate v2.
 
 ```text
 Issue / Test Card
@@ -304,17 +319,7 @@ Issue / Test Card
 → KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-Current sanity regression baseline:
-
-```text
-Hit@1          75%
-Hit@3         100%
-Hit@5         100%
-MRR           0.875
-Evidence hit  100%
-```
-
-These are regression metrics, not competitive benchmark claims.
+Sanity metrics are regression indicators, not competitive benchmark claims.
 
 ## Current module map
 
@@ -328,7 +333,9 @@ These are regression metrics, not competitive benchmark claims.
 | `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
 | `tessera/models.py` | Domain models for memory/write paths |
 | `tessera/cli.py` | Human CLI surface |
-| `benchmarks/sanity/` | Deterministic regression evaluation |
+| `tessera/mcp_server.py` | MCP transport surface; parity hardening tracked in #68/#77 |
+| `tessera/orchestrator.py` | Optional assisted retrieval/synthesis path; boundary tracked in #74 |
+| `benchmarks/sanity/` | Deterministic project-agnostic regression evaluation |
 
 ## Implemented vs planned
 
@@ -351,10 +358,15 @@ Test Card governance
 Planned / experimental:
 
 ```text
+#68 Engine / CLI / MCP contract parity
 #12 incremental/idempotent indexing
+#69 text ingestion coverage
+#70 structural segmentation
 #13 metadata doctor
 #14/#25/#26 controlled relations/graph intelligence
 #15 temporal model + state keys
+#71/#72 harness adapters + instruction resolver
+#73 source/memory revision history
 #16 conflict/supersession
 #27 Evidence Arbitration
 #32 source authority + instruction precedence
@@ -362,7 +374,8 @@ Planned / experimental:
 #18 LongMemEval
 #28 rendering ablation
 #17 adaptive retrieval
-#19 evidence-aware memory admission / advanced write gating
+#74 core vs optional LLM orchestrator boundary
+#19 evidence-aware memory admission
 #21 experience learning / utility feedback
 ```
 
@@ -381,7 +394,7 @@ Relation Reliability
   ↓
 Temporal Validity / State Keys
   ↓
-Authority / Scope / Precedence
+Authority / Scope / Instruction Resolution
   ↓
 Conflict Detection
   ↓
