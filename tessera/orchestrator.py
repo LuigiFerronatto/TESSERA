@@ -30,6 +30,7 @@ See `tessera.hooks` for the mechanism that *automatically* intercepts a task and
 triggers this pipeline (rather than the caller invoking it by hand).
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
@@ -106,10 +107,46 @@ class TesseraOrchestrator:
             from .llm_bridge import resolve_llm_fn
             resolved_fn, _ = resolve_llm_fn(return_backend_name=True)
             if not resolved_fn:
-                raise ValueError("A real LLM backend is required but none is available.")
-            self.llm_fn = resolved_fn
+                # Use offline simulated llm instead of raising ValueError, as documented.
+                self.llm_fn = self._simulated_llm
+            else:
+                self.llm_fn = resolved_fn
         else:
             self.llm_fn = llm_fn
+
+    def _simulated_llm(self, system_prompt: str, user_prompt: str) -> str:
+        """Deterministic offline string-template simulation so the pipeline runs offline/testable."""
+        if system_prompt == NEED_AGENT_SYSTEM_PROMPT:
+            match = re.search(r"Task instruction:\s*(.*?)(?:\n|$)", user_prompt, re.IGNORECASE)
+            task = match.group(1).strip() if match else "the task"
+            return f"Need to retrieve factual and procedural memory notes related to: {task}"
+        
+        elif system_prompt == PLANNER_AGENT_SYSTEM_PROMPT:
+            match = re.search(r"Information need:\s*(.*?)(?:\n|$)", user_prompt, re.IGNORECASE)
+            need = match.group(1).strip() if match else "query"
+            clean_query = need.replace("Need to retrieve factual and procedural memory notes related to:", "").strip()
+            return clean_query
+            
+        elif system_prompt == INFERENCE_AGENT_SYSTEM_PROMPT:
+            # Look for the Retrieved memory notes section in the user prompt
+            match = re.search(r"Retrieved memory notes:\n(.*?\n\n|.*?$)", user_prompt, re.DOTALL | re.IGNORECASE)
+            notes_block = match.group(1).strip() if match else ""
+            
+            summary_parts = [
+                "### Primary Anchors of Truth (Simulated)\n"
+            ]
+            note_headers = re.findall(r"\[[a-zA-Z_]+\s*\|\s*([a-zA-Z0-9_\-/]+)\s*\|.*?\]", user_prompt)
+            if note_headers:
+                for idx, nid in enumerate(note_headers, 1):
+                    summary_parts.append(f"{idx}. Provenance from note: {nid}")
+                summary_parts.append("\n### Consolidated Context (Simulated)")
+                summary_parts.append(notes_block)
+            else:
+                summary_parts.append("(No relevant memory found for this task.)")
+            return "\n".join(summary_parts)
+            
+        else:
+            return user_prompt
 
     # ------------------------------------------------------------------
     # Pipeline steps
