@@ -18,6 +18,7 @@ from .evidence import (
     EvidenceLedger,
     enrich_retrieval_results,
     ledger_from_graph,
+    retrieval_results_contract,
 )
 
 
@@ -85,3 +86,7 @@ class TesseraEngine(_CoreTesseraEngine):
             weights=weights,
         )
         return enrich_retrieval_results(self, results)
+
+    def retrieve_context_contract(self, *args: Any, **kwargs: Any) -> List[Dict[str, Any]]:
+        """Return retrieval results in the shared Engine/CLI/MCP contract."""
+        return retrieval_results_contract(self.retrieve_context(*args, **kwargs))
