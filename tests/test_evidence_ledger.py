@@ -1,10 +1,13 @@
 from pathlib import Path
 
+from tessera import Entity, TesseraEngine
 from tessera.canonical import parse_and_normalize
 from tessera.evidence import (
     EvidenceLedger,
+    enrich_retrieval_results,
     evidence_for_text,
     evidence_from_canonical,
+    ledger_from_graph,
     locate_evidence_span,
     verify_evidence_freshness,
 )
@@ -143,3 +146,67 @@ def test_query_aware_evidence_uses_exact_line_span_and_never_invents_one(tmp_pat
     unknown = locate_evidence_span(raw, "texto que não existe")
     assert unknown.start_line is None
     assert unknown.end_line is None
+
+
+def test_indexed_graph_rebuilds_ledger_and_retrieval_can_be_enriched(tmp_path):
+    engine = TesseraEngine(storage_dir=str(tmp_path))
+    engine.write_memory_note(
+        mem_id="lao/charter",
+        mem_type="factual",
+        episode_id="ep-purpose",
+        content=(
+            "O propósito do LAO é escalar experimentação com agentes autônomos.\n\n"
+            "A memória auditável preserva evidências para decisões futuras."
+        ),
+        tags=["lao", "purpose", "charter"],
+        entities=[Entity("LAO", "Lab Autonomous Officer")],
+    )
+    engine.write_memory_note(
+        mem_id="lao/noise",
+        mem_type="factual",
+        episode_id="ep-noise",
+        content="Uma nota geral sobre automação de software.",
+        tags=["automation"],
+        entities=[],
+    )
+    engine.build_index(use_cache=False)
+
+    ledger = ledger_from_graph(engine.graph)
+    records = ledger.for_memory("lao/charter")
+    assert len(records) == 1
+    assert records[0].source.document_id
+    assert records[0].source.path.endswith("lao/charter.md")
+
+    raw_results = engine.retrieve_context("qual o propósito do LAO?", top_n=2)
+    enriched = enrich_retrieval_results(engine, raw_results)
+    charter = next(item for item in enriched if item["id"] == "lao/charter")
+
+    assert charter["provenance"]["memory_id"] == "lao/charter"
+    assert charter["provenance"]["source"]["document_id"] == records[0].source.document_id
+    assert charter["relevant_evidence"]
+    assert charter["evidence"] is not None
+    assert charter["evidence"]["span"]["start_line"] is not None
+    assert charter["evidence"]["span"]["end_line"] is not None
+    assert charter["evidence"]["extraction"]["method"] == "paragraph_lexical"
+
+
+def test_no_relevant_evidence_means_no_query_specific_evidence_record(tmp_path):
+    engine = TesseraEngine(storage_dir=str(tmp_path))
+    engine.write_memory_note(
+        mem_id="lao/charter",
+        mem_type="factual",
+        episode_id="ep-purpose",
+        content="O propósito do LAO é escalar experimentação.",
+        tags=["lao"],
+        entities=[],
+    )
+    engine.build_index(use_cache=False)
+
+    raw_results = engine.retrieve_context("xyzabcqwe", top_n=1)
+    # Depending on seed threshold this may yield no candidates at all; both
+    # states are valid abstention behavior for this bridge.
+    if raw_results:
+        enriched = enrich_retrieval_results(engine, raw_results)
+        assert enriched[0]["relevant_evidence"] is None
+        assert enriched[0]["evidence"] is None
+        assert enriched[0]["provenance"] is not None
