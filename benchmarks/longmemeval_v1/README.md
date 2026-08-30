@@ -105,6 +105,32 @@ PY
 
 The comparison includes checksum, selected IDs/order, generated memory IDs, retrieved IDs/order/scores, retrieval metrics, and scorecard schema. It ignores only `created_at`, per-question indexing/query latency, aggregate latency fields, and absolute output location (which is not stored).
 
+## Ledger and CI profiles
+
+The compact canonical dev-50 record lives at
+`benchmarks/results/longmemeval-v1-dev-50/baseline.json`; its Markdown view is
+mechanically generated and checked in CI. Same-commit repeated runs must have
+identical normalized hashes. Cross-commit comparisons first enforce the frozen
+dataset, selection, adapter, metric, and retrieval configuration, then compare
+metrics and a retrieval-result signature that excludes timestamps and Git
+provenance.
+
+Benchmark CI installs with the versioned `constraints-ci.txt` under Python
+3.12.14. New ledger records capture the complete forward environment
+fingerprint. The #96 record remains the unchanged historical retrieval baseline
+with an explicitly incomplete environment; `forward.json` is the separate
+pinned-environment drift reference.
+
+CI prepares the dataset through `prepare_dataset.py`, the single authoritative
+atomic download/checksum path. Cache hits are verified just like downloads, and
+network, cache, upstream, or checksum failures remain explicit infrastructure
+failures. The dataset is treated only as data; no LongMemEval code executes.
+
+The future full-500 profile is manual or scheduled, must have a separate name
+and record, and must never overwrite dev-50. Reader/answer generation and an LLM
+judge remain separate future evaluation layers. LongMemEval V2 is not supported
+by this adapter.
+
 ## Limitations
 
 - The 50-question slice is a minimal reproducible gate, not the official 500-question result.

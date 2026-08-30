@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LuigiFerronatto/TESSERA/benchmarks/results/schema.json",
+  "title": "TESSERA benchmark ledger record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "record_id", "benchmark", "profile", "issue",
+    "pull_request", "decision", "measured_commit", "merge_commit",
+    "parent_record_id", "retrieval_contract_commit", "dataset",
+    "configuration", "selection", "determinism", "metrics", "latency",
+    "cost", "environment", "limitations", "created_at"
+  ],
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": "1.1.0"}}},
+      "then": {"required": ["parent_commit", "execution"]}
+    }
+  ],
+  "properties": {
+    "schema_version": {"enum": ["1.0.0", "1.1.0"]},
+    "record_id": {"type": "string", "minLength": 1},
+    "benchmark": {"const": "LongMemEval V1"},
+    "profile": {"const": "longmemeval-v1-dev-50"},
+    "issue": {"type": "integer", "minimum": 0},
+    "pull_request": {"type": "integer", "minimum": 0},
+    "decision": {"enum": ["KEEP", "ITERATE", "REVERT", "DROP", "PENDING"]},
+    "measured_commit": {"$ref": "#/$defs/gitSha"},
+    "merge_commit": {"anyOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
+    "parent_record_id": {"type": ["string", "null"], "minLength": 1},
+    "parent_commit": {"anyOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
+    "retrieval_contract_commit": {"$ref": "#/$defs/gitSha"},
+    "execution": {"$ref": "#/$defs/execution"},
+    "dataset": {"$ref": "#/$defs/dataset"},
+    "configuration": {"$ref": "#/$defs/configuration"},
+    "selection": {"$ref": "#/$defs/selection"},
+    "determinism": {"$ref": "#/$defs/determinism"},
+    "metrics": {"$ref": "#/$defs/metrics"},
+    "latency": {"$ref": "#/$defs/latency"},
+    "cost": {"$ref": "#/$defs/cost"},
+    "environment": {"$ref": "#/$defs/environment"},
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "nonNegativeNumber": {"type": "number", "minimum": 0},
+    "nullableNonNegativeNumber": {
+      "anyOf": [{"$ref": "#/$defs/nonNegativeNumber"}, {"type": "null"}]
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "revision", "source_url", "upstream_commit", "sha256", "query_count", "positive_count", "abstention_count"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "source_url": {"type": "string", "minLength": 1},
+        "upstream_commit": {"$ref": "#/$defs/gitSha"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "query_count": {"const": 50},
+        "positive_count": {"const": 46},
+        "abstention_count": {"const": 4}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subset", "top_k", "granularity", "reader", "judge", "retrieval_configuration", "metric_definitions_sha256", "token_count_method", "adapter_version"],
+      "properties": {
+        "subset": {"const": "deterministic-small"},
+        "top_k": {"const": 10},
+        "granularity": {"const": "session"},
+        "reader": {"type": "null"},
+        "judge": {"type": "null"},
+        "retrieval_configuration": {"type": "object"},
+        "metric_definitions_sha256": {"$ref": "#/$defs/sha256"},
+        "token_count_method": {"type": "string", "minLength": 1},
+        "adapter_version": {"type": "string", "minLength": 1}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "seed", "query_ids_sha256", "query_count"],
+      "properties": {
+        "algorithm": {"type": "string", "minLength": 1},
+        "seed": {"type": "string", "minLength": 1},
+        "query_ids_sha256": {"$ref": "#/$defs/sha256"},
+        "query_count": {"const": 50}
+      }
+    },
+    "determinism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_count", "equivalent", "normalized_sha256", "retrieval_result_sha256"],
+      "properties": {
+        "run_count": {"type": "integer", "minimum": 1},
+        "equivalent": {"type": "boolean"},
+        "normalized_sha256": {"$ref": "#/$defs/sha256"},
+        "retrieval_result_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recall_at_1", "recall_at_3", "recall_at_5", "recall_at_10", "mrr", "ndcg_at_10", "evidence_hit_rate", "first_evidence_position", "provenance_coverage", "abstention_retrieval_empty_rate", "average_context_characters", "average_context_tokens"],
+      "properties": {
+        "recall_at_1": {"type": "number", "minimum": 0, "maximum": 1},
+        "recall_at_3": {"type": "number", "minimum": 0, "maximum": 1},
+        "recall_at_5": {"type": "number", "minimum": 0, "maximum": 1},
+        "recall_at_10": {"type": "number", "minimum": 0, "maximum": 1},
+        "mrr": {"type": "number", "minimum": 0, "maximum": 1},
+        "ndcg_at_10": {"type": "number", "minimum": 0, "maximum": 1},
+        "evidence_hit_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "first_evidence_position": {
+          "anyOf": [
+            {"type": "number", "minimum": 1},
+            {"type": "null"}
+          ]
+        },
+        "provenance_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "abstention_retrieval_empty_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "average_context_characters": {"$ref": "#/$defs/nonNegativeNumber"},
+        "average_context_tokens": {"$ref": "#/$defs/nonNegativeNumber"}
+      }
+    },
+    "latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["comparable_environment", "indexing_latency_ms", "total_indexing_latency_ms", "query_latency_p50_ms", "query_latency_p95_ms"],
+      "properties": {
+        "comparable_environment": {"type": "boolean"},
+        "indexing_latency_ms": {"$ref": "#/$defs/nullableNonNegativeNumber"},
+        "total_indexing_latency_ms": {"$ref": "#/$defs/nullableNonNegativeNumber"},
+        "query_latency_p50_ms": {"$ref": "#/$defs/nullableNonNegativeNumber"},
+        "query_latency_p95_ms": {"$ref": "#/$defs/nullableNonNegativeNumber"}
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["api_calls", "llm_calls", "estimated_usd"],
+      "properties": {
+        "api_calls": {"type": "integer", "minimum": 0},
+        "llm_calls": {"type": "integer", "minimum": 0},
+        "estimated_usd": {"$ref": "#/$defs/nonNegativeNumber"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "event_name", "event_identity", "run_id", "run_attempt"],
+      "properties": {
+        "role": {"enum": ["candidate", "parent", "canonical", "forward", "local"]},
+        "event_name": {"enum": ["pull_request", "push", "schedule", "workflow_dispatch", "local"]},
+        "event_identity": {"type": "string", "minLength": 1},
+        "run_id": {"type": ["string", "null"], "minLength": 1},
+        "run_attempt": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "environment": {
+      "oneOf": [
+        {"$ref": "#/$defs/historicalEnvironment"},
+        {"$ref": "#/$defs/forwardEnvironment"}
+      ]
+    },
+    "historicalEnvironment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_version", "platform", "repository_dirty"],
+      "properties": {
+        "python_version": {"type": ["string", "null"]},
+        "platform": {"type": ["string", "null"]},
+        "repository_dirty": {"type": ["boolean", "null"]}
+      }
+    },
+    "forwardEnvironment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_implementation", "python_version", "python_full_version", "os", "platform", "architecture", "numpy_version", "scipy_version", "scikit_learn_version", "networkx_version", "pyyaml_version", "repository_dirty", "repository_root", "constraints_file", "constraints_sha256", "fingerprint_sha256", "complete"],
+      "properties": {
+        "python_implementation": {"type": "string", "minLength": 1},
+        "python_version": {"type": "string", "minLength": 1},
+        "python_full_version": {"type": "string", "minLength": 1},
+        "os": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "numpy_version": {"type": "string", "minLength": 1},
+        "scipy_version": {"type": "string", "minLength": 1},
+        "scikit_learn_version": {"type": "string", "minLength": 1},
+        "networkx_version": {"type": "string", "minLength": 1},
+        "pyyaml_version": {"type": "string", "minLength": 1},
+        "repository_dirty": {"const": false},
+        "repository_root": {"const": "."},
+        "constraints_file": {"type": "string", "minLength": 1},
+        "constraints_sha256": {"$ref": "#/$defs/sha256"},
+        "fingerprint_sha256": {"$ref": "#/$defs/sha256"},
+        "complete": {"const": true}
+      }
+    }
+  }
+}

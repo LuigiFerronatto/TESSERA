@@ -1,0 +1,111 @@
+{
+  "benchmark": "LongMemEval V1",
+  "configuration": {
+    "adapter_version": "1",
+    "granularity": "session",
+    "judge": null,
+    "metric_definitions_sha256": "9c0adb9186c949167d08679767edb00efc13da733a342ca6e0b2e0bf6be40bb1",
+    "reader": null,
+    "retrieval_configuration": {
+      "engine": "TesseraEngine.retrieve_context_contract",
+      "reader": null,
+      "resolve_conflicts": true,
+      "top_k": 10,
+      "weights": "runtime-defaults"
+    },
+    "subset": "deterministic-small",
+    "token_count_method": "whitespace",
+    "top_k": 10
+  },
+  "cost": {
+    "api_calls": 0,
+    "estimated_usd": 0,
+    "llm_calls": 0
+  },
+  "created_at": "2026-08-30T23:24:02.155334+00:00",
+  "dataset": {
+    "abstention_count": 4,
+    "name": "longmemeval_s_cleaned.json",
+    "positive_count": 46,
+    "query_count": 50,
+    "revision": "cleaned-2025-09",
+    "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "source_url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json",
+    "upstream_commit": "9e0b455f4ef0e2ab8f2e582289761153549043fc"
+  },
+  "decision": "KEEP",
+  "determinism": {
+    "equivalent": true,
+    "normalized_sha256": "0978ac074c1afc0c23903f3cc0fb33cb29100aac257c62baf941ae3f2e4d280c",
+    "retrieval_result_sha256": "3154eebce37a04bb5c12dbd4d70e88b9dc185d18bb583fba7b5d757ddb4d8b1d",
+    "run_count": 1
+  },
+  "environment": {
+    "architecture": "x86_64",
+    "complete": true,
+    "constraints_file": "benchmarks/longmemeval_v1/constraints-ci.txt",
+    "constraints_sha256": "ccfe8ef09b8d2c744bce01fd34f3ea9c42da97c7b020dc839e2e090be1d8ca7c",
+    "fingerprint_sha256": "53990d7bab034ff10068093248fa0756ed2c53023d539a706eba959acfd996b7",
+    "networkx_version": "3.6.1",
+    "numpy_version": "2.5.2",
+    "os": "Linux",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python_full_version": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "python_implementation": "CPython",
+    "python_version": "3.12.14",
+    "pyyaml_version": "6.0.3",
+    "repository_dirty": false,
+    "repository_root": ".",
+    "scikit_learn_version": "1.9.0",
+    "scipy_version": "1.18.1"
+  },
+  "execution": {
+    "event_identity": "pull_request:33341628084:1:e0bc0412e1ea2e06b00993b9a11533a2b9a9f6a5",
+    "event_name": "pull_request",
+    "role": "forward",
+    "run_attempt": 1,
+    "run_id": "33341628084"
+  },
+  "issue": 100,
+  "latency": {
+    "comparable_environment": false,
+    "indexing_latency_ms": 155.4596251800001,
+    "query_latency_p50_ms": 71.90889399998923,
+    "query_latency_p95_ms": 81.4458840000043,
+    "total_indexing_latency_ms": 7772.981259000006
+  },
+  "limitations": [
+    "50-question subset is not an official full LongMemEval score",
+    "retrieval only; no reader, generation, or LLM-as-judge",
+    "latency is environment-dependent"
+  ],
+  "measured_commit": "467ba649f53312cedcecf40caf548af5f766c67b",
+  "merge_commit": null,
+  "metrics": {
+    "abstention_retrieval_empty_rate": 0.0,
+    "average_context_characters": 12583.98,
+    "average_context_tokens": 2050.562,
+    "evidence_hit_rate": 0.9565217391304348,
+    "first_evidence_position": 1.9318181818181819,
+    "mrr": 0.7785024154589372,
+    "ndcg_at_10": 0.7874548353775167,
+    "provenance_coverage": 1.0,
+    "recall_at_1": 0.4710144927536232,
+    "recall_at_10": 0.9166666666666666,
+    "recall_at_3": 0.7028985507246377,
+    "recall_at_5": 0.7753623188405797
+  },
+  "parent_commit": null,
+  "parent_record_id": "longmemeval-v1-dev-50/96-b09ceacc",
+  "profile": "longmemeval-v1-dev-50",
+  "pull_request": 102,
+  "record_id": "longmemeval-v1-dev-50/forward-467ba649f533",
+  "retrieval_contract_commit": "fb23012ba4b2fddc3912d7cb593391a04fe45ae7",
+  "schema_version": "1.1.0",
+  "selection": {
+    "algorithm": "sha256-stratified",
+    "query_count": 50,
+    "query_ids_sha256": "a5549148e1405715c970e640b7146a42670e9d2735270419d0a0a5d872e6480a",
+    "seed": "tessera-lme-v1-96"
+  }
+}

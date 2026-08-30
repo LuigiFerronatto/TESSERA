@@ -9,6 +9,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ## Unreleased
 
 ### Added
+- A versioned LongMemEval V1 dev-50 benchmark ledger with immediate-parent regression gating, a separate historical #96 comparison, validated Test Card attribution, pinned forward-environment fingerprints, and checksum-pinned conditional benchmark CI. ([#100](https://github.com/LuigiFerronatto/TESSERA/issues/100))
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed

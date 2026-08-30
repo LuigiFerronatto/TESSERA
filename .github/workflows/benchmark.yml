@@ -1,0 +1,381 @@
+name: TESSERA Benchmark Ledger
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tessera-benchmark-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATASET_PATH: .benchmark-data/longmemeval-v1/longmemeval_s_cleaned.json
+  DATASET_SHA256: d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442
+  CANONICAL_COMMIT: b09ceacc24d9dfb67f9cd63f5219cd2ce8bc9f5a
+  FORWARD_RECORD: benchmarks/results/longmemeval-v1-dev-50/forward.json
+  CONSTRAINTS_PATH: benchmarks/longmemeval_v1/constraints-ci.txt
+  ARTIFACT_ROOT: artifacts/benchmark-reporting
+  CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  benchmark-reporting:
+    name: benchmark-reporting (offline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      applicability: ${{ steps.applicability.outputs.applicability }}
+      benchmark_issue: ${{ steps.applicability.outputs.benchmark_issue }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install TESSERA and test dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Validate benchmark applicability and Test Card identity
+        id: applicability
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            python -m benchmarks.reporting.applicability \
+              --body-env PR_BODY \
+              --github-output "$GITHUB_OUTPUT"
+          else
+            echo "applicability=REQUIRED" >> "$GITHUB_OUTPUT"
+            echo "benchmark_issue=0" >> "$GITHUB_OUTPUT"
+            echo "REQUIRED"
+          fi
+
+      - name: Validate versioned records and generated Markdown
+        run: |
+          python -m benchmarks.reporting.cli validate-record \
+            --record benchmarks/results/longmemeval-v1-dev-50/baseline.json \
+            --markdown benchmarks/results/longmemeval-v1-dev-50/baseline.md
+          if [[ -f "$FORWARD_RECORD" ]]; then
+            python -m benchmarks.reporting.cli validate-record \
+              --record "$FORWARD_RECORD" \
+              --markdown benchmarks/results/longmemeval-v1-dev-50/forward.md
+          fi
+
+      - name: Run focused offline benchmark reporting tests
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: python -m pytest -q tests/test_benchmark_reporting.py
+
+  longmemeval-dev-50:
+    name: longmemeval-v1-dev-50
+    needs: benchmark-reporting
+    if: >-
+      (github.event_name == 'pull_request' && needs.benchmark-reporting.outputs.applicability == 'REQUIRED') ||
+      github.event_name == 'push' ||
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.CANDIDATE_SHA }}
+
+      - name: Set up pinned benchmark Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+          cache: pip
+          cache-dependency-path: benchmarks/longmemeval_v1/constraints-ci.txt
+
+      - name: Install pinned dev-50 environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -c "$CONSTRAINTS_PATH" -e ".[dev]"
+          python -m pip check
+
+      - name: Resolve event, Test Card, PR, and immediate parent identity
+        id: identity
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          BENCHMARK_ISSUE: ${{ needs.benchmark-reporting.outputs.benchmark_issue || 0 }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          issue=0
+          pr=0
+          case "$EVENT_NAME" in
+            pull_request)
+              issue="$BENCHMARK_ISSUE"
+              pr="$PR_NUMBER"
+              parent="$PR_BASE_SHA"
+              if [[ ! "$issue" =~ ^[1-9][0-9]*$ || ! "$pr" =~ ^[1-9][0-9]*$ ]]; then
+                echo "invalid PR/Test Card identity" >&2
+                exit 1
+              fi
+              ;;
+            push)
+              parent="$PUSH_BEFORE"
+              if [[ -z "$parent" || "$parent" =~ ^0+$ ]]; then
+                parent="$(python -c 'import json; print(json.load(open("benchmarks/results/longmemeval-v1-dev-50/forward.json"))["measured_commit"])')"
+              fi
+              ;;
+            schedule|workflow_dispatch)
+              parent="$(python -c 'import json; print(json.load(open("benchmarks/results/longmemeval-v1-dev-50/forward.json"))["measured_commit"])')"
+              ;;
+            *)
+              echo "unsupported event: $EVENT_NAME" >&2
+              exit 1
+              ;;
+          esac
+          if [[ ! "$parent" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "invalid comparison parent SHA: $parent" >&2
+            exit 1
+          fi
+          identity="$EVENT_NAME:${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT}:${CANDIDATE_SHA}"
+          parent_record_id="longmemeval-v1-dev-50/parent-${parent}-run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          {
+            echo "issue=$issue"
+            echo "pull_request=$pr"
+            echo "parent_sha=$parent"
+            echo "parent_record_id=$parent_record_id"
+            echo "event_identity=$identity"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Restore checksum-pinned dataset cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DATASET_PATH }}
+          key: longmemeval-v1-dev-50-dataset-${{ env.DATASET_SHA256 }}
+
+      - name: Acquire and verify pinned dataset
+        run: |
+          set -euo pipefail
+          python -m benchmarks.longmemeval_v1.prepare_dataset \
+            --dataset-path "$DATASET_PATH"
+          python -m benchmarks.longmemeval_v1.prepare_dataset \
+            --dataset-path "$DATASET_PATH" \
+            --verify-only
+
+      - name: Require a clean measured worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+            echo "infrastructure failure: benchmark worktree is dirty" >&2
+            git status --short >&2
+            exit 1
+          fi
+
+      - name: Validate artifact output paths
+        run: |
+          mkdir -p "$ARTIFACT_ROOT"
+          for directory in candidate-run-1 candidate-run-2 parent-runtime canonical-runtime; do
+            python -m benchmarks.reporting.cli validate-output-path \
+              --allowed-root "$ARTIFACT_ROOT" \
+              --path "$ARTIFACT_ROOT/$directory"
+          done
+
+      - name: Run candidate dev-50 twice
+        shell: bash
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: |
+          set -euo pipefail
+          for run in 1 2; do
+            python -m benchmarks.longmemeval_v1.run \
+              --dataset-path "$DATASET_PATH" \
+              --subset deterministic-small \
+              --limit 50 \
+              --top-k 10 \
+              --output-dir "$ARTIFACT_ROOT/candidate-run-$run"
+          done
+
+      - name: Reconstruct immediate parent and canonical #96 in isolated worktrees
+        shell: bash
+        env:
+          PARENT_SHA: ${{ steps.identity.outputs.parent_sha }}
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: |
+          set -euo pipefail
+          dataset_absolute="$GITHUB_WORKSPACE/$DATASET_PATH"
+          parent_output="$GITHUB_WORKSPACE/$ARTIFACT_ROOT/parent-runtime"
+          canonical_output="$GITHUB_WORKSPACE/$ARTIFACT_ROOT/canonical-runtime"
+          parent_tree="$RUNNER_TEMP/tessera-parent-${PARENT_SHA}"
+          canonical_tree="$RUNNER_TEMP/tessera-canonical-${CANONICAL_COMMIT}"
+
+          git cat-file -e "${PARENT_SHA}^{commit}" || git fetch --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
+          git cat-file -e "${PARENT_SHA}^{commit}"
+          git worktree add --detach "$parent_tree" "$PARENT_SHA"
+          (
+            cd "$parent_tree"
+            PYTHONPATH="$parent_tree" python -m benchmarks.longmemeval_v1.run \
+              --dataset-path "$dataset_absolute" \
+              --subset deterministic-small --limit 50 --top-k 10 \
+              --output-dir "$parent_output"
+          )
+          git worktree remove "$parent_tree"
+
+          canonical_ref="refs/remotes/origin/benchmark-baseline-99"
+          git fetch --no-tags origin "refs/pull/99/head:${canonical_ref}"
+          fetched_commit="$(git rev-parse "${canonical_ref}^{commit}")"
+          if [[ "$fetched_commit" != "$CANONICAL_COMMIT" ]]; then
+            echo "infrastructure failure: canonical #96 ref moved: expected $CANONICAL_COMMIT, got $fetched_commit" >&2
+            exit 1
+          fi
+          git worktree add --detach "$canonical_tree" "$fetched_commit"
+          (
+            cd "$canonical_tree"
+            PYTHONPATH="$canonical_tree" python -m benchmarks.longmemeval_v1.run \
+              --dataset-path "$dataset_absolute" \
+              --subset deterministic-small --limit 50 --top-k 10 \
+              --output-dir "$canonical_output"
+          )
+          git worktree remove "$canonical_tree"
+
+      - name: Build candidate and immediate-parent records
+        shell: bash
+        env:
+          BENCHMARK_ISSUE: ${{ steps.identity.outputs.issue }}
+          PR_NUMBER: ${{ steps.identity.outputs.pull_request }}
+          PARENT_SHA: ${{ steps.identity.outputs.parent_sha }}
+          PARENT_RECORD_ID: ${{ steps.identity.outputs.parent_record_id }}
+          EVENT_IDENTITY: ${{ steps.identity.outputs.event_identity }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          python -m benchmarks.reporting.cli verify-repeatability \
+            --first "$ARTIFACT_ROOT/candidate-run-1" \
+            --second "$ARTIFACT_ROOT/candidate-run-2" \
+            --output "$ARTIFACT_ROOT/repeatability.json"
+          common=(
+            --issue "$BENCHMARK_ISSUE"
+            --pull-request "$PR_NUMBER"
+            --event-name "$EVENT_NAME"
+            --event-identity "$EVENT_IDENTITY"
+            --run-id "$GITHUB_RUN_ID"
+            --run-attempt "$GITHUB_RUN_ATTEMPT"
+            --constraints "$CONSTRAINTS_PATH"
+          )
+          python -m benchmarks.reporting.cli record-from-artifacts \
+            --artifact-dir "$ARTIFACT_ROOT/parent-runtime" \
+            --record-id "$PARENT_RECORD_ID" \
+            --decision PENDING \
+            --parent-record-id longmemeval-v1-dev-50/forward-reference \
+            --execution-role parent \
+            --output "$ARTIFACT_ROOT/parent.json" \
+            "${common[@]}"
+          python -m benchmarks.reporting.cli record-from-artifacts \
+            --artifact-dir "$ARTIFACT_ROOT/candidate-run-1" \
+            --repeat-artifact-dir "$ARTIFACT_ROOT/candidate-run-2" \
+            --record-id "longmemeval-v1-dev-50/candidate-${CANDIDATE_SHA}" \
+            --decision PENDING \
+            --parent-record-id "$PARENT_RECORD_ID" \
+            --parent-commit "$PARENT_SHA" \
+            --execution-role candidate \
+            --output "$ARTIFACT_ROOT/candidate.json" \
+            "${common[@]}"
+
+      - name: Validate pinned forward environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f "$FORWARD_RECORD" ]]; then
+            python -m benchmarks.reporting.cli validate-environment \
+              --record "$ARTIFACT_ROOT/candidate.json" \
+              --reference "$FORWARD_RECORD" \
+              --output "$ARTIFACT_ROOT/environment-comparison.json"
+          else
+            echo '{"bootstrap_required":true}' > "$ARTIFACT_ROOT/environment-comparison.json"
+            echo "Forward reference bootstrap required; add parent.json from this pinned CI run." >&2
+          fi
+
+      - name: Compare immediate parent and candidate (primary merge gate)
+        run: |
+          python -m benchmarks.reporting.compare \
+            --baseline "$ARTIFACT_ROOT/parent.json" \
+            --candidate "$ARTIFACT_ROOT/candidate.json" \
+            --baseline-artifacts "$ARTIFACT_ROOT/parent-runtime" \
+            --candidate-artifacts "$ARTIFACT_ROOT/candidate-run-1" \
+            --threshold provenance_coverage=0 \
+            --output-json "$ARTIFACT_ROOT/parent-comparison.json" \
+            --output-md "$ARTIFACT_ROOT/parent-comparison.md" \
+            --fail-on-regression
+
+      - name: Compare canonical #96 and candidate (longitudinal reference)
+        run: |
+          python -m benchmarks.reporting.compare \
+            --baseline benchmarks/results/longmemeval-v1-dev-50/baseline.json \
+            --candidate "$ARTIFACT_ROOT/candidate.json" \
+            --baseline-artifacts "$ARTIFACT_ROOT/canonical-runtime" \
+            --candidate-artifacts "$ARTIFACT_ROOT/candidate-run-1" \
+            --threshold provenance_coverage=0 \
+            --output-json "$ARTIFACT_ROOT/canonical-comparison.json" \
+            --output-md "$ARTIFACT_ROOT/canonical-comparison.md"
+
+      - name: Publish benchmark summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/benchmark-reporting")
+          print("# LongMemEval V1 dev-50")
+          print()
+          print("Retrieval-only development gate; not answer accuracy or an official full-500 result.")
+          repeat_path = root / "repeatability.json"
+          if repeat_path.exists():
+              repeat = json.loads(repeat_path.read_text(encoding="utf-8"))
+              print(f"- Candidate repeatability: **{repeat['equivalent']}**")
+              print(f"- Run 1 normalized SHA-256: `{repeat['first_normalized_sha256']}`")
+              print(f"- Run 2 normalized SHA-256: `{repeat['second_normalized_sha256']}`")
+          for label in ("parent", "canonical"):
+              path = root / f"{label}-comparison.json"
+              if path.exists():
+                  comparison = json.loads(path.read_text(encoding="utf-8"))
+                  print(f"- {label.title()} comparison decision: **{comparison['decision']}**")
+                  print(f"- {label.title()} gating regressions: **{comparison['summary']['gating_regressions']}**")
+                  print(f"- {label.title()} query regressions: **{len(comparison['query_level']['regressions'])}**")
+          environment_path = root / "environment-comparison.json"
+          if environment_path.exists():
+              environment = json.loads(environment_path.read_text(encoding="utf-8"))
+              print(f"- Forward environment compatible: **{environment.get('compatible', False)}**")
+          PY
+
+      - name: Upload benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longmemeval-v1-dev-50-${{ env.CANDIDATE_SHA }}
+          path: artifacts/benchmark-reporting/
+          if-no-files-found: error
+          retention-days: 14

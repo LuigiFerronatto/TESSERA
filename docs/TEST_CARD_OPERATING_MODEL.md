@@ -54,6 +54,29 @@ A card is ready only when:
 8. Open/complete the PR with exact commands, before/after metrics, costs and regressions.
 9. Merge only when the success gate and recorded decision allow it.
 
+## Benchmark applicability
+
+Every pull request declares exactly one benchmark level:
+
+- `REQUIRED` for changes that can affect ingestion, segmentation, canonical
+  memory representation, indexing, retrieval/ranking, query compilation, graph
+  expansion, temporal/conflict behavior, evidence selection/reconstruction, or
+  benchmark adapters and metrics.
+- `SMOKE_ONLY` for integration work that should not alter retrieval quality,
+  such as write validation, configuration parity, transport, diagnostics,
+  packaging, and isolated public-contract fixes. A rationale is mandatory.
+- `NOT_APPLICABLE` for documentation, governance, branding, or non-executable
+  repository metadata. A rationale is mandatory.
+
+A `REQUIRED` PR also declares exactly one validated numeric Test Card identity
+as `Benchmark issue: #<number>`. CI records that issue and the actual PR number.
+Push, schedule, and manual runs instead record their explicit GitHub event/run
+identity and do not inherit a historical Test Card number.
+
+The declaration and PR evidence are authoritative and reviewable; a filename by
+itself does not decide applicability. See [`BENCHMARK_CI.md`](BENCHMARK_CI.md)
+for CI tiers, frozen inputs, and failure semantics.
+
 ## Stop conditions
 
 Move a card to blocked when:

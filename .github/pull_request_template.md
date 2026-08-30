@@ -34,6 +34,14 @@ Closes #
 **Documentation impact:** `YES | NO`
 <!-- Link docs changed or explain why none are needed. -->
 
+## Benchmark applicability
+
+<!-- Replace the choices below with exactly one value. A rationale is mandatory for SMOKE_ONLY and NOT_APPLICABLE. -->
+Benchmark applicability: REQUIRED | SMOKE_ONLY | NOT_APPLICABLE
+<!-- REQUIRED must name exactly one numeric Test Card issue, for example: Benchmark issue: #123 -->
+Benchmark issue: #
+Benchmark rationale:
+
 ## Technical implementation
 <!-- What changed in code/data/docs? Keep this implementation-oriented. -->
 - 

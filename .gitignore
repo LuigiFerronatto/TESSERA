@@ -10,3 +10,4 @@ dist/
 .benchmark-cache/
 .benchmark-data/
 artifacts/longmemeval-v1/
+artifacts/benchmark-reporting/
