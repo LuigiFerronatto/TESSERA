@@ -33,6 +33,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
+| [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
 
 ---
 
