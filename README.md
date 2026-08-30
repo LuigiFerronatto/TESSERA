@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/brand/tessera-hero.svg" alt="TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories" />
+  <img src="docs/assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories" />
 </p>
 
 # TESSERA
