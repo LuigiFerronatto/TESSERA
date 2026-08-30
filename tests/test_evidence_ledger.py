@@ -1,7 +1,13 @@
 from pathlib import Path
 
 from tessera.canonical import parse_and_normalize
-from tessera.evidence import EvidenceLedger, evidence_from_canonical, verify_evidence_freshness
+from tessera.evidence import (
+    EvidenceLedger,
+    evidence_for_text,
+    evidence_from_canonical,
+    locate_evidence_span,
+    verify_evidence_freshness,
+)
 
 
 def _canonical(tmp_path: Path, text: str, name: str = "note.md"):
@@ -105,3 +111,35 @@ def test_evidence_serialization_preserves_provenance_fields(tmp_path):
     assert payload["source"]["content_hash"]
     assert payload["fingerprint"]
     assert payload["extraction"] == {"method": "canonical_document", "inferred": False}
+
+
+def test_query_aware_evidence_uses_exact_line_span_and_never_invents_one(tmp_path):
+    raw = (
+        "---\n"
+        "id: lao/charter\n"
+        "---\n"
+        "# Charter\n"
+        "\n"
+        "O LAO pesquisa sinais.\n"
+        "\n"
+        "O propósito do LAO é escalar experimentação.\n"
+        "com agentes autônomos e evidência auditável.\n"
+    )
+    _path, canonical = _canonical(tmp_path, raw)
+    evidence_text = (
+        "O propósito do LAO é escalar experimentação.\n"
+        "com agentes autônomos e evidência auditável."
+    )
+
+    span = locate_evidence_span(raw, evidence_text)
+    assert span.start_line == 8
+    assert span.end_line == 9
+
+    record = evidence_for_text(canonical, raw, evidence_text)
+    assert record.span.start_line == 8
+    assert record.span.end_line == 9
+    assert record.extraction.method == "paragraph_lexical"
+
+    unknown = locate_evidence_span(raw, "texto que não existe")
+    assert unknown.start_line is None
+    assert unknown.end_line is None
