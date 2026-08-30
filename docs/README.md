@@ -34,7 +34,40 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
 
-`OUTPUT_CONTRACT.md` is being introduced under Issue #40; if it is not yet present on your branch, follow that Issue/PR rather than inferring a machine contract from CLI formatting.
+---
+
+# Change history and governance
+
+TESSERA keeps product history, architecture rationale and experimental evidence separate on purpose.
+
+| Artifact | Question it answers |
+|---|---|
+| [`../CHANGELOG.md`](../CHANGELOG.md) | **What changed** in the product/public contract? |
+| [CHANGE_POLICY.md](CHANGE_POLICY.md) | **When and how** should a PR update the changelog? |
+| [research/DECISION_TRACE.md](research/DECISION_TRACE.md) | **Why** did a research/architecture signal influence a decision? |
+| [ROADMAP.md](ROADMAP.md) + linked Issues/Test Cards | **What are we trying to prove next?** |
+| Pull request + CI/benchmark artifacts | **How was it implemented and what evidence passed?** |
+
+Canonical separation:
+
+```text
+CHANGELOG
+→ what changed
+
+DECISION TRACE
+→ why the direction changed
+
+TEST CARD
+→ what we tried to prove
+
+PR
+→ how it was implemented
+
+CI / BENCHMARK
+→ objective evidence
+```
+
+The changelog is curated manually. CI may later enforce that a PR explicitly updated it or declared N/A, but CI should not synthesize product history from commits.
 
 ---
 
@@ -76,10 +109,13 @@ The repository follows:
 
 Use [ROADMAP.md](ROADMAP.md) for sequencing, but use the linked Issue as the living experiment record.
 
-Important current/future examples:
+Current examples include:
 
 ```text
+#68 Engine / CLI / MCP Contract Parity
 #12 Incremental & Idempotent Indexing
+#69 Text Ingestion Coverage
+#70 Structural Segmentation
 #13 Metadata Doctor
 #18 LongMemEval
 #25 Query-aware Graph Expansion
@@ -115,7 +151,7 @@ The following files preserve useful project history, demos or earlier architectu
 | [REFERENCES.md](REFERENCES.md) | Older compact reference list; prefer `research/REFERENCES.md` for current research decision trace. |
 | `archive/` | Explicit older implementation/version material when present. |
 
-Historical docs should not be deleted only because architecture evolved. Their role is to preserve decision history while current docs clearly supersede them for implementation decisions.
+Historical docs should preserve useful decision history, but they must not define the current public product contract. Project-specific legacy narratives are tracked for cleanup separately.
 
 ---
 
@@ -148,13 +184,15 @@ When a feature changes:
 ```text
 implementation PR
   ↓
+update CHANGELOG or explicitly mark N/A
+  ↓
 update its Test Card with evidence/learnings
   ↓
-update FEATURES/ARCHITECTURE/OUTPUT_CONTRACT if the public semantics changed
+update FEATURES/ARCHITECTURE/OUTPUT_CONTRACT if public semantics changed
   ↓
 update ROADMAP if the decision changes sequencing
   ↓
 update research decision trace if an external idea materially influenced the change
 ```
 
-Do not let a feature become “implemented” only in a PR description. If it changes the product contract, current documentation should move with it.
+Do not let a feature become “implemented” only in a PR description. If it changes the product contract, current documentation and product history should move with it.
