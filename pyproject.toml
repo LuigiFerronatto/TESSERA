@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tessera"
 version = "3.4.0"
-description = "Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories: a Markdown-backed, graph-indexed long-term memory engine for autonomous agents (built for LAO)."
+description = "TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories: a text-first, auditable memory and evidence layer for AI agents."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "LAO - Lab Autonomous Officer" }]
-keywords = ["memory", "agents", "rag", "knowledge-graph", "llm", "pagerank"]
+authors = [{ name = "TESSERA Contributors" }]
+keywords = ["memory", "agents", "rag", "knowledge-graph", "llm", "pagerank", "provenance", "evidence"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -35,7 +35,10 @@ tessera = "tessera.cli:main"
 tessera-mcp = "tessera.mcp_server:main"
 
 [project.urls]
-Homepage = "https://github.com/blip-ai/lao-lab-autonomous-officer"
+Homepage = "https://github.com/LuigiFerronatto/TESSERA"
+Repository = "https://github.com/LuigiFerronatto/TESSERA"
+Documentation = "https://github.com/LuigiFerronatto/TESSERA/tree/main/docs"
+Issues = "https://github.com/LuigiFerronatto/TESSERA/issues"
 
 [tool.setuptools]
 packages = ["tessera"]
