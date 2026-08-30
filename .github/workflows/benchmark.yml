@@ -185,7 +185,15 @@ jobs:
           baseline_tree="$RUNNER_TEMP/tessera-canonical-b09ceacc"
           dataset_absolute="$GITHUB_WORKSPACE/$DATASET_PATH"
           output_absolute="$GITHUB_WORKSPACE/$ARTIFACT_ROOT/canonical-runtime"
-          git worktree add --detach "$baseline_tree" "$CANONICAL_COMMIT"
+          canonical_ref="refs/remotes/origin/benchmark-baseline-99"
+          git fetch --no-tags origin \
+            "refs/pull/99/head:${canonical_ref}"
+          fetched_commit="$(git rev-parse "${canonical_ref}^{commit}")"
+          if [[ "$fetched_commit" != "$CANONICAL_COMMIT" ]]; then
+            echo "infrastructure failure: PR #99 baseline ref moved: expected $CANONICAL_COMMIT, got $fetched_commit" >&2
+            exit 1
+          fi
+          git worktree add --detach "$baseline_tree" "$fetched_commit"
           (
             cd "$baseline_tree"
             PYTHONPATH="$baseline_tree" python -m benchmarks.longmemeval_v1.run \
