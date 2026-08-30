@@ -89,20 +89,47 @@ jobs:
 
           tessera index "$corpus"
 
+          # Human/scriptable plain output still gets a smoke pass.
           tessera query "$corpus" "qual o propósito do LAO?" --top-n 2 --plain | tee artifacts/cli-smoke.txt
           tessera query "$corpus" "como o LAO aprende?" --top-n 2 --debug --plain | tee -a artifacts/cli-smoke.txt
-
           grep -q "lao/charter" artifacts/cli-smoke.txt
           grep -q "lao/learning-process" artifacts/cli-smoke.txt
           grep -q "Relevant evidence" artifacts/cli-smoke.txt
-          grep -q "raw pagerank" artifacts/cli-smoke.txt
+          grep -q "raw_pr=" artifacts/cli-smoke.txt
+
+          # Agents/CI validate the structured contract instead of scraping human text.
+          tessera query "$corpus" "como o LAO aprende?" --top-n 2 --json > artifacts/query.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          results = json.loads(Path("artifacts/query.json").read_text(encoding="utf-8"))
+          assert isinstance(results, list) and results
+          top = results[0]
+          assert top["id"] == "lao/learning-process"
+          assert isinstance(top["score"], (int, float))
+          assert top["relevant_evidence"]
+          assert top["body"]
+          assert "filepath" in top
+          assert "related_ids" in top
+
+          explain = top["score_explain"]
+          assert explain["raw_pagerank"] > 0
+          assert explain["normalized_relations"] >= 0
+          assert explain["recency_weight"] == 0.0
+          assert explain["recency_applied_multiplier"] == 1.0
+          assert explain["recency_boost"] == 1.0
+          assert explain["recency_raw_score"] >= 1.0
+          PY
 
       - name: Upload CLI smoke output
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tessera-cli-smoke
-          path: artifacts/cli-smoke.txt
+          path: |
+            artifacts/cli-smoke.txt
+            artifacts/query.json
           if-no-files-found: warn
 
   sanity-eval:
