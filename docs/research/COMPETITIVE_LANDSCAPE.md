@@ -1,53 +1,60 @@
 # TESSERA — Competitive Landscape
 
-> **Scope:** compare memory-system design choices, not marketing claims. Products/frameworks and research architectures are listed separately.
+> **Scope:** compare memory-system design choices, not marketing claims.
+>
+> **Primary-source verification date:** 2026-08-30.
+>
+> Product/framework behavior changes quickly. Revalidate primary sources before publishing this document outside the project.
 
 ## Executive takeaway
 
-The agent-memory landscape is converging around several recurring ideas:
+The agent-memory ecosystem is not converging on one winning architecture. It contains several control models:
 
-- persistent memory outside the model context;
-- extraction or structured representation;
-- vector/hybrid retrieval;
-- graph-based relations;
-- temporal state;
-- prompt/context assembly;
-- lifecycle/write management.
+```text
+extracted memories + hybrid search           Mem0
+managed/open temporal context graphs         Zep / Graphiti
+agent-visible state / memory management      Letta
+application-defined stores + memory patterns LangGraph / LangMem
+memory operating-system abstraction          MemOS
+verbatim local-first recall                   MemPalace
+```
 
-TESSERA's current differentiation is not “we have a graph” or “we store memories”. It is the combination of:
+TESSERA's current thesis is different:
 
 ```text
 text-first source of truth
 + stable memory/source identity
-+ explicit provenance/evidence ledger
-+ explainable multi-signal retrieval
++ source-version-aware provenance
++ explainable retrieval
 + query-specific evidence
-+ strict separation of relevance / confidence / authority / utility
-+ experimental governance before adding intelligence
++ memory architecture hidden from the agent
++ strict separation of relevance / trust / authority / time
++ experiments before adding intelligence
 ```
 
-Several important differentiators are still **hypotheses**, not proven advantages. LongMemEval/ablations (#18) must determine whether they actually improve downstream outcomes.
+This is an **architectural position**, not proof of benchmark superiority. LongMemEval #18 is required before making quality claims against competitors.
 
 ---
 
-# Comparison dimensions
+# How to read this document
 
-We compare systems using these questions:
+We compare systems using the following dimensions:
 
 | Dimension | Question |
 |---|---|
-| Representation | What is stored: raw text, extracted facts, blocks, graph facts, atomic notes? |
-| Source preservation | Is original source/verbatim history retained or is extracted memory primary? |
-| Retrieval | Vector, keyword, hybrid, graph, agentic search? |
-| Graph | Are relations first-class? How do they affect retrieval? |
-| Temporal | Can facts/relations change and preserve history? |
-| Provenance | Can a result trace back to source/version/span? |
-| Conflict/update | How are old/new/conflicting facts handled? |
-| Scope/governance | How are user/agent/project boundaries represented? |
-| Rendering/context | What artifact is handed to the consuming model? |
-| Agent responsibility | Does the agent manage memory explicitly or is memory hidden behind a layer? |
-| Local/offline path | Can core operation work without a generative API call? |
-| Benchmark posture | What evaluation does the project publish/use? |
+| Representation | What becomes memory: verbatim source, extracted facts, blocks, JSON records, graph facts? |
+| Source preservation | Is original evidence retained or does extracted memory become primary? |
+| Retrieval | Semantic, lexical, hybrid, graph, tool-driven? |
+| Relations | Are edges first-class? What do they influence? |
+| Temporal state | Can facts evolve/invalidate while preserving history? |
+| Provenance | Can a returned item trace back to source/version/span? |
+| Write lifecycle | How are memories added, changed, consolidated or rejected? |
+| Scope | How are user/agent/session/project boundaries represented? |
+| Agent control | Does the agent explicitly manage memory or receive an abstraction? |
+| Rendering | What artifact is ultimately sent to the consuming model? |
+| Evaluation | What benchmarks/controls does the system publish? |
+
+A blank or cautious cell does **not** mean a competitor lacks a capability. It means we do not want to infer beyond the primary material reviewed for this project.
 
 ---
 
@@ -55,458 +62,547 @@ We compare systems using these questions:
 
 ## Mem0
 
-Sources:
+### Primary sources verified
 
-- https://docs.mem0.ai/platform/overview
 - https://docs.mem0.ai/open-source/features/graph-memory
+- https://docs.mem0.ai/migration/oss-v2-to-v3
+- https://docs.mem0.ai/platform/cli
 - https://arxiv.org/abs/2504.19413
 
-### How it approaches memory
+### Current architecture signal
 
-Mem0 is a production-oriented memory layer that extracts salient information from conversations and stores/retrieves memories through vector/hybrid infrastructure, with optional graph memory.
+Mem0 focuses on extracting salient memories and retrieving them through production-oriented search infrastructure.
 
-Current graph-memory documentation describes entity/relationship extraction alongside embeddings. Vector search remains the primary result ordering, while graph context is returned as related information; current open-source material also describes semantic + BM25 + entity hybrid retrieval.
+A current OSS migration guide describes a newer algorithm with:
 
-### What is especially relevant
+```text
+single-pass ADD-only extraction
++ semantic search
++ BM25 keyword search
++ entity matching/linking
+```
 
-- pragmatic extraction pipeline;
-- hybrid retrieval;
-- entity-scoped memory (`user_id`, `agent_id`, etc.);
-- graph augmentation without necessarily letting graph signals replace vector ranking;
-- strong emphasis on production latency/cost.
+The same guide explicitly says external graph-store support was removed from the newer open-source path and replaced by built-in entity linking.
+
+A separate Graph Memory documentation page still describes the older/alternate graph architecture where an extraction LLM creates entities/relations, vector search orders hits and graph context is returned alongside them.
+
+### Documentation-version caution
+
+For TESSERA comparisons, do **not** write simply:
+
+```text
+Mem0 = vector + graph
+```
+
+without identifying version/product path. Current Mem0 documentation contains materially different graph behavior across pages/migration generations.
+
+### Especially relevant to TESSERA
+
+- pragmatic memory extraction;
+- strong hybrid retrieval direction;
+- user/agent/run scoping;
+- entity linking;
+- structured CLI/agent output;
+- production-oriented latency/cost posture.
 
 ### TESSERA difference / hypothesis
 
-TESSERA currently emphasizes **source-backed auditability** more strongly: source document identity, version hashes, spans and Evidence Ledger are explicit Foundation contracts.
+TESSERA starts with source-backed text and stable document/evidence identity rather than making extracted memory the only visible truth substrate.
 
-TESSERA also keeps its base path generative-LLM optional, whereas extraction-centric workflows commonly use LLM extraction.
+TESSERA's basic retrieval path can operate without a generative extraction call.
 
-What remains unproven:
+Unproven questions for #18:
 
-- whether TESSERA atomic/source-backed representation beats Mem0-style extraction on downstream benchmarks;
-- whether TESSERA relation/temporal plans outperform Mem0 graph memory.
-
-Benchmark requirement: #18.
+```text
+Does atomic/source-backed representation preserve evidence better?
+Does it cost more context?
+Does Mem0-style extraction produce better downstream QA?
+Does TESSERA provenance materially improve reliability?
+```
 
 ---
 
 ## Zep / Graphiti
 
-Sources:
+### Primary sources verified
 
-- https://help.getzep.com/overview
+- https://help.getzep.com/v3/overview
+- https://help.getzep.com/graph-overview
 - https://help.getzep.com/graphiti/getting-started/overview
+- https://help.getzep.com/graphiti/getting-started/welcome
+- https://help.getzep.com/zep-vs-graphiti
 - https://arxiv.org/abs/2501.13956
 
-### How it approaches memory
+### How they approach memory
 
-Zep builds temporal Context Graphs from conversations, documents and business data. Graphiti is its open-source temporal knowledge-graph framework.
-
-Graphiti documents:
-
-- episodic ingestion;
-- entities + fact/relationship edges;
-- temporal fact lifecycles/invalidation;
-- incremental graph updates;
-- hybrid time/full-text/semantic/graph search.
-
-Zep adds a managed Context Lake and serves prompt-ready context blocks.
-
-### What is especially relevant
-
-This is one of the strongest references for:
+Graphiti is the open-source temporal Context Graph framework. Its documented architecture includes:
 
 ```text
-temporal graph
+episodic ingestion
+→ entity + edge extraction
+→ bi-temporal / validity metadata
+→ fact invalidation
+→ hybrid time + full-text + semantic + graph retrieval
+→ incremental graph updates
+```
+
+Zep builds managed agent memory on top of that model and describes a governed Context Lake containing many Context Graphs, with prompt-ready context served to agents.
+
+### Especially relevant to TESSERA
+
+Zep/Graphiti is one of the strongest existing references for:
+
+```text
 changing facts
-historical validity
+temporal validity
+fact invalidation
 incremental graph updates
-hybrid retrieval
+source episodes / provenance
+hybrid graph retrieval
 ```
 
 ### TESSERA difference / hypothesis
 
-TESSERA starts from **auditable source documents + atomic knowledge records + evidence spans**, and treats graph intelligence as an experiment layered on top.
+Graphiti makes the temporal graph a central representation.
 
-Zep/Graphiti starts more directly from temporal graph construction as the central memory representation.
+TESSERA currently makes **source documents + canonical identities + evidence ledger** the stable substrate and treats graph intelligence as a layer that must prove value through ablation.
 
-The key comparison later should be:
+The important comparison is therefore not:
 
 ```text
-Graphiti-style temporal graph
-vs
-TESSERA source-backed evidence graph / atomic state
+who has a graph?
 ```
 
-on temporal updates, provenance correctness, retrieval quality and context cost.
+It is:
 
-Related TESSERA cards: #14, #15, #16, #25, #26.
+```text
+Graphiti temporal Context Graph
+vs
+TESSERA source-backed atomic/evidence substrate
+```
+
+on:
+
+```text
+temporal update correctness
+historical traceability
+retrieval quality
+context tokens
+index/update cost
+```
+
+Related Test Cards: #12, #14, #15, #16, #25, #26, #27.
 
 ---
 
 ## Letta / MemGPT lineage
 
-Sources:
+### Primary source verified
 
-- https://docs.letta.com/tutorials/attaching-detaching-blocks/
-- https://docs.letta.com/api/resources/agents
+- https://docs.letta.com/
 
 ### How it approaches memory
 
-Letta exposes persistent **memory blocks** that occupy reserved sections of an agent's context and archival/passages memory searchable outside core context.
+Letta positions itself as a platform/runtime for **stateful agents**. Memory is closely integrated with persistent agent state and agent operation rather than exposed only as an external retrieval service.
 
-Memory can be attached/detached across agents, and persisted agent state is a core abstraction.
+Its memory model and broader harness let agents maintain persistent state across interactions and use memory as part of an agent runtime.
 
-### What is especially relevant
+### Especially relevant to TESSERA
 
-- explicit separation between always-visible core memory and searchable archival memory;
-- memory is closely integrated with agent state;
-- dynamic memory attachment supports sharing/context switching.
-
-### TESSERA difference / hypothesis
-
-TESSERA's default product contract is almost the inverse at the agent interface:
-
-> hide memory architecture from the agent, but expose evidence/provenance.
-
-A consuming TESSERA agent should not need to manually manage “memory blocks” to benefit from retrieval.
-
-That does not mean Letta's approach is inferior. It represents a different control model:
+The main contrast is **control model**:
 
 ```text
-Letta: agent/runtime-visible memory management
-TESSERA: memory-layer abstraction + evidence-visible output
+Letta
+→ memory is part of the agent/runtime model
+→ agent state and memory management are closely coupled
+
+TESSERA
+→ memory architecture is abstracted behind a layer
+→ evidence/provenance remain visible to the consuming agent
 ```
 
-Future benchmark/control-flow tests should measure whether hiding architecture improves reliability or simply reduces useful agent control.
+Neither is automatically better.
+
+Future evaluation should ask whether hiding memory mechanics reduces failure modes or removes useful agent control.
 
 ---
 
-## LangGraph / LangMem
+## LangGraph / LangMem / LangChain memory patterns
 
-Sources:
+### Primary sources verified
 
 - https://docs.langchain.com/oss/python/langchain/long-term-memory
 - https://docs.langchain.com/oss/python/concepts/memory
-- https://langchain-ai.github.io/langmem/concepts/conceptual_guide/
 
 ### How it approaches memory
 
-LangGraph stores long-term memories as JSON documents in namespace/key stores and leaves significant memory-design choices to application developers.
+Current LangChain/LangGraph documentation describes long-term memory as JSON documents stored by namespace/key in LangGraph stores and recalled across threads.
 
-Its conceptual material distinguishes:
+The conceptual framework separates:
 
 ```text
 semantic memory
+→ facts
+
 episodic memory
+→ experiences
+
 procedural memory
+→ instructions/rules
 ```
 
-LangMem provides LLM-assisted extraction/consolidation patterns for memory state.
+It also distinguishes write timing such as hot-path vs background updates.
 
-### What is especially relevant
+### TESSERA difference
 
-- flexible application-level memory storage;
-- clear memory-type taxonomy;
-- hot-path vs background memory writes;
-- composability with agent workflows.
-
-### TESSERA difference / hypothesis
-
-TESSERA's three semantic drawers are **not** the same taxonomy:
+TESSERA's semantic drawers are **not the same taxonomy**:
 
 ```text
-TESSERA facts/preferences/insights
+TESSERA
+facts / preferences / insights
+
 ≠
-semantic/episodic/procedural memory categories
+
+semantic / episodic / procedural
 ```
 
-TESSERA also treats harness instructions as document/instruction semantics (`drawer: null`) rather than forcing them into a procedural semantic drawer.
+TESSERA treats harness instructions as document/instruction semantics with `drawer: null`, rather than turning all instructions into a fourth semantic memory drawer.
 
-LangGraph is a broad application/runtime framework; TESSERA is intended to be a narrower memory/evidence subsystem that can plug into different runtimes.
+LangGraph provides a broad application/runtime substrate; TESSERA aims to be a narrower memory/evidence subsystem that can plug into different runtimes.
 
 ---
 
 ## MemOS
 
-Sources:
+### Primary sources verified
 
 - https://github.com/MemTensor/MemOS
 - https://github.com/MemTensor/MemOS/blob/main/docs/en/open_source/home/memos_intro.md
+- https://github.com/MemTensor/MemOS/blob/main/docs/en/open_source/home/core_concepts.md
 
 ### How it approaches memory
 
-MemOS explicitly positions memory as an operating-system-like first-class resource with unified management, scheduling and multiple memory types.
+MemOS explicitly describes itself as a **Memory Operating System**. Memory is treated as a first-class orchestrated resource with unified lifecycle/scheduling concepts.
 
-Its project documentation describes support spanning textual/tree/preference/skill and other memory forms, plus lifecycle/scheduling abstractions.
-
-### What is especially relevant
-
-MemOS is a useful reference for the **memory operating layer** positioning:
+Its architecture includes concepts such as:
 
 ```text
-model/agent
-↕
-memory operating layer
-↕
-stores / knowledge / lifecycle
+MOS orchestration layer
+MemCubes
+multiple memory types
+user/session management
+memory scheduling
+retrieval / governance
 ```
+
+### Especially relevant to TESSERA
+
+MemOS is a strong reference for the broad “memory operating layer” positioning.
 
 ### TESSERA difference / hypothesis
 
-TESSERA is intentionally much narrower today:
+TESSERA is intentionally narrower today:
 
 ```text
 text-first
-local/deterministic Foundation
-source-backed provenance
-explicit evidence contract
+local deterministic Foundation
+source identity
+provenance
+structured evidence
 ```
 
-rather than trying to orchestrate many memory modalities/types immediately.
+It does not yet try to orchestrate all parametric/activation/textual forms of memory.
 
-The strategic question is whether this narrower auditable substrate produces a better foundation before expanding into broader Memory-OS behavior.
+The research question is whether a narrower auditable substrate produces a stronger base before adding OS-like orchestration.
 
 ---
 
 ## MemPalace
 
-Source:
+### Primary source verified
 
-- https://github.com/MemPalace/mempalace
+- https://github.com/bassemhalawani/memorypalace
+
+> Previous TESSERA documentation referenced `MemPalace/mempalace`. The verified public repository identifies `bassemhalawani/memorypalace` as an official source; this document corrects that reference.
 
 ### How it approaches memory
 
-MemPalace describes itself as local-first and keeps conversation/project content **verbatim** rather than extracting/summarizing it by default. It uses pluggable semantic retrieval and publishes LongMemEval retrieval-recall artifacts. It also documents a local temporal entity/relationship graph.
+MemPalace describes itself as local-first AI memory with **verbatim storage**. It explicitly says it does not summarize, extract or paraphrase stored conversation history by default.
 
-### What is especially relevant
-
-MemPalace is a critical baseline because it challenges the assumption that “more structured extraction = better memory”.
-
-Its published benchmark progression argues that raw verbatim content with strong retrieval can retain evidence that extraction may discard.
-
-### TESSERA difference / hypothesis
-
-TESSERA uses atomic/canonical representations but deliberately preserves original source/body and provenance.
-
-The fair test is not:
+Its documented architecture includes:
 
 ```text
-TESSERA Top-5 atomic IDs
-vs
-MemPalace Top-5 whole sessions
+verbatim source retention
+structured palace organization
+pluggable semantic retrieval
+local operation
+Temporal Knowledge Graph
+MCP tooling
 ```
 
-Instead #18 should evaluate:
+Its repository publishes reproducible benchmark artifacts and reports raw LongMemEval retrieval recall such as 96.6% R@5 for a zero-API-call path.
+
+### Why it is an especially important TESSERA control
+
+MemPalace directly challenges a core assumption in structured memory systems:
+
+> Does extraction/atomicization actually improve memory, or can verbatim storage plus strong retrieval retain more useful evidence?
+
+### Fair TESSERA comparison
+
+Do **not** compare:
+
+```text
+TESSERA top-5 atomic memory IDs
+vs
+MemPalace top-5 source sessions
+```
+
+Instead #18 should control:
 
 ```text
 same source histories
-same encoder where isolating representation
+same encoder when isolating representation
 session-normalized recall
 token-budget evidence recall
 same downstream reader
+same rendering controls
 ```
 
-This is one of the most important competitive controls for TESSERA.
+This comparison is strategically more useful than claiming TESSERA is “more advanced” because it has richer metadata.
 
 ---
 
-# Research architectures / benchmarks
+# Research architectures / benchmark signals
 
-These are not direct products, but they shape the design space.
+These are not necessarily direct competitors; they influence TESSERA experiments.
 
 ## QUMem
 
-Focus:
-
-```text
-variable episodes
-facts/preferences/insights
-query-conditioned user state
-temporal/source evidence
-```
-
-TESSERA takes the three-drawer semantic split but aims for a more agent/runtime-agnostic evidence layer.
-
----
+TESSERA inherits the useful semantic separation around facts/preferences/insights while adapting it into an agent/runtime-agnostic text/evidence layer.
 
 ## A-MEM
 
-Focus:
+Relevant concepts:
 
 ```text
 atomic structured notes
-Zettelkasten links
+memory links
 memory evolution
-agentic updates
 ```
 
-TESSERA shares atomic/interconnected-memory interests but is more conservative about automatic rewriting/evolution.
+TESSERA is deliberately more conservative about autonomous rewriting/evolution until provenance and write admission are measured.
 
----
+## GraphMemix — 2026-08-27
 
-## GraphMemix
+Primary source:
+- https://arxiv.org/abs/2608.26983
 
-Focus:
-
-```text
-query-aware evidence graph/forest
-relation activation reliability/cost
-evidence budget
-```
-
-TESSERA response:
-
-- #25 turns this into controlled 1-hop/budget ablations instead of immediately replacing retrieval.
-
----
-
-## CaSKG
-
-Focus:
+Paper focus:
 
 ```text
-edge reliability / validation before expansion
+query-aware evidence forest
+candidate graph expansion
+direct evidence utility
+relation activation/reliability cost
+maximum evidence budget
+quality/cost Pareto optimization
 ```
 
 TESSERA response:
+- #25 Query-aware Graph Expansion / Evidence Budget.
 
-- #26 separates relation type, origin, confidence, evidence/validation and query relevance.
+## CaSKG — 2026-08-26
 
----
+Primary source:
+- https://arxiv.org/abs/2608.25500
 
-## MemToC
-
-Focus:
+Paper focus:
 
 ```text
-memory vs tool conflict
-source correctness
+candidate skill graph
+edge reliability calibration
+counterfactual remove/substitute/reorder probes
+state-filtered weighted graph
+task-conditioned expansion
+```
+
+TESSERA response:
+- #26 Relation Confidence / Edge Validation.
+
+Core distinction:
+
+```text
+relation_type
+≠ relation_origin
+≠ relation_confidence
+≠ query_relevance
+```
+
+## MemToC — 2026-08-26
+
+Primary source:
+- https://arxiv.org/abs/2608.26295
+
+Paper focus:
+
+```text
+memory/parametric answer vs tool return
+independently controlled source correctness
+source arbitration
 abstention side effects
 ```
 
 TESSERA response:
-
 - #27 Evidence Arbitration;
-- #20 four-state evidence status;
-- #32 authority/scope precedence.
+- #20 `sufficient | insufficient | conflicting | ambiguous`;
+- #32 Authority / Scope / Instruction Precedence.
 
----
+## RENDER — 2026-06-05
 
-## RENDER
+Primary source:
+- https://arxiv.org/abs/2608.23568
 
-Focus:
+Paper focus:
 
 ```text
-reader-facing evidence representation as an evaluation variable
+same underlying information
++ different reader-facing artifact
+→ materially different downstream memory scores
 ```
 
 TESSERA response:
-
-- #28 RAW vs EVIDENCE vs STRUCTURED rendering under fixed retrieval/reader controls.
+- #28 RAW vs EVIDENCE vs STRUCTURED renderer ablation, starting with #18.
 
 ---
 
-# Capability matrix
+# Relation model comparison lens
+
+One of the most important TESSERA distinctions for future competitor/research comparisons is that “having a graph” is not enough.
+
+We want to ask four separate questions:
+
+```text
+relation_type
+→ what does this edge mean?
+
+relation_origin
+→ where did the edge come from?
+
+relation_confidence
+→ how strongly do we believe the edge is correct?
+
+query_relevance
+→ how useful is traversing this edge for this query?
+```
+
+A system can have excellent graph extraction but poor query-time traversal, or weakly calibrated edges but a strong retriever. Competitive analysis should keep those dimensions separate.
+
+---
+
+# Capability / architecture matrix
 
 Legend:
 
 ```text
-✓ documented/core capability
-~ partial/optional/architecture-specific
-? future/unproven for TESSERA
-— not a central documented focus
+✓ strongly documented / central
+~ supported or architecture/config dependent
+? TESSERA future/unproven
+— not a central focus in the primary material reviewed
 ```
 
-| System | Raw/source preservation | Extracted/structured memory | Graph | Temporal | Explicit provenance/span | Query-aware evidence | Conflict/arbitration | Local basic path |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **TESSERA (current)** | ✓ | ✓ | ~ | — | ✓ | ✓ | — | ✓ |
-| Mem0 | ~ | ✓ | ✓ optional | ~ timestamps/graph context | ~ | ~ | ~ memory updates | ~ configurable |
-| Zep/Graphiti | ✓ episodic source | ✓ graph facts/entities | ✓ | ✓ | ✓ episodic provenance | ✓ context/search | ✓ fact invalidation | Graphiti self-hostable |
-| Letta | ✓ messages/archive | ✓ memory blocks | — | ~ timestamps/state | ~ | ~ archival search | ~ agent-managed | ✓ self-host options |
-| LangGraph/LangMem | app-defined | app-defined/✓ | app-defined | app-defined | app-defined | app-defined | app-defined | ✓ possible |
-| MemOS | ✓/multi-source | ✓ multi-type | ✓ supported | ~ lifecycle/versioning | ~ | ✓ retrieval layer | ~ lifecycle | ✓ open source |
-| MemPalace | ✓ strong/verbatim | ~ structured palace metadata | ✓ temporal graph | ✓ graph validity | ✓ source retained | ~ semantic/hybrid search | ~ invalidation | ✓ |
+| System | Source/verbatim preservation | Structured/extracted memory | Graph / relations | Temporal model | Explicit source-version/span provenance | Agent/runtime control model | Local/core path |
+|---|---:|---:|---:|---:|---:|---|---:|
+| **TESSERA current** | ✓ | ✓ canonical/atomic | ~ explicit + structural signal | — future | ✓ | memory mechanics abstracted; evidence visible | ✓ |
+| Mem0 current OSS direction | ~ | ✓ extraction | ~ entity linking; graph behavior version-dependent | ~ timestamps/metadata | ~ | memory service/SDK | ✓ configurable |
+| Zep / Graphiti | ✓ episodic source | ✓ graph facts/entities | ✓ central | ✓ bi-temporal / invalidation | ✓ episodic provenance | Context Graph / managed Context Lake | Graphiti local; Zep managed |
+| Letta | ✓ runtime/history dependent | ✓ persistent agent memory/state | ~ not central comparison axis here | ~ persistent state | ~ | agent/runtime-visible stateful memory | ✓ self-host/runtime options |
+| LangGraph / LangChain | app-defined | app-defined JSON / memory patterns | app-defined | app-defined | app-defined | application/agent framework | ✓ |
+| MemOS | ✓ multi-source/textual | ✓ multiple memory types | ✓ supported | ~ lifecycle-oriented | ~ explainable/governed | Memory OS / orchestration layer | ✓ open source |
+| MemPalace | ✓ strong/verbatim | ~ structured organization | ✓ temporal KG | ✓ graph validity | ✓ source retained | local memory/MCP layer | ✓ |
 
-**Important:** this table summarizes documented architectural emphasis, not benchmark superiority. Several cells depend on configuration/version and should be revalidated before publication outside the project.
+This table represents **documented architectural emphasis as of the verification date**, not benchmark ranking.
 
 ---
 
 # Where TESSERA currently appears differentiated
 
-## 1. Provenance as a Foundation feature
+## 1. Provenance before advanced intelligence
 
-TESSERA makes source document identity, source version hashes and evidence span first-class before implementing advanced temporal/arbitration behavior.
+Stable source document identity, source version hashes and evidence spans are Foundation contracts before temporal/arbitration features are added.
 
-## 2. Separation of ranking from trust
+## 2. Trust dimensions remain separated
 
 Roadmap invariant:
 
 ```text
-relevance
-≠ confidence
-≠ authority
+retrieval relevance
+≠ memory confidence
+≠ source authority
 ≠ relation confidence
 ≠ temporal validity
 ≠ utility
 ```
 
-Several systems may expose equivalent concepts, but TESSERA treats avoiding a unified magic score as an explicit architectural constraint.
+TESSERA deliberately avoids a single opaque “truth score”.
 
-## 3. Non-memory text as first-class knowledge without extra drawers
+## 3. Non-memory text is first-class without new drawers
 
-Harness/project/reference documents can be indexed without pretending they are user preferences or factual memories.
+Harness instructions and project/reference documents can be indexed with `drawer: null` instead of being mislabeled as preferences/facts simply to fit a memory taxonomy.
 
-## 4. Experimental graph posture
+## 4. Graph intelligence must prove itself
 
-TESSERA does not assume graph expansion is beneficial. #14/#25/#26 require ablations against no-graph/simple retrieval baselines.
+TESSERA does not assume more graph traversal is better. #14/#25/#26 compare no graph / simple graph / typed / query-aware / confidence-aware variants.
 
-## 5. Evidence interface as a benchmark target
+## 5. The evidence interface itself is testable
 
-RENDER-inspired #28 explicitly asks whether the structured evidence interface itself improves downstream behavior.
+RENDER-inspired #28 asks whether TESSERA's STRUCTURED Evidence interface improves downstream behavior under fixed retrieval.
 
 ---
 
-# Where competitors are ahead / TESSERA is not complete
+# Where competitors are ahead / TESSERA is incomplete
 
-A useful competitive document must also state this clearly.
+## Temporal graph maturity
 
-## Temporal state
+Graphiti already documents bi-temporal relationships, invalidation and incremental graph updates. TESSERA temporal/state behavior is still #15/#16.
 
-Zep/Graphiti already has a mature documented temporal graph/fact invalidation model. TESSERA temporal state is still #15/#16.
+## Managed production infrastructure
 
-## Production scale / managed infrastructure
+Zep and Mem0 offer mature production/service ecosystems. TESSERA is currently a Foundation-stage local/open architecture.
 
-Mem0 and Zep provide managed production platforms, governance and scalable services. TESSERA is currently an early local/open Foundation.
+## Stateful agent runtime maturity
 
-## Mature agent-context orchestration
-
-Letta has a mature agent-state/memory-block model; LangGraph has broad workflow/store integration; MemOS targets a broader OS abstraction. TESSERA is intentionally narrower today.
+Letta has a broader persistent-agent runtime; LangGraph has broad workflow/store integration; MemOS targets a broader memory-OS layer.
 
 ## External benchmark evidence
 
-MemPalace, Mem0, Zep and multiple research systems publish benchmark results. TESSERA does not yet have a clean LongMemEval result; #18 is required before making competitive quality claims.
+TESSERA does not yet have a clean controlled LongMemEval result. #18 is required before competitive quality claims.
 
 ---
 
 # Competitive hypotheses to test
 
-Instead of a marketing comparison, TESSERA should turn differences into experiments:
+Instead of turning the table into marketing, TESSERA converts differences into experiments:
 
-1. **Raw vs Atomic representation** — does atomic/source-backed representation improve evidence density without losing recall? (#18)
-2. **No graph vs graph** — when do relations improve distributed evidence retrieval? (#14/#25)
-3. **Edge confidence** — does confidence-aware expansion reduce harmful context? (#26)
-4. **Temporal graph vs state-key approach** — how much temporal complexity is necessary? (#15/#16)
-5. **Evidence rendering** — does Structured Evidence improve reader outcomes at the same retrieval set? (#28)
-6. **Arbitration** — does explicit conflict representation improve source choice/abstention? (#27/#20)
-7. **Memory architecture visibility** — should the agent manage memory explicitly or receive an abstracted evidence interface? future evaluation.
+1. **Raw vs Atomic** — atomic/source-backed representation vs verbatim source under same encoder and token budget (#18).
+2. **Graph value** — no graph vs controlled graph expansion (#14/#25).
+3. **Edge reliability** — whether confidence-aware relations reduce harmful context (#26).
+4. **Temporal complexity** — state-key/evidence model vs mature temporal-graph approaches (#15/#16).
+5. **Renderer effect** — RAW vs EVIDENCE vs STRUCTURED under frozen retrieval (#28).
+6. **Evidence Arbitration** — explicit source conflict vs silent winner (#27/#20).
+7. **Authority/scope** — deterministic instruction precedence vs relevance/newest wins (#32).
+8. **Memory-control visibility** — agent-managed memory vs abstracted memory architecture, future evaluation.
 
 ---
 
-# Positioning draft
+# Current positioning
 
 A defensible current positioning is:
 
-> **TESSERA is a text-first, agent-agnostic memory and evidence layer focused on stable identity, provenance, explainable retrieval and auditable evolution. It keeps source evidence visible while hiding storage/indexing complexity from the consuming agent.**
+> **TESSERA is a text-first, agent-agnostic memory and evidence layer focused on stable identity, source-version-aware provenance, explainable retrieval and auditable evolution. It hides storage/indexing complexity while keeping evidence visible to the consuming agent.**
 
-A stronger future claim such as “better long-term memory than Mem0/Zep/MemPalace” is **not justified** until #18 produces controlled results.
+A claim such as:
+
+> “TESSERA is better than Mem0, Zep/Graphiti or MemPalace”
+
+is not justified until controlled #18 results exist.
