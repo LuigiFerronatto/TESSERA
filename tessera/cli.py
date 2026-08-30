@@ -12,6 +12,7 @@ Usage:
 import argparse
 import os
 import sys
+import json
 from typing import Dict
 
 from .engine import TesseraEngine
@@ -135,6 +136,9 @@ def cmd_query(args):
         top_n=args.top_n,
         resolve_conflicts=not args.no_resolve_conflicts,
     )
+    if args.json:
+        print(json.dumps(results, ensure_ascii=False, indent=2, default=str))
+        return
     if not results:
         print("Nenhuma memória relevante encontrada para essa consulta.")
         return
@@ -471,7 +475,9 @@ def build_parser():
     p_query.add_argument("--no-body", action="store_true",
                            help="Print id/score/filename/related but skip the note body text")
     p_query.add_argument("--debug", action="store_true",
-                           help="Show explainable score breakdown for retrieved memories")
+                         help="Show explainable score breakdown for retrieved memories")
+    p_query.add_argument("--json", action="store_true",
+                         help="Print the complete machine-readable retrieval contract as JSON")
     p_query.set_defaults(func=cmd_query)
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])

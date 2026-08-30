@@ -237,6 +237,20 @@ def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> 
     return enriched
 
 
+def retrieval_result_contract(result: Dict[str, Any]) -> Dict[str, Any]:
+    """Return the stable machine-readable retrieval contract.
+
+    This is a presentation projection only: it preserves every semantic field
+    produced by the Engine and deliberately does not calculate or reorder
+    anything.  CLI and MCP use it to avoid surface-specific field loss.
+    """
+    return dict(result)
+
+
+def retrieval_results_contract(results: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [retrieval_result_contract(result) for result in results]
+
+
 def _split_body_for_hash(raw_text: str) -> str:
     """Use Canonical's parser so freshness checks follow exactly its semantics."""
     from .canonical import _split_markdown

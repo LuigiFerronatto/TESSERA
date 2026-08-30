@@ -44,6 +44,7 @@ from typing import Any, Dict, List, Optional
 from .engine import TesseraEngine
 from .hooks import TesseraTaskHook
 from .models import Connection, Entity
+from .evidence import retrieval_results_contract
 
 try:
     from mcp.server.fastmcp import FastMCP
@@ -83,18 +84,7 @@ def query_memories(query: str, top_n: int = 7, resolve_conflicts: bool = True) -
     `--paths-only` / `--show-related` output.
     """
     results = _engine.retrieve_context(query_text=query, top_n=top_n, resolve_conflicts=resolve_conflicts)
-    return [
-        {
-            "id": r["id"],
-            "type": r["type"],
-            "score": r["score"],
-            "body": r["body"],
-            "filename": r.get("filename"),
-            "filepath": r.get("filepath"),
-            "related_ids": r.get("related_ids", []),
-        }
-        for r in results
-    ]
+    return retrieval_results_contract(results)
 
 
 @mcp.tool()
