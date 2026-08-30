@@ -13,7 +13,7 @@ TESSERA turns project knowledge into structured evidence an agent can query with
 - **Explainable** — retrieval signals and relevant evidence are inspectable instead of hidden behind one opaque score.
 - **Agent-agnostic** — use the Python API, CLI, or MCP surface without coupling memory to one agent runtime.
 
-[Install](#install) · [Quickstart](#quickstart) · [Python API](#python-api) · [Features](#features) · [How it works](#how-it-works) · [Research](#research-references) · [Documentation](#documentation) · [Contributors](#contributors)
+[Install](#install) · [Quickstart](#quickstart) · [Python API](#python-api) · [Features](#features) · [Benchmarks](#benchmarks) · [How it works](#how-it-works) · [Research](#research-references) · [Documentation](#documentation) · [Contributors](#contributors)
 
 [![TESSERA CI](https://github.com/LuigiFerronatto/TESSERA/actions/workflows/tessera-ci.yml/badge.svg)](https://github.com/LuigiFerronatto/TESSERA/actions/workflows/tessera-ci.yml)
 
@@ -151,6 +151,25 @@ TESSERA is memory infrastructure, not the final reasoning agent. It does not:
 - require a generative LLM for the basic retrieval path;
 - claim experimental temporal, arbitration, abstention, or adaptive-retrieval work as finished;
 - use source-code indexing as its primary memory model.
+
+## Benchmarks
+
+TESSERA versions a compact, non-sensitive ledger for its deterministic
+LongMemEval V1 dev-50 retrieval profile. The ledger records aggregate retrieval
+metrics, frozen inputs, configuration, commit provenance, cost, and hashes; it
+does not commit the dataset, questions, answers, ground-truth mappings, or full
+result bundles.
+
+Every pull request declares benchmark applicability. Offline reporting checks
+run for every PR, while retrieval-affecting `REQUIRED` changes run the frozen
+50-query profile twice and compare it with the canonical baseline. Main and a
+weekly schedule provide drift detection. These scores measure evidence
+retrieval, not final-answer correctness; reader and judge evaluation remain
+separate future layers.
+
+See [`benchmarks/results/README.md`](benchmarks/results/README.md) for the local
+comparison command and [`docs/BENCHMARK_CI.md`](docs/BENCHMARK_CI.md) for the CI
+and applicability contract.
 
 ## How it works
 

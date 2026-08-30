@@ -1,0 +1,248 @@
+name: TESSERA Benchmark Ledger
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tessera-benchmark-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATASET_PATH: .benchmark-data/longmemeval-v1/longmemeval_s_cleaned.json
+  DATASET_SHA256: d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442
+  CANONICAL_COMMIT: b09ceacc24d9dfb67f9cd63f5219cd2ce8bc9f5a
+  ARTIFACT_ROOT: artifacts/benchmark-reporting
+
+jobs:
+  benchmark-reporting:
+    name: benchmark-reporting (offline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      applicability: ${{ steps.applicability.outputs.applicability }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install TESSERA and test dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Validate benchmark applicability
+        id: applicability
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            python -m benchmarks.reporting.applicability \
+              --body-env PR_BODY \
+              --github-output "$GITHUB_OUTPUT"
+          else
+            echo "applicability=REQUIRED" >> "$GITHUB_OUTPUT"
+            echo "REQUIRED"
+          fi
+
+      - name: Validate canonical record and generated Markdown
+        run: |
+          python -m benchmarks.reporting.cli validate-record \
+            --record benchmarks/results/longmemeval-v1-dev-50/baseline.json \
+            --markdown benchmarks/results/longmemeval-v1-dev-50/baseline.md
+
+      - name: Run focused offline benchmark reporting tests
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: python -m pytest -q tests/test_benchmark_reporting.py
+
+  longmemeval-dev-50:
+    name: longmemeval-v1-dev-50
+    needs: benchmark-reporting
+    if: >-
+      (github.event_name == 'pull_request' && needs.benchmark-reporting.outputs.applicability == 'REQUIRED') ||
+      github.event_name == 'push' ||
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install TESSERA and test dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Restore checksum-pinned dataset cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DATASET_PATH }}
+          key: longmemeval-v1-dev-50-dataset-${{ env.DATASET_SHA256 }}
+
+      - name: Acquire and verify pinned dataset
+        run: |
+          set -euo pipefail
+          python -m benchmarks.longmemeval_v1.prepare_dataset \
+            --dataset-path "$DATASET_PATH"
+          python -m benchmarks.longmemeval_v1.prepare_dataset \
+            --dataset-path "$DATASET_PATH" \
+            --verify-only
+
+      - name: Require a clean measured worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+            echo "infrastructure failure: benchmark worktree is dirty" >&2
+            git status --short >&2
+            exit 1
+          fi
+
+      - name: Validate artifact output paths
+        run: |
+          mkdir -p "$ARTIFACT_ROOT"
+          python -m benchmarks.reporting.cli validate-output-path \
+            --allowed-root "$ARTIFACT_ROOT" \
+            --path "$ARTIFACT_ROOT/candidate-run-1"
+          python -m benchmarks.reporting.cli validate-output-path \
+            --allowed-root "$ARTIFACT_ROOT" \
+            --path "$ARTIFACT_ROOT/candidate-run-2"
+          python -m benchmarks.reporting.cli validate-output-path \
+            --allowed-root "$ARTIFACT_ROOT" \
+            --path "$ARTIFACT_ROOT/canonical-runtime"
+
+      - name: Run candidate dev-50 twice
+        shell: bash
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: |
+          set -euo pipefail
+          for run in 1 2; do
+            python -m benchmarks.longmemeval_v1.run \
+              --dataset-path "$DATASET_PATH" \
+              --subset deterministic-small \
+              --limit 50 \
+              --top-k 10 \
+              --output-dir "$ARTIFACT_ROOT/candidate-run-$run"
+          done
+
+      - name: Verify candidate repeatability and build candidate record
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+        run: |
+          set -euo pipefail
+          python -m benchmarks.reporting.cli verify-repeatability \
+            --first "$ARTIFACT_ROOT/candidate-run-1" \
+            --second "$ARTIFACT_ROOT/candidate-run-2" \
+            --output "$ARTIFACT_ROOT/repeatability.json"
+          python -m benchmarks.reporting.cli record-from-artifacts \
+            --artifact-dir "$ARTIFACT_ROOT/candidate-run-1" \
+            --repeat-artifact-dir "$ARTIFACT_ROOT/candidate-run-2" \
+            --record-id "longmemeval-v1-dev-50/candidate-${GITHUB_SHA}" \
+            --issue 100 \
+            --pull-request "$PR_NUMBER" \
+            --decision PENDING \
+            --parent-record-id longmemeval-v1-dev-50/96-b09ceacc \
+            --output "$ARTIFACT_ROOT/candidate.json"
+
+      - name: Reconstruct canonical query-level artifacts in isolation
+        shell: bash
+        env:
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: |
+          set -euo pipefail
+          baseline_tree="$RUNNER_TEMP/tessera-canonical-b09ceacc"
+          dataset_absolute="$GITHUB_WORKSPACE/$DATASET_PATH"
+          output_absolute="$GITHUB_WORKSPACE/$ARTIFACT_ROOT/canonical-runtime"
+          git worktree add --detach "$baseline_tree" "$CANONICAL_COMMIT"
+          (
+            cd "$baseline_tree"
+            PYTHONPATH="$baseline_tree" python -m benchmarks.longmemeval_v1.run \
+              --dataset-path "$dataset_absolute" \
+              --subset deterministic-small \
+              --limit 50 \
+              --top-k 10 \
+              --output-dir "$output_absolute"
+          )
+          git worktree remove "$baseline_tree"
+
+      - name: Compare canonical baseline and candidate
+        run: |
+          python -m benchmarks.reporting.compare \
+            --baseline benchmarks/results/longmemeval-v1-dev-50/baseline.json \
+            --candidate "$ARTIFACT_ROOT/candidate.json" \
+            --baseline-artifacts "$ARTIFACT_ROOT/canonical-runtime" \
+            --candidate-artifacts "$ARTIFACT_ROOT/candidate-run-1" \
+            --threshold provenance_coverage=0 \
+            --output-json "$ARTIFACT_ROOT/comparison.json" \
+            --output-md "$ARTIFACT_ROOT/comparison.md" \
+            --fail-on-regression
+
+      - name: Publish benchmark summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/benchmark-reporting")
+          print("# LongMemEval V1 dev-50")
+          print()
+          print("Retrieval-only development gate; not answer accuracy or an official full-500 result.")
+          repeat_path = root / "repeatability.json"
+          if repeat_path.exists():
+              repeat = json.loads(repeat_path.read_text(encoding="utf-8"))
+              print(f"- Candidate repeatability: **{repeat['equivalent']}**")
+              print(f"- Run 1 normalized SHA-256: `{repeat['first_normalized_sha256']}`")
+              print(f"- Run 2 normalized SHA-256: `{repeat['second_normalized_sha256']}`")
+          comparison_path = root / "comparison.json"
+          if comparison_path.exists():
+              comparison = json.loads(comparison_path.read_text(encoding="utf-8"))
+              print(f"- Decision: **{comparison['decision']}**")
+              print(f"- Gating regressions: **{comparison['summary']['gating_regressions']}**")
+              print(f"- Query-level regressions: **{len(comparison['query_level']['regressions'])}**")
+              print(f"- Retrieval signature match: **{comparison['determinism']['retrieval_signature_match']}**")
+          else:
+              print("- Result: infrastructure or benchmark failure; inspect the failed step.")
+          PY
+
+      - name: Upload benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longmemeval-v1-dev-50-${{ github.sha }}
+          path: artifacts/benchmark-reporting/
+          if-no-files-found: error
+          retention-days: 14

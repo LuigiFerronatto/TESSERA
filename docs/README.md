@@ -34,6 +34,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
 | [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
+| [BENCHMARK_CI.md](BENCHMARK_CI.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
 
 ---
 

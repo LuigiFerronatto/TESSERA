@@ -1,0 +1,89 @@
+{
+  "benchmark": "LongMemEval V1",
+  "configuration": {
+    "adapter_version": "1",
+    "granularity": "session",
+    "judge": null,
+    "metric_definitions_sha256": "9c0adb9186c949167d08679767edb00efc13da733a342ca6e0b2e0bf6be40bb1",
+    "reader": null,
+    "retrieval_configuration": {
+      "engine": "TesseraEngine.retrieve_context_contract",
+      "reader": null,
+      "resolve_conflicts": true,
+      "top_k": 10,
+      "weights": "runtime-defaults"
+    },
+    "subset": "deterministic-small",
+    "token_count_method": "whitespace",
+    "top_k": 10
+  },
+  "cost": {
+    "api_calls": 0,
+    "estimated_usd": 0,
+    "llm_calls": 0
+  },
+  "created_at": "2026-08-30T21:17:21.060083+00:00",
+  "dataset": {
+    "abstention_count": 4,
+    "name": "longmemeval_s_cleaned.json",
+    "positive_count": 46,
+    "query_count": 50,
+    "revision": "cleaned-2025-09",
+    "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "source_url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json",
+    "upstream_commit": "9e0b455f4ef0e2ab8f2e582289761153549043fc"
+  },
+  "decision": "KEEP",
+  "determinism": {
+    "equivalent": true,
+    "normalized_sha256": "e284a8229436e59e116ee066226fdb89bbad656fcc8828fffa2e81cfc9069944",
+    "retrieval_result_sha256": "759f5f01ec5898b44a30bf3cc28549df21d36eb7405f7e063d9c98c3b1b463dc",
+    "run_count": 2
+  },
+  "environment": {
+    "platform": null,
+    "python_version": "3.12.3",
+    "repository_dirty": false
+  },
+  "issue": 96,
+  "latency": {
+    "comparable_environment": false,
+    "indexing_latency_ms": null,
+    "query_latency_p50_ms": null,
+    "query_latency_p95_ms": null,
+    "total_indexing_latency_ms": null
+  },
+  "limitations": [
+    "50-question subset is not an official full LongMemEval score",
+    "retrieval only; no reader, generation, or LLM-as-judge",
+    "canonical comparable latency was not recorded"
+  ],
+  "measured_commit": "b09ceacc24d9dfb67f9cd63f5219cd2ce8bc9f5a",
+  "merge_commit": "812c3aa37b59a3e99135a9d8b39245aeb71356d0",
+  "metrics": {
+    "abstention_retrieval_empty_rate": 0.0,
+    "average_context_characters": 12574.122,
+    "average_context_tokens": 2049.184,
+    "evidence_hit_rate": 0.9565217391304348,
+    "first_evidence_position": 1.9318181818181819,
+    "mrr": 0.7785024154589372,
+    "ndcg_at_10": 0.7874548353775167,
+    "provenance_coverage": 1.0,
+    "recall_at_1": 0.4710144927536232,
+    "recall_at_10": 0.9166666666666666,
+    "recall_at_3": 0.7028985507246377,
+    "recall_at_5": 0.7753623188405797
+  },
+  "parent_record_id": null,
+  "profile": "longmemeval-v1-dev-50",
+  "pull_request": 99,
+  "record_id": "longmemeval-v1-dev-50/96-b09ceacc",
+  "retrieval_contract_commit": "fb23012ba4b2fddc3912d7cb593391a04fe45ae7",
+  "schema_version": "1.0.0",
+  "selection": {
+    "algorithm": "sha256-stratified",
+    "query_count": 50,
+    "query_ids_sha256": "a5549148e1405715c970e640b7146a42670e9d2735270419d0a0a5d872e6480a",
+    "seed": "tessera-lme-v1-96"
+  }
+}
