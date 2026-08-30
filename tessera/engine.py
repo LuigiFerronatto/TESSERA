@@ -862,9 +862,20 @@ class TesseraEngine:
             # Safe fallback if the subgraph is disconnected or a numerical error occurs.
             pagerank_scores = nx.pagerank(subgraph, alpha=0.85, weight="weight")
 
+        import re
+        import math
+
         # 5. Filter down to real memory-note candidates.
         retrieved_memories = []
-        for node_id, score in pagerank_scores.items():
+        
+        # We need the maximum PageRank score among the memory nodes to normalize PR scores.
+        memory_pageranks = [pagerank_scores.get(nid, 0.0) for nid in pagerank_scores 
+                            if nid in self.graph.nodes and self.graph.nodes[nid].get("node_type") in MEMORY_NODE_TYPES]
+        max_pagerank = max(memory_pageranks) if memory_pageranks else 1.0
+
+        query_tokens = set(re.findall(r"\b\w+\b", query_text.lower()))
+
+        for node_id, pr_score in pagerank_scores.items():
             if node_id not in self.graph.nodes:
                 continue
             node_data = self.graph.nodes[node_id]
@@ -881,15 +892,109 @@ class TesseraEngine:
                         if nb != node_id and self.graph.nodes[nb].get("node_type") in MEMORY_NODE_TYPES
                     }
                 )
+                
+                # Compute Multi-Signal Score
+                # A. Lexical Similarity (Mix of TF-IDF Cosine Similarity and Direct Token Overlap)
+                raw_tfidf = float(node_sim_map.get(node_id, 0.0))
+                
+                body_text = node_data.get("body", "")
+                body_tokens = set(re.findall(r"\b\w+\b", body_text.lower()))
+                term_overlap = len(query_tokens & body_tokens) / max(1, len(query_tokens))
+                
+                lexical_score = 0.7 * raw_tfidf + 0.3 * term_overlap
+                
+                # B. Title/ID Relevance
+                clean_id_tokens = set(re.findall(r"\b\w+\b", node_id.lower().replace("/", " ").replace("-", " ").replace("_", " ")))
+                title_score = len(query_tokens & clean_id_tokens) / max(1, len(query_tokens))
+                
+                # C. Metadata Relevance (Tags + Entities)
+                tags = [str(t).lower() for t in node_data.get("frontmatter", {}).get("tags", [])]
+                entity_names = [str(e.get("name", "")).lower() for e in node_data.get("frontmatter", {}).get("entities", []) if isinstance(e, dict)]
+                metadata_tokens = set(tags) | set(entity_names)
+                metadata_score = len(query_tokens & metadata_tokens) / max(1, len(query_tokens))
+                
+                # D. Graph Centrality (Normalized Personalized PageRank)
+                normalized_relations = pr_score / max_pagerank if max_pagerank > 0 else 0.0
+                
+                # E. Intent Type Boost
+                type_boost = 1.0
+                query_lower = query_text.lower()
+                if node_type == "procedural_anchor" and any(kw in query_lower for kw in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "como fazer", "how to", "how")):
+                    type_boost = 1.3
+                elif node_type == "preference" and any(kw in query_lower for kw in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")):
+                    type_boost = 1.3
+                elif node_type == "factual" and any(kw in query_lower for kw in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name")):
+                    type_boost = 1.2
+                    
+                # F. Temporal Recency Boost (60-day exponential half-life)
+                recency_boost = 1.0
+                fm = node_data.get("frontmatter", {})
+                date_str = fm.get("last_updated_at") or fm.get("created_at") or fm.get("date")
+                if date_str:
+                    try:
+                        date_str = str(date_str)[:10]
+                        dt = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+                        today = datetime.date(2026, 8, 30) # Fixed anchor for today's date in this run
+                        days = (today - dt).days
+                        if days <= 0:
+                            recency_boost = 1.1
+                        else:
+                            recency_boost = 1.0 + 0.1 * math.exp(-days / 60.0)
+                    except Exception:
+                        pass
+                
+                # Combine Weighted Signals
+                W_LEXICAL = 0.4
+                W_TITLE = 0.3
+                W_METADATA = 0.2
+                W_RELATIONS = 0.1
+                
+                base_relevance = (
+                    W_LEXICAL * lexical_score +
+                    W_TITLE * title_score +
+                    W_METADATA * metadata_score +
+                    W_RELATIONS * normalized_relations
+                )
+                
+                final_score = base_relevance * type_boost * recency_boost
+                
+                # Phase 2: Query-Aware Relevant Evidence Extraction (Deterministic, Local & Fast)
+                paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body_text) if p.strip()]
+                if not paragraphs:
+                    paragraphs = [line.strip() for line in body_text.splitlines() if line.strip()]
+                
+                relevant_evidence = ""
+                if paragraphs:
+                    best_para_score = -1.0
+                    best_para = paragraphs[0]
+                    for p in paragraphs:
+                        p_tokens = set(re.findall(r"\b\w+\b", p.lower()))
+                        overlap = len(query_tokens & p_tokens)
+                        jaccard = overlap / len(query_tokens | p_tokens) if (query_tokens | p_tokens) else 0.0
+                        para_score = overlap + jaccard
+                        if para_score > best_para_score:
+                            best_para_score = para_score
+                            best_para = p
+                    relevant_evidence = best_para
+                
                 retrieved_memories.append(
                     {
                         "id": node_id,
                         "type": node_type,
                         "filepath": node_data.get("filepath"),
                         "filename": node_data.get("filename"),
-                        "score": float(score),
-                        "body": node_data.get("body", "").strip(),
-                        "frontmatter": node_data.get("frontmatter", {}),
+                        "score": float(final_score),
+                        "score_explain": {
+                            "lexical": float(lexical_score),
+                            "title": float(title_score),
+                            "metadata": float(metadata_score),
+                            "relations": float(normalized_relations),
+                            "type_boost": float(type_boost),
+                            "recency_boost": float(recency_boost),
+                        },
+                        "relevant_evidence": relevant_evidence,
+                        "body": body_text.strip(),
+                        "frontmatter": fm,
                         "related_ids": related_ids,
                     }
                 )
