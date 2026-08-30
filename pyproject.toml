@@ -41,7 +41,7 @@ Documentation = "https://github.com/LuigiFerronatto/TESSERA/tree/main/docs"
 Issues = "https://github.com/LuigiFerronatto/TESSERA/issues"
 
 [tool.setuptools]
-packages = ["tessera"]
+packages = ["tessera", "benchmarks", "benchmarks.longmemeval_v1"]
 
 [tool.setuptools.package-data]
 tessera = ["skills_library/*.md"]

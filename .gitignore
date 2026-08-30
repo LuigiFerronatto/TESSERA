@@ -7,3 +7,6 @@ dist/
 .venv/
 .venv*/
 .pytest_cache/
+.benchmark-cache/
+.benchmark-data/
+artifacts/longmemeval-v1/
