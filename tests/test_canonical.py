@@ -166,6 +166,117 @@ def test_stable_identity_rename_and_move_in_engine():
         assert node_data["filepath"] == filepath_new
 
 
+def test_stable_source_document_id_on_rename():
+    """Verify that source.document_id is stable across rename/move operations."""
+    with tempfile.TemporaryDirectory() as tmp:
+        engine = TesseraEngine(storage_dir=tmp)
+        
+        filepath_old = os.path.join(tmp, "file_old.md")
+        with open(filepath_old, "w", encoding="utf-8") as f:
+            f.write("# Document Title\nStable document ID content.")
+            
+        engine.build_index()
+        nodes_v1 = [n for n, d in engine.graph.nodes(data=True)]
+        assert len(nodes_v1) == 1
+        meta_v1 = engine.graph.nodes[nodes_v1[0]]["canonical_metadata"]
+        doc_id_v1 = meta_v1.source.document_id
+        
+        # Move file on disk
+        filepath_new = os.path.join(tmp, "sub", "file_moved.md")
+        os.makedirs(os.path.dirname(filepath_new), exist_ok=True)
+        os.rename(filepath_old, filepath_new)
+        
+        engine.build_index(use_cache=False)
+        nodes_v2 = [n for n, d in engine.graph.nodes(data=True)]
+        assert len(nodes_v2) == 1
+        meta_v2 = engine.graph.nodes[nodes_v2[0]]["canonical_metadata"]
+        doc_id_v2 = meta_v2.source.document_id
+        
+        # Document ID must remain 100% stable
+        assert doc_id_v1 == doc_id_v2
+        assert meta_v2.source.path == "sub/file_moved.md"
+
+
+def test_duplicate_content_is_not_classified_as_rename():
+    """Verify that copy/duplicate files with same content retain separate IDs if original still exists."""
+    with tempfile.TemporaryDirectory() as tmp:
+        engine = TesseraEngine(storage_dir=tmp)
+        
+        filepath_1 = os.path.join(tmp, "a.md")
+        with open(filepath_1, "w", encoding="utf-8") as f:
+            f.write("# Identical content\nSame text.")
+            
+        # Write b.md with EXACT same content, but a.md STILL exists on disk!
+        filepath_2 = os.path.join(tmp, "b.md")
+        with open(filepath_2, "w", encoding="utf-8") as f:
+            f.write("# Identical content\nSame text.")
+            
+        engine.build_index(use_cache=False)
+        nodes = sorted([n for n, d in engine.graph.nodes(data=True) if d.get("node_type") == "factual"])
+        
+        # Mudar o arquivo para duplicado não deve fundir suas identidades
+        assert len(nodes) == 2
+        assert nodes[0] == "a"
+        assert nodes[1] == "b"
+
+
+def test_duplicate_explicit_id_collision_failure():
+    """Verify that declaring identical explicit IDs in multiple files raises ValueError."""
+    with tempfile.TemporaryDirectory() as tmp:
+        engine = TesseraEngine(storage_dir=tmp)
+        
+        # Write two files declaring explicit ID "collision/test"
+        with open(os.path.join(tmp, "file1.md"), "w", encoding="utf-8") as f:
+            f.write("---\nid: collision/test\n---\nHello")
+            
+        with open(os.path.join(tmp, "file2.md"), "w", encoding="utf-8") as f:
+            f.write("---\nid: collision/test\n---\nWorld")
+            
+        with pytest.raises(ValueError) as exc:
+            engine.build_index(use_cache=False)
+        assert "Collision de IDs Explícitos Detectada" in str(exc.value)
+
+
+def test_raw_frontmatter_preservation():
+    """Verify that canonical_metadata.raw_frontmatter remains raw and unmutated."""
+    with tempfile.TemporaryDirectory() as tmp:
+        engine = TesseraEngine(storage_dir=tmp)
+        
+        with open(os.path.join(tmp, "notes.md"), "w", encoding="utf-8") as f:
+            f.write("---\nname: Authentic\n---\nBody content.")
+            
+        engine.build_index()
+        
+        meta = engine.graph.nodes["notes"]["canonical_metadata"]
+        # Injected legacy adapter fields must NOT exist in the truly raw_frontmatter
+        assert "id" not in meta.raw_frontmatter
+        assert "node_type" not in meta.raw_frontmatter
+        assert "drawer" not in meta.raw_frontmatter
+        assert "active_connections" not in meta.raw_frontmatter
+        assert meta.raw_frontmatter.get("name") == "Authentic"
+
+
+def test_semantic_equivalence_on_metadata_changes():
+    """Verify that changing tags/entities invalidates semantic equivalence, while content hash matches."""
+    raw_text_1 = """---
+tags: [tag_old]
+---
+Same body text.
+"""
+    raw_text_2 = """---
+tags: [tag_new]
+---
+Same body text.
+"""
+    meta_1 = parse_and_normalize(raw_text_1, "/storage/note.md", "/storage")
+    meta_2 = parse_and_normalize(raw_text_2, "/storage/note.md", "/storage")
+    
+    # Body is equivalent
+    assert meta_1.is_content_equivalent(meta_2)
+    # But because tags differ and tags affect retrieval score, they are NOT semantically equivalent
+    assert not meta_1.is_semantically_equivalent(meta_2)
+
+
 def test_stable_identity_edit_retains_id():
     """Verify that editing the content of a file retains the stable ID while updating version hashes."""
     with tempfile.TemporaryDirectory() as tmp:
