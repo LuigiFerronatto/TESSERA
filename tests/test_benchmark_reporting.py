@@ -38,6 +38,8 @@ from benchmarks.reporting.schema import (
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE_JSON = ROOT / "benchmarks/results/longmemeval-v1-dev-50/baseline.json"
 BASELINE_MD = ROOT / "benchmarks/results/longmemeval-v1-dev-50/baseline.md"
+FORWARD_JSON = ROOT / "benchmarks/results/longmemeval-v1-dev-50/forward.json"
+FORWARD_MD = ROOT / "benchmarks/results/longmemeval-v1-dev-50/forward.md"
 
 
 @pytest.fixture
@@ -262,6 +264,25 @@ def test_baseline_markdown_generation_is_deterministic_and_consistent(baseline):
     assert "does not measure final-answer correctness" in first
 
 
+def test_forward_reference_is_complete_pinned_ci_evidence():
+    forward = load_record(FORWARD_JSON)
+    assert forward["schema_version"] == SCHEMA_VERSION
+    assert forward["issue"] == 100
+    assert forward["pull_request"] == 102
+    assert forward["execution"]["role"] == "forward"
+    assert forward["measured_commit"] == "467ba649f53312cedcecf40caf548af5f766c67b"
+    assert forward["environment"]["complete"] is True
+    constraints = ROOT / forward["environment"]["constraints_file"]
+    import hashlib
+    assert hashlib.sha256(constraints.read_bytes()).hexdigest() == (
+        forward["environment"]["constraints_sha256"]
+    )
+    assert environment_fingerprint(forward["environment"]) == (
+        forward["environment"]["fingerprint_sha256"]
+    )
+    assert render_record(forward) == FORWARD_MD.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize(
     "dotted,value",
     [
@@ -398,7 +419,8 @@ def test_same_commit_repeatability_hash_rule(baseline):
 
 def test_versioned_outputs_contain_no_restricted_benchmark_content(baseline):
     assert_no_restricted_content(baseline)
-    for path in (BASELINE_JSON, BASELINE_MD):
+    assert_no_restricted_content(load_record(FORWARD_JSON))
+    for path in (BASELINE_JSON, BASELINE_MD, FORWARD_JSON, FORWARD_MD):
         text = path.read_text(encoding="utf-8").lower()
         assert '"question":' not in text
         assert "expected_answer" not in text
