@@ -361,9 +361,18 @@ def compare_records(
     threshold_failures = [
         name for name, item in metrics.items() if item["threshold_passed"] is False
     ]
+    same_commit = baseline["measured_commit"] == candidate["measured_commit"]
+    normalized_sha_match = (
+        baseline["determinism"]["normalized_sha256"]
+        == candidate["determinism"]["normalized_sha256"]
+    )
+    determinism_regression = (
+        not candidate["determinism"]["equivalent"]
+        or (same_commit and not normalized_sha_match)
+    )
     decision = "ITERATE" if (
         provenance_regression or gating_regressions or threshold_failures
-        or query_level["regressions"]
+        or query_level["regressions"] or determinism_regression
     ) else "KEEP"
     return {
         "schema_version": "1.0.0",
@@ -383,11 +392,9 @@ def compare_records(
         "determinism": {
             "candidate_run_count": candidate["determinism"]["run_count"],
             "candidate_equivalent": candidate["determinism"]["equivalent"],
-            "same_commit_hash_rule": baseline["measured_commit"] == candidate["measured_commit"],
-            "normalized_sha_match": (
-                baseline["determinism"]["normalized_sha256"]
-                == candidate["determinism"]["normalized_sha256"]
-            ),
+            "same_commit_hash_rule": same_commit,
+            "normalized_sha_match": normalized_sha_match,
+            "regression": determinism_regression,
             "retrieval_signature_match": (
                 baseline["determinism"]["retrieval_result_sha256"]
                 == candidate["determinism"]["retrieval_result_sha256"]

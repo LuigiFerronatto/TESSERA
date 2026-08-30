@@ -360,6 +360,10 @@ def test_same_commit_repeatability_hash_rule(baseline):
     comparison = compare_records(baseline, candidate)
     assert comparison["determinism"]["same_commit_hash_rule"] is True
     assert comparison["determinism"]["normalized_sha_match"] is True
+    candidate["determinism"]["normalized_sha256"] = "0" * 64
+    comparison = compare_records(baseline, candidate)
+    assert comparison["determinism"]["regression"] is True
+    assert comparison["decision"] == "ITERATE"
 
 
 def test_versioned_outputs_contain_no_restricted_benchmark_content(baseline):
