@@ -44,6 +44,17 @@ from .engine import TesseraEngine
 from .orchestrator import TesseraOrchestrator, OrchestratorResult
 from .hooks import TesseraTaskHook, TaskInterceptionResult
 from .skills import SKILL_IDS, install_default_skills, list_default_skill_files
+from .evidence import (
+    EVIDENCE_SCHEMA_VERSION,
+    EvidenceExtraction,
+    EvidenceFreshness,
+    EvidenceLedger,
+    EvidenceRecord,
+    EvidenceSource,
+    EvidenceSpan,
+    evidence_from_canonical,
+    verify_evidence_freshness,
+)
 
 __version__ = "3.4.0"
 
@@ -67,5 +78,14 @@ __all__ = [
     "SKILL_IDS",
     "install_default_skills",
     "list_default_skill_files",
+    "EVIDENCE_SCHEMA_VERSION",
+    "EvidenceExtraction",
+    "EvidenceFreshness",
+    "EvidenceLedger",
+    "EvidenceRecord",
+    "EvidenceSource",
+    "EvidenceSpan",
+    "evidence_from_canonical",
+    "verify_evidence_freshness",
     "__version__",
 ]
