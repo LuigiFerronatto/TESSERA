@@ -99,16 +99,22 @@ def evidence_from_canonical(
     *,
     extraction_method: str = "canonical_document",
     inferred: bool = False,
+    span: Optional[EvidenceSpan] = None,
 ) -> EvidenceRecord:
-    """Build a deterministic evidence record from Canonical Metadata."""
+    """Build a deterministic evidence record from Canonical Metadata.
+
+    ``span`` defaults to Canonical's document-level source span. Retrieval can
+    pass an exact query-aware span when a specific paragraph/snippet is used as
+    evidence, without changing the source or canonical identity.
+    """
     source = metadata.source
-    span = source.span
+    resolved_span = span or EvidenceSpan(source.span.start_line, source.span.end_line)
     fingerprint = _evidence_fingerprint(
         metadata.identity.id,
         source.document_id,
         source.content_hash,
-        span.start_line,
-        span.end_line,
+        resolved_span.start_line,
+        resolved_span.end_line,
     )
     return EvidenceRecord(
         schema_version=EVIDENCE_SCHEMA_VERSION,
@@ -121,9 +127,43 @@ def evidence_from_canonical(
             content_hash=source.content_hash,
             format=source.format,
         ),
-        span=EvidenceSpan(span.start_line, span.end_line),
+        span=resolved_span,
         fingerprint=fingerprint,
         extraction=EvidenceExtraction(method=extraction_method, inferred=inferred),
+    )
+
+
+def locate_evidence_span(raw_text: str, evidence_text: str) -> EvidenceSpan:
+    """Resolve an exact 1-based line span for evidence text in a source file.
+
+    The match is literal and deterministic. If the exact evidence text cannot
+    be located, precision is not invented: ``(None, None)`` is returned.
+    """
+    if not evidence_text:
+        return EvidenceSpan(None, None)
+    start_offset = raw_text.find(evidence_text)
+    if start_offset < 0:
+        return EvidenceSpan(None, None)
+    end_offset = start_offset + len(evidence_text)
+    start_line = raw_text.count("\n", 0, start_offset) + 1
+    end_line = raw_text.count("\n", 0, max(start_offset, end_offset - 1)) + 1
+    return EvidenceSpan(start_line, end_line)
+
+
+def evidence_for_text(
+    metadata: CanonicalMetadata,
+    raw_text: str,
+    evidence_text: str,
+    *,
+    extraction_method: str = "paragraph_lexical",
+) -> EvidenceRecord:
+    """Create query-aware evidence with exact span when it can be proven."""
+    span = locate_evidence_span(raw_text, evidence_text)
+    return evidence_from_canonical(
+        metadata,
+        extraction_method=extraction_method,
+        inferred=False,
+        span=span,
     )
 
 
