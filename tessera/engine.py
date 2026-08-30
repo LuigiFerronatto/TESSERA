@@ -31,46 +31,15 @@ from .models import (
 )
 from .security import WriteGatingEngine
 
-# Relation types that receive a retrieval boost — they anchor procedural
-# stability (skills that stabilize a service/deployment/generalization).
 PROCEDURAL_RELATION_BOOST_TYPES = {
     "stabilizes_service",
     "standardizes_deployment",
     "generalization_of",
 }
 PROCEDURAL_RELATION_BOOST_FACTOR = 1.35
-
-# How many top TF-IDF matches to consider as seed nodes for subgraph expansion.
-# Kept wide (30, not 5) so dense, highly-similar note sets — e.g. dozens of
-# evolving preference notes about the same topic — don't get truncated before
-# the ConflictResolver ever sees the full temporal history.
 SEED_NODE_LIMIT = 30
 SEED_NODE_MIN_SIMILARITY = 0.01
-
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
-
-# Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
-# Some external corpora (e.g. LAO's own `.claude/memory/`) use a different,
-# equally valid frontmatter shape: `name` / `description` / `metadata.type`.
-# These are the `metadata.type` values recognized as indexable memory notes
-# when a file uses that "foreign" schema instead of Tessera's native one.
-FOREIGN_MEMORY_METADATA_TYPES = {
-    "learning",
-    "project",
-    "reference",
-    "user",
-    "feedback",
-    "experiment-result",
-    "hypothesis",
-    "governance",
-    "pipeline",
-}
-
-# Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
-# Some external corpora (e.g. LAO's own `.claude/memory/`) use a different,
-# equally valid frontmatter shape: `name` / `description` / `metadata.type`.
-# These are the `metadata.type` values recognized as indexable memory notes
-# when a file uses that "foreign" schema instead of Tessera's native one.
 FOREIGN_MEMORY_METADATA_TYPES = {
     "learning",
     "project",
@@ -85,11 +54,6 @@ FOREIGN_MEMORY_METADATA_TYPES = {
 
 
 class TesseraEngine:
-    """
-    Core Tessera search engine: ties together physical note ingestion, graph
-    construction, DW-PR-weighted subgraph search, and write-side management.
-    """
-
     def __init__(self, storage_dir: str, weights: Optional[Dict[str, float]] = None):
         self.storage_dir = storage_dir
         self.graph = nx.DiGraph()
@@ -99,46 +63,31 @@ class TesseraEngine:
         self.tfidf_matrix = None
         self.vectorizer = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b")
         self.gating_engine = WriteGatingEngine()
-        
-        # Default weights for Multi-Signal Scoring (F10)
         self.weights = {
-            "lexical_tfidf": 0.28,    # 0.7 of 0.4
-            "lexical_overlap": 0.12,  # 0.3 of 0.4
+            "lexical_tfidf": 0.28,
+            "lexical_overlap": 0.12,
             "title": 0.3,
             "metadata": 0.2,
             "relations": 0.1,
-            "recency": 0.0,           # Recency is disabled by default (weight 0.0) in default ranking
+            "recency": 0.0,
         }
         if weights:
             self.weights.update(weights)
-            
         self._today_provider = None
-
         if not os.path.exists(storage_dir):
             os.makedirs(storage_dir)
-
-        # On-disk index cache: lives *inside* storage_dir so the graph
-        # persists across CLI invocations instead of being rebuilt (and
-        # discarded) in-memory every single time. Never mixed in with the
-        # user's own memory notes (kept in a dedicated subfolder that
-        # `_iter_markdown_files` explicitly skips).
         self.index_cache_dir = os.path.join(storage_dir, ".tessera_index")
         self.index_cache_pkl = os.path.join(self.index_cache_dir, "graph.pkl")
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
 
     def set_today_provider(self, provider: Any) -> None:
-        """Injects a custom provider to fetch 'today's date for determinism in testing."""
         self._today_provider = provider
 
     def get_today(self) -> datetime.date:
-        """Resolves today's date, using the injected provider if any, else real today."""
         if self._today_provider:
             return self._today_provider()
         return datetime.date.today()
 
-    # ------------------------------------------------------------------
-    # Write path
-    # ------------------------------------------------------------------
     def write_memory_note(
         self,
         mem_id: str,
@@ -152,35 +101,8 @@ class TesseraEngine:
         active_connections: Optional[List[Connection]] = None,
         persist_format: str = "md",
     ) -> str:
-        """
-        Secure, incremental write flow:
-        1. Runs security audit + sanitization (write-side gating).
-        2. Formats the note as an atomic card (Markdown + YAML frontmatter).
-        3. Persists it physically to disk.
-        4. Returns the generated file path.
-
-        `mem_id` SHOULD carry a domain prefix ("<domain>/<slug>", e.g.
-        "research/browser-actions/thesis" or "lao/some-learning") so the
-        note lands inside a topical subdirectory of storage_dir instead of
-        loose at its root. A bare, unprefixed mem_id (no "/" at all) is
-        accepted — writing must never hard-fail an autonomous run over a
-        naming nit — but is a near-certain sign the caller (an LLM agent
-        following a system prompt, most often) skipped that convention.
-        Confirmed live 2026-08-25/26: a Gemini-driven `/lao` run wrote
-        mem_id="voice-ai-blip-integration-strategy" with no prefix at all
-        and the note silently landed at .claude/memory/'s own root, next to
-        MEMORY.md/README.md/STRUCTURE.md, instead of inside e.g.
-        research/<topic>/ or lao/ - nothing in this engine (or the write_memory
-        MCP tool's docstring) told it any different. This warning is a
-        stopgap until every caller-facing surface (MCP tool docstring, CLI
-        --help, hooks.py's on_task_end mem_id default) is updated to make
-        the domain prefix impossible to miss - see the "Improvements found
-        auditing against the QUMem paper" notes in Tessera/docs/ for the full
-        list this belongs to.
-        """
         if "/" not in mem_id.strip("/"):
             import warnings
-
             warnings.warn(
                 f"write_memory_note: mem_id={mem_id!r} has no domain prefix "
                 "(expected '<domain>/<slug>', e.g. 'research/some-topic/note' "
@@ -189,18 +111,10 @@ class TesseraEngine:
                 "This is very likely unintentional.",
                 stacklevel=2,
             )
-
         provenance_turns = provenance_turns or []
         active_connections = active_connections or []
-
-        sanitized_content, threat_score, is_sanitized = self.gating_engine.audit_and_sanitize(
-            content, tags
-        )
-
-        gating_status = "passed"
-        if threat_score > self.gating_engine.toxicity_threshold:
-            gating_status = "flagged_and_sanitized"
-
+        sanitized_content, threat_score, is_sanitized = self.gating_engine.audit_and_sanitize(content, tags)
+        gating_status = "flagged_and_sanitized" if threat_score > self.gating_engine.toxicity_threshold else "passed"
         now = datetime.datetime.now().astimezone().isoformat()
         frontmatter_data = MemoryFrontmatter(
             memory_id=mem_id,
@@ -217,918 +131,276 @@ class TesseraEngine:
             toxicity_score=threat_score,
             sanitized=is_sanitized,
         )
-
         frontmatter_dict = frontmatter_data.to_dict()
         filepath_base = os.path.join(self.storage_dir, mem_id)
-        
-        # `mem_id` commonly carries a domain prefix (e.g. "lao/some-slug") so
-        # notes land inside a topical subdirectory instead of loose at
-        # storage_dir's root. Without creating that subdirectory first, a
-        # first-ever write to a brand-new domain prefix crashes with
-        # FileNotFoundError deep inside an autonomous run (confirmed live
-        # 2026-08-25/26: a Gemini-driven /lao run wrote mem_id="voice-ai-..."
-        # with NO domain prefix at all and silently landed the note at
-        # .claude/memory/'s root instead of e.g. research/<topic>/ - the
-        # engine had no way to reject or redirect that, since it never
-        # validates mem_id shape). This makedirs alone only fixes the crash
-        # for prefixed ids that don't have their subdirectory yet; it does
-        # NOT enforce a prefix - see write_memory_note's docstring/callers
-        # for the convention every caller (CLI, MCP tool, hooks) must follow.
         os.makedirs(os.path.dirname(filepath_base) or self.storage_dir, exist_ok=True)
-
         if persist_format == "json":
             import json
             filepath = f"{filepath_base}.json"
-            payload = {
-                "frontmatter": frontmatter_dict,
-                "body": sanitized_content.strip()
-            }
             with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(payload, f, indent=2, ensure_ascii=False)
+                json.dump({"frontmatter": frontmatter_dict, "body": sanitized_content.strip()}, f, indent=2, ensure_ascii=False)
         else:
-            yaml_frontmatter = yaml.dump(
-                frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
-            )
-            markdown_body = f"---\n{yaml_frontmatter}---\n\n{sanitized_content.strip()}\n"
+            yaml_frontmatter = yaml.dump(frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True)
             filepath = f"{filepath_base}.md"
             with open(filepath, "w", encoding="utf-8") as f:
-                f.write(markdown_body)
-
+                f.write(f"---\n{yaml_frontmatter}---\n\n{sanitized_content.strip()}\n")
         self.file_registry[mem_id] = filepath
         return filepath
 
-    # ------------------------------------------------------------------
-    # Typed stores ("gavetas") — facts / preferences / insights
-    # ------------------------------------------------------------------
-    # Tessera organizes everything learned into exactly 3 typed stores instead
-    # of one undifferentiated pile of notes:
-    #   - facts:       concrete, immutable information (what happened / what
-    #                   is true) — maps to node_type="factual".
-    #   - preferences: behavior, tastes, feedback, corrections from a human
-    #                   or operator — maps to node_type="preference".
-    #   - insights:    transferable learnings from task execution that can
-    #                   be applied to *future*, different situations — maps
-    #                   to node_type="procedural_anchor".
-    # These thin wrappers exist so callers (the orchestrator's hook,
-    # MCP tools, CLI) write with clear intent instead of remembering the
-    # underlying node_type string.
+    def write_fact(self, mem_id: str, episode_id: str, content: str, tags=None, entities=None, active_connections=None) -> str:
+        return self.write_memory_note(mem_id, "factual", episode_id, content, tags or [], entities or [], active_connections=active_connections)
 
-    def write_fact(
-        self,
-        mem_id: str,
-        episode_id: str,
-        content: str,
-        tags: Optional[List[str]] = None,
-        entities: Optional[List[Entity]] = None,
-        active_connections: Optional[List[Connection]] = None,
-    ) -> str:
-        """Writes a concrete, immutable fact to the `facts` store."""
-        return self.write_memory_note(
-            mem_id=mem_id,
-            mem_type="factual",
-            episode_id=episode_id,
-            content=content,
-            tags=tags or [],
-            entities=entities or [],
-            active_connections=active_connections,
-        )
+    def write_preference(self, mem_id: str, episode_id: str, content: str, tags=None, entities=None, active_connections=None) -> str:
+        return self.write_memory_note(mem_id, "preference", episode_id, content, tags or [], entities or [], active_connections=active_connections)
 
-    def write_preference(
-        self,
-        mem_id: str,
-        episode_id: str,
-        content: str,
-        tags: Optional[List[str]] = None,
-        entities: Optional[List[Entity]] = None,
-        active_connections: Optional[List[Connection]] = None,
-    ) -> str:
-        """
-        Writes a behavior/taste/feedback statement to the `preferences` store.
-        Superseded automatically by ConflictResolver at retrieval time when a
-        newer preference about the same subject exists.
-        """
-        return self.write_memory_note(
-            mem_id=mem_id,
-            mem_type="preference",
-            episode_id=episode_id,
-            content=content,
-            tags=tags or [],
-            entities=entities or [],
-            active_connections=active_connections,
-        )
+    def write_insight(self, mem_id: str, episode_id: str, content: str, tags=None, entities=None, active_connections=None) -> str:
+        return self.write_memory_note(mem_id, "procedural_anchor", episode_id, content, tags or [], entities or [], active_connections=active_connections)
 
-    def write_insight(
-        self,
-        mem_id: str,
-        episode_id: str,
-        content: str,
-        tags: Optional[List[str]] = None,
-        entities: Optional[List[Entity]] = None,
-        active_connections: Optional[List[Connection]] = None,
-    ) -> str:
-        """
-        Writes a transferable insight (a learning from executing a task that
-        generalizes to future, different situations) to the `insights` store.
-        Receives the procedural-anchor retrieval boost (see
-        PROCEDURAL_RELATION_BOOST_TYPES) since these notes are meant to
-        stabilize *future* action, not just describe the past.
-        """
-        return self.write_memory_note(
-            mem_id=mem_id,
-            mem_type="procedural_anchor",
-            episode_id=episode_id,
-            content=content,
-            tags=tags or [],
-            entities=entities or [],
-            active_connections=active_connections,
-        )
-
-    def write_episode(
-        self,
-        mem_id: str,
-        store: str,
-        episode_id: str,
-        episode: Episode,
-        tags: Optional[List[str]] = None,
-        entities: Optional[List[Entity]] = None,
-        active_connections: Optional[List[Connection]] = None,
-    ) -> str:
-        """
-        Writes a memory note structured as an *episode* (beginning / middle /
-        end) instead of one undifferentiated content block, then files it
-        into the given typed store (``STORE_FACTS`` / ``STORE_PREFERENCES`` /
-        ``STORE_INSIGHTS``).
-
-        Breaking a task execution into begin/middle/end lets retrieval later
-        distinguish "why this started" from "what happened" from "what was
-        learned/resolved" — which matters most for the `insights` store,
-        where the "end" (the lesson) is what's actually transferable to a
-        future, different situation, not the blow-by-blow "middle".
-        """
+    def write_episode(self, mem_id: str, store: str, episode_id: str, episode: Episode, tags=None, entities=None, active_connections=None) -> str:
         if store not in STORE_TO_NODE_TYPE:
-            raise ValueError(
-                f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
-            )
-        mem_type = STORE_TO_NODE_TYPE[store]
-        return self.write_memory_note(
-            mem_id=mem_id,
-            mem_type=mem_type,
-            episode_id=episode_id,
-            content=episode.to_markdown_body(),
-            tags=tags or [],
-            entities=entities or [],
-            active_connections=active_connections,
-        )
+            raise ValueError(f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS.")
+        return self.write_memory_note(mem_id, STORE_TO_NODE_TYPE[store], episode_id, episode.to_markdown_body(), tags or [], entities or [], active_connections=active_connections)
 
-    def decompose_and_write_episode(
-        self,
-        mem_id_prefix: str,
-        episode_id: str,
-        episode: Episode,
-        llm_fn: Optional[Any] = None,
-        tags: Optional[List[str]] = None,
-    ) -> List[str]:
-        """
-        QUMem-style automatic typed decomposition (see `tessera.decomposer`):
-        rather than the caller manually deciding which typed store(s) an
-        episode belongs to (as `write_episode` requires), this mechanically
-        extracts N atomic facts/preferences/insights from the raw episode
-        and writes each through the normal gated typed-store path.
-
-        `llm_fn` is the same `(system_prompt, user_prompt) -> str` shape used
-        by `TesseraOrchestrator`/`llm_bridge.resolve_llm_fn()` - pass a real one
-        for actual reasoning; omit for the deterministic offline heuristic
-        fallback (same offline-by-default philosophy as the rest of Tessera).
-
-        Returns the list of filepaths written (each still goes through the
-        same write-side gating/sanitization as a manual `write_fact`/
-        `write_preference`/`write_insight` call - decomposition only decides
-        *how many* notes get proposed, never bypasses the security gate).
-        """
+    def decompose_and_write_episode(self, mem_id_prefix: str, episode_id: str, episode: Episode, llm_fn: Optional[Any] = None, tags=None) -> List[str]:
         from .decomposer import decompose_and_write
+        return decompose_and_write(engine=self, mem_id_prefix=mem_id_prefix, episode_id=episode_id, episode=episode, llm_fn=llm_fn, tags=tags)
 
-        return decompose_and_write(
-            engine=self,
-            mem_id_prefix=mem_id_prefix,
-            episode_id=episode_id,
-            episode=episode,
-            llm_fn=llm_fn,
-            tags=tags,
-        )
-
-    def retrieve_from_store(
-        self, query_text: str, store: str, top_n: int = 7, resolve_conflicts: bool = True
-    ) -> List[Dict[str, Any]]:
-        """
-        Same retrieval pipeline as ``retrieve_context``, but scoped to a
-        single typed store (``STORE_FACTS`` / ``STORE_PREFERENCES`` /
-        ``STORE_INSIGHTS``). Useful when a caller (e.g. the Retrieval Planner
-        agent) already knows which drawer it needs to open instead of
-        searching all three indiscriminately.
-        """
+    def retrieve_from_store(self, query_text: str, store: str, top_n: int = 7, resolve_conflicts: bool = True) -> List[Dict[str, Any]]:
         if store not in STORE_TO_NODE_TYPE:
-            raise ValueError(
-                f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
-            )
+            raise ValueError(f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS.")
         target_node_type = STORE_TO_NODE_TYPE[store]
-        # Over-fetch then filter: DW-PR ranks across the whole graph, so we
-        # ask for more candidates than top_n to make sure enough survive the
-        # store filter without a second, disjoint pass over the graph.
-        candidates = self.retrieve_context(
-            query_text=query_text, top_n=max(top_n * 4, 12), resolve_conflicts=resolve_conflicts
-        )
-        filtered = [m for m in candidates if m.get("type") == target_node_type]
-        return filtered[:top_n]
+        candidates = self.retrieve_context(query_text=query_text, top_n=max(top_n * 4, 12), resolve_conflicts=resolve_conflicts)
+        return [m for m in candidates if m.get("type") == target_node_type][:top_n]
 
-    # ------------------------------------------------------------------
-    # Index build
-    # ------------------------------------------------------------------
     def build_index(self, recursive: bool = True, use_cache: bool = True, persist: bool = True) -> None:
-        """
-        Scans the storage directory and (re)builds the heterogeneous
-        knowledge graph in memory: memory notes, entities, tags, and their
-        interrelations. Also (re)trains the TF-IDF vectorizer over the corpus.
-
-        Args:
-            recursive: when True (default), walks all subdirectories of
-                ``storage_dir`` too — needed for corpora organized into
-                topic folders (e.g. LAO's ``.claude/memory/research/<topic>/``).
-            use_cache: when True (default), first tries to load a previously
-                persisted index (``.tessera_index/graph.pkl``) if its fingerprint
-                (file count + latest mtime across the corpus) still matches
-                the notes on disk — this skips a full re-parse+re-vectorize
-                on every CLI invocation when nothing actually changed.
-            persist: when True (default), writes the freshly built index to
-                ``.tessera_index/`` (pickle for fast reload + a human-readable
-                JSON summary) once the scan finishes.
-        """
         if use_cache and self._load_index_if_fresh():
             return
-
-        self.graph.clear()
-        self.file_registry.clear()
-        self.node_corpus.clear()
-        pending_connections = []
-
+        self.graph.clear(); self.file_registry.clear(); self.node_corpus.clear(); pending_connections = []
         if not os.path.exists(self.storage_dir):
             return
-
         for filepath in self._iter_markdown_files(recursive=recursive):
             filename = os.path.relpath(filepath, self.storage_dir)
             try:
                 with open(filepath, "r", encoding="utf-8") as f:
                     raw_text = f.read()
-
                 frontmatter, body = self._parse_markdown(raw_text)
-                if frontmatter is None:
-                    # File has no YAML frontmatter block (e.g. CLAUDE.md, GEMINI.md, README.md)
-                    # Use an empty dictionary so _normalize_frontmatter can synthesize its ID and properties.
-                    frontmatter = {}
-
-                frontmatter = self._normalize_frontmatter(frontmatter, filepath)
-
+                frontmatter = self._normalize_frontmatter(frontmatter or {}, filepath)
                 mem_id = frontmatter.get("id")
                 if not mem_id:
                     continue
                 if mem_id in self.graph:
-                    # Duplicate id across files (e.g. two notes sharing a slug) —
-                    # disambiguate deterministically instead of silently
-                    # overwriting the earlier node.
                     mem_id = f"{mem_id}__{abs(hash(filepath)) % 10_000}"
-
                 self.file_registry[mem_id] = filepath
                 node_type = frontmatter.get("node_type", "factual")
-
                 tags_str = " ".join(frontmatter.get("tags", []))
                 entities_str = " ".join([e.get("name", "") for e in frontmatter.get("entities", [])])
                 description = frontmatter.get("description", "") or ""
                 self.node_corpus[mem_id] = f"{description} {body} {tags_str} {entities_str}"
-
-                self.graph.add_node(
-                    mem_id,
-                    node_type=node_type,
-                    filepath=filepath,
-                    filename=filename,
-                    frontmatter=frontmatter,
-                    body=body,
-                )
-
+                self.graph.add_node(mem_id, node_type=node_type, filepath=filepath, filename=filename, frontmatter=frontmatter, body=body)
                 for ent in frontmatter.get("entities", []):
                     ent_name = ent.get("name")
                     if not ent_name:
                         continue
-                    ent_desc = ent.get("description", "")
                     ent_id = f"ent_{ent_name.lower().replace(' ', '_')}"
-
                     if ent_id not in self.graph:
-                        self.graph.add_node(ent_id, node_type="entity", name=ent_name, description=ent_desc)
-                        self.node_corpus[ent_id] = f"{ent_name}: {ent_desc}"
-
+                        self.graph.add_node(ent_id, node_type="entity", name=ent_name, description=ent.get("description", ""))
+                        self.node_corpus[ent_id] = f"{ent_name}: {ent.get('description', '')}"
                     self.graph.add_edge(mem_id, ent_id, relation_type="mentions")
-
                 for tag in frontmatter.get("tags", []):
                     tag_id = f"tag_{tag.lower()}"
                     if tag_id not in self.graph:
                         self.graph.add_node(tag_id, node_type="tag", tag_name=tag)
                         self.node_corpus[tag_id] = f"Tag: {tag}"
-
                     self.graph.add_edge(mem_id, tag_id, relation_type="tagged_with")
-
                 for conn in frontmatter.get("active_connections", []):
-                    pending_connections.append(
-                        (mem_id, conn.get("target_memory_id"), conn.get("relation_type"))
-                    )
-
-            except Exception as e:  # noqa: BLE001 - keep indexing resilient to one bad file
+                    pending_connections.append((mem_id, conn.get("target_memory_id"), conn.get("relation_type")))
+            except Exception as e:
                 print(f"[Aviso] Falha ao processar a nota física {filename}: {e}")
-                continue
-
         for src, dest, rel in pending_connections:
             if src in self.graph and dest in self.graph:
                 self.graph.add_edge(src, dest, relation_type=rel)
-
         if self.node_corpus:
             self.node_ids = list(self.node_corpus.keys())
-            corpus_texts = [self.node_corpus[nid] for nid in self.node_ids]
-            self.tfidf_matrix = self.vectorizer.fit_transform(corpus_texts)
-
+            self.tfidf_matrix = self.vectorizer.fit_transform([self.node_corpus[nid] for nid in self.node_ids])
         if persist:
             self.save_index()
 
-    # ------------------------------------------------------------------
-    # Index persistence (disk cache)
-    # ------------------------------------------------------------------
     def _source_fingerprint(self) -> Tuple[int, float]:
-        """
-        Cheap signature of the current corpus state: (file count, max mtime)
-        across every ``.md`` file under ``storage_dir``. Used to decide
-        whether a cached index is still valid without re-parsing anything.
-        """
-        count = 0
-        latest_mtime = 0.0
+        count = 0; latest_mtime = 0.0
         for filepath in self._iter_markdown_files(recursive=True):
             count += 1
-            try:
-                mtime = os.path.getmtime(filepath)
-            except OSError:
-                continue
-            if mtime > latest_mtime:
-                latest_mtime = mtime
+            try: latest_mtime = max(latest_mtime, os.path.getmtime(filepath))
+            except OSError: pass
         return count, latest_mtime
 
     def save_index(self) -> None:
-        """
-        Persists the current in-memory graph/index to
-        ``<storage_dir>/.tessera_index/``:
-          - ``graph.pkl``: full binary snapshot (graph + TF-IDF matrix/
-            vectorizer + corpus + file registry) for instant reload.
-          - ``graph.json``: human-readable summary (nodes, edges, per-node
-            type/filepath) so you can actually open and inspect what got
-            indexed without deserializing pickle.
-        """
-        import json
-        import pickle
-
+        import json, pickle
         os.makedirs(self.index_cache_dir, exist_ok=True)
-
-        fingerprint = self._source_fingerprint()
-        snapshot = {
-            "storage_dir": os.path.abspath(self.storage_dir),
-            "fingerprint": fingerprint,
-            "graph": self.graph,
-            "file_registry": self.file_registry,
-            "node_corpus": self.node_corpus,
-            "node_ids": self.node_ids,
-            "tfidf_matrix": self.tfidf_matrix,
-            "vectorizer": self.vectorizer,
-        }
-        with open(self.index_cache_pkl, "wb") as f:
-            pickle.dump(snapshot, f)
-
-        readable = {
-            "storage_dir": os.path.abspath(self.storage_dir),
-            "generated_at": datetime.datetime.now().astimezone().isoformat(),
-            "num_nodes": self.graph.number_of_nodes(),
-            "num_edges": self.graph.number_of_edges(),
-            "nodes": {
-                node_id: {
-                    "node_type": data.get("node_type"),
-                    "filepath": data.get("filepath"),
-                    "tags": data.get("frontmatter", {}).get("tags", []) if data.get("frontmatter") else None,
-                }
-                for node_id, data in self.graph.nodes(data=True)
-            },
-        }
-        with open(self.index_cache_json, "w", encoding="utf-8") as f:
-            json.dump(readable, f, indent=2, ensure_ascii=False)
+        snapshot = {"storage_dir": os.path.abspath(self.storage_dir), "fingerprint": self._source_fingerprint(), "graph": self.graph, "file_registry": self.file_registry, "node_corpus": self.node_corpus, "node_ids": self.node_ids, "tfidf_matrix": self.tfidf_matrix, "vectorizer": self.vectorizer}
+        with open(self.index_cache_pkl, "wb") as f: pickle.dump(snapshot, f)
+        readable = {"storage_dir": os.path.abspath(self.storage_dir), "generated_at": datetime.datetime.now().astimezone().isoformat(), "num_nodes": self.graph.number_of_nodes(), "num_edges": self.graph.number_of_edges(), "nodes": {node_id: {"node_type": data.get("node_type"), "filepath": data.get("filepath"), "tags": data.get("frontmatter", {}).get("tags", []) if data.get("frontmatter") else None} for node_id, data in self.graph.nodes(data=True)}}
+        with open(self.index_cache_json, "w", encoding="utf-8") as f: json.dump(readable, f, indent=2, ensure_ascii=False)
 
     def _load_index_if_fresh(self) -> bool:
-        """
-        Attempts to load ``.tessera_index/graph.pkl`` and validates its stored
-        fingerprint against the corpus's current state. Returns True (and
-        populates self.graph/etc.) only if the cache is still valid; False
-        otherwise (caller should fall back to a full rebuild).
-        """
         import pickle
-
-        if not os.path.exists(self.index_cache_pkl):
-            return False
-
+        if not os.path.exists(self.index_cache_pkl): return False
         try:
-            with open(self.index_cache_pkl, "rb") as f:
-                snapshot = pickle.load(f)
-        except Exception:  # noqa: BLE001 - any corrupt/incompatible cache -> rebuild
-            return False
-
-        if snapshot.get("fingerprint") != self._source_fingerprint():
-            return False
-
-        self.graph = snapshot["graph"]
-        self.file_registry = snapshot["file_registry"]
-        self.node_corpus = snapshot["node_corpus"]
-        self.node_ids = snapshot["node_ids"]
-        self.tfidf_matrix = snapshot["tfidf_matrix"]
-        self.vectorizer = snapshot["vectorizer"]
+            with open(self.index_cache_pkl, "rb") as f: snapshot = pickle.load(f)
+        except Exception: return False
+        if snapshot.get("fingerprint") != self._source_fingerprint(): return False
+        self.graph = snapshot["graph"]; self.file_registry = snapshot["file_registry"]; self.node_corpus = snapshot["node_corpus"]; self.node_ids = snapshot["node_ids"]; self.tfidf_matrix = snapshot["tfidf_matrix"]; self.vectorizer = snapshot["vectorizer"]
         return True
 
     def _iter_markdown_files(self, recursive: bool):
-        """Yields absolute paths to every ``.md`` file to index."""
-        scan_dirs = [self.storage_dir]
-        individual_files = []
-
-        # Find potential project roots (current working dir or 2 steps up from storage_dir)
-        roots = [os.getcwd()]
+        scan_dirs = [self.storage_dir]; individual_files = []; roots = [os.getcwd()]
         try:
-            two_up = os.path.dirname(os.path.dirname(os.path.abspath(self.storage_dir)))
-            if os.path.exists(two_up) and os.path.isdir(two_up):
-                roots.append(two_up)
-        except Exception:
-            pass
-
-        # Deduplicate roots while preserving order
-        seen_roots = set()
-        unique_roots = []
+            roots.append(os.path.dirname(os.path.dirname(os.path.abspath(self.storage_dir))))
+        except Exception: pass
+        seen_roots = set(); unique_roots = []
         for r in roots:
             abs_r = os.path.abspath(r)
             if abs_r not in seen_roots:
-                seen_roots.add(abs_r)
-                unique_roots.append(abs_r)
-
-        # Map the monorepo folders ONLY if storage_dir resides inside the project root
-        # This keeps clean temporary/sandbox test environments isolated and pristine.
+                seen_roots.add(abs_r); unique_roots.append(abs_r)
         for root in unique_roots:
-            storage_dir_abs = os.path.abspath(self.storage_dir)
-            root_abs = os.path.abspath(root)
+            storage_dir_abs = os.path.abspath(self.storage_dir); root_abs = os.path.abspath(root)
             if storage_dir_abs.startswith(root_abs):
-                # 1. Add specific research folders if they exist
                 for folder in ["experiments", "newsletters", "docs"]:
                     path = os.path.join(root, folder)
-                    if os.path.exists(path) and os.path.isdir(path):
-                        abs_path = os.path.abspath(path)
-                        if abs_path not in [os.path.abspath(d) for d in scan_dirs]:
-                            scan_dirs.append(abs_path)
-                
-                # 2. Add individual top-level markdown files in the project root (e.g. GEMINI.md, AGENTS.md, README.md)
+                    if os.path.isdir(path) and os.path.abspath(path) not in [os.path.abspath(d) for d in scan_dirs]: scan_dirs.append(os.path.abspath(path))
                 try:
                     for filename in os.listdir(root):
                         if filename.endswith(".md"):
-                            abs_filepath = os.path.abspath(os.path.join(root, filename))
-                            if abs_filepath not in individual_files:
-                                individual_files.append(abs_filepath)
-                except Exception:
-                    pass
-
-        # Yield from directories
+                            p = os.path.abspath(os.path.join(root, filename))
+                            if p not in individual_files: individual_files.append(p)
+                except Exception: pass
         for s_dir in scan_dirs:
             if recursive:
                 for root, dirs, files in os.walk(s_dir):
-                    # Exclude typical build/env/git/dependency folders from recursion
-                    dirs[:] = [
-                        d for d in dirs 
-                        if d not in (
-                            ".tessera_index", ".git", "node_modules", "venv", 
-                            ".venv-browser-agent", ".browser-harness", "Tessera"
-                        )
-                    ]
+                    dirs[:] = [d for d in dirs if d not in (".tessera_index", ".git", "node_modules", "venv", ".venv-browser-agent", ".browser-harness", "Tessera")]
                     for filename in files:
-                        if filename.endswith(".md"):
-                            yield os.path.join(root, filename)
+                        if filename.endswith(".md"): yield os.path.join(root, filename)
             else:
                 try:
                     for filename in os.listdir(s_dir):
-                        if filename.endswith(".md"):
-                            yield os.path.join(s_dir, filename)
-                except Exception:
-                    pass
-
-        # Yield individual top-level files
+                        if filename.endswith(".md"): yield os.path.join(s_dir, filename)
+                except Exception: pass
         for filepath in individual_files:
-            if os.path.exists(filepath):
-                yield filepath
+            if os.path.exists(filepath): yield filepath
 
     def _normalize_frontmatter(self, frontmatter: Dict[str, Any], filepath: str) -> Dict[str, Any]:
-        """
-        Normalizes a parsed frontmatter dict into Tessera's native shape
-        (``id`` / ``node_type`` / ``tags`` / ``entities`` / ``active_connections``).
-
-        Tessera's own writer (``write_memory_note``) already produces the native
-        shape, so this is a no-op for those notes. For "foreign" corpora that
-        use ``name`` / ``description`` / ``metadata.type`` instead (e.g. LAO's
-        ``.claude/memory/`` learnings), this maps fields across so the same
-        engine (graph, DW-PR, conflict resolution) works unmodified on both.
-        """
-        if "id" in frontmatter and "node_type" in frontmatter:
-            return frontmatter  # already native Tessera shape
-
+        if "id" in frontmatter and "node_type" in frontmatter: return frontmatter
         normalized = dict(frontmatter)
-
         name = normalized.get("name")
-        if isinstance(name, list):  # a couple of template files have `name: [placeholder]`
-            name = name[0] if name else None
-        if not name:
-            name = os.path.splitext(os.path.basename(filepath))[0]
+        if isinstance(name, list): name = name[0] if name else None
+        if not name: name = os.path.splitext(os.path.basename(filepath))[0]
         normalized["id"] = str(name)
-
-        metadata = normalized.get("metadata")
-        meta_type = metadata.get("type") if isinstance(metadata, dict) else None
-        node_type_map = {
-            "user": "preference",
-            "feedback": "preference",
-            "reference": "factual",
-            "hypothesis": "factual",
-            "experiment-result": "factual",
-            "governance": "procedural_anchor",
-            "pipeline": "procedural_anchor",
-            "learning": "procedural_anchor",
-            "project": "factual",
-        }
-        
+        metadata = normalized.get("metadata"); meta_type = metadata.get("type") if isinstance(metadata, dict) else None
+        node_type_map = {"user": "preference", "feedback": "preference", "reference": "factual", "hypothesis": "factual", "experiment-result": "factual", "governance": "procedural_anchor", "pipeline": "procedural_anchor", "learning": "procedural_anchor", "project": "factual"}
         filename_lower = os.path.basename(filepath).lower()
-        if "claude.md" in filename_lower or "gemini.md" in filename_lower or "agents.md" in filename_lower or "agentes.md" in filename_lower:
-            fallback_type = "procedural_anchor"
-        elif "instruction" in filename_lower or "rule" in filename_lower or "convention" in filename_lower or "guide" in filename_lower:
-            fallback_type = "procedural_anchor"
-        else:
-            fallback_type = "factual"
-
+        fallback_type = "procedural_anchor" if any(x in filename_lower for x in ("claude.md", "gemini.md", "agents.md", "agentes.md", "instruction", "rule", "convention", "guide")) else "factual"
         normalized["node_type"] = node_type_map.get(meta_type, fallback_type)
-
-        # Fold `description` + any metadata scalars into searchable tags so
-        # foreign notes remain retrievable even without an explicit `tags` list.
         tags = list(normalized.get("tags") or [])
         if isinstance(metadata, dict):
             for key in ("category", "phase", "topic", "type"):
                 val = metadata.get(key)
-                if isinstance(val, str) and val not in tags:
-                    tags.append(val)
+                if isinstance(val, str) and val not in tags: tags.append(val)
         normalized["tags"] = tags
-
-        if "entities" not in normalized:
-            normalized["entities"] = []
-        if "active_connections" not in normalized:
-            normalized["active_connections"] = []
-
-        # Fold `metadata.related_to` (a plain list of target ids, LAO's
-        # preferred foreign frontmatter shape) into real active_connections
-        # edges, so a note authored with that shape gets the same explicit
-        # graph linking as a native Tessera note written via --related-to.
-        # Without this, related_to only ever fed the TF-IDF corpus above —
-        # readable by a human, invisible to the graph/DW-PR ranking.
+        normalized.setdefault("entities", []); normalized.setdefault("active_connections", [])
         if isinstance(metadata, dict):
             related_to = metadata.get("related_to")
             if isinstance(related_to, list) and not normalized["active_connections"]:
-                existing_targets = set()
+                seen = set()
                 for target in related_to:
-                    if not isinstance(target, str) or not target.strip():
-                        continue
-                    target = target.strip()
-                    if target in existing_targets:
-                        continue
-                    existing_targets.add(target)
-                    normalized["active_connections"].append(
-                        {"target_memory_id": target, "relation_type": "related_to", "cosine_similarity": 0.0}
-                    )
-
+                    if isinstance(target, str) and target.strip() and target.strip() not in seen:
+                        target = target.strip(); seen.add(target)
+                        normalized["active_connections"].append({"target_memory_id": target, "relation_type": "related_to", "cosine_similarity": 0.0})
         return normalized
 
-    # ------------------------------------------------------------------
-    # Retrieval
-    # ------------------------------------------------------------------
-    def retrieve_context(
-        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        End-to-end adaptive retrieval (QUMem & MemORAI style):
-        1. Finds seed nodes via semantic (TF-IDF cosine) similarity.
-        2. Builds a local subgraph focused on the query intent (1-hop expansion).
-        3. Dynamically weights edges based on similarity + procedural-anchor boosts (DW-PR).
-        4. Runs personalized PageRank over the subgraph.
-        5. Filters down to actual memory-note candidates using explainable multi-signal ranking.
-        6. Applies temporal conflict resolution over preferences/facts.
-        """
-        if not self.graph or not self.node_corpus or self.tfidf_matrix is None:
-            return []
-
-        # 1. Seed node discovery.
-        query_vec = self.vectorizer.transform([query_text])
-        similarities = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
-        sorted_indices = np.argsort(similarities)[::-1]
-
-        seed_nodes = []
-        seed_similarities = {}
+    def retrieve_context(self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None) -> List[Dict[str, Any]]:
+        if not self.graph or not self.node_corpus or self.tfidf_matrix is None: return []
+        import re, math
+        query_vec = self.vectorizer.transform([query_text]); similarities = cosine_similarity(query_vec, self.tfidf_matrix).flatten(); sorted_indices = np.argsort(similarities)[::-1]
+        seed_nodes = []; seed_similarities = {}
         for idx in sorted_indices[:SEED_NODE_LIMIT]:
             if similarities[idx] > SEED_NODE_MIN_SIMILARITY:
-                nid = self.node_ids[idx]
-                seed_nodes.append(nid)
-                seed_similarities[nid] = similarities[idx]
-
-        if not seed_nodes:
-            return []
-
-        # 2. 1-hop subgraph expansion (MemORAI).
+                nid = self.node_ids[idx]; seed_nodes.append(nid); seed_similarities[nid] = similarities[idx]
+        if not seed_nodes: return []
         subgraph_nodes = set(seed_nodes)
         for seed in seed_nodes:
-            subgraph_nodes.update(self.graph.successors(seed))
-            subgraph_nodes.update(self.graph.predecessors(seed))
-
-        subgraph = self.graph.subgraph(subgraph_nodes).copy()
-
-        # 3. Dynamic edge weighting (DW-PR).
-        all_sub_nodes = list(subgraph.nodes())
-        sub_texts = [self.node_corpus.get(nid, "") for nid in all_sub_nodes]
-        sub_vecs = self.vectorizer.transform(sub_texts)
-        sub_sims = cosine_similarity(query_vec, sub_vecs).flatten()
-        node_sim_map = dict(zip(all_sub_nodes, sub_sims))
-
+            subgraph_nodes.update(self.graph.successors(seed)); subgraph_nodes.update(self.graph.predecessors(seed))
+        subgraph = self.graph.subgraph(subgraph_nodes).copy(); all_sub_nodes = list(subgraph.nodes()); sub_texts = [self.node_corpus.get(nid, "") for nid in all_sub_nodes]; sub_vecs = self.vectorizer.transform(sub_texts); sub_sims = cosine_similarity(query_vec, sub_vecs).flatten(); node_sim_map = dict(zip(all_sub_nodes, sub_sims))
         for u, v in list(subgraph.edges()):
-            target_similarity = node_sim_map.get(v, 0.0)
-            relation_type = subgraph[u][v].get("relation_type", "")
-
-            relation_boost = (
-                PROCEDURAL_RELATION_BOOST_FACTOR
-                if relation_type in PROCEDURAL_RELATION_BOOST_TYPES
-                else 1.0
-            )
-
-            dynamic_weight = (target_similarity + 0.1) * relation_boost
-            subgraph[u][v]["weight"] = max(0.01, float(dynamic_weight))
-
-        # 4. Personalized PageRank (DW-PR).
+            relation_boost = PROCEDURAL_RELATION_BOOST_FACTOR if subgraph[u][v].get("relation_type", "") in PROCEDURAL_RELATION_BOOST_TYPES else 1.0
+            subgraph[u][v]["weight"] = max(0.01, float((node_sim_map.get(v, 0.0) + 0.1) * relation_boost))
         try:
-            personalization = {nid: seed_similarities.get(nid, 0.0) for nid in subgraph.nodes()}
-            p_sum = sum(personalization.values())
-            personalization = {k: v / p_sum for k, v in personalization.items()} if p_sum > 0 else None
-
-            pagerank_scores = nx.pagerank(
-                subgraph, alpha=0.85, weight="weight", personalization=personalization
-            )
+            personalization = {nid: seed_similarities.get(nid, 0.0) for nid in subgraph.nodes()}; p_sum = sum(personalization.values()); personalization = {k: v / p_sum for k, v in personalization.items()} if p_sum > 0 else None
+            pagerank_scores = nx.pagerank(subgraph, alpha=0.85, weight="weight", personalization=personalization)
         except Exception:
-            # Safe fallback if the subgraph is disconnected or a numerical error occurs.
             pagerank_scores = nx.pagerank(subgraph, alpha=0.85, weight="weight")
-
-        import re
-        import math
-
-        # 5. Filter down to real memory-note candidates.
         retrieved_memories = []
-        
-        # We need the maximum PageRank score among the memory nodes to normalize PR scores.
-        memory_pageranks = [pagerank_scores.get(nid, 0.0) for nid in pagerank_scores 
-                            if nid in self.graph.nodes and self.graph.nodes[nid].get("node_type") in MEMORY_NODE_TYPES]
+        memory_pageranks = [pagerank_scores.get(nid, 0.0) for nid in pagerank_scores if nid in self.graph.nodes and self.graph.nodes[nid].get("node_type") in MEMORY_NODE_TYPES]
         max_pagerank = max(memory_pageranks) if memory_pageranks else 1.0
-
-        # Resolve weights to use
-        weights_used = dict(self.weights)
-        if weights:
-            weights_used.update(weights)
-
-        # Normalize query tokens and phrase matching (F3 / Subset trap fix)
-        query_tokens = set(re.findall(r"\b\w+\b", query_text.lower()))
-        query_clean = " ".join(re.findall(r"\b\w+\b", query_text.lower()))
-
+        weights_used = dict(self.weights); weights_used.update(weights or {})
+        query_tokens = set(re.findall(r"\b\w+\b", query_text.lower())); query_clean = " ".join(re.findall(r"\b\w+\b", query_text.lower()))
         for node_id, pr_score in pagerank_scores.items():
-            if node_id not in self.graph.nodes:
-                continue
-            node_data = self.graph.nodes[node_id]
-            node_type = node_data.get("node_type")
-
-            if node_type in MEMORY_NODE_TYPES:
-                # Related notes: direct graph neighbors (tags/entities/active_connections
-                # in either direction) that are themselves memory notes, not tag/entity
-                # nodes — lets a caller jump to connected notes without re-querying.
-                related_ids = sorted(
-                    {
-                        nb
-                        for nb in set(self.graph.successors(node_id)) | set(self.graph.predecessors(node_id))
-                        if nb != node_id and self.graph.nodes[nb].get("node_type") in MEMORY_NODE_TYPES
-                    }
-                )
-                
-                # Compute Multi-Signal Score
-                # A. Lexical Similarity
-                raw_tfidf = float(node_sim_map.get(node_id, 0.0))
-                
-                body_text = node_data.get("body", "")
-                body_tokens = set(re.findall(r"\b\w+\b", body_text.lower()))
-                term_overlap = len(query_tokens & body_tokens) / max(1, len(query_tokens))
-                
-                # B. Title/ID Relevance
-                clean_id_tokens = set(re.findall(r"\b\w+\b", node_id.lower().replace("/", " ").replace("-", " ").replace("_", " ")))
-                title_score = len(query_tokens & clean_id_tokens) / max(1, len(query_tokens))
-                
-                # C. Metadata Relevance (Tags + Entities) - Normalize and tokenize to avoid multiword mismatch (F4)
-                tags = [str(t).lower() for t in node_data.get("frontmatter", {}).get("tags", [])]
-                entity_names = [str(e.get("name", "")).lower() for e in node_data.get("frontmatter", {}).get("entities", []) if isinstance(e, dict)]
-                metadata_tokens = set()
-                for tag in tags:
-                    metadata_tokens.update(re.findall(r"\b\w+\b", tag))
-                for ent_name in entity_names:
-                    metadata_tokens.update(re.findall(r"\b\w+\b", ent_name))
-                
-                metadata_score = len(query_tokens & metadata_tokens) / max(1, len(query_tokens))
-                
-                # D. Graph Centrality (Normalized Personalized PageRank) (F7)
-                normalized_relations = pr_score / max_pagerank if max_pagerank > 0 else 0.0
-                
-                # E. Intent Type Boost (F3 - matching with query tokens and phrase matching to avoid substring trap)
-                type_boost = 1.0
-                is_procedural_intent = any(tk in query_tokens for tk in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "how")) or "como fazer" in query_clean or "how to" in query_clean
-                is_preference_intent = any(tk in query_tokens for tk in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")) or "comportamento do" in query_clean
-                is_factual_intent = any(tk in query_tokens for tk in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name"))
-                
-                if node_type == "procedural_anchor" and is_procedural_intent:
-                    type_boost = 1.3
-                elif node_type == "preference" and is_preference_intent:
-                    type_boost = 1.3
-                elif node_type == "factual" and is_factual_intent:
-                    type_boost = 1.2
-                    
-                # F. Temporal Recency Boost (60-day exponential half-life) - Injected today Clock (F2)
-                recency_score = 0.0
-                fm = node_data.get("frontmatter", {})
-                date_str = fm.get("last_updated_at") or fm.get("created_at") or fm.get("date")
-                if date_str:
-                    try:
-                        date_str = str(date_str)[:10]
-                        dt = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-                        today = self.get_today()
-                        days = (today - dt).days
-                        if days <= 0:
-                            recency_score = 1.1
-                        else:
-                            recency_score = 1.0 + 0.1 * math.exp(-days / 60.0)
-                    except Exception:
-                        pass
-                
-                # Default is disabled (weight 0.0), only applies if explicitly enabled in weights
-                recency_boost = 1.0
-                if weights_used.get("recency", 0.0) > 0.0 and recency_score > 0.0:
-                    recency_boost = recency_score
-                
-                # Combine Weighted Signals
-                base_relevance = (
-                    weights_used.get("lexical_tfidf", 0.28) * raw_tfidf +
-                    weights_used.get("lexical_overlap", 0.12) * term_overlap +
-                    weights_used.get("title", 0.3) * title_score +
-                    weights_used.get("metadata", 0.2) * metadata_score +
-                    weights_used.get("relations", 0.1) * normalized_relations
-                )
-                
-                final_score = base_relevance * type_boost * recency_boost
-                
-                # Phase 2: Query-Aware Relevant Evidence Extraction (Deterministic, Local & Fast)
-                # Gated by overlap threshold to return None when evidence is insufficient (F5)
-                paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body_text) if p.strip()]
-                if not paragraphs:
-                    paragraphs = [line.strip() for line in body_text.splitlines() if line.strip()]
-                
-                relevant_evidence = None
-                evidence_info = None
-                if paragraphs:
-                    best_para_score = -1.0
-                    best_para = None
-                    for p in paragraphs:
-                        p_tokens = set(re.findall(r"\b\w+\b", p.lower()))
-                        overlap = len(query_tokens & p_tokens)
-                        jaccard = overlap / len(query_tokens | p_tokens) if (query_tokens | p_tokens) else 0.0
-                        para_score = overlap + jaccard
-                        if para_score > best_para_score:
-                            best_para_score = para_score
-                            best_para = p
-                    
-                    # Threshold check: requires at least 1 overlapping query token (best_para_score >= 1.0)
-                    if best_para and best_para_score >= 1.0:
-                        relevant_evidence = best_para
-                        evidence_info = {
-                            "text": relevant_evidence,
-                            "score": float(best_para_score),
-                            "strategy": "paragraph_lexical"
-                        }
-                
-                retrieved_memories.append(
-                    {
-                        "id": node_id,
-                        "type": node_type,
-                        "filepath": node_data.get("filepath"),
-                        "filename": node_data.get("filename"),
-                        "score": float(final_score),
-                        "score_explain": {
-                            "lexical_tfidf": float(raw_tfidf),
-                            "lexical_overlap": float(term_overlap),
-                            "lexical_score": float(raw_tfidf * 0.7 + term_overlap * 0.3),
-                            "title": float(title_score),
-                            "metadata": float(metadata_score),
-                            "raw_pagerank": float(pr_score),
-                            "normalized_relations": float(normalized_relations),
-                            "relations_contribution": float(normalized_relations * weights_used.get("relations", 0.1)),
-                            "type_boost": float(type_boost),
-                            "recency_boost": float(recency_score if recency_score > 0 else 1.0),
-                        },
-                        "relevant_evidence": relevant_evidence,
-                        "evidence_info": evidence_info,
-                        "body": body_text.strip(),
-                        "frontmatter": fm,
-                        "related_ids": related_ids,
-                    }
-                )
-
+            if node_id not in self.graph.nodes: continue
+            node_data = self.graph.nodes[node_id]; node_type = node_data.get("node_type")
+            if node_type not in MEMORY_NODE_TYPES: continue
+            related_ids = sorted({nb for nb in set(self.graph.successors(node_id)) | set(self.graph.predecessors(node_id)) if nb != node_id and self.graph.nodes[nb].get("node_type") in MEMORY_NODE_TYPES})
+            raw_tfidf = float(node_sim_map.get(node_id, 0.0)); body_text = node_data.get("body", ""); body_tokens = set(re.findall(r"\b\w+\b", body_text.lower())); term_overlap = len(query_tokens & body_tokens) / max(1, len(query_tokens))
+            clean_id_tokens = set(re.findall(r"\b\w+\b", node_id.lower().replace("/", " ").replace("-", " ").replace("_", " "))); title_score = len(query_tokens & clean_id_tokens) / max(1, len(query_tokens))
+            fm = node_data.get("frontmatter", {}); tags = [str(t).lower() for t in fm.get("tags", [])]; entity_names = [str(e.get("name", "")).lower() for e in fm.get("entities", []) if isinstance(e, dict)]; metadata_tokens = set()
+            for tag in tags: metadata_tokens.update(re.findall(r"\b\w+\b", tag))
+            for ent_name in entity_names: metadata_tokens.update(re.findall(r"\b\w+\b", ent_name))
+            metadata_score = len(query_tokens & metadata_tokens) / max(1, len(query_tokens)); normalized_relations = pr_score / max_pagerank if max_pagerank > 0 else 0.0
+            is_procedural_intent = any(tk in query_tokens for tk in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "how")) or "como fazer" in query_clean or "how to" in query_clean
+            is_preference_intent = any(tk in query_tokens for tk in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")) or "comportamento do" in query_clean
+            is_factual_intent = any(tk in query_tokens for tk in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name"))
+            type_boost = 1.3 if node_type == "procedural_anchor" and is_procedural_intent else 1.3 if node_type == "preference" and is_preference_intent else 1.2 if node_type == "factual" and is_factual_intent else 1.0
+            recency_raw_score = 1.0; date_str = fm.get("last_updated_at") or fm.get("created_at") or fm.get("date")
+            if date_str:
+                try:
+                    dt = datetime.datetime.strptime(str(date_str)[:10], "%Y-%m-%d").date(); days = (self.get_today() - dt).days; recency_raw_score = 1.1 if days <= 0 else 1.0 + 0.1 * math.exp(-days / 60.0)
+                except Exception: pass
+            recency_weight = float(weights_used.get("recency", 0.0)); recency_applied_multiplier = recency_raw_score if recency_weight > 0.0 else 1.0
+            base_relevance = weights_used.get("lexical_tfidf", 0.28) * raw_tfidf + weights_used.get("lexical_overlap", 0.12) * term_overlap + weights_used.get("title", 0.3) * title_score + weights_used.get("metadata", 0.2) * metadata_score + weights_used.get("relations", 0.1) * normalized_relations
+            final_score = base_relevance * type_boost * recency_applied_multiplier
+            paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body_text) if p.strip()] or [line.strip() for line in body_text.splitlines() if line.strip()]
+            relevant_evidence = None; evidence_info = None
+            if paragraphs:
+                best_para_score = -1.0; best_para = None
+                for p in paragraphs:
+                    p_tokens = set(re.findall(r"\b\w+\b", p.lower())); overlap = len(query_tokens & p_tokens); jaccard = overlap / len(query_tokens | p_tokens) if (query_tokens | p_tokens) else 0.0; para_score = overlap + jaccard
+                    if para_score > best_para_score: best_para_score = para_score; best_para = p
+                if best_para and best_para_score >= 1.0:
+                    relevant_evidence = best_para; evidence_info = {"text": relevant_evidence, "score": float(best_para_score), "strategy": "paragraph_lexical"}
+            retrieved_memories.append({"id": node_id, "type": node_type, "filepath": node_data.get("filepath"), "filename": node_data.get("filename"), "score": float(final_score), "score_explain": {"lexical_tfidf": float(raw_tfidf), "lexical_overlap": float(term_overlap), "lexical_score": float(raw_tfidf * 0.7 + term_overlap * 0.3), "title": float(title_score), "metadata": float(metadata_score), "raw_pagerank": float(pr_score), "normalized_relations": float(normalized_relations), "relations_contribution": float(normalized_relations * weights_used.get("relations", 0.1)), "type_boost": float(type_boost), "recency_raw_score": float(recency_raw_score), "recency_weight": recency_weight, "recency_applied_multiplier": float(recency_applied_multiplier), "recency_contribution": float(recency_applied_multiplier - 1.0), "recency_boost": float(recency_applied_multiplier)}, "relevant_evidence": relevant_evidence, "evidence_info": evidence_info, "body": body_text.strip(), "frontmatter": fm, "related_ids": related_ids})
         retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
-
-        # 6. Temporal conflict resolution (FinPerMA & QUMem).
         if resolve_conflicts:
-            retrieved_memories = ConflictResolver.resolve_temporal_conflicts(retrieved_memories)
-            retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
-
+            retrieved_memories = ConflictResolver.resolve_temporal_conflicts(retrieved_memories); retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
         return retrieved_memories[:top_n]
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
     def _parse_markdown(self, raw_text: str) -> Tuple[Optional[Dict[str, Any]], str]:
-        """Splits a note into (frontmatter dict, body text)."""
         text = raw_text.strip()
-        if not text.startswith("---"):
-            return None, raw_text
-
+        if not text.startswith("---"): return None, raw_text
         parts = text.split("---", 2)
         if len(parts) >= 3:
-            frontmatter_raw = parts[1]
-            body = parts[2]
-            try:
-                frontmatter = yaml.safe_load(frontmatter_raw)
-                return frontmatter, body
+            try: return yaml.safe_load(parts[1]), parts[2]
             except yaml.YAMLError:
-                # Some hand-authored corpora (e.g. LAO's own memory notes) have
-                # unquoted colons inside single-line scalar values (most often
-                # `description: Some claim: with a colon in it`), which breaks
-                # strict YAML parsing. Recover by auto-quoting the offending
-                # `key: value` lines instead of discarding the whole note.
-                repaired = self._repair_frontmatter_yaml(frontmatter_raw)
-                try:
-                    frontmatter = yaml.safe_load(repaired)
-                    return frontmatter, body
-                except Exception as e:
-                    raise InvalidFrontmatterError(f"YAML parsing error: {e}") from e
+                repaired = self._repair_frontmatter_yaml(parts[1])
+                try: return yaml.safe_load(repaired), parts[2]
+                except Exception as e: raise InvalidFrontmatterError(f"YAML parsing error: {e}") from e
         return None, raw_text
 
     @staticmethod
     def _repair_frontmatter_yaml(frontmatter_raw: str) -> str:
-        """Best-effort auto-quoting of single-line scalar values containing
-        unescaped colons, so a minor authoring slip doesn't sink an entire note."""
         import re
-
-        fixed_lines = []
-        key_line_re = re.compile(r"^(\s*)([A-Za-z0-9_]+):\s+(.*)$")
+        fixed_lines = []; key_line_re = re.compile(r"^(\s*)([A-Za-z0-9_]+):\s+(.*)$")
         for line in frontmatter_raw.splitlines():
             match = key_line_re.match(line)
-            if not match:
-                fixed_lines.append(line)
-                continue
-            indent, key, value = match.groups()
-            stripped = value.strip()
-
-            # A value that STARTS with a quote but has trailing content after
-            # the closing quote (e.g. `"Voice by Blip" (Thesis 2B, ...)`) is
-            # invalid YAML — a scalar can't have unquoted text following a
-            # quoted string on the same line. Re-quote the whole value.
-            starts_quoted_with_trailer = (
-                len(stripped) > 1
-                and stripped[0] in "\"'"
-                and not (stripped.endswith(stripped[0]) and stripped.count(stripped[0]) == 2)
-            )
-
-            looks_like_nested_or_safe = (
-                not stripped
-                or stripped.startswith(("-", "[", "{"))
-                or (stripped.startswith(("\"", "'")) and not starts_quoted_with_trailer)
-                or ":" not in stripped
-            ) and not starts_quoted_with_trailer
-
-            if looks_like_nested_or_safe:
-                fixed_lines.append(line)
-                continue
-            # Contains an un-quoted colon (or a broken quoted-then-trailing
-            # value) in a plain scalar — re-quote the whole thing safely.
-            escaped = stripped.replace('"', '\\"')
-            fixed_lines.append(f'{indent}{key}: "{escaped}"')
+            if not match: fixed_lines.append(line); continue
+            indent, key, value = match.groups(); stripped = value.strip(); starts_quoted_with_trailer = len(stripped) > 1 and stripped[0] in "\"'" and not (stripped.endswith(stripped[0]) and stripped.count(stripped[0]) == 2)
+            looks_like_nested_or_safe = (not stripped or stripped.startswith(("-", "[", "{")) or (stripped.startswith(("\"", "'")) and not starts_quoted_with_trailer) or ":" not in stripped) and not starts_quoted_with_trailer
+            if looks_like_nested_or_safe: fixed_lines.append(line); continue
+            fixed_lines.append(f'{indent}{key}: "{stripped.replace(chr(34), chr(92)+chr(34))}"')
         return "\n".join(fixed_lines)
