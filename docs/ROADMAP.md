@@ -58,6 +58,49 @@ Documentation/governance tracker: **Issue #38**.
 
 ---
 
+# Authoritative execution portfolio — 2026-08-30
+
+The open-issue portfolio was audited against the current runtime and cited research. The dependency graph below supersedes older status/dependency notes later in this document and inside historical issue sections.
+
+## M0 — Contract & Safety
+
+| Order | Issue | Decision |
+| --- | --- | --- |
+| 1 | #68 | Golden Engine/CLI/MCP response contract |
+| 2 | #92 | Truthful write-gate and sanitization metadata |
+| 3 | #93 | Canonical storage configuration across surfaces |
+| 4 | #94 | Support JSON end-to-end or reject it before write |
+| 5 | #95 | Remove legacy LAO/Blip runtime coupling |
+| 6 | #67 | Encode #68/#92–#95 as regression gates |
+| 7 | #74 | Decide deterministic core versus optional LLM boundary |
+| 8 | #16 | Contain the silent heuristic resolver before the full M4 experiment |
+
+## M1–M5
+
+```text
+M1  #96 LongMemEval V1 baseline → #28 rendering ablation
+ ↓
+M2  #12 → #69 → #70 → #13 → #73
+ ↓
+M3  #14 epic → #25 baseline/budget → #26 edge trust
+ ↓
+M4  #15; #71 → #32 → #72; then #16 → #27 → #20
+ ↓
+M5  #19 → #17/#74 assisted-mode ablation → #21
+```
+
+Rules:
+
+- #14, #18 and #38 are epics/trackers and do not produce direct implementation PRs.
+- #18 depends only on #68 for its first executable child, #96.
+- Feature cards depend on the benchmark; benchmark reruns are evidence and never reverse dependencies.
+- Policy (#32) precedes resolver (#72).
+- The architecture decision (#74) precedes adaptive implementation (#17).
+- Maximum WIP is two implementation cards plus one benchmark/documentation lane.
+- See [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) for Definition of Ready, stop conditions and the Codex handoff contract.
+
+---
+
 # Current status
 
 ## Foundation — implemented
@@ -131,7 +174,9 @@ Documentation/governance tracker: **Issue #38**.
 
 ---
 
-# Recommended execution order
+# Superseded execution order — historical reference
+
+> The sequence below predates the 2026-08-30 portfolio audit and is retained only to explain earlier roadmap assumptions. Use the authoritative execution portfolio above and the routing block in each open issue.
 
 ```text
 PUBLIC FOUNDATION / GOVERNANCE
