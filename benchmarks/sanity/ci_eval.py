@@ -2,6 +2,10 @@
 
 This is intentionally small and synthetic. It is a regression gate for the
 memory engine itself, not a competitive benchmark such as LongMemEval.
+
+The fixture is deliberately project-agnostic: a clean checkout must be able to
+run the complete gate without knowing anything about a private/external agent
+project that may have used TESSERA during development.
 """
 
 import argparse
@@ -16,24 +20,24 @@ from tessera import Entity, TesseraEngine
 
 CASES = [
     {
-        "id": "lao-purpose-pt",
-        "query": "qual o propósito do LAO?",
-        "gold": "lao/charter",
+        "id": "project-purpose-direct",
+        "query": "qual o propósito do projeto?",
+        "gold": "project/charter",
     },
     {
-        "id": "lao-purpose-colloquial",
-        "query": "pq o LAO existe?",
-        "gold": "lao/charter",
+        "id": "project-purpose-colloquial",
+        "query": "pq esse projeto existe?",
+        "gold": "project/charter",
     },
     {
-        "id": "lao-learning",
-        "query": "como o LAO aprende?",
-        "gold": "lao/learning-process",
+        "id": "project-learning-process",
+        "query": "como o projeto aprende?",
+        "gold": "project/learning-process",
     },
     {
-        "id": "copilot-error",
-        "query": "qual erro tivemos com o Copilot?",
-        "gold": "gotchas/copilot-worktree-error",
+        "id": "worktree-cwd-gotcha",
+        "query": "qual erro aconteceu quando a CLI removeu o worktree?",
+        "gold": "gotchas/worktree-cwd-error",
     },
 ]
 
@@ -41,38 +45,38 @@ CASES = [
 def _build_fixture_engine(storage_dir: str) -> TesseraEngine:
     engine = TesseraEngine(storage_dir=storage_dir)
     engine.write_memory_note(
-        mem_id="lao/charter",
+        mem_id="project/charter",
         mem_type="factual",
-        episode_id="ep_lao_purpose",
+        episode_id="ep_project_purpose",
         content=(
-            "O propósito do LAO (Lab Autonomous Officer) é funcionar como um "
-            "runtime de inovação para agentes autônomos, permitindo pesquisar, "
-            "testar hipóteses e acumular aprendizados de forma persistente."
+            "O propósito do projeto é oferecer uma camada de memória auditável "
+            "para agentes, preservando evidência e provenance enquanto esconde "
+            "a complexidade de armazenamento, indexação e retrieval."
         ),
-        tags=["lao", "purpose", "charter", "runtime"],
-        entities=[Entity("LAO", "Lab Autonomous Officer")],
+        tags=["project", "purpose", "charter", "memory"],
+        entities=[Entity("Project", "Example project")],
     )
     engine.write_memory_note(
-        mem_id="lao/learning-process",
+        mem_id="project/learning-process",
         mem_type="procedural_anchor",
-        episode_id="ep_lao_learning",
+        episode_id="ep_project_learning",
         content=(
-            "O LAO aprende registrando episódios e aprendizados no TESSERA e "
-            "recuperando memórias relevantes nas execuções seguintes."
+            "O projeto aprende registrando episódios e evidências verificadas no "
+            "TESSERA e recuperando memórias relevantes nas execuções seguintes."
         ),
-        tags=["lao", "learning", "tessera"],
-        entities=[Entity("LAO", "Lab Autonomous Officer")],
+        tags=["project", "learning", "tessera", "evidence"],
+        entities=[Entity("Project", "Example project")],
     )
     engine.write_memory_note(
-        mem_id="gotchas/copilot-worktree-error",
+        mem_id="gotchas/worktree-cwd-error",
         mem_type="factual",
-        episode_id="ep_copilot_error",
+        episode_id="ep_worktree_error",
         content=(
-            "O Copilot CLI removeu um worktree enquanto ainda dependia daquele "
-            "diretório; o CWD ficou inválido e os hooks subsequentes falharam."
+            "Uma CLI removeu um worktree enquanto ainda dependia daquele diretório; "
+            "o CWD ficou inválido e as operações subsequentes falharam."
         ),
-        tags=["copilot", "worktree", "error", "gotcha"],
-        entities=[Entity("Copilot", "Copilot CLI")],
+        tags=["cli", "worktree", "cwd", "error", "gotcha"],
+        entities=[Entity("CLI", "Command-line tool")],
     )
     engine.write_memory_note(
         mem_id="research/unrelated-newsletter",
@@ -150,7 +154,7 @@ def run_eval(output_dir: str) -> Dict[str, object]:
 
     total = len(CASES)
     summary: Dict[str, object] = {
-        "dataset": "tessera-sanity-ci-v1",
+        "dataset": "tessera-sanity-ci-v2-project-agnostic",
         "queries": total,
         "hit_at_1": sum(1 for item in per_query if item["gold_rank"] == 1) / total,
         "hit_at_3": sum(
@@ -179,7 +183,9 @@ def run_eval(output_dir: str) -> Dict[str, object]:
 
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 
-    # Conservative regression thresholds for the controlled fixture.
+    # Keep the existing conservative aggregate gates while the new neutral
+    # fixture is validated in a real GitHub Actions run. If a metric differs,
+    # the PR must explain the behavioral cause before any threshold changes.
     if float(summary["hit_at_1"]) < 0.75:
         raise SystemExit("Sanity failure: Hit@1 fell below 0.75")
     if float(summary["hit_at_3"]) < 1.0:
