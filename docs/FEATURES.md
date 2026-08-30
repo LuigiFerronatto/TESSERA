@@ -4,9 +4,9 @@
 
 ## Executive takeaway
 
-TESSERA already provides the core substrate required for auditable agent memory: canonical text normalization, stable identities, explainable retrieval, query-relevant evidence, graph-linked context and provenance.
+TESSERA already provides the core substrate required for auditable agent memory: canonical text normalization, stable identities, explainable retrieval, query-relevant evidence, graph-linked context, provenance, and a basic deterministic write-side sanitization gate.
 
-The current Foundation is intentionally conservative. Temporal-state reasoning, confidence-aware relations, source arbitration and abstention remain experiments in the roadmap.
+The current Foundation is intentionally conservative. Incremental indexing, evidence-aware memory admission, temporal-state reasoning, confidence-aware relations, source arbitration and abstention remain experiments in the roadmap.
 
 ---
 
@@ -14,15 +14,9 @@ The current Foundation is intentionally conservative. Temporal-state reasoning, 
 
 **Tracking:** Issue #9 / PR #3
 
-### Why it exists
 Projects rarely have one perfect Markdown schema. Some files have complete frontmatter, some partial metadata and some none at all.
 
-### What TESSERA does
-TESSERA normalizes supported text documents into Canonical Metadata while preserving the source file as the source of truth.
-
-It understands memory documents as well as non-memory knowledge such as harness instructions and project context.
-
-Examples:
+TESSERA normalizes supported text documents into Canonical Metadata while preserving the source file as the source of truth. It understands memory documents as well as non-memory knowledge such as harness instructions and project context.
 
 ```yaml
 # semantic memory
@@ -37,7 +31,6 @@ kind: instruction
 drawer: null
 ```
 
-### Important invariant
 There are exactly three semantic drawers:
 
 ```text
@@ -63,9 +56,7 @@ source.path
 document_hash / content_hash
 ```
 
-This allows a file to move without becoming a new source document and allows content to change without losing conceptual identity.
-
-### Expected behavior
+Expected behavior:
 
 ```text
 rename / move
@@ -91,17 +82,13 @@ This is foundational for provenance, incremental indexing and later temporal rea
 
 **Tracking:** Issue #9 / PR #3
 
-TESSERA currently preserves explicit/local relations found in supported metadata and links and represents them in its graph.
+TESSERA currently preserves explicit/local relations found in supported metadata and links and represents them in its graph. The graph already participates as a structural retrieval signal.
 
-The graph is already used as a structural signal in retrieval.
-
-### What is **not** implemented yet
-
-The following are future Test Cards, not current capabilities:
+Not implemented yet:
 
 - typed relation reliability/confidence (#26);
 - query-aware graph expansion budget (#25);
-- deep graph traversal;
+- controlled relation ablations (#14);
 - automatic causal relation inference.
 
 ---
@@ -110,9 +97,7 @@ The following are future Test Cards, not current capabilities:
 
 **Tracking:** Issue #8 / PR #2
 
-TESSERA no longer relies on raw PageRank alone.
-
-The current ranking combines inspectable signals such as:
+Current ranking combines inspectable signals such as:
 
 - TF-IDF lexical similarity;
 - direct token overlap;
@@ -124,9 +109,7 @@ The current ranking combines inspectable signals such as:
 
 The purpose is not to claim full semantic retrieval. The purpose is to make ranking behavior measurable and debuggable.
 
-### Known limitation
-
-The paraphrase:
+Known limitation:
 
 ```text
 pq o LAO existe?
@@ -142,8 +125,6 @@ can still place the intended `lao/charter` result at #2 instead of #1. This rema
 
 Instead of only returning an entire memory, TESSERA selects a paragraph/snippet that overlaps with the current query when there is sufficient lexical evidence.
 
-Conceptually:
-
 ```text
 memory
 ├── relevant_evidence   ← foregrounded for this query
@@ -152,7 +133,7 @@ memory
 
 If no paragraph has enough support, `relevant_evidence` remains `None` instead of falling back to an arbitrary first paragraph.
 
-That behavior is an early foundation for future Evidence Sufficiency/Abstention (#20), but the four-state sufficiency classifier itself is not implemented yet.
+That behavior is an early foundation for future Evidence Sufficiency/Abstention (#20), but the four-state classifier itself is not implemented yet.
 
 ---
 
@@ -161,8 +142,6 @@ That behavior is an early foundation for future Evidence Sufficiency/Abstention 
 **Tracking:** Issue #11 / PR #6
 
 Every canonical indexed memory can be mapped to deterministic evidence records.
-
-A provenance record includes:
 
 ```yaml
 evidence_id: ev_...
@@ -181,13 +160,9 @@ extraction:
   inferred: false
 ```
 
-### Auditability rule
+If query-specific evidence appears more than once and the exact occurrence cannot be proven, TESSERA returns a null span instead of guessing.
 
-If the query-specific evidence text appears more than once and the exact occurrence cannot be proven, TESSERA returns a null span instead of guessing.
-
-### Freshness states
-
-The Evidence Ledger can distinguish source freshness conditions such as:
+Freshness states include:
 
 ```text
 fresh
@@ -196,11 +171,7 @@ content_changed
 missing_source
 ```
 
-### Important boundary
-
-The ledger is provenance, not arbitration.
-
-Future authority, confidence, temporal validity and preferred-source decisions should live above this immutable/rebuildable substrate.
+The ledger is provenance, not arbitration. Future authority, confidence, temporal validity and preferred-source decisions live above this immutable/rebuildable substrate if their Test Cards succeed.
 
 ---
 
@@ -208,16 +179,14 @@ Future authority, confidence, temporal validity and preferred-source decisions s
 
 **Tracking:** Issue #11 / PR #6
 
-Evidence IDs include the source document version/hash and span, so a source change produces a new evidence version while the memory/document identity can remain stable.
-
-This preserves the difference between:
+Evidence IDs include the source document version/hash and span, so a source change produces a new evidence version while memory/document identity can remain stable.
 
 ```text
 same entity
 new source version
 ```
 
-and:
+is distinct from:
 
 ```text
 new entity
@@ -225,7 +194,62 @@ new entity
 
 ---
 
-## 8. Deterministic CI and sanity evaluation
+## 8. Basic heuristic write-side sanitization
+
+**Tracking:** existing write path; documentation correction Issue #54
+
+The current `write_memory_note()` path instantiates `WriteGatingEngine` and runs:
+
+```python
+audit_and_sanitize(content, tags)
+```
+
+before persisting the memory.
+
+Today this gate performs deterministic checks for a small known set of hostile-instruction patterns and suspicious tags, and applies deterministic redaction for matched patterns.
+
+Conceptually:
+
+```text
+candidate memory
+   ↓
+known-pattern / suspicious-tag audit
+   ↓
+optional redaction
+   ↓
+MemoryFrontmatter security metadata
+   ↓
+Markdown persistence
+```
+
+### Important boundary
+
+This is a **basic security/sanitization gate**, not the full future memory-admission system.
+
+It does not yet decide comprehensively:
+
+```text
+is this genuinely new?
+is it duplicated?
+is it useful/stable enough to persist?
+is it sufficiently supported by evidence?
+should it become durable memory at all?
+```
+
+Those broader questions are the planned #19 **evidence-aware memory admission / advanced write gating** Test Card.
+
+So:
+
+```text
+basic heuristic hostile-pattern sanitization  IMPLEMENTED
+full evidence-aware memory admission           PLANNED (#19)
+```
+
+This distinction matters because documenting all write gating as “future” understates current behavior, while calling the current regex/tag gate a complete memory-admission system would overstate it.
+
+---
+
+## 9. Deterministic CI and sanity evaluation
 
 **Tracking:** Issue #10 / PR #4
 
@@ -238,18 +262,9 @@ CLI smoke
 sanity retrieval evaluation
 ```
 
-The sanity evaluator measures:
+The sanity evaluator measures Hit@1/3/5, MRR, evidence hit rate, latency, returned context size and missing-evidence behavior.
 
-- Hit@1;
-- Hit@3;
-- Hit@5;
-- MRR;
-- evidence hit rate;
-- latency;
-- returned context size;
-- missing-evidence behavior.
-
-Current regression baseline recorded by the project:
+Current regression baseline:
 
 ```text
 Hit@1          75%
@@ -259,9 +274,7 @@ MRR           0.875
 Evidence hit  100%
 ```
 
-This is a regression guard, **not** a competitive benchmark.
-
-LongMemEval is tracked separately in #18.
+This is a regression guard, **not** a competitive benchmark. LongMemEval is tracked separately in #18.
 
 ---
 
@@ -279,32 +292,36 @@ source text
 → relevant evidence
 → provenance/evidence ledger
 → structured retrieval result
+
+write_memory_note
+→ basic heuristic audit/sanitization
+→ persistence
 ```
 
 Still experimental/planned:
 
 ```text
-incremental indexing                 #12
-metadata doctor                      #13
-query-aware graph expansion          #25
-relation confidence                  #26
-temporal state / state keys          #15
-conflict resolution                  #16
-evidence/source arbitration          #27
-authority + instruction precedence   #32
-4-state sufficiency / abstention      #20
-LongMemEval                           #18
-renderer ablation                     #28
-adaptive retrieval                    #17
-write gating                          #19
-experience learning                   #21
+incremental indexing                          #12
+metadata doctor                               #13
+query-aware graph expansion                   #25
+relation confidence                           #26
+temporal state / state keys                   #15
+conflict resolution                           #16
+evidence/source arbitration                   #27
+authority + instruction precedence            #32
+4-state sufficiency / abstention               #20
+LongMemEval                                    #18
+renderer ablation                              #28
+adaptive retrieval                             #17
+evidence-aware memory admission / advanced gate #19
+experience learning                            #21
 ```
 
 ---
 
 # Why the Foundation matters
 
-The value of these features is less visible than a final-answer demo, but they create the substrate for every later capability:
+These features create the substrate for every later capability:
 
 ```text
 stable identity
