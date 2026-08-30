@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Tessera — A Memória Adaptativa e Atômica do LAO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Regular.otf') format('opentype'); font-weight: 400; }
+@font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Medium.otf') format('opentype'); font-weight: 500; }
+@font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Bold.otf') format('opentype'); font-weight: 700; }
+@font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-ExtraBold.otf') format('opentype'); font-weight: 800; }
+@font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Black.otf') format('opentype'); font-weight: 900; }
+
+:root{
+  --blip-blue:#1968F0;
+  --light-blue:#0096FA;
+  --mid-blue:#0C4EC0;
+  --dark-blue:#072F73;
+  --pale-blue:#C5D9FB;
+  --black:#141414;
+  --dgray1:#1F1F1F;
+  --dgray2:#292929;
+  --mgray1:#525252;
+  --mgray2:#666666;
+  --lgray1:#A3A3A3;
+  --lgray2:#E0E0E0;
+  --offwhite:#F5F5F5;
+  --white:#FFFFFF;
+  --green:#1BA766;
+  --lgreen:#35DE90;
+  --purple:#561093;
+  --lpurple:#A85AED;
+  --pink:#FB4BC1;
+  --logo-blue:#009AFF;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{
+  background:#000;
+  font-family:'Carbona','Lexend','Inter',sans-serif;
+  scroll-behavior:smooth;
+}
+
+.deck{
+  width:100%;
+  scroll-snap-type:y mandatory;
+  overflow-y:scroll;
+  height:100vh;
+}
+
+.slide{
+  width:100%;
+  height:100vh;
+  scroll-snap-align:start;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  padding:64px 88px;
+}
+
+/* ---------- UTILITARIOS DE TEMA ---------- */
+.bg-white{background:var(--white); color:var(--black);}
+.bg-offwhite{background:var(--offwhite); color:var(--black);}
+.bg-black{background:var(--black); color:var(--white);}
+.bg-darkblue{background:var(--dark-blue); color:var(--white);}
+.bg-paleblue{background:var(--pale-blue); color:var(--dark-blue);}
+
+/* ---------- CHAT BUBBLE MOTIF ---------- */
+.bubble{
+  position:relative;
+  border-radius:25px;
+  padding:16px 24px;
+  display:inline-block;
+  max-width:100%;
+}
+.bubble::after{
+  content:"";
+  position:absolute;
+  left:36px;
+  bottom:-14px;
+  width:0; height:0;
+  border-left:8px solid transparent;
+  border-right:22px solid transparent;
+  border-top:16px solid inherit;
+}
+.bubble.tail-blipblue{background:var(--blip-blue); color:#fff;}
+.bubble.tail-blipblue::after{border-top-color:var(--blip-blue);}
+.bubble.tail-paleblue{background:var(--pale-blue); color:var(--dark-blue);}
+.bubble.tail-paleblue::after{border-top-color:var(--pale-blue);}
+.bubble.tail-darkblue{background:var(--dark-blue); color:var(--light-blue);}
+.bubble.tail-darkblue::after{border-top-color:var(--dark-blue);}
+.bubble.tail-white{background:var(--white); color:var(--dark-blue); box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.bubble.tail-white::after{border-top-color:var(--white);}
+.bubble.tail-lightblue{background:var(--light-blue); color:#fff;}
+.bubble.tail-lightblue::after{border-top-color:var(--light-blue);}
+
+/* ---------- LOGO / FOOTER ---------- */
+.brand-logo{position:absolute; top:48px; right:64px; height:28px;}
+.footer-block{
+  position:absolute; left:88px; bottom:32px;
+  font-size:11px; line-height:1.5; opacity:.65; font-weight:400;
+}
+.footer-block b{font-weight:700;}
+.slide-index{
+  position:absolute; right:64px; bottom:32px;
+  font-size:12px; font-weight:500; opacity:.5; letter-spacing:.05em;
+}
+
+/* ---------- TIPOGRAFIA ---------- */
+h1{font-weight:800; letter-spacing:-.01em;}
+h2{font-weight:700; letter-spacing:-.01em;}
+.kicker{
+  font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--blip-blue); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--blip-blue); display:inline-block;}
+.bg-black .kicker, .bg-darkblue .kicker{color:var(--light-blue);}
+.bg-black .kicker .dot, .bg-darkblue .kicker .dot{background:var(--light-blue);}
+
+/* ---------- MASCOT ---------- */
+.mascot{position:absolute; pointer-events:none; filter:drop-shadow(0 20px 40px rgba(0,0,0,.25));}
+
+/* ---------- SHAPES ---------- */
+.deco-circle{position:absolute; border-radius:50%;}
+.rounded-card{border-radius:25px;}
+
+/* ---------- COVER ---------- */
+.s-cover{background:var(--dark-blue); color:#fff; justify-content:center;}
+.s-cover .grid{display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:center; height:100%;}
+.s-cover .eyebrow{color:var(--light-blue); font-weight:700; font-size:14px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:28px;}
+.s-cover h1{font-size:76px; line-height:1.02; margin-bottom:22px;}
+.s-cover .accent{color:var(--light-blue);}
+.s-cover .lede{font-size:20px; color:var(--pale-blue); max-width:560px; line-height:1.5; font-weight:400;}
+.s-cover .cover-right{position:relative; height:100%;}
+.s-cover .cover-mascot{position:absolute; right:0; bottom:-32px; width:420px;}
+.s-cover .bubble-stack{position:absolute; top:6%; left:0; display:flex; flex-direction:column; gap:16px;}
+
+/* ---------- SECTION DIVIDER ---------- */
+.s-divider{background:var(--black); color:#fff; align-items:flex-start; justify-content:center;}
+.s-divider .num{font-size:140px; font-weight:900; color:var(--dgray2); line-height:1; position:absolute; top:56px; right:88px;}
+.s-divider .kicker{margin-bottom:24px;}
+.s-divider h1{font-size:56px; max-width:900px; line-height:1.08;}
+.s-divider .lede{margin-top:22px; font-size:18px; color:var(--lgray1); max-width:680px; font-weight:400; line-height:1.55;}
+
+/* ---------- GENERIC CONTENT ---------- */
+.content h2{font-size:40px; margin-bottom:8px;}
+.content .lede{font-size:17px; font-weight:400; max-width:760px; margin-bottom:36px; line-height:1.5;}
+.bg-white .lede, .bg-offwhite .lede{color:var(--mgray1);}
+.bg-black .lede, .bg-darkblue .lede{color:var(--lgray1);}
+
+/* card grid */
+.grid-cards{display:grid; gap:20px; flex:1;}
+.cols-3{grid-template-columns:repeat(3,1fr);}
+.cols-2{grid-template-columns:repeat(2,1fr);}
+.card{
+  border-radius:25px; padding:28px 26px; display:flex; flex-direction:column; gap:12px;
+}
+.card .card-icon{width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; margin-bottom:4px;}
+.card h3{font-size:19px; font-weight:700; line-height:1.25;}
+.card p{font-size:14.5px; line-height:1.5; font-weight:400;}
+.card.on-white{background:var(--offwhite); color:var(--black);}
+.card.on-white p{color:var(--mgray1);}
+.card.on-blue{background:var(--blip-blue); color:#fff;}
+.card.on-blue p{color:var(--pale-blue);}
+.card.on-dark{background:var(--dgray2); color:#fff;}
+.card.on-dark p{color:var(--lgray1);}
+.card.on-paleblue{background:var(--pale-blue); color:var(--dark-blue);}
+.card.on-paleblue p{color:var(--dark-blue); opacity:.8;}
+.card .tag{align-self:flex-start; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:5px 12px; border-radius:100px;}
+
+/* problem/solution split */
+.split{display:grid; grid-template-columns:1fr 1fr; gap:28px; flex:1;}
+.split-col{border-radius:25px; padding:36px; display:flex; flex-direction:column; gap:16px;}
+.split-col.problem{background:var(--offwhite);}
+.split-col.solution{background:var(--dark-blue); color:#fff;}
+.split-col h3{font-size:22px; font-weight:700; margin-bottom:4px;}
+.split-col ul{list-style:none; display:flex; flex-direction:column; gap:14px;}
+.split-col li{font-size:15px; line-height:1.5; padding-left:26px; position:relative;}
+.split-col.problem li{color:var(--mgray1);}
+.split-col.solution li{color:var(--pale-blue);}
+.split-col li::before{content:"×"; position:absolute; left:0; top:-2px; font-weight:900; font-size:18px; color:var(--lgray1);}
+.split-col.solution li::before{content:"✓"; color:var(--lgreen);}
+
+/* timeline (v1 v2 v3) */
+.timeline{display:flex; flex-direction:column; gap:0; flex:1; justify-content:center;}
+.tl-row{display:grid; grid-template-columns:120px 1fr; gap:28px; position:relative; padding-bottom:34px;}
+.tl-row:last-child{padding-bottom:0;}
+.tl-row .tl-marker{display:flex; flex-direction:column; align-items:center;}
+.tl-row .tl-dot{width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:20px; color:#fff; flex-shrink:0;}
+.tl-row .tl-line{flex:1; width:2px; background:var(--lgray2); margin-top:8px;}
+.tl-row:last-child .tl-line{display:none;}
+.tl-body{background:var(--offwhite); border-radius:22px; padding:22px 28px;}
+.tl-body h3{font-size:20px; font-weight:700; margin-bottom:6px; color:var(--black);}
+.tl-body p{font-size:14.5px; color:var(--mgray1); line-height:1.5;}
+.tl-body .pillmini{display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:100px; margin-top:10px; letter-spacing:.04em;}
+
+/* pipeline steps */
+.pipeline{display:flex; gap:0; flex:1; align-items:stretch;}
+.pipe-step{flex:1; background:var(--dgray2); border-radius:22px; padding:26px 22px; display:flex; flex-direction:column; gap:10px; position:relative;}
+.pipe-step + .pipe-step{margin-left:20px;}
+.pipe-step .step-num{font-size:34px; font-weight:900; color:var(--light-blue);}
+.pipe-step h3{font-size:17px; font-weight:700; color:#fff;}
+.pipe-step p{font-size:13px; color:var(--lgray1); line-height:1.5;}
+.pipe-arrow{position:absolute; right:-28px; top:50%; transform:translateY(-50%); font-size:22px; color:var(--light-blue); z-index:2; font-weight:900;}
+.pipe-step:last-child .pipe-arrow{display:none;}
+
+/* stat highlight */
+.stat-row{display:flex; gap:20px; margin-top:auto;}
+.stat-box{flex:1; border-radius:22px; padding:22px 24px;}
+.stat-box .num{font-size:44px; font-weight:900; line-height:1; margin-bottom:8px;}
+.stat-box .lbl{font-size:13px; font-weight:500; line-height:1.4;}
+
+/* roadmap checklist */
+.roadmap-list{display:flex; flex-direction:column; gap:14px; flex:1; justify-content:center; max-width:820px;}
+.rm-item{display:flex; align-items:flex-start; gap:16px; background:var(--dgray2); border-radius:18px; padding:18px 22px;}
+.rm-item .rm-num{width:32px; height:32px; border-radius:9px; background:var(--light-blue); color:#072f73; font-weight:900; font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.rm-item.done .rm-num{background:var(--lgreen);}
+.rm-item .rm-txt h4{font-size:15.5px; font-weight:700; color:#fff; margin-bottom:3px;}
+.rm-item .rm-txt p{font-size:13px; color:var(--lgray1); line-height:1.4;}
+.rm-status{margin-left:auto; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 12px; border-radius:100px; flex-shrink:0; align-self:center;}
+.rm-status.done{background:var(--lgreen); color:#072f73;}
+.rm-status.todo{background:var(--dgray1); color:var(--lgray1); border:1px solid var(--mgray1);}
+
+/* mascot quote */
+.quote-row{display:flex; align-items:center; gap:48px; flex:1;}
+.quote-row .qmascot{width:260px; flex-shrink:0;}
+.quote-row .qtext{font-size:26px; font-weight:500; line-height:1.4;}
+.quote-row .qtext b{font-weight:800; color:var(--light-blue);}
+
+/* code-ish block */
+.codeblock{
+  background:#0d1117; border-radius:18px; padding:22px 26px; font-family:'SF Mono','Consolas',monospace;
+  font-size:13px; line-height:1.7; color:#c9d1d9; overflow:hidden;
+  white-space:pre-wrap; word-break:break-word;
+}
+.codeblock .cm{color:#8b949e;}
+.codeblock .kw{color:#79c0ff;}
+.codeblock .st{color:#a5d6ff;}
+.codeblock .fn{color:#d2a8ff;}
+
+/* closing */
+.s-closing{background:var(--dark-blue); color:#fff; align-items:center; justify-content:center; text-align:center;}
+.s-closing h1{font-size:72px; margin-bottom:20px;}
+.s-closing .lede{font-size:20px; color:var(--pale-blue); max-width:640px; margin:0 auto 40px auto; font-weight:400;}
+.s-closing .cmascot{width:220px; margin-bottom:36px;}
+
+/* nav */
+.navhint{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(20,20,20,.75); color:#fff; padding:8px 18px; border-radius:100px; font-size:12px; z-index:50; backdrop-filter:blur(6px); letter-spacing:.02em;}
+
+@media print{
+  .deck{overflow:visible; height:auto;}
+  .slide{scroll-snap-align:none; page-break-after:always; height:100vh;}
+  .navhint{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="navhint">↑ ↓ ou scroll para navegar · 22 slides</div>
+<div class="deck" id="deck">
+
+<!-- ============ SLIDE 1 — CAPA ============ -->
+<section class="slide s-cover">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="grid">
+    <div>
+      <div class="eyebrow">Lab Autonomous Officer · Memória Atômica & Adaptativa</div>
+      <h1>Tessera: a arquitetura científica para o LAO<br><span class="accent">nunca mais esquecer.</span></h1>
+      <p class="lede">Como sairemos de grep, glob e read em arquivos markdown a um motor de memória atômica com resolução de conflitos temporais e indexação topológica.</p>
+    </div>
+    <div class="cover-right">
+      <div class="bubble-stack">
+        <span class="bubble tail-paleblue" style="font-size:14px;font-weight:700;">QUMem · LiveMem · Range Retrieval</span>
+        <span class="bubble tail-blipblue" style="font-size:15px;font-weight:800;">Need → Planner → Inference</span>
+      </div>
+      <img class="cover-mascot" src="assets/mascots/LAO-3D-thinking-transparent.png" alt="LAO pensando">
+    </div>
+  </div>
+  <div class="footer-block">
+    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> LAO — Lab Autonomous Officer
+  </div>
+<div class="slide-index">01 / 22</div>
+</section>
+
+<!-- ============ SLIDE 2 — DECODIFICANDO O NOME ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Conceitos Fundamentais</div>
+  <h2>Decodificando: Atômica, Adaptativa e Topológica</h2>
+  <p class="lede">Antes de aprofundarmos no problema, o que exatamente significa o nome Tessera?</p>
+  <div class="grid-cards cols-3" style="margin-top:8px;">
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">⚛️</div>
+      <h3>Memória Atômica</h3>
+      <p>Em vez de arquivos de log gigantes e não estruturados, a informação é fatiada no menor pedaço lógico possível (um Fato, uma Preferência). Se uma regra muda, não precisamos reescrever um log inteiro, apenas atualizamos aquele <b>átomo</b> de informação isoladamente.</p>
+    </div>
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--pink); color:#fff;">🔄</div>
+      <h3>Adaptativa</h3>
+      <p>O sistema entende a flecha do tempo. Ele não assume que o que foi dito há seis meses é verdade hoje. A memória é capaz de <b>resolver conflitos temporais</b> e adaptar o contexto para garantir que o Agente opere sempre com a verdade mais recente.</p>
+    </div>
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--lpurple); color:#fff;">🕸️</div>
+      <h3>Topológica (Grafos)</h3>
+      <p>A indexação não é feita num banco de dados relacional comum. É feita num <b>Grafo de Conhecimento</b>. Memórias são conectadas por "fios" invisíveis (Tags e Entidades). Recuperar informação é navegar por essa topologia, em vez de buscar apenas por palavras parecidas.</p>
+    </div>
+  </div>
+<div class="slide-index">02 / 22</div>
+</section>
+
+<!-- ============ SLIDE 2 — FUNDAMENTAÇÃO CIENTÍFICA ============ -->
+<section class="slide bg-black content">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Estruturação acadêmica</div>
+  <h2 style="color:#fff;">Três pilares da literatura científica de sistemas de memória</h2>
+  <p class="lede">O Tessera consolidou o estado da arte de agentes de longa duração para garantir que o comportamento do LAO seja deterministicamente auditável.</p>
+  <div class="grid-cards cols-3">
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--light-blue); color:#072f73;">arXiv 2608.16168</span>
+      <h3>QUMem</h3>
+      <p>Fundamenta a decomposição automática de episódios em 3 gavetas independentes (fatos, preferências e insights) e propõe o pipeline de 3 agentes de recuperação (Need → Planner → Inference) para estimar estado real.</p>
+    </div>
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--lgreen); color:#072f73;">arXiv 2608.02515</span>
+      <h3>LiveMem</h3>
+      <p>Desenvolve a mecânica de <b>Continuous State Update</b>. Novas memórias conflitantes realizam <i>override</i> de estados antigos, neutralizando a desatualização acumulada de instruções de comportamento.</p>
+    </div>
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--lpurple); color:#2b0849;">arXiv 2502.13245</span>
+      <h3>Range Retrieval</h3>
+      <p>Valida que a busca puramente baseada em similaridade vetorial (top-k) ignora caminhos semânticos essenciais. Tessera usa Dynamic Weighted PageRank sobre o grafo para pescar notas conexas importantes.</p>
+    </div>
+  </div>
+<div class="slide-index">03 / 22</div>
+</section>
+
+<!-- ============ SLIDE 3 — O LAO ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>O Contexto</div>
+  <h2>O Lab Autonomous Officer (LAO) e o Preço da Amnésia</h2>
+  <p class="lede">O LAO é o agente da Blip que opera autonomamente de segunda a sexta descobrindo tecnologias emergentes, rodando experimentos H3 e gerando inteligência competitiva. Mas ele tinha um problema fundamental.</p>
+  <div class="grid-cards cols-2" style="margin-top:8px;">
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--light-blue); color:#fff;">∞</div>
+      <h3>O Loop Infinito da Amnésia</h3>
+      <p>Sem uma memória estruturada e inteligente, o LAO era como o protagonista do filme Amnésia: extremamente brilhante, mas preso em um dia que sempre recomeçava do zero. Ele esquecia os bugs de rede que já tinha corrigido e as regras de negócio que já tinha aprendido na semana anterior.</p>
+    </div>
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--mgray2); color:#fff;">$</div>
+      <h3>O Custo de Re-explorar</h3>
+      <p>Para compensar o esquecimento, o agente queimava dezenas de turnos de API disparando comandos de terminal às cegas a cada nova sessão, tentando reconstruir a própria identidade a um custo computacional altíssimo.</p>
+    </div>
+  </div>
+<div class="slide-index">04 / 22</div>
+</section>
+
+<!-- ============ SLIDE 4 — O PROBLEMA DAS MEMÓRIAS ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip" style="filter:invert(0);">
+  <div class="kicker"><span class="dot"></span>A Ilusão do Texto</div>
+  <h2>O Paradoxo da Caixa de Sapato 🗄️</h2>
+  <p class="lede">"Se a memória do agente é em texto, não é só salvar em arquivos Markdown?" <b>Não.</b> Anotar tudo e jogar numa pasta é como jogar os recibos da empresa numa caixa de sapato. Ter a informação lá dentro não significa ter memória útil.</p>
+  <div class="split" style="margin-top:8px;">
+    <div class="split-col problem">
+      <h3>1. O Labirinto do Grep/Read (Busca Cega)</h3>
+      <ul>
+        <li><b>Procurando a Agulha:</b> O agente queima turnos e gasta dinheiro rodando <code>grep</code> e <code>read_file</code> para procurar o que precisa na força bruta.</li>
+        <li><b>Context Bloat:</b> Fica forçado a ler logs inteiros com milhares de linhas de ruído apenas para extrair a credencial ou a regra de deploy correta.</li>
+      </ul>
+    </div>
+    <div class="split-col problem">
+      <h3>2. A Armadilha do RAG (State Contamination)</h3>
+      <ul>
+        <li><b>A Falsa Inteligência:</b> Bancos de RAG tradicionais puxam as notas por similaridade de texto. Se buscar por "arquitetura", o sistema entrega a regra de 2024 misturada com a de 2026.</li>
+        <li><b>O Colapso Temporal:</b> O agente recebe instruções opostas no mesmo prompt. O código do projeto entra em curto-circuito.</li>
+      </ul>
+    </div>
+  </div>
+<div class="slide-index">05 / 22</div>
+</section>
+
+<!-- ============ SLIDE 5 — A SOLUÇÃO TESSERA ============ -->
+<section class="slide s-divider">
+  <span class="num">02</span>
+  <div class="kicker"><span class="dot"></span>A Solução</div>
+  <h1>Tessera: Transformando o caos dos arquivos soltos em um motor de conhecimento tipado.</h1>
+  <p class="lede">Com resolução ativa de conflitos temporais e inteligência de grafos acionada antes de enviar uma única palavra ao prompt do Agente Principal.</p>
+<div class="slide-index">06 / 22</div>
+</section>
+
+<!-- ============ SLIDE 6 — AS GAVETAS ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Particionamento Cognitivo</div>
+  <h2>As Gavetas Estantes: Blindagem contra colisões</h2>
+  <p class="lede">Não se mistura o que é uma config de sistema estável com o que é um feedback de comportamento volátil. O Tessera força a memória a se particionar em 3 gavetas herméticas para viabilizar resolução de tempo.</p>
+  <div class="grid-cards cols-3">
+    <div class="card on-paleblue">
+      <span class="tag" style="background:var(--dark-blue); color:#fff;">Factual Note</span>
+      <h3>Gaveta Factual</h3>
+      <p>Dados objetivos de infra, credenciais, benchmarks e caminhos físicos de arquivos. Sofre invalidação determinística por identidade de entidade.</p>
+    </div>
+    <div class="card on-blue">
+      <span class="tag" style="background:#fff; color:var(--blip-blue);">Preference Note</span>
+      <h3>Preferências (Mutable)</h3>
+      <p>Modo de operação, estilos de código e restrições. "O usuário prefere testes antes do commit". Se houver colisão de chave, a versão mais recente sempre ganha.</p>
+    </div>
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--lgreen); color:#072f73;">Procedural Anchor</span>
+      <h3>Insights Transferíveis (Âncoras)</h3>
+      <p>A sabedoria técnica consolidada: passos para reproduzir bugs, armadilhas identificadas e planos de teste. Também chamados de <i>insights transferíveis</i>, acumulam sabedoria de falha sem sofrer override.</p>
+    </div>
+  </div>
+<div class="slide-index">07 / 22</div>
+</section>
+
+<!-- ============ SLIDE 7 — O BOLO DE CENOURA (INTERAÇÃO) ============ -->
+<section class="slide bg-white content" style="justify-content:center; align-items:center; text-align:center;">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip" style="filter:invert(0);">
+  <img class="mascot" src="assets/mascots/LAO-3D-thinking-transparent.png" alt="LAO pensando" style="position:relative; width:300px; margin-bottom:20px;">
+  
+  <div style="display:flex; flex-direction:column; gap:20px; align-items:center; width:100%;">
+    <span class="bubble tail-white" style="font-size:22px; font-weight:700; max-width:600px; line-height:1.4;">
+      "Eu adoro bolo de cenoura com cobertura de chocolate molinha..."
+    </span>
+    
+    <span class="bubble tail-blipblue" style="font-size:18px; font-weight:500; max-width:400px; margin-left:120px;">
+      "Entendido. Preferência salva."
+    </span>
+  </div>
+<div class="slide-index">08 / 22</div>
+</section>
+
+<!-- ============ SLIDE 7.5 — A ANÁLISE ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Analisando a Interação</div>
+  <h2>A Conversa do Bolo de Cenoura 🥕</h2>
+  <p class="lede">O agente acabou de salvar uma informação no sistema. Mas pense bem:</p>
+  <div class="grid-cards cols-3" style="margin-top:8px;">
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">?</div>
+      <h3>Em qual gaveta isso entra?</h3>
+      <p>Isso não é um "Fato" imutável do universo, e sim uma <b>Preferência</b> atrelada ao gosto e comportamento temporal do usuário.</p>
+    </div>
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--light-blue); color:#fff;">💾</div>
+      <h3>Como o sistema grava?</h3>
+      <p>O agente gera uma nota tipada de preferência, carimba com a data de hoje, adiciona tags como <code>#bolo</code> e <code>#sobremesa</code>, e salva no disco.</p>
+    </div>
+    <div class="card on-white">
+      <div class="card-icon" style="background:var(--pink); color:#fff;">⏱️</div>
+      <h3>Pode ser atualizada depois?</h3>
+      <p>Sim! Pessoas mudam de ideia, e repositórios mudam de tecnologia. Essa memória de bolo de cenoura está fadada a entrar em conflito no futuro. E é isso que veremos a seguir.</p>
+    </div>
+  </div>
+<div class="slide-index">09 / 22</div>
+</section>
+
+<!-- ============ SLIDE 8 — A MUDANÇA ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>O Fator Temporal</div>
+  <h2>Meses depois... O Enjoo 🍫</h2>
+  <p class="lede">Seis meses se passam. Você volta a conversar com o agente num dia qualquer e comenta:<br><br><b style="color:var(--mid-blue);">"Sabe de uma coisa? Enjoei um pouco de bolo de cenoura... meu preferido agora é bolo de chocolate com cobertura dura."</b></p>
+  <div class="split" style="margin-top:8px;">
+    <div class="split-col problem" style="justify-content:center; background:var(--offwhite);">
+      <h3 style="color:var(--black);">O que acontece no sistema?</h3>
+      <p style="font-size:14.5px; color:var(--mgray1); line-height:1.5;">O agente anota essa nova preferência de forma obediente. Agora o banco de dados da IA possui dois arquivos físicos diferentes e auditáveis:</p>
+      <div style="background:#e0e0e0; padding:16px; border-radius:12px; font-size:13px; font-family:monospace; line-height:1.4; color:var(--black);">
+📄 nota_jan.md: "Favorito é cenoura, cobertura mole."
+📄 nota_jul.md: "Favorito é chocolate, cobertura dura."
+      </div>
+    </div>
+    <div class="split-col solution" style="justify-content:center;">
+      <h3>Onde a bomba relógio é armada</h3>
+      <ul>
+        <li>Ambas as memórias compartilham as mesmas <b>entidades</b> e as mesmas <b>tags</b> (ex: <code>#sobremesa</code>, <code>#favorito</code>).</li>
+        <li>Uma não apaga a existência física da outra, pois precisamos manter a história auditável do projeto.</li>
+        <li>O cenário está completamente armado para um colapso cognitivo no próximo prompt do usuário.</li>
+      </ul>
+    </div>
+  </div>
+<div class="slide-index">10 / 22</div>
+</section>
+
+<!-- ============ SLIDE 9 — O COLAPSO DO RAG ============ -->
+<section class="slide bg-black content">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>O Limite Tradicional</div>
+  <h2 style="color:#fff;">O Colapso: "Me traz a minha sobremesa favorita!" 💥</h2>
+  <p class="lede">No dia seguinte, você apenas pede: <b>"Pede a minha sobremesa favorita."</b> Aqui é onde os sistemas comuns e as buscas por terminal falham miseravelmente.</p>
+  <div class="split" style="margin-top:8px;">
+    <div class="split-col problem" style="background:#1d1d1d; color:#fff;">
+      <h3 style="color:var(--light-blue);">Por que Grep, Glob e RAG Clássico falham?</h3>
+      <ul>
+        <li style="color:var(--lgray1);"><b>Grep / Glob / Read:</b> O agente varre a pasta de memória com shell, lê todos os arquivos e joga tudo no contexto cru: <i>"O usuário gosta de bolo de cenoura e também de chocolate".</i></li>
+        <li style="color:var(--lgray1);"><b>RAG Semântico Clássico:</b> Ambas as notas falam de "bolo" e "favorito". A similaridade de cosseno puxa as duas com força total. O RAG assume cegamente que <b>similaridade = relevância</b>, ignorando a linha do tempo.</li>
+      </ul>
+    </div>
+    <div class="split-col solution" style="background:var(--blip-blue);">
+      <h3 style="color:#fff;">A Síndrome da Contaminação de Estado</h3>
+      <ul>
+        <li style="color:#fff;">O agente recebe instruções opostas no prompt. Ele cria um Frankenstein cômico: <i>"Vou pedir um bolo de cenoura com cobertura dura de chocolate!"</i></li>
+        <li style="color:#fff;"><b>Na Vida Real (Código):</b> Se for uma base de código, o agente tenta usar regras da API legada misturadas com os endpoints da API nova. O projeto crasha e você perde 2 horas debugando.</li>
+      </ul>
+    </div>
+  </div>
+<div class="slide-index">11 / 22</div>
+</section>
+
+<!-- ============ SLIDE 10 — A EVOLUÇÃO ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Engenharia de Sobrevivência</div>
+  <h2>Como Chegamos Aqui? O Ciclo Evolutivo do LAO</h2>
+  <p class="lede">Foi observando esse "bolo Frankenstein" em projetos de produção da Blip que forçamos a arquitetura do LAO a evoluir continuamente por quatro estágios.</p>
+  <div class="timeline">
+    <div class="tl-row">
+      <div class="tl-marker"><div class="tl-dot" style="background:var(--mgray1);">v1</div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <h3>Brute-force: O próprio agente pesquisava (grep síncrono)</h3>
+        <p>O próprio Agente Principal usava scripts de shell para grepar os logs da memória passada. Saturação violenta do prompt, estouro de tokens e perda de turnos de API com navegação inútil pelo terminal.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-marker"><div class="tl-dot" style="background:var(--blip-blue);">v2</div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <h3>O Especialista (agent/memory.md)</h3>
+        <p>Isolamos a tarefa em um agente focado apenas em buscar dados para o LAO. Resolveu o foco, mas não a lentidão: o especialista ainda sofria timeouts de CLI varrendo e cruzando arquivos manualmente pelo bash.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-marker"><div class="tl-dot" style="background:var(--lpurple);">v3</div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <h3>memory-graph: O primeiro grafo acoplado</h3>
+        <p>Criamos um indexador que via os metadados dos .mds e montava grafos de conhecimento de apoio. Porém era travado dentro dos scripts nativos do LAO, redundante com outros serviços de graphify e frágil.</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-marker"><div class="tl-dot" style="background:var(--dark-blue);">v4</div></div>
+      <div class="tl-body" style="background:var(--dark-blue); color:#fff;">
+        <h3 style="color:#fff;">Tessera: Motor Unificado, Atômico e Científico</h3>
+        <p style="color:var(--pale-blue);">Reestruturação acadêmica com pacotes Python isolados, gavetas estantes, MCP unificado e detecção de conflitos, resolvendo 100% dos limites estruturais anteriores.</p>
+      </div>
+    </div>
+  </div>
+<div class="slide-index">12 / 22</div>
+</section>
+
+<!-- ============ SLIDE 11 — EPISÓDIOS ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Fronteiras Dinâmicas</div>
+  <h2>Fronteira de Episódios: Organizando o fluxo temporal</h2>
+  <p class="lede">No Tessera, memória não é log bruto, são <b>episódios semanticamente coerentes</b>. Mas como decidir autonomamente onde um assunto começa e outro termina?</p>
+  <div class="grid-cards cols-3">
+    <div class="card on-offwhite" style="background:var(--offwhite);">
+      <div class="card-icon" style="background:var(--mgray2); color:#fff;">f_θ</div>
+      <h3>O Gap do Paper</h3>
+      <p>O paper original do QUMem assume um classificador binário turno a turno, que é computacionalmente caro para nosso volume de interações.</p>
+    </div>
+    <div class="card on-offwhite" style="background:var(--offwhite);">
+      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">dt</div>
+      <h3>Fronteira por Tempo</h3>
+      <p>O <code>EpisodeBoundaryTracker</code> fecha o episódio atual após um hiato de silêncio de $T$ minutos (padrão: 30) entre as interações do dev e a IA.</p>
+    </div>
+    <div class="card on-offwhite" style="background:var(--offwhite);">
+      <div class="card-icon" style="background:var(--light-blue); color:#fff;">cos</div>
+      <h3>Drift Semântico TF-IDF</h3>
+      <p>Mede a mudança léxica da conversa em tempo real. Se a similaridade despencar abaixo de $\tau$ (0.03), um novo assunto lógico é detectado no ato.</p>
+    </div>
+  </div>
+<div class="slide-index">13 / 22</div>
+</section>
+
+<!-- ============ SLIDE 12 — PIPELINE 3-AGENTES ============ -->
+<section class="slide bg-black content">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Estimação de Estado</div>
+  <h2 style="color:#fff;">O Trio de Agentes Detetives: Estimando o Estado Atual</h2>
+  <p class="lede">Em vez de buscar cegamente no sistema, o Tessera ativa um pipeline de 3 etapas de IA especializado em limpar o ruído antes da resposta do LAO.</p>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <span class="step-num">01</span>
+      <h3>Information-Need Agent (A1)</h3>
+      <p>Lê a instrução que você passou ao LAO e infere criticamente o que o agente NÃO sabe (ex: regras passadas de código) para completar o job.</p>
+      <span class="pipe-arrow">→</span>
+    </div>
+    <div class="pipe-step">
+      <span class="step-num">02</span>
+      <h3>Retrieval Planner Agent (A2)</h3>
+      <p>Transforma essas necessidades em queries hiper focadas e direciona em quais gavetas exatas (Fatos, Prefs, Âncoras) o sistema deve puxar dados.</p>
+      <span class="pipe-arrow">→</span>
+    </div>
+    <div class="pipe-step">
+      <span class="step-num">03</span>
+      <h3>Retrieval + ConflictResolver</h3>
+      <p>Resgata notas físicas, caminha no grafo pelo PageRank e executa a exclusão e substituição pesada do que for conflitante no tempo.</p>
+      <span class="pipe-arrow">→</span>
+    </div>
+    <div class="pipe-step" style="background:var(--dark-blue);">
+      <span class="step-num" style="color:#fff;">04</span>
+      <h3>User-State Inference Agent (A3)</h3>
+      <p style="color:var(--pale-blue);">Consolida as notas sobreviventes em um sumário impecável de contexto e entrega ao LAO. Sem Frankenstein.</p>
+    </div>
+  </div>
+<div class="slide-index">14 / 22</div>
+</section>
+
+<!-- ============ SLIDE 13 — RESOLUÇÃO DE CONFLITOS ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Mecânica Interna</div>
+  <h2>ConflictResolver: Salvando o Bolo de Chocolate</h2>
+  <p class="lede">O algoritmo de resolução em <code>conflict.py</code> é a garantia de que as preferências obsoletas nunca chegarão no LAO. É ele quem "mata" a nota velha de bolo de cenoura.</p>
+  <div class="split" style="margin-top:8px;">
+    <div>
+      <div class="codeblock" style="font-size:12px; line-height:1.5;">
+<span class="cm"># Algoritmo de resolução de conflito temporal</span>
+<span class="kw">for</span> note <span class="kw">in</span> retrieved_notes:
+    key = note.entity_name + note.tags[<span class="st">0</span>]
+    <span class="kw">if</span> key <span class="kw">in</span> active_states:
+        <span class="kw">if</span> note.timestamp > active_states[key].timestamp:
+            <span class="fn">invalidate_note</span>(active_states[key])
+            active_states[key] = note
+        <span class="kw">else</span>:
+            <span class="fn">invalidate_note</span>(note)
+    <span class="kw">else</span>:
+        active_states[key] = note
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:16px; justify-content:center;">
+      <h3 style="font-size:20px; font-weight:700;">Como bloqueamos a contaminação:</h3>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">1. <b>A Chave Composta:</b> Juntamos a Entidade Foco com a primeira Tag (<code>User + #sobremesa</code>). Se colidir, sabemos que o tópico é o mesmo.</p>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">2. <b>Override Histórico:</b> A nota do bolo de chocolate de Julho descarta instantaneamente a de Janeiro por Timestamp. Ambas vivem no disco, mas só a verdade prevalece.</p>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">3. <b>Purificação do Fluxo:</b> O Agente final nunca nem fica sabendo que o bolo de cenoura um dia existiu.</p>
+    </div>
+  </div>
+<div class="slide-index">15 / 22</div>
+</section>
+
+<!-- ============ SLIDE 14 — QUADRO DE CORTIÇA ============ -->
+<section class="slide bg-black content">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Indexação Topológica</div>
+  <h2 style="color:#fff;">O "Quadro de Cortiça" do Investigador e a força do DW-PR</h2>
+  <p class="lede">A busca apenas por proximidade vetorial não alcança insights que têm lógicas entrelaçadas. O Tessera caminha pelos tópicos conectivos através de uma topologia física de grafo de conhecimento.</p>
+  <div class="grid-cards cols-3">
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--pink); color:#fff;">Alfinetes de Notas</span>
+      <h3>O Quadro de Cortiça</h3>
+      <p>As notas físicas de markdown são nós do grafo, interconectados por "linhas vermelhas de lã" com nós virtuais de Tags (verde) e Entidades (vermelho). O relacionamento estruturado dita a real proximidade.</p>
+    </div>
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--lpurple); color:#fff;">Caminhando pelos fios</span>
+      <h3>Custom PageRank</h3>
+      <p>Uma busca lexical leve ativa notas "sementes". A partir delas, o PageRank Dinâmico (DW-PR) caminha recursivamente pelos fios de lã vizinhos (subgrafo 1-hop), encontrando papéis conexos que sistemas vetoriais puros perderiam.</p>
+    </div>
+    <div class="card on-dark">
+      <span class="tag" style="background:var(--lgreen); color:#072f73;">Topologia Vence Cosseno</span>
+      <h3>Zero "Vácuo Semântico"</h3>
+      <p>Uma nota vital sobre uma interrupção crítica será recuperada e lida pelo LAO porque compartilha a entidade da arquitetura de deploy com a sua tarefa atual, mesmo se a sua busca omitir a palavra exata "crash".</p>
+    </div>
+  </div>
+<div class="slide-index">16 / 22</div>
+</section>
+
+<!-- ============ SLIDE 15 — DECOMPOSIÇÃO ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>A Função g_φ de Extração</div>
+  <h2>Toda história tem Início, Meio e Fim. A memória também.</h2>
+  <p class="lede">Nós não lembramos o mundo em tabelas frias de banco de dados. Nós narramos episódios. O Tessera permite que agentes e humanos registrem <em>o que aconteceu</em> de forma fluida, e o próprio motor fatia a prosa em "átomos" de conhecimento.</p>
+  <div class="split">
+    <div class="split-col problem" style="justify-content:center;">
+      <h3 style="color:var(--black);">1. Você conta a história (O Episódio)</h3>
+      <div class="codeblock" style="background:#e0e0e0; color:var(--black); font-size:12px; line-height:1.4; padding:12px; margin-bottom:12px;">
+<span style="color:var(--mid-blue); font-weight:bold;">Início:</span> "Deu um bug de timeout no gateway de voz."
+<span style="color:var(--mid-blue); font-weight:bold;">Meio:</span> "Descobrimos que a lib X não recicla conexões TCP. Corrigimos usando um pool persistente."
+<span style="color:var(--mid-blue); font-weight:bold;">Fim:</span> "Validamos em prod, latência caiu 40ms. A partir de agora, toda lib de rede tem que usar pool explícito."
+      </div>
+      <p style="font-size:13px; color:var(--mgray1); line-height:1.4;">Ao invés de classificar cada metadado e criar links manualmente, o dev apenas conta a narrativa do incidente.</p>
+    </div>
+    <div class="split-col solution" style="justify-content:center;">
+      <h3>2. O Tessera fatia e arquiva</h3>
+      <ul>
+        <li><b>Fatiamento Preciso:</b> O sistema engole a narrativa e extrai as notas atômicas separadas (ex: um <em>Fato Factual</em> sobre o erro, e um <em>Insight Procedural</em> duradouro para usar pools).</li>
+        <li><b>Write-Gating Engine:</b> Cada fragmento extraído passa por uma malha de segurança estrita para evitar injeções ou comandos soltos sendo gravados no disco da empresa.</li>
+        <li><b>Dual-Sync:</b> As fatias são escritas localmente no Linux e sincronizadas com a base do Notion no exato mesmo segundo. O agente segue a vida.</li>
+      </ul>
+    </div>
+  </div>
+<div class="slide-index">17 / 22</div>
+</section>
+
+<!-- ============ SLIDE 16 — MCP ============ -->
+<section class="slide bg-black content">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Protocolo Unificado</div>
+  <h2 style="color:#fff;">Model Context Protocol (tessera): Agnóstico de Engine</h2>
+  <p class="lede">A evolução do Tessera é ser universal. Ele é agora um servidor MCP rodando sobre JSON-RPC unificado, expondo 8 ferramentas potentes de forma nativa e agnóstica a qualquer CLI.</p>
+  <div class="codeblock" style="font-size:12px; line-height:1.5;">
+<span class="cm">// Qualquer engine conectado (Claude / Copilot / Gemini) dispara a mesma ferramenta:</span>
+{
+  <span class="kw">"query_memories_pipeline"</span>: {
+    <span class="kw">"task_instruction"</span>: <span class="st">"Me ajuda a gerar um deploy do bot de voz sem derrubar conexão"</span>,
+    <span class="kw">"top_n"</span>: <span class="fn">5</span>,
+    <span class="kw">"use_llm"</span>: <span class="fn">true</span>
+  }
+}
+<span class="cm">// -> O Servidor devolve todo o contexto do bug de TCP sem nenhuma configuração a mais.</span>
+  </div>
+  <div class="grid-cards cols-3" style="margin-top:16px; font-size:13px;">
+    <div class="card on-dark" style="padding:18px;">
+      <h3>Modo Híbrido</h3>
+      <p>Processamento do backend e das buscas ocorre localmente para velocidade offline. O uso de LLM robusto é invocado sob demanda via endpoint Azure.</p>
+    </div>
+    <div class="card on-dark" style="padding:18px;">
+      <h3>Gating Inteligente</h3>
+      <p>Qualquer escrita vinda de qualquer ferramenta MCP é higienizada ativamente, criando a barreira definitiva de contaminação.</p>
+    </div>
+    <div class="card on-dark" style="padding:18px;">
+      <h3>Unidade de Verdade</h3>
+      <p>O insight anotado pelo desenvolvedor Copilot codando a dashboard ontem, já é usado pelo Gemini na cron autônoma do LAO de amanhã.</p>
+    </div>
+  </div>
+<div class="slide-index">18 / 22</div>
+</section>
+
+<!-- ============ SLIDE 17 — HORA DA DEMO ============ -->
+<section class="slide bg-white content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Hora da Demo</div>
+  <h2>Tessera vs. Grep: Na prática, direto do terminal</h2>
+  <p class="lede">A prova de fogo: o que acontece quando você lembra do <em>conceito geral</em> de uma métrica de nuvem, mas esquece completamente a <em>palavra exata</em> do título do arquivo markdown?</p>
+
+  <div class="split" style="margin-top:8px;">
+    <div class="split-col problem">
+      <h3>Onde o Grep Falha (A Limitação Léxica)</h3>
+      <div class="codeblock" style="font-size:12px; line-height:1.4; background:#f0f0f0; color:var(--mgray2); border:1px solid #ccc; padding:12px;">
+$ time (grep -rli "quanto tempo demora chamar a IA pelo gateway da azure comparado a linha de comando" .claude/memory/ || echo "Not Found")
+
+<span style="color:var(--black); font-weight:bold;">Not Found</span>
+<span class="cm">real  0m0.019s</span>
+      </div>
+      <p style="font-size:14px; line-height:1.4; color:var(--mgray1); margin-top:12px;">
+        A informação existe gravada exatamente com o nome <code>tessera-llm-backend-benchmark.md</code>, mas o grep puro te retorna um vazio frustrante e os agentes entram em parafuso tentando ler mais arquivos ao acaso.
+      </p>
+    </div>
+    <div class="split-col solution">
+      <h3>Onde o Tessera Brilha (Conceitual & Temporal)</h3>
+      <div class="codeblock" style="font-size:12px; line-height:1.4; padding:12px;">
+$ time tessera query .claude/memory "quanto tempo demora chamar a IA pelo gateway da azure..." --top-n 1
+
+<span class="fn">✔ Note: lao/tessera-llm-backend-benchmark (factual)</span>
+<span style="color:#c9d1d9;">[O terminal cospe as métricas exatas resgatadas do conhecimento histórico validado]</span>
+
+<span class="cm">real  0m1.850s</span>
+      </div>
+      <p style="font-size:14px; line-height:1.4; color:var(--pale-blue); margin-top:12px;">
+        Ele aceita o trade-off de $1,8s$ de tempo de máquina para encontrar a semente semântica certa, navegar pela topologia daquele nó, e te responder exatamente a intenção.
+      </p>
+    </div>
+  </div>
+<div class="slide-index">19 / 22</div>
+</section>
+
+<!-- ============ SLIDE 18 — ONBOARDING E SETUP ============ -->
+<section class="slide bg-offwhite content">
+  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Plug & Play</div>
+  <h2>Agnóstico, Autoinstalável e Open Source</h2>
+  <p class="lede">Nós não fizemos uma engenharia proprietária apenas para rodar em uma VM da Blip. O Tessera v4 é pacote Python robusto que é independente de escopo de projeto.</p>
+  <div class="grid-cards cols-2" style="margin-top:8px;">
+    <div class="card on-white">
+      <span class="tag" style="background:var(--blip-blue); color:#fff;">tessera doctor</span>
+      <h3>Check-up de Integridade Completo</h3>
+      <p>A primeira coisa após o clone do repo do Tessera é verificar todo o motor. O <code>tessera doctor</code> roda um teste cego na escrita, valida grafos e a conectividade opcional Azure.</p>
+    </div>
+    <div class="card on-white">
+      <span class="tag" style="background:var(--lpurple); color:#fff;">tessera quickstart</span>
+      <h3>Wizard de Instalação Universal</h3>
+      <p>O <code>quickstart</code> descobre qual tipo de framework Node ou Python ou Rust você usa, cria uma pasta virgem, cospe um json do seu Servidor MCP pronto e já deixa seu projeto novo com a mesma capacidade de memória do LAO.</p>
+    </div>
+  </div>
+  <div class="codeblock" style="margin-top:8px; font-size:12px; line-height:1.4;">
+$ tessera doctor .claude/memory
+<span class="fn">✔</span> storage_dir está aberto e é gravável
+<span class="fn">✔</span> índice do grafo foi construído com sucesso (279 nós, 460 arestas)
+<span class="fn">✔</span> round-trip de escrita, indexação e leitura de teste OK
+<span class="fn">✔</span> mcp extra: python mcp server registrado e saudável na porta local
+  </div>
+<div class="slide-index">20 / 22</div>
+</section>
+
+<!-- ============ SLIDE 19 — AUTO-MELHORIA CONTÍNUA ============ -->
+<section class="slide bg-darkblue">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <div class="kicker"><span class="dot"></span>Lições de Produção</div>
+  <div class="quote-row" style="margin-top:16px;">
+    <img class="qmascot" src="assets/mascots/LAO-3D-research-book-transparent.png" alt="LAO pesquisando">
+    <div>
+      <div class="qtext">"A real capacidade de autonomia de um agente reside na habilidade de <b>notar seus próprios gaps operacionais</b> e refatorar a infraestrutura e arquitetura que os causou."</div>
+      <p style="margin-top:24px; font-size:15px; color:var(--pale-blue); font-weight:400;">O Tessera não nasceu pronto. Ele é o somatório de resiliência a cada travamento e hallucination de um dia perdido. Extraímos as lições, validamos pela literatura científica rigorosa e codamos a resolução nativamente para ele se tornar o que é hoje.</p>
+    </div>
+  </div>
+<div class="slide-index">21 / 22</div>
+</section>
+
+<!-- ============ SLIDE 20 — CLOSING ============ -->
+<section class="slide s-closing">
+  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="cmascot" src="assets/mascots/LAO-3D-happy-birthday-transparent.png" alt="LAO celebrando">
+  <h1>Obrigado!</h1>
+  <p class="lede">Garantindo a evolução perpétua e coerente do conhecimento das IAs autônomas corporativas e de engenharia.<br>O seu agente é o que ele lembra. Conecte sua IA agora mesmo.</p>
+  <span class="bubble tail-blipblue" style="font-size:16px; font-weight:700;">Tessera/README.md · tessera quickstart</span>
+  <div class="footer-block" style="left:88px; bottom:32px; color:var(--pale-blue);">
+    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> LAO — Lab Autonomous Officer
+  </div>
+<div class="slide-index">22 / 22</div>
+</section>
+
+</div>
+
+<script>
+const deck = document.getElementById('deck');
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+function goTo(i){
+  if(i<0||i>=slides.length) return;
+  current = i;
+  slides[i].scrollIntoView({behavior:'smooth'});
+}
+window.addEventListener('keydown', (e)=>{
+  if(['ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); goTo(current+1); }
+  if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); goTo(current-1); }
+});
+deck.addEventListener('scroll', ()=>{
+  let closest = 0, min = Infinity;
+  slides.forEach((s,i)=>{
+    const d = Math.abs(s.getBoundingClientRect().top);
+    if(d<min){min=d; closest=i;}
+  });
+  current = closest;
+});
+</script>
+</body>
+</html>
