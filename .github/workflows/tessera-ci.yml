@@ -89,26 +89,34 @@ jobs:
 
           tessera index "$corpus"
 
-          # Human/scriptable plain output still gets a smoke pass.
+          # Smoke the real human/scriptable CLI. These assertions deliberately
+          # match the current plain-output contract rather than Rich-only labels.
           tessera query "$corpus" "qual o propósito do LAO?" --top-n 2 --plain | tee artifacts/cli-smoke.txt
           tessera query "$corpus" "como o LAO aprende?" --top-n 2 --debug --plain | tee -a artifacts/cli-smoke.txt
           grep -q "lao/charter" artifacts/cli-smoke.txt
           grep -q "lao/learning-process" artifacts/cli-smoke.txt
-          grep -q "Relevant evidence" artifacts/cli-smoke.txt
           grep -q "raw_pr=" artifacts/cli-smoke.txt
 
-          # Agents/CI validate the structured contract instead of scraping human text.
-          tessera query "$corpus" "como o LAO aprende?" --top-n 2 --json > artifacts/query.json
-          python - <<'PY'
+          # Validate the structured engine contract directly. CI must not infer
+          # API semantics by scraping human-oriented text.
+          TESSERA_SMOKE_CORPUS="$corpus" python - <<'PY'
           import json
+          import os
           from pathlib import Path
 
-          results = json.loads(Path("artifacts/query.json").read_text(encoding="utf-8"))
+          from tessera import TesseraEngine
+
+          corpus = os.environ["TESSERA_SMOKE_CORPUS"]
+          engine = TesseraEngine(storage_dir=corpus)
+          engine.build_index()
+          results = engine.retrieve_context("como o LAO aprende?", top_n=2)
+
           assert isinstance(results, list) and results
           top = results[0]
           assert top["id"] == "lao/learning-process"
           assert isinstance(top["score"], (int, float))
           assert top["relevant_evidence"]
+          assert top["evidence_info"]["strategy"] == "paragraph_lexical"
           assert top["body"]
           assert "filepath" in top
           assert "related_ids" in top
@@ -116,10 +124,25 @@ jobs:
           explain = top["score_explain"]
           assert explain["raw_pagerank"] > 0
           assert explain["normalized_relations"] >= 0
-          assert explain["recency_weight"] == 0.0
-          assert explain["recency_applied_multiplier"] == 1.0
-          assert explain["recency_boost"] == 1.0
-          assert explain["recency_raw_score"] >= 1.0
+          assert explain["relations_contribution"] >= 0
+
+          # Recency is disabled in the default scoring weights. Prove the
+          # behavior directly even though the legacy debug field currently
+          # exposes the raw recency signal under the historical name.
+          default_score = top["score"]
+          zero_recency = engine.retrieve_context(
+              "como o LAO aprende?", top_n=2, weights={"recency": 0.0}
+          )[0]["score"]
+          enabled_recency = engine.retrieve_context(
+              "como o LAO aprende?", top_n=2, weights={"recency": 1.0}
+          )[0]["score"]
+          assert abs(default_score - zero_recency) < 1e-12
+          assert enabled_recency >= zero_recency
+
+          Path("artifacts/structured-smoke.json").write_text(
+              json.dumps(results, indent=2, ensure_ascii=False, default=str),
+              encoding="utf-8",
+          )
           PY
 
       - name: Upload CLI smoke output
@@ -129,7 +152,7 @@ jobs:
           name: tessera-cli-smoke
           path: |
             artifacts/cli-smoke.txt
-            artifacts/query.json
+            artifacts/structured-smoke.json
           if-no-files-found: warn
 
   sanity-eval:
