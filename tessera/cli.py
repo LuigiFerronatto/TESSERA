@@ -3,14 +3,13 @@ Command-line interface for Tessera.
 
 Usage:
     tessera init <storage_dir>
-    tessera write <storage_dir> --id ID --type factual|preference|procedural_anchor \
+    tessera write <storage_dir> --id ID --type factual|preference|procedural_anchor \\
         --episode EP_ID --content "..." --tags tag1,tag2 --entity "Name:description"
     tessera index <storage_dir>
     tessera query <storage_dir> "question text" [--top-n 3] [--no-resolve-conflicts]
 """
 
 import argparse
-import json
 import os
 import sys
 from typing import Dict
@@ -122,18 +121,14 @@ def cmd_index(args):
 
 
 def cmd_query(args):
-    if not getattr(args, "json", False):
-        print(f"[tessera] storage_dir: {args.storage_dir}  |  query: {args.query!r}", file=sys.stderr)
+    print(f"[tessera] storage_dir: {args.storage_dir}  |  query: {args.query!r}", file=sys.stderr)
     engine = TesseraEngine(storage_dir=args.storage_dir)
     engine.build_index()
     if engine.graph.number_of_nodes() == 0:
-        if getattr(args, "json", False):
-            print("[]")
-        else:
-            print(
-                f"Nenhuma nota de memória indexada em '{args.storage_dir}'. "
-                "Verifique o caminho (ou exporte LAO_MEM_DIR)."
-            )
+        print(
+            f"Nenhuma nota de memória indexada em '{args.storage_dir}'. "
+            "Verifique o caminho (ou exporte LAO_MEM_DIR)."
+        )
         return
     results = engine.retrieve_context(
         query_text=args.query,
@@ -141,17 +136,7 @@ def cmd_query(args):
         resolve_conflicts=not args.no_resolve_conflicts,
     )
     if not results:
-        if getattr(args, "json", False):
-            print("[]")
-        else:
-            print("Nenhuma memória relevante encontrada para essa consulta.")
-        return
-
-    # Stable machine-readable contract for agents, CI and shell integrations.
-    # This serializes the exact engine result object; Rich/plain are only
-    # presentation layers over the same retrieval contract.
-    if getattr(args, "json", False):
-        print(json.dumps(results, indent=2, ensure_ascii=False, default=str))
+        print("Nenhuma memória relevante encontrada para essa consulta.")
         return
 
     if args.paths_only:
@@ -172,23 +157,9 @@ def cmd_query(args):
 
     for i, r in enumerate(results, 1):
         print(f"\n[{i}] {r['id']} ({r['type']}) — score={r['score']:.4f}  [{r.get('filename', '')}]")
-        if r.get("relevant_evidence"):
-            print(f"    Relevant evidence: {r['relevant_evidence']}")
         if getattr(args, "debug", False) and r.get("score_explain"):
             exp = r["score_explain"]
-            print(
-                f"    debug: final={r['score']:.3f} | "
-                f"tfidf={exp.get('lexical_tfidf', 0.0):.2f} | "
-                f"overlap={exp.get('lexical_overlap', 0.0):.2f} | "
-                f"title={exp.get('title', 0.0):.2f} | "
-                f"metadata={exp.get('metadata', 0.0):.2f} | "
-                f"raw_pr={exp.get('raw_pagerank', 0.0):.4f} | "
-                f"relations={exp.get('normalized_relations', 0.0):.2f} | "
-                f"type_boost={exp.get('type_boost', 1.0):.2f} | "
-                f"recency_raw={exp.get('recency_raw_score', exp.get('recency_boost', 1.0)):.3f} | "
-                f"recency_weight={exp.get('recency_weight', 0.0):.2f} | "
-                f"recency_applied={exp.get('recency_applied_multiplier', exp.get('recency_boost', 1.0)):.3f}"
-            )
+            print(f"    debug: final={r['score']:.3f} | tfidf={exp.get('lexical_tfidf', 0.0):.2f} | overlap={exp.get('lexical_overlap', 0.0):.2f} | title={exp.get('title', 0.0):.2f} | metadata={exp.get('metadata', 0.0):.2f} | raw_pr={exp.get('raw_pagerank', 0.0):.4f} | relations={exp.get('normalized_relations', 0.0):.2f} | type_boost={exp.get('type_boost', 1.0):.1f} | recency_boost={exp.get('recency_boost', 1.0):.1f}")
         if r.get("related_ids"):
             print(f"    relacionadas: {', '.join(r['related_ids'])}")
         if not args.no_body:
@@ -501,8 +472,6 @@ def build_parser():
                            help="Print id/score/filename/related but skip the note body text")
     p_query.add_argument("--debug", action="store_true",
                            help="Show explainable score breakdown for retrieved memories")
-    p_query.add_argument("--json", action="store_true",
-                           help="Emit the exact retrieval result contract as JSON for agents/CI (supersedes presentation flags)")
     p_query.set_defaults(func=cmd_query)
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])
