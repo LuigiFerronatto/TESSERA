@@ -115,7 +115,7 @@ def test_retrieve_from_store_rejects_unknown_store(engine):
 # ----------------------------------------------------------------------
 # Pillar 3: The automatic task hook (detective trio)
 # ----------------------------------------------------------------------
-def test_hook_on_task_start_returns_consolidated_context(engine):
+def test_hook_on_task_start_returns_consolidated_context(engine, fake_llm):
     engine.write_insight(
         mem_id="insight_service", episode_id="ep1",
         content="Sempre checar se a porta 5432 está livre antes de subir o banco em background.",
@@ -123,7 +123,7 @@ def test_hook_on_task_start_returns_consolidated_context(engine):
     )
     engine.build_index()
 
-    hook = TesseraTaskHook(engine)
+    hook = TesseraTaskHook(engine, llm_fn=fake_llm)
     result = hook.on_task_start("Como faço deploy seguro de um banco de dados em background?")
 
     assert isinstance(result, TaskInterceptionResult)
@@ -132,9 +132,9 @@ def test_hook_on_task_start_returns_consolidated_context(engine):
     assert result.raw_memories
 
 
-def test_hook_on_task_end_writes_to_requested_store(engine):
+def test_hook_on_task_end_writes_to_requested_store(engine, fake_llm):
     engine.build_index()
-    hook = TesseraTaskHook(engine)
+    hook = TesseraTaskHook(engine, llm_fn=fake_llm)
 
     path = hook.on_task_end(
         task_instruction="tarefa de teste",
@@ -148,19 +148,19 @@ def test_hook_on_task_end_writes_to_requested_store(engine):
     assert written_nodes
 
 
-def test_hook_on_task_end_rejects_unknown_store(engine):
+def test_hook_on_task_end_rejects_unknown_store(engine, fake_llm):
     engine.build_index()
-    hook = TesseraTaskHook(engine)
+    hook = TesseraTaskHook(engine, llm_fn=fake_llm)
     with pytest.raises(ValueError):
         hook.on_task_end(task_instruction="x", store="not_a_real_store", summary="y")
 
 
-def test_hook_subscriber_is_called(engine):
+def test_hook_subscriber_is_called(engine, fake_llm):
     engine.write_fact(mem_id="fact_1", episode_id="ep1", content="Um fato qualquer.")
     engine.build_index()
 
     seen = []
-    hook = TesseraTaskHook(engine, subscribers=[lambda result: seen.append(result)])
+    hook = TesseraTaskHook(engine, llm_fn=fake_llm, subscribers=[lambda result: seen.append(result)])
     hook.on_task_start("pergunta qualquer")
 
     assert len(seen) == 1
