@@ -8,7 +8,7 @@ subgraph retrieval, and temporal conflict resolution.
 
 import datetime
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import networkx as nx
 import numpy as np
@@ -240,14 +240,20 @@ class TesseraEngine:
         description: str = "",
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
-        persist_format: str = "md",
+        persist_format: Literal["md"] = "md",
     ) -> str:
         """
         Secure, incremental write flow:
-        1. Runs security audit + sanitization (write-side gating).
-        2. Formats the note as an atomic card (Markdown + YAML frontmatter).
-        3. Persists it physically to disk.
-        4. Returns the generated file path.
+        1. Validates the Markdown-only persistence contract before side effects.
+        2. Runs security audit + sanitization (write-side gating).
+        3. Formats the note as an atomic card (Markdown + YAML frontmatter).
+        4. Persists it physically to disk.
+        5. Returns the generated file path.
+
+        ``persist_format`` accepts exactly ``"md"``. Any other value raises
+        ``ValueError`` before warnings, sanitization, timestamps, frontmatter,
+        filesystem writes, registry/graph updates, index rebuilds, or Evidence
+        Ledger updates. Arbitrary JSON persistence/ingestion is not supported.
 
         `mem_id` SHOULD carry a domain prefix ("<domain>/<slug>", e.g.
         "research/browser-actions/thesis" or "lao/some-learning") so the
@@ -268,6 +274,12 @@ class TesseraEngine:
         auditing against the QUMem paper" notes in Tessera/docs/ for the full
         list this belongs to.
         """
+        if persist_format != "md":
+            raise ValueError(
+                f"Unsupported persist_format {persist_format!r}; supported format is "
+                "'md'. No memory was persisted."
+            )
+
         if "/" not in mem_id.strip("/"):
             import warnings
 
@@ -326,23 +338,13 @@ class TesseraEngine:
         # for the convention every caller (CLI, MCP tool, hooks) must follow.
         os.makedirs(os.path.dirname(filepath_base) or self.storage_dir, exist_ok=True)
 
-        if persist_format == "json":
-            import json
-            filepath = f"{filepath_base}.json"
-            payload = {
-                "frontmatter": frontmatter_dict,
-                "body": sanitized_content.strip()
-            }
-            with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(payload, f, indent=2, ensure_ascii=False)
-        else:
-            yaml_frontmatter = yaml.dump(
-                frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
-            )
-            markdown_body = f"---\n{yaml_frontmatter}---\n\n{sanitized_content.strip()}\n"
-            filepath = f"{filepath_base}.md"
-            with open(filepath, "w", encoding="utf-8") as f:
-                f.write(markdown_body)
+        yaml_frontmatter = yaml.dump(
+            frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
+        )
+        markdown_body = f"---\n{yaml_frontmatter}---\n\n{sanitized_content.strip()}\n"
+        filepath = f"{filepath_base}.md"
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(markdown_body)
 
         self.file_registry[mem_id] = filepath
         return filepath

@@ -349,10 +349,12 @@ de flag — sempre vem preenchido).
 Igual, mas filtra por typed store: `store="factual"` \| `"preference"` \|
 `"procedural_anchor"`.
 
-### `write_memory(mem_id, mem_type, episode_id, content, tags=None, entity_names=None, connect_to=None, relation_type="related_to")`
+### `write_memory(mem_id, mem_type, episode_id, content, tags=None, entity_names=None, connect_to=None, relation_type="related_to", persist_format="md")`
 Equivalente ao `tessera write`. `connect_to` aceita uma **lista** de ids
 (múltiplas conexões explícitas em uma única chamada, igual ao `--related-to`
-repetível da CLI).
+repetível da CLI). `persist_format` aceita somente `"md"`: Markdown é o formato
+canônico gravável e indexável. Outros valores falham antes da gravação e do
+rebuild; ingestão arbitrária de JSON não é suportada.
 
 ### `get_memory(memory_id)`
 Devolve o corpo bruto de uma nota específica pelo id.
@@ -474,6 +476,10 @@ engine.write_memory_note(
 )
 engine.build_index()  # reindexar após escrever
 ```
+
+`write_memory_note(..., persist_format="md")` é o único formato público de
+persistência. O default já é `"md"`; qualquer outro valor é rejeitado antes de
+efeitos colaterais, e ingestão arbitrária de JSON não é suportada.
 
 ### Decomposição automática de episódio (`decompose_and_write_episode`)
 
