@@ -1,11 +1,11 @@
 ## Executive takeaway
-<!-- What changed and why should a maintainer care? 2–4 lines. -->
+<!-- In 2–4 lines: what changed, why does it matter, and what is the decision impact? -->
 
 ## Em linguagem simples
-<!-- Explain the task conversationally before the technical detail. -->
+<!-- Explain the task conversationally before implementation detail. -->
 
-## Objetivo
-<!-- What specific problem does this PR try to solve? -->
+## Objective
+<!-- One concrete problem this PR is trying to solve. -->
 
 ## Issue / Test Card
 Closes #
@@ -16,12 +16,43 @@ Closes #
 
 **Success gate:**
 
-**Decision so far:** `PENDING | KEEP | ITERATE | REVERT | DROP | DEFER`
+**Decision:** `PENDING | KEEP | ITERATE | REVERT | DROP | DEFER`
 
-## O que mudou tecnicamente
+## Change classification
+
+**Category:** `Added | Changed | Fixed | Experimental | Deprecated | Removed | N/A`
+
+**Contract surfaces affected:**
+- [ ] Python Engine/API
+- [ ] CLI
+- [ ] MCP
+- [ ] Persistence / index / schema
+- [ ] Documentation
+- [ ] Benchmark / evaluation
+- [ ] None
+
+**Documentation impact:** `YES | NO`
+<!-- Link docs changed or explain why none are needed. -->
+
+## Technical implementation
+<!-- What changed in code/data/docs? Keep this implementation-oriented. -->
 - 
 
-## Exemplo antes / depois
+# Evaluation Card
+
+## Tests
+```bash
+# Exact reproducible commands, or explain which existing CI jobs cover this PR.
+```
+
+## Evaluation
+<!-- What behavior did you evaluate beyond “tests passed”? Include benchmark/sanity evidence when relevant. -->
+
+| Metric | Baseline | This PR | Delta |
+| --- | ---: | ---: | ---: |
+|  |  |  |  |
+
+## Before vs After
 ### Before
 ```text
 
@@ -32,44 +63,56 @@ Closes #
 
 ```
 
-## Como testar
-```bash
-# exact reproducible commands
+## Output examples
+<!-- Real CLI/API/MCP/output snippets when behavior changes. For docs-only work, show the resulting public contract/structure. -->
+```text
+
 ```
 
-## Evidências
-<!-- CI, benchmark artifacts, query examples and relevant measurements. -->
+## Known regressions
+<!-- Be explicit. “None observed” is acceptable only after checking the relevant gates. -->
+- 
 
-| Metric | Baseline | This PR | Delta |
-| --- | ---: | ---: | ---: |
-|  |  |  |  |
+## Changelog
+- [ ] `CHANGELOG.md` updated
+- [ ] N/A — rationale below
+
+**Changelog category:** `Added | Changed | Fixed | Experimental | Deprecated | Removed | N/A`
+
+**Rationale / entry:**
+<!-- Required even for N/A. Follow docs/CHANGE_POLICY.md. -->
 
 ## Learnings
-### O que funcionou
+### What worked
 - 
 
-### O que falhou / surpreendeu
+### What failed / surprised us
 - 
 
-### Limitações conhecidas
+### Known limitations
 - 
 
-## Arquitetura / invariants checklist
-- [ ] Source files remain the source of truth; index/artifacts are derived and rebuildable.
-- [ ] TESSERA returns structured evidence, not the final answer for the agent.
+## Public-surface / architecture invariants
+- [ ] Public docs, examples, fixtures, benchmark data and runtime-facing configuration remain project-agnostic.
+- [ ] Source files remain the source of truth; indexes/artifacts are derived and rebuildable.
+- [ ] TESSERA returns structured evidence rather than silently replacing consuming-agent cognition.
 - [ ] Exactly 3 semantic drawers remain: `facts`, `preferences`, `insights`.
-- [ ] New concepts are facets/metadata unless there is explicit evidence for a drawer change.
+- [ ] New concepts remain facets/metadata unless a separate Test Card explicitly changes that contract.
 - [ ] No mandatory generative LLM was introduced in the basic path.
-- [ ] Retrieval relevance was not conflated with confidence, authority or utility.
+- [ ] Retrieval relevance was not conflated with confidence, authority, temporal validity, relation confidence or utility.
 - [ ] No silent mutation of user source files.
+- [ ] Current capabilities and target/experimental architecture are not presented as the same thing.
 
 ## Follow-ups
-<!-- New work becomes a new Issue/Test Card; do not hide unrelated TODOs in this PR. -->
+<!-- Unrelated/new work becomes a new Issue/Test Card. -->
 - [ ] None
 
 ## Merge gate
 - [ ] Issue/Test Card linked
+- [ ] PR category + contract surfaces declared
+- [ ] Changelog updated or explicitly N/A with rationale
 - [ ] Tests green
-- [ ] Relevant sanity/benchmark gate green or explicitly waived with rationale
-- [ ] Evidence & Learnings updated in the Issue
+- [ ] Relevant contract/smoke/sanity/benchmark gate green or explicitly waived with rationale
+- [ ] Evidence & Learnings updated in the Issue/Test Card
+- [ ] Known regressions recorded
 - [ ] Final decision recorded
