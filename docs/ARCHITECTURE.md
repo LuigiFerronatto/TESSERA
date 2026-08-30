@@ -1,121 +1,397 @@
-# Arquitetura do Tessera
+# TESSERA — Architecture
 
-> Este documento consolida o racional científico e o design técnico do Tessera.
-> Para o "como usar" (instalação, CLI, exemplos), veja o [README](../README.md).
-> Para a explicação linha a linha das classes/métodos, veja [CODE_EXPLANATION.md](CODE_EXPLANATION.md).
-> Para o conceito de âncoras procedimentais em detalhe, veja [PROCEDURAL_ANCHORS.md](PROCEDURAL_ANCHORS.md).
+> Current architecture reference for the Foundation on `main`.
+>
+> See also: [OVERVIEW.md](OVERVIEW.md), [FEATURES.md](FEATURES.md), [CONCEPTS.md](CONCEPTS.md), [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md), [ROADMAP.md](ROADMAP.md), and [research/](research/).
 
-## Por que não RAG plano
+## Executive takeaway
 
-Buscas vetoriais planas (RAG tradicional) sofrem três problemas em agentes de
-longa duração como o LAO:
+TESSERA is a **text-first, agent-agnostic memory and evidence layer**. It is not a final-answer engine and it is not merely GraphRAG.
 
-1. **Saturação de contexto** — histórico bruto de diálogo cresce sem limite.
-2. **Desalinhamento temporal** — preferências antigas competem com as atuais
-   sem nenhum critério de recência.
-3. **Propagação de ruído** — blocos de texto isolados, sem estrutura de
-   relacionamento, poluem a recuperação com resultados semanticamente
-   próximos mas irrelevantes.
+The current Foundation provides canonical understanding of heterogeneous text, stable knowledge/source identity, explicit graph structure, explainable multi-signal retrieval, query-aware evidence, source-version-aware provenance, a basic heuristic write-side sanitization gate, and CI/Test Card governance.
 
-O Tessera responde a isso com uma abordagem híbrida: cada memória é um **cartão
-atômico** (Markdown + YAML frontmatter) e a recuperação usa um **grafo de
-conhecimento heterogêneo** com PageRank ponderado dinamicamente, não apenas
-similaridade de cosseno.
+Advanced memory admission, query-aware graph expansion, relation confidence, temporal state, authority, Evidence Arbitration and abstention remain experiments.
 
-## Os quatro pilares científicos
+## Product contract
 
-| # | Pilar | Problema de origem | Solução no Tessera |
-|---|-------|---------------------|------------------|
-| 1 | **Decomposição de Memória Tipada** (QUMem) | Logs brutos saturam o contexto | Notas classificadas em `factual`, `preference`, `procedural_anchor` |
-| 2 | **Âncoras Procedimentais** (Skills as Anchors) | Agentes falham em setup/sintaxe básicos | Nós `procedural_anchor` com checklists e known pitfalls |
-| 3 | **Recuperação Adaptativa por Subgrafo (DW-PR)** (MemORAI) | RAG plano traz ruído irrelevante | Seed nodes → expansão 1-hop → PageRank ponderado dinamicamente |
-| 4 | **Gating de Escrita** (anti State Contamination) | "Memory laundering" contamina o agente | Sanitização e auditoria antes de qualquer escrita em disco |
-
-## Fluxo de dados
-
-```
-[ Ingestão / Escrita ]
-Conteúdo bruto ──► WriteGatingEngine (audit_and_sanitize)
-                 ──► MemoryFrontmatter (YAML)
-                 ──► Gravação física em memories/{id}.md
-
-[ Recuperação ]
-Query ──► TF-IDF cosine similarity (seed nodes, top 30)
-       ──► Expansão de subgrafo 1-hop (successors + predecessors)
-       ──► Pesos dinâmicos de aresta (DW-PR, boost 1.35x em relações procedurais)
-       ──► PageRank personalizado nos seed nodes
-       ──► Filtro: apenas nós factual/preference/procedural_anchor
-       ──► ConflictResolver (mantém só a nota mais recente por assunto)
-       ──► top_n memórias retornadas
+```text
+AGENT
+  │ natural-language information need
+  ▼
+TESSERA
+  │ hides storage/index/graph/provenance mechanics
+  ▼
+STRUCTURED EVIDENCE
+  │ evidence + source + relations + score/provenance
+  ▼
+AGENT
+  └─ reasons / acts / answers
 ```
 
-## Mapeamento código → conceito
+## Architectural invariants
 
-| Classe / módulo | Responsabilidade |
+- Source text remains the source of truth.
+- Indexes, manifests, graph snapshots and evidence ledgers are derived/rebuildable.
+- Exactly three semantic drawers exist: `facts`, `preferences`, `insights`.
+- Non-memory documents may be indexed with `drawer: null`.
+- `document_type`, scope, authority, confidence, temporal state, relations, quality and utility are facets, not new drawers.
+- Retrieval relevance ≠ confidence ≠ authority ≠ relation confidence ≠ temporal validity ≠ utility.
+- File path = location, not identity.
+- Hash = version/fingerprint, not identity.
+- No generative LLM is mandatory for the basic Foundation path.
+- User source files are not silently rewritten during indexing.
+
+## Current read / retrieval pipeline
+
+```text
+TEXT FILES
+   ↓
+DISCOVER
+   ↓
+PARSE + CANONICAL NORMALIZATION
+   ├─ complete / partial / absent frontmatter
+   ├─ document classification
+   ├─ semantic drawer when applicable
+   ├─ metadata_origin
+   ├─ scope
+   └─ explicit/local relations
+   ↓
+STABLE IDENTITY
+   ├─ identity.id
+   ├─ source.document_id
+   ├─ source.path
+   ├─ document_hash
+   └─ content_hash
+   ↓
+GRAPH / INDEX
+   ├─ memory/document nodes
+   ├─ tag/entity structure
+   ├─ explicit relations
+   └─ lexical corpus / TF-IDF
+   ↓
+RETRIEVAL
+   ├─ lexical TF-IDF
+   ├─ token overlap
+   ├─ title / ID relevance
+   ├─ metadata relevance
+   ├─ graph/PageRank structural signal
+   └─ deterministic intent/type boost
+   ↓
+QUERY-AWARE EVIDENCE
+   ├─ relevant paragraph when supported
+   └─ None instead of arbitrary evidence when unsupported
+   ↓
+EVIDENCE LEDGER / PROVENANCE
+   ├─ evidence_id
+   ├─ source document identity
+   ├─ source version hashes
+   ├─ exact span when uniquely provable
+   └─ freshness state
+   ↓
+STRUCTURED RETRIEVAL RESULT
+```
+
+## Current write path
+
+The existing `write_memory_note()` path already contains a **basic heuristic security gate**:
+
+```text
+candidate memory content
+   ↓
+WriteGatingEngine.audit_and_sanitize()
+   ├─ known hostile-instruction patterns
+   ├─ suspicious-tag signal
+   └─ deterministic redaction for matched patterns
+   ↓
+MemoryFrontmatter
+   ↓
+Markdown source file
+```
+
+This is different from roadmap #19.
+
+```text
+basic heuristic sanitization          IMPLEMENTED
+full evidence-aware memory admission  PLANNED (#19)
+```
+
+# 1. Canonical Metadata Layer
+
+**Tracking:** Issue #9 / PR #3
+
+TESSERA normalizes heterogeneous project text into one canonical representation before indexing.
+
+```yaml
+identity:
+  id: lao/charter
+classification:
+  document_type: memory
+  kind: factual
+  drawer: facts
+source:
+  document_id: doc_...
+  path: lao/charter.md
+metadata_origin:
+  drawer: inferred
+```
+
+Harness instructions remain orthogonal to semantic drawers:
+
+```yaml
+classification:
+  document_type: harness_instructions
+  kind: instruction
+  drawer: null
+```
+
+This allows `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` to participate without being forced into facts/preferences/insights.
+
+# 2. Stable identity model
+
+```text
+identity.id
+→ persistent knowledge/memory identity
+
+source.document_id
+→ persistent source-document identity
+
+source.path
+→ current source location
+
+document_hash / content_hash
+→ current source/content version
+```
+
+Expected lifecycle:
+
+```text
+MOVE / RENAME
+identity.id        SAME
+source.document_id SAME
+source.path        CHANGED
+content_hash       SAME
+```
+
+```text
+CONTENT EDIT
+identity.id        SAME
+source.document_id SAME
+source.path        SAME
+content_hash       CHANGED
+```
+
+# 3. Graph representation
+
+TESSERA preserves explicit/local relations and graph structure, but the graph is **not the final relevance engine**.
+
+```text
+explicit relations
+   ↓
+graph
+   ↓
+PageRank / structural signal
+   ↓
+one component of retrieval ranking
+```
+
+Future relation intelligence must keep these separate:
+
+```text
+relation_type
+≠ relation_origin
+≠ relation_confidence
+≠ query_relevance
+```
+
+Planned Test Cards: #14, #25, #26.
+
+# 4. Explainable retrieval
+
+**Tracking:** Issue #8 / PR #2
+
+Current ranking combines inspectable signals:
+
+```text
+ranking
+  ← lexical TF-IDF
+  ← direct overlap
+  ← title / ID
+  ← metadata
+  ← normalized relation/PageRank signal
+  ← deterministic type/intent behavior
+```
+
+Recency is disabled by default because recent information is not necessarily current truth.
+
+Known baseline limitation:
+
+```text
+pq o LAO existe?
+→ intended charter memory can still appear at #2
+```
+
+That remains benchmark evidence rather than a reason for per-query tuning.
+
+# 5. Query-aware Relevant Evidence
+
+TESSERA foregrounds a query-specific paragraph when lexical support exists while preserving the full memory body.
+
+```text
+retrieved memory
+├─ relevant_evidence
+└─ full body
+```
+
+If evidence cannot be supported, `relevant_evidence` remains `None`.
+
+The future four-state #20 contract is not implemented yet:
+
+```text
+sufficient
+insufficient
+conflicting
+ambiguous
+```
+
+# 6. Evidence Ledger
+
+**Tracking:** Issue #11 / PR #6
+
+The Evidence Ledger is an immutable/rebuildable provenance substrate derived from source files and Canonical Metadata.
+
+```yaml
+evidence_id: ev_...
+memory_id: lao/charter
+source:
+  document_id: doc_...
+  path: lao/charter.md
+  document_hash: sha256:...
+  content_hash: sha256:...
+span:
+  start_line: 31
+  end_line: 37
+extraction:
+  method: paragraph_lexical
+```
+
+It answers: **where did this evidence come from, and which source version supports it?**
+
+It does not decide authority, truth, arbitration winner, query relevance or temporal validity. If evidence text occurs multiple times and the exact occurrence cannot be proven, the span is null rather than guessed.
+
+# 7. Derived state and indexing
+
+```text
+SOURCE FILES
+   ├─ canonical metadata
+   ├─ identity manifest
+   ├─ graph/index cache
+   └─ evidence ledger
+```
+
+Derived state must be reconstructible from source files. Current indexing still uses coarse cache/rebuild semantics; **incremental/idempotent indexing remains #12**.
+
+# 8. CI and experimental governance
+
+**Tracking:** Issue #10 / PR #4 and Issue #22 / PR #24
+
+```text
+Issue / Test Card
+→ implementation PR
+→ unit / contract tests
+→ CLI smoke
+→ sanity evaluation
+→ evidence + learnings
+→ KEEP | ITERATE | REVERT | DROP | DEFER
+```
+
+Current sanity regression baseline:
+
+```text
+Hit@1          75%
+Hit@3         100%
+Hit@5         100%
+MRR           0.875
+Evidence hit  100%
+```
+
+These are regression metrics, not competitive benchmark claims.
+
+## Current module map
+
+| Module | Current role |
 |---|---|
-| `tessera.models.Entity`, `Connection`, `MemoryFrontmatter` | Modelo de domínio dos cartões atômicos |
-| `tessera.security.WriteGatingEngine` | Auditoria e sanitização antes da escrita física |
-| `tessera.conflict.ConflictResolver` | Resolução cronológica de preferências/fatos conflitantes |
-| `tessera.engine.TesseraEngine` | Orquestra escrita, indexação do grafo e recuperação (DW-PR) |
-| `tessera.cli` | Interface de linha de comando (`tessera init/write/index/query`) |
+| `tessera/canonical.py` | Canonical parsing, classification and stable metadata semantics |
+| `tessera/engine_core.py` | Write path, indexing, graph construction and core retrieval |
+| `tessera/engine.py` | Evidence-aware facade integrating retrieval with provenance |
+| `tessera/evidence.py` | Evidence records, ledger, freshness and span/provenance helpers |
+| `tessera/security.py` | Basic deterministic write-side hostile-pattern audit/sanitization |
+| `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
+| `tessera/models.py` | Domain models for memory/write paths |
+| `tessera/cli.py` | Human CLI surface |
+| `benchmarks/sanity/` | Deterministic regression evaluation |
 
-## Estrutura física de memórias em disco
+## Implemented vs planned
 
-```
-minha-app/
-└── memories/
-    ├── mem_fact_0312a.md      # Notas Factuais
-    ├── mem_pref_0892f.md      # Notas de Preferências
-    ├── sk_docker_setup_01.md  # Âncoras Procedimentais (Skills)
-```
+Implemented Foundation:
 
-O índice do grafo é reconstruído em memória a cada `build_index()` — não há
-banco de dados externo. **Se você apagar o índice, os `.md` continuam
-100% legíveis e editáveis manualmente.** Essa é uma decisão deliberada de
-design (desacoplamento leitura/escrita).
-
-## Exemplo de nota física (`.md` com frontmatter)
-
-```markdown
----
-id: sk_docker_setup_01
-node_type: procedural_anchor
-tags: [docker, devops]
-entities:
-  - name: Docker
-    description: Motor de containers.
-active_connections:
-  - target_memory_id: ent_docker_daemon
-    relation_type: stabilizes_service
-security:
-  gating_status: passed
-  toxicity_score: 0.012
-  sanitized: true
----
-
-# Fluxo de Configuração de Containers Docker
-
-1. Verificar se o daemon está ativo (`docker info`).
-2. Validar presença do `docker-compose.yml`.
-3. Subir serviços com `docker-compose up -d --build`.
-4. Testar saúde do serviço (`curl localhost:8080/health`).
-
-## Known Pitfalls
-* Rodar build antes do daemon estar ativo.
-* Conflito de hostnames locais com as pontes de rede do container.
+```text
+canonical text normalization
+stable memory identity
+stable source-document identity
+explicit relation parsing
+graph representation
+explainable multi-signal ranking
+query-aware relevant evidence
+Evidence Ledger / provenance
+basic heuristic write-side sanitization
+CI + sanity evaluation
+Test Card governance
 ```
 
-## Diferenciais de produção
+Planned / experimental:
 
-- **Desacoplamento leitura/escrita** — o grafo é só um índice; os arquivos
-  `.md` são a fonte de verdade e sobrevivem à perda do índice.
-- **Alinhamento temporal (FinPerMA)** — trajetórias ordenadas de preferência
-  evitam que o agente regrida a escolhas obsoletas.
-- **Estabilidade de execução de tools** — âncoras procedimentais reduzem
-  drasticamente erros de setup/sintaxe comparado a injetar logs de erro brutos.
+```text
+#12 incremental/idempotent indexing
+#13 metadata doctor
+#14/#25/#26 controlled relations/graph intelligence
+#15 temporal model + state keys
+#16 conflict/supersession
+#27 Evidence Arbitration
+#32 source authority + instruction precedence
+#20 four-state evidence sufficiency/abstention
+#18 LongMemEval
+#28 rendering ablation
+#17 adaptive retrieval
+#19 evidence-aware memory admission / advanced write gating
+#21 experience learning / utility feedback
+```
 
-## Histórico de versões
+## Target architecture — only if experiments justify it
 
-Veja [`archive/README.md`](../archive/README.md) para o histórico de v1 → v2 → v3
-e o que mudou em cada uma. O pacote `tessera/` atual consolida a v3 (a mais madura),
-dividida em módulos (`models.py`, `security.py`, `conflict.py`, `engine.py`, `cli.py`).
+```text
+QUERY
+  ↓
+Candidate Retrieval
+  ↓
+Seed Evidence
+  ↓
+Query-Aware Graph Expansion
+  ↓
+Relation Reliability
+  ↓
+Temporal Validity / State Keys
+  ↓
+Authority / Scope / Precedence
+  ↓
+Conflict Detection
+  ↓
+Evidence Arbitration
+  ↓
+Evidence Status
+  ↓
+Structured Renderer
+  ↓
+CONSUMING AGENT
+```
+
+This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
