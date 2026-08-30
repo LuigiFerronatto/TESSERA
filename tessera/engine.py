@@ -90,7 +90,7 @@ class TesseraEngine:
     construction, DW-PR-weighted subgraph search, and write-side management.
     """
 
-    def __init__(self, storage_dir: str):
+    def __init__(self, storage_dir: str, weights: Optional[Dict[str, float]] = None):
         self.storage_dir = storage_dir
         self.graph = nx.DiGraph()
         self.file_registry: Dict[str, str] = {}
@@ -99,6 +99,20 @@ class TesseraEngine:
         self.tfidf_matrix = None
         self.vectorizer = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b")
         self.gating_engine = WriteGatingEngine()
+        
+        # Default weights for Multi-Signal Scoring (F10)
+        self.weights = {
+            "lexical_tfidf": 0.28,    # 0.7 of 0.4
+            "lexical_overlap": 0.12,  # 0.3 of 0.4
+            "title": 0.3,
+            "metadata": 0.2,
+            "relations": 0.1,
+            "recency": 0.0,           # Recency is disabled by default (weight 0.0) in default ranking
+        }
+        if weights:
+            self.weights.update(weights)
+            
+        self._today_provider = None
 
         if not os.path.exists(storage_dir):
             os.makedirs(storage_dir)
@@ -111,6 +125,16 @@ class TesseraEngine:
         self.index_cache_dir = os.path.join(storage_dir, ".tessera_index")
         self.index_cache_pkl = os.path.join(self.index_cache_dir, "graph.pkl")
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
+
+    def set_today_provider(self, provider: Any) -> None:
+        """Injects a custom provider to fetch 'today's date for determinism in testing."""
+        self._today_provider = provider
+
+    def get_today(self) -> datetime.date:
+        """Resolves today's date, using the injected provider if any, else real today."""
+        if self._today_provider:
+            return self._today_provider()
+        return datetime.date.today()
 
     # ------------------------------------------------------------------
     # Write path
@@ -791,7 +815,7 @@ class TesseraEngine:
     # Retrieval
     # ------------------------------------------------------------------
     def retrieve_context(
-        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True
+        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None
     ) -> List[Dict[str, Any]]:
         """
         End-to-end adaptive retrieval (QUMem & MemORAI style):
@@ -799,7 +823,7 @@ class TesseraEngine:
         2. Builds a local subgraph focused on the query intent (1-hop expansion).
         3. Dynamically weights edges based on similarity + procedural-anchor boosts (DW-PR).
         4. Runs personalized PageRank over the subgraph.
-        5. Filters down to actual memory-note candidates.
+        5. Filters down to actual memory-note candidates using explainable multi-signal ranking.
         6. Applies temporal conflict resolution over preferences/facts.
         """
         if not self.graph or not self.node_corpus or self.tfidf_matrix is None:
@@ -873,7 +897,14 @@ class TesseraEngine:
                             if nid in self.graph.nodes and self.graph.nodes[nid].get("node_type") in MEMORY_NODE_TYPES]
         max_pagerank = max(memory_pageranks) if memory_pageranks else 1.0
 
+        # Resolve weights to use
+        weights_used = dict(self.weights)
+        if weights:
+            weights_used.update(weights)
+
+        # Normalize query tokens and phrase matching (F3 / Subset trap fix)
         query_tokens = set(re.findall(r"\b\w+\b", query_text.lower()))
+        query_clean = " ".join(re.findall(r"\b\w+\b", query_text.lower()))
 
         for node_id, pr_score in pagerank_scores.items():
             if node_id not in self.graph.nodes:
@@ -894,79 +925,88 @@ class TesseraEngine:
                 )
                 
                 # Compute Multi-Signal Score
-                # A. Lexical Similarity (Mix of TF-IDF Cosine Similarity and Direct Token Overlap)
+                # A. Lexical Similarity
                 raw_tfidf = float(node_sim_map.get(node_id, 0.0))
                 
                 body_text = node_data.get("body", "")
                 body_tokens = set(re.findall(r"\b\w+\b", body_text.lower()))
                 term_overlap = len(query_tokens & body_tokens) / max(1, len(query_tokens))
                 
-                lexical_score = 0.7 * raw_tfidf + 0.3 * term_overlap
-                
                 # B. Title/ID Relevance
                 clean_id_tokens = set(re.findall(r"\b\w+\b", node_id.lower().replace("/", " ").replace("-", " ").replace("_", " ")))
                 title_score = len(query_tokens & clean_id_tokens) / max(1, len(query_tokens))
                 
-                # C. Metadata Relevance (Tags + Entities)
+                # C. Metadata Relevance (Tags + Entities) - Normalize and tokenize to avoid multiword mismatch (F4)
                 tags = [str(t).lower() for t in node_data.get("frontmatter", {}).get("tags", [])]
                 entity_names = [str(e.get("name", "")).lower() for e in node_data.get("frontmatter", {}).get("entities", []) if isinstance(e, dict)]
-                metadata_tokens = set(tags) | set(entity_names)
+                metadata_tokens = set()
+                for tag in tags:
+                    metadata_tokens.update(re.findall(r"\b\w+\b", tag))
+                for ent_name in entity_names:
+                    metadata_tokens.update(re.findall(r"\b\w+\b", ent_name))
+                
                 metadata_score = len(query_tokens & metadata_tokens) / max(1, len(query_tokens))
                 
-                # D. Graph Centrality (Normalized Personalized PageRank)
+                # D. Graph Centrality (Normalized Personalized PageRank) (F7)
                 normalized_relations = pr_score / max_pagerank if max_pagerank > 0 else 0.0
                 
-                # E. Intent Type Boost
+                # E. Intent Type Boost (F3 - matching with query tokens and phrase matching to avoid substring trap)
                 type_boost = 1.0
-                query_lower = query_text.lower()
-                if node_type == "procedural_anchor" and any(kw in query_lower for kw in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "como fazer", "how to", "how")):
+                is_procedural_intent = any(tk in query_tokens for tk in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "how")) or "como fazer" in query_clean or "how to" in query_clean
+                is_preference_intent = any(tk in query_tokens for tk in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")) or "comportamento do" in query_clean
+                is_factual_intent = any(tk in query_tokens for tk in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name"))
+                
+                if node_type == "procedural_anchor" and is_procedural_intent:
                     type_boost = 1.3
-                elif node_type == "preference" and any(kw in query_lower for kw in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")):
+                elif node_type == "preference" and is_preference_intent:
                     type_boost = 1.3
-                elif node_type == "factual" and any(kw in query_lower for kw in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name")):
+                elif node_type == "factual" and is_factual_intent:
                     type_boost = 1.2
                     
-                # F. Temporal Recency Boost (60-day exponential half-life)
-                recency_boost = 1.0
+                # F. Temporal Recency Boost (60-day exponential half-life) - Injected today Clock (F2)
+                recency_score = 0.0
                 fm = node_data.get("frontmatter", {})
                 date_str = fm.get("last_updated_at") or fm.get("created_at") or fm.get("date")
                 if date_str:
                     try:
                         date_str = str(date_str)[:10]
                         dt = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-                        today = datetime.date(2026, 8, 30) # Fixed anchor for today's date in this run
+                        today = self.get_today()
                         days = (today - dt).days
                         if days <= 0:
-                            recency_boost = 1.1
+                            recency_score = 1.1
                         else:
-                            recency_boost = 1.0 + 0.1 * math.exp(-days / 60.0)
+                            recency_score = 1.0 + 0.1 * math.exp(-days / 60.0)
                     except Exception:
                         pass
                 
-                # Combine Weighted Signals
-                W_LEXICAL = 0.4
-                W_TITLE = 0.3
-                W_METADATA = 0.2
-                W_RELATIONS = 0.1
+                # Default is disabled (weight 0.0), only applies if explicitly enabled in weights
+                recency_boost = 1.0
+                if weights_used.get("recency", 0.0) > 0.0 and recency_score > 0.0:
+                    recency_boost = recency_score
                 
+                # Combine Weighted Signals
                 base_relevance = (
-                    W_LEXICAL * lexical_score +
-                    W_TITLE * title_score +
-                    W_METADATA * metadata_score +
-                    W_RELATIONS * normalized_relations
+                    weights_used.get("lexical_tfidf", 0.28) * raw_tfidf +
+                    weights_used.get("lexical_overlap", 0.12) * term_overlap +
+                    weights_used.get("title", 0.3) * title_score +
+                    weights_used.get("metadata", 0.2) * metadata_score +
+                    weights_used.get("relations", 0.1) * normalized_relations
                 )
                 
                 final_score = base_relevance * type_boost * recency_boost
                 
                 # Phase 2: Query-Aware Relevant Evidence Extraction (Deterministic, Local & Fast)
+                # Gated by overlap threshold to return None when evidence is insufficient (F5)
                 paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body_text) if p.strip()]
                 if not paragraphs:
                     paragraphs = [line.strip() for line in body_text.splitlines() if line.strip()]
                 
-                relevant_evidence = ""
+                relevant_evidence = None
+                evidence_info = None
                 if paragraphs:
                     best_para_score = -1.0
-                    best_para = paragraphs[0]
+                    best_para = None
                     for p in paragraphs:
                         p_tokens = set(re.findall(r"\b\w+\b", p.lower()))
                         overlap = len(query_tokens & p_tokens)
@@ -975,7 +1015,15 @@ class TesseraEngine:
                         if para_score > best_para_score:
                             best_para_score = para_score
                             best_para = p
-                    relevant_evidence = best_para
+                    
+                    # Threshold check: requires at least 1 overlapping query token (best_para_score >= 1.0)
+                    if best_para and best_para_score >= 1.0:
+                        relevant_evidence = best_para
+                        evidence_info = {
+                            "text": relevant_evidence,
+                            "score": float(best_para_score),
+                            "strategy": "paragraph_lexical"
+                        }
                 
                 retrieved_memories.append(
                     {
@@ -985,14 +1033,19 @@ class TesseraEngine:
                         "filename": node_data.get("filename"),
                         "score": float(final_score),
                         "score_explain": {
-                            "lexical": float(lexical_score),
+                            "lexical_tfidf": float(raw_tfidf),
+                            "lexical_overlap": float(term_overlap),
+                            "lexical_score": float(raw_tfidf * 0.7 + term_overlap * 0.3),
                             "title": float(title_score),
                             "metadata": float(metadata_score),
-                            "relations": float(normalized_relations),
+                            "raw_pagerank": float(pr_score),
+                            "normalized_relations": float(normalized_relations),
+                            "relations_contribution": float(normalized_relations * weights_used.get("relations", 0.1)),
                             "type_boost": float(type_boost),
-                            "recency_boost": float(recency_boost),
+                            "recency_boost": float(recency_score if recency_score > 0 else 1.0),
                         },
                         "relevant_evidence": relevant_evidence,
+                        "evidence_info": evidence_info,
                         "body": body_text.strip(),
                         "frontmatter": fm,
                         "related_ids": related_ids,
