@@ -30,7 +30,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Architecture Decisions
 - TESSERA's public product boundary is project-agnostic: public docs, examples, fixtures, benchmarks and runtime-facing configuration must describe TESSERA itself rather than a development environment. ([#62](https://github.com/LuigiFerronatto/TESSERA/issues/62))
-- Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
+- Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
 - The root README describes **implemented capabilities separately from hypotheses/Test Cards**. ([#63](https://github.com/LuigiFerronatto/TESSERA/issues/63))
 - Product-history updates are curated manually; CI may enforce explicit changelog consideration but must not synthesize entries from commits. ([#65](https://github.com/LuigiFerronatto/TESSERA/issues/65))
 
