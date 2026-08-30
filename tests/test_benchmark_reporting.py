@@ -438,6 +438,7 @@ def test_ci_workflow_syntax_and_least_privilege():
     assert "secrets." not in text
     assert "prepare_dataset" in text
     assert DATASET_SHA256 in text
+    assert "ref: ${{ env.CANDIDATE_SHA }}" in text
 
 
 def test_artifact_path_validation_rejects_escape_and_symlink(tmp_path):

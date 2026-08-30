@@ -21,6 +21,7 @@ env:
   DATASET_SHA256: d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442
   CANONICAL_COMMIT: b09ceacc24d9dfb67f9cd63f5219cd2ce8bc9f5a
   ARTIFACT_ROOT: artifacts/benchmark-reporting
+  CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   benchmark-reporting:
@@ -89,6 +90,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ env.CANDIDATE_SHA }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -167,7 +169,7 @@ jobs:
           python -m benchmarks.reporting.cli record-from-artifacts \
             --artifact-dir "$ARTIFACT_ROOT/candidate-run-1" \
             --repeat-artifact-dir "$ARTIFACT_ROOT/candidate-run-2" \
-            --record-id "longmemeval-v1-dev-50/candidate-${GITHUB_SHA}" \
+            --record-id "longmemeval-v1-dev-50/candidate-${CANDIDATE_SHA}" \
             --issue 100 \
             --pull-request "$PR_NUMBER" \
             --decision PENDING \
@@ -251,7 +253,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: longmemeval-v1-dev-50-${{ github.sha }}
+          name: longmemeval-v1-dev-50-${{ env.CANDIDATE_SHA }}
           path: artifacts/benchmark-reporting/
           if-no-files-found: error
           retention-days: 14
