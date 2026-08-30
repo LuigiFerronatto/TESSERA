@@ -167,6 +167,74 @@ def evidence_for_text(
     )
 
 
+def ledger_from_graph(graph: Any) -> "EvidenceLedger":
+    """Rebuild document-level evidence records from an indexed TESSERA graph.
+
+    Nodes without Canonical Metadata (tags/entities/legacy graph auxiliaries)
+    are intentionally ignored. This function proves the ledger is derived from
+    the index/source pipeline rather than becoming a second source of truth.
+    """
+    ledger = EvidenceLedger()
+    for _node_id, data in graph.nodes(data=True):
+        canonical = data.get("canonical_metadata")
+        if isinstance(canonical, CanonicalMetadata):
+            ledger.add(evidence_from_canonical(canonical))
+    return ledger
+
+
+def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Attach structured provenance to real retrieval results without mutation.
+
+    This is the bridge used while Evidence Ledger is being integrated into the
+    engine contract. Every returned memory gets document-level ``provenance``.
+    A query-specific ``evidence`` record is present only when
+    ``relevant_evidence`` exists; no evidence snippet means ``evidence=None``.
+    """
+    enriched: List[Dict[str, Any]] = []
+    for result in results:
+        item = dict(result)
+        node_id = item.get("id")
+        node_data = engine.graph.nodes.get(node_id, {}) if node_id in engine.graph else {}
+        canonical = node_data.get("canonical_metadata") if node_data else None
+        if not isinstance(canonical, CanonicalMetadata):
+            item["provenance"] = None
+            item["evidence"] = None
+            enriched.append(item)
+            continue
+
+        provenance = evidence_from_canonical(canonical)
+        item["provenance"] = provenance.to_dict()
+
+        evidence_text = item.get("relevant_evidence")
+        if evidence_text:
+            filepath = node_data.get("filepath") or item.get("filepath")
+            try:
+                with open(filepath, "r", encoding="utf-8") as handle:
+                    raw_text = handle.read()
+                evidence = evidence_for_text(
+                    canonical,
+                    raw_text,
+                    evidence_text,
+                    extraction_method=(item.get("evidence_info") or {}).get(
+                        "strategy", "paragraph_lexical"
+                    ),
+                )
+                item["evidence"] = evidence.to_dict()
+            except (OSError, UnicodeError):
+                # Never fabricate a span if the source cannot be read.
+                item["evidence"] = evidence_from_canonical(
+                    canonical,
+                    extraction_method=(item.get("evidence_info") or {}).get(
+                        "strategy", "paragraph_lexical"
+                    ),
+                    span=EvidenceSpan(None, None),
+                ).to_dict()
+        else:
+            item["evidence"] = None
+        enriched.append(item)
+    return enriched
+
+
 def _split_body_for_hash(raw_text: str) -> str:
     """Use Canonical's parser so freshness checks follow exactly its semantics."""
     from .canonical import _split_markdown
