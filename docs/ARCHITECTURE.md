@@ -11,16 +11,20 @@
 
 ## Executive takeaway
 
-TESSERA is not a final-answer engine and it is not “GraphRAG with a different name”. It is a **text-first, agent-agnostic memory and evidence layer**.
+TESSERA is a **text-first, agent-agnostic memory and evidence layer**, not a final-answer engine and not merely GraphRAG.
 
-The current Foundation does four things especially deliberately:
+The current Foundation provides:
 
-1. understands heterogeneous text through a canonical model;
-2. keeps memory identity separate from file location and source version;
-3. retrieves with inspectable multi-signal ranking and query-specific evidence;
-4. can prove where retrieved evidence came from through the Evidence Ledger.
+1. canonical understanding of heterogeneous text;
+2. stable knowledge and source-document identity;
+3. explicit graph structure as one retrieval signal;
+4. explainable multi-signal ranking;
+5. query-aware relevant evidence;
+6. source-version-aware Evidence Ledger / provenance;
+7. a basic heuristic write-side sanitization gate for memories written through `write_memory_note()`;
+8. CI + Test Card governance.
 
-Advanced graph expansion, temporal state, authority, conflict arbitration, abstention and adaptive retrieval remain Test Cards — they are not represented here as implemented capabilities.
+More ambitious memory admission, graph expansion, temporal state, authority, arbitration and abstention remain experiments.
 
 ---
 
@@ -40,7 +44,7 @@ AGENT
   └─ reasons / acts / answers
 ```
 
-TESSERA abstracts memory architecture away from the consuming agent while preserving enough evidence and provenance for the agent to audit and navigate what was retrieved.
+TESSERA hides memory-system mechanics while preserving enough evidence and provenance for the consuming agent to audit what was retrieved.
 
 ---
 
@@ -54,20 +58,18 @@ TESSERA abstracts memory architecture away from the consuming agent while preser
 - Retrieval relevance is not semantic confidence, authority or utility.
 - A file path is location, not identity.
 - A hash represents a version/fingerprint, not identity.
-- No generative LLM is mandatory for the basic Foundation path.
+- No generative LLM is mandatory for the basic Foundation retrieval path.
 - TESSERA does not silently rewrite user source files during indexing.
 
 ---
 
-# Current data pipeline
+# Current read / retrieval pipeline
 
 ```text
 TEXT FILES
-   │
-   ▼
+   ↓
 DISCOVER
-   │
-   ▼
+   ↓
 PARSE + CANONICAL NORMALIZATION
    ├─ complete / partial / absent frontmatter
    ├─ document classification
@@ -75,23 +77,20 @@ PARSE + CANONICAL NORMALIZATION
    ├─ metadata_origin
    ├─ scope
    └─ explicit/local relations
-   │
-   ▼
+   ↓
 STABLE IDENTITY
    ├─ identity.id
    ├─ source.document_id
    ├─ source.path
    ├─ document_hash
    └─ content_hash
-   │
-   ▼
+   ↓
 GRAPH / INDEX
    ├─ memory/document nodes
    ├─ tag/entity structure
    ├─ explicit relations
    └─ lexical corpus / TF-IDF
-   │
-   ▼
+   ↓
 RETRIEVAL
    ├─ lexical TF-IDF
    ├─ token overlap
@@ -99,22 +98,55 @@ RETRIEVAL
    ├─ metadata relevance
    ├─ graph/PageRank structural signal
    └─ deterministic intent/type boost
-   │
-   ▼
+   ↓
 QUERY-AWARE EVIDENCE
    ├─ relevant paragraph when supported
    └─ None instead of arbitrary evidence when unsupported
-   │
-   ▼
+   ↓
 EVIDENCE LEDGER / PROVENANCE
    ├─ evidence_id
    ├─ source document identity
    ├─ source version hashes
    ├─ exact span when uniquely provable
    └─ freshness state
-   │
-   ▼
+   ↓
 STRUCTURED RETRIEVAL RESULT
+```
+
+---
+
+# Current write path
+
+The existing `write_memory_note()` path already contains a **basic heuristic security gate**:
+
+```text
+candidate memory content
+   ↓
+WriteGatingEngine.audit_and_sanitize()
+   ├─ known injection-pattern checks
+   ├─ suspicious-tag signal
+   └─ deterministic redaction for matched patterns
+   ↓
+MemoryFrontmatter
+   ↓
+Markdown source file
+```
+
+This capability must not be confused with roadmap #19.
+
+Current gating answers roughly:
+
+> Does this content match a small set of known hostile-instruction patterns before persistence?
+
+Roadmap #19 is broader **memory admission** and asks:
+
+> Is this candidate new, useful, stable, non-duplicate and supported by evidence — and should it become durable memory at all?
+
+So:
+
+```text
+basic heuristic sanitization       IMPLEMENTED
+full evidence-aware write admission PLANNED (#19)
 ```
 
 ---
@@ -123,30 +155,23 @@ STRUCTURED RETRIEVAL RESULT
 
 **Tracking:** Issue #9 / PR #3
 
-Projects contain heterogeneous text: normal Markdown, notes without frontmatter, harness instructions, project context and other reference documents. TESSERA normalizes these into one canonical representation before indexing.
-
-Conceptually:
+TESSERA normalizes heterogeneous project text into one canonical representation before indexing.
 
 ```yaml
 identity:
   id: lao/charter
-
 classification:
   document_type: memory
   kind: factual
   drawer: facts
-
 source:
   document_id: doc_...
   path: lao/charter.md
-  format: markdown
-
 metadata_origin:
   drawer: inferred
-  document_type: inferred
 ```
 
-For harness instructions:
+Harness knowledge remains orthogonal to semantic drawers:
 
 ```yaml
 classification:
@@ -155,13 +180,11 @@ classification:
   drawer: null
 ```
 
-This lets `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` participate in the knowledge layer without being forced into a semantic memory drawer.
+This permits `CLAUDE.md`, `AGENTS.md` and `*.SKILL.md` to participate in the knowledge layer without becoming preferences/facts merely to fit a taxonomy.
 
 ---
 
 # 2. Stable identity model
-
-The architecture separates four axes:
 
 ```text
 identity.id
@@ -171,13 +194,13 @@ source.document_id
 → persistent source-document identity
 
 source.path
-→ current source location
+→ current location
 
 document_hash / content_hash
-→ current source/content version
+→ current version/fingerprint
 ```
 
-Expected lifecycle:
+Lifecycle guarantee:
 
 ```text
 MOVE / RENAME
@@ -195,23 +218,21 @@ source.path        SAME
 content_hash       CHANGED
 ```
 
-This separation is the substrate for provenance today and for incremental/temporal lifecycle later.
+This is the substrate for provenance today and incremental/temporal lifecycle later.
 
 ---
 
 # 3. Graph representation
 
-TESSERA already represents explicit relations and graph structure, but the graph is **not the final relevance engine**.
-
-Current role:
+TESSERA preserves explicit/local relations and graph structure, but the graph is **not the final relevance engine**.
 
 ```text
-explicit/local relations
-        ↓
-knowledge graph
-        ↓
+explicit relations
+   ↓
+graph
+   ↓
 PageRank / structural signal
-        ↓
+   ↓
 one component of retrieval ranking
 ```
 
@@ -224,7 +245,7 @@ controlled evidence budget       #25
 typed-relation ablations          #14
 ```
 
-The architecture intentionally separates:
+Future relation intelligence must keep these separate:
 
 ```text
 relation_type
@@ -239,12 +260,10 @@ relation_type
 
 **Tracking:** Issue #8 / PR #2
 
-The Foundation retrieval ranker combines inspectable signals instead of allowing PageRank alone to determine relevance.
-
-Conceptually:
+The current ranker combines inspectable signals rather than letting PageRank alone determine relevance:
 
 ```text
-FINAL RANKING
+ranking
   ← lexical TF-IDF
   ← direct overlap
   ← title / ID
@@ -255,23 +274,20 @@ FINAL RANKING
 
 Recency is disabled by default because recent information is not necessarily current truth.
 
-The debug path exposes individual scoring signals so changes can be measured rather than guessed.
-
-### Known limitation
-
-The paraphrase:
+Known baseline limitation:
 
 ```text
 pq o LAO existe?
+→ intended charter memory can still appear at #2
 ```
 
-can still rank the intended charter memory at #2 instead of #1. This is deliberately retained as a sanity-baseline limitation; semantic/adaptive retrieval must prove itself through later ablations rather than query-specific tuning.
+That is preserved as benchmark evidence rather than tuned away per-query.
 
 ---
 
 # 5. Query-aware Relevant Evidence
 
-Instead of forcing the consuming agent to treat an entire memory as equally relevant, TESSERA foregrounds a query-specific evidence span when lexical support exists.
+TESSERA foregrounds a query-specific paragraph when lexical support exists while preserving the full memory body.
 
 ```text
 retrieved memory
@@ -279,9 +295,9 @@ retrieved memory
 └─ full body
 ```
 
-If evidence cannot be supported, the field remains `None`.
+If evidence cannot be supported, `relevant_evidence` remains `None`.
 
-This is **not yet** full Evidence Sufficiency/Abstention. The future four-state contract is tracked in #20:
+This is not yet the future four-state #20 contract:
 
 ```text
 sufficient
@@ -297,8 +313,6 @@ ambiguous
 **Tracking:** Issue #11 / PR #6
 
 The Evidence Ledger is an immutable/rebuildable provenance substrate derived from source files and Canonical Metadata.
-
-Example shape:
 
 ```yaml
 evidence_id: ev_...
@@ -319,46 +333,31 @@ It answers:
 
 > Where did this evidence come from, and which source version supports it?
 
-It does **not** decide:
+It does not decide authority, truth, arbitration winner, query relevance or temporal validity.
 
-- authority;
-- truth;
-- arbitration winner;
-- query relevance;
-- temporal validity.
-
-Those belong to later assessment/arbitration layers if their Test Cards succeed.
-
-### Precision rule
-
-If the same evidence text appears multiple times and the exact occurrence cannot be proven uniquely, TESSERA returns a null span rather than inventing precision.
+If evidence text occurs multiple times and the exact occurrence cannot be proven, the span is null rather than guessed.
 
 ---
 
 # 7. Derived state and source of truth
 
-Conceptually:
-
 ```text
 SOURCE FILES
-   │
    ├─ canonical metadata
    ├─ identity manifest
    ├─ graph/index cache
    └─ evidence ledger
 ```
 
-Everything under the derived indexing layer must be rebuildable from source files.
+Derived state must be reconstructible from source files.
 
-Current indexing still uses coarse rebuild/cache behavior. **Incremental and idempotent indexing is #12, not a current capability.**
+Current indexing still uses coarse cache/rebuild semantics. **Incremental and idempotent indexing remains #12.**
 
 ---
 
 # 8. CI and experimental governance
 
 **Tracking:** Issue #10 / PR #4 and Issue #22 / PR #24
-
-Every meaningful change is expected to go through:
 
 ```text
 Issue / Test Card
@@ -370,7 +369,7 @@ Issue / Test Card
 → KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-Current deterministic sanity baseline:
+Current sanity regression baseline:
 
 ```text
 Hit@1          75%
@@ -380,26 +379,27 @@ MRR           0.875
 Evidence hit  100%
 ```
 
-These are regression metrics, not competitive quality claims.
+These are regression metrics, not competitive benchmark claims.
 
 ---
 
 # Current module map
 
-| Module | Current architectural role |
+| Module | Current role |
 |---|---|
-| `tessera/canonical.py` | Canonical parsing, classification, normalization and stable metadata semantics |
-| `tessera/engine_core.py` | Core indexing, graph construction and retrieval implementation |
-| `tessera/engine.py` | Evidence-aware engine facade integrating core retrieval with provenance |
-| `tessera/evidence.py` | Evidence records, ledger construction, freshness and span/provenance helpers |
-| `tessera/conflict.py` | Existing conflict compatibility logic; future state/arbitration redesign remains experimental |
-| `tessera/models.py` | Core domain models used by memory/write paths |
+| `tessera/canonical.py` | Canonical parsing, classification and stable metadata semantics |
+| `tessera/engine_core.py` | Write path, indexing, graph construction and core retrieval |
+| `tessera/engine.py` | Evidence-aware facade integrating retrieval with provenance |
+| `tessera/evidence.py` | Evidence records, ledger, freshness and span/provenance helpers |
+| `tessera/security.py` | Basic deterministic write-side hostile-pattern audit/sanitization |
+| `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign remains experimental |
+| `tessera/models.py` | Domain models for memory/write paths |
 | `tessera/cli.py` | Human CLI surface |
-| `benchmarks/sanity/` | Deterministic regression evaluation, not competitive benchmark |
+| `benchmarks/sanity/` | Deterministic regression evaluation |
 
 ---
 
-# What is implemented vs planned
+# Implemented vs planned
 
 ## Implemented Foundation
 
@@ -412,6 +412,7 @@ graph representation
 explainable multi-signal ranking
 query-aware relevant evidence
 Evidence Ledger / provenance
+basic heuristic write-side sanitization
 CI + sanity evaluation
 Test Card governance
 ```
@@ -430,11 +431,9 @@ Test Card governance
 #18 LongMemEval
 #28 rendering ablation
 #17 adaptive retrieval
-#19 write gating / memory admission
+#19 evidence-aware memory admission / advanced write gating
 #21 experience learning / utility feedback
 ```
-
-Historical documents may describe some of these ideas as older prototypes. The current source of truth for product status is `FEATURES.md` + `ROADMAP.md` + the linked Test Cards.
 
 ---
 
@@ -466,6 +465,4 @@ Structured Renderer
 CONSUMING AGENT
 ```
 
-This is a roadmap target, not current runtime behavior.
-
-The point of the Test Card process is that individual layers may be simplified or dropped if they do not improve measurable outcomes.
+This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
