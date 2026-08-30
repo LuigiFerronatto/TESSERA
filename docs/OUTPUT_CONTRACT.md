@@ -37,10 +37,10 @@ The consuming agent can then decide how to reason with that evidence.
 A current retrieval hit can contain:
 
 ```yaml
-id: lao/charter
+id: project/charter
 
 type: factual
-filepath: /.../lao/charter.md
+filepath: /.../project/charter.md
 filename: charter.md
 
 score: 0.4308
@@ -57,27 +57,27 @@ score_explain:
   type_boost: 1.0
   recency_boost: 1.0
 
-relevant_evidence: "O propósito do LAO é ..."
+relevant_evidence: "The project exists to provide auditable memory for agents."
 
 evidence_info:
-  text: "O propósito do LAO é ..."
+  text: "The project exists to provide auditable memory for agents."
   score: 2.12
   strategy: paragraph_lexical
 
 body: |
-  O propósito do LAO é ...
+  The project exists to provide auditable memory for agents.
 
 frontmatter: {...}
 related_ids:
-  - lao/learning
+  - project/learning-process
 
 provenance:
   schema_version: 1
   evidence_id: ev_...
-  memory_id: lao/charter
+  memory_id: project/charter
   source:
     document_id: doc_...
-    path: lao/charter.md
+    path: project/charter.md
     document_hash: ...
     content_hash: ...
     format: markdown
@@ -92,7 +92,7 @@ provenance:
 evidence:
   schema_version: 1
   evidence_id: ev_...
-  memory_id: lao/charter
+  memory_id: project/charter
   source: {...}
   span:
     start_line: 5
@@ -307,7 +307,7 @@ engine.retrieve_context(query_text, top_n=...)
 
 Current CLI text should therefore not be parsed as a stable machine protocol when the same data is available through the structured engine result.
 
-A future explicit serialized API/JSON contract may be added, but that is a separate interface decision and should not silently fork the retrieval semantics.
+Contract parity across Python, CLI and MCP is tracked explicitly in #68. Renderers/transports may differ; semantic evidence must not disappear silently.
 
 ---
 
@@ -316,13 +316,13 @@ A future explicit serialized API/JSON contract may be added, but that is a separ
 These are roadmap concepts, not current guaranteed fields:
 
 ```text
-relation confidence / validation        #26
-temporal validity / state keys           #15
-source authority / instruction precedence #32
-Evidence Arbitration resolution          #27
-four-state evidence_status               #20
-adaptive retrieval strategy              #17
-utility feedback                          #21
+relation confidence / validation          #26
+temporal validity / state keys             #15
+source authority / instruction precedence  #32/#72
+Evidence Arbitration resolution            #27
+four-state evidence_status                 #20
+adaptive retrieval strategy                #17
+utility feedback                            #21
 ```
 
 Future additions should be backward-compatible where practical or explicitly versioned.
@@ -361,5 +361,6 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
 - `recency_boost` debug naming is less explicit than the desired raw/weight/applied model.
 - `frontmatter` remains a compatibility surface; canonical semantics should be preferred internally.
 - Human CLI formatting is not a formal machine serialization protocol.
+- MCP currently exposes a reduced subset of the engine result; #68 exists to close that transport-parity gap.
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
