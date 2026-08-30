@@ -1,20 +1,33 @@
 # TESSERA — Research & Competitive References
 
-> **Purpose:** keep an auditable bibliography for ideas that influence TESSERA. A source appearing here does **not** mean TESSERA implements or validates its claims.
+> **Purpose:** auditable bibliography for ideas that influence TESSERA.
+>
+> **Last primary-source verification:** 2026-08-30.
+>
+> A source appearing here does **not** mean TESSERA implements or validates its claims.
 
 ## Source policy
 
-Each reference should be read as one of these categories:
+Keep five layers separate:
 
-- **Paper** — research claim from the cited publication.
-- **Official docs** — product/framework behavior described by its maintainers.
-- **Official repository** — implementation/readme/benchmark claim from the project's own repo.
-- **TESSERA interpretation** — our architectural reading of that source.
-- **TESSERA result** — only something measured in this repository/CI/benchmark.
+```text
+external source
+→ what the paper/product actually says
 
-Do not rewrite a paper claim as a TESSERA result.
+TESSERA interpretation
+→ what we think the signal means for our architecture
 
-When a source influences an experiment, link the corresponding Issue/Test Card.
+Test Card
+→ how we plan to measure that interpretation
+
+implementation
+→ what code actually exists
+
+TESSERA result
+→ what this repository/CI/benchmark actually measured
+```
+
+Never rewrite a paper claim as a TESSERA result. Prefer primary/official sources. Revalidate fast-moving product docs before using them externally.
 
 ---
 
@@ -26,16 +39,14 @@ When a source influences an experiment, link the corresponding Issue/Test Card.
 ArXiv: https://arxiv.org/abs/2608.16168  
 Published: 2026-08-17
 
-Why it matters to TESSERA:
+Relevant signal:
+- independent handling of facts, preferences and transferable insights;
+- query-conditioned user-state inference;
+- temporal/source evidence.
 
-- motivates independent retrieval of facts, preferences and transferable insights;
-- preserves temporal positions and source evidence;
-- emphasizes query-conditioned state inference rather than a single flat Top-K query.
-
-TESSERA relationship:
-
-- the exactly-three semantic drawers (`facts`, `preferences`, `insights`) are strongly influenced by this framing;
-- TESSERA deliberately does **not** copy QUMem's full multi-agent inference pipeline as a mandatory retrieval path.
+TESSERA interpretation:
+- exactly three semantic drawers: `facts`, `preferences`, `insights`;
+- do not make QUMem's full inference pipeline mandatory for basic retrieval.
 
 Related: #9, #17, #20.
 
@@ -47,16 +58,14 @@ Related: #9, #17, #20.
 ArXiv: https://arxiv.org/abs/2502.12110  
 Published: 2025-02-17
 
-Source claim:
+Relevant signal:
+- atomic structured notes;
+- Zettelkasten-inspired links;
+- adaptive memory evolution.
 
-- uses Zettelkasten-inspired structured notes;
-- dynamically links memories;
-- allows new memories to update contextual representations/attributes of existing memories.
-
-Why it matters:
-
-- useful reference for atomic/interconnected memory and memory evolution;
-- also a warning for TESSERA: adaptive evolution should remain auditable and should not silently rewrite historical truth.
+TESSERA interpretation:
+- atomic/interconnected memory is useful;
+- automatic memory evolution must remain auditable and must not silently rewrite historical evidence.
 
 Related: #14, #19, #21.
 
@@ -68,27 +77,31 @@ Related: #14, #19, #21.
 ArXiv: https://arxiv.org/abs/2410.10813  
 Published: 2024-10-14
 
-Core benchmark abilities:
+Core abilities:
+1. Information Extraction
+2. Multi-Session Reasoning
+3. Knowledge Updates
+4. Temporal Reasoning
+5. Abstention
 
-1. information extraction;
-2. multi-session reasoning;
-3. temporal reasoning;
-4. knowledge updates;
-5. abstention.
-
-Why it matters:
-
-- provides a shared evaluation target rather than only internal examples;
-- explicitly separates design choices across indexing, retrieval and reading.
-
-TESSERA relationship:
-
-- benchmark adapter/ablations are tracked in #18;
-- internal sanity metrics are not to be presented as LongMemEval performance.
+TESSERA use:
+- external benchmark backbone in #18;
+- internal sanity Hit@k/MRR must never be presented as LongMemEval performance.
 
 ---
 
-# Recent research signals
+## LongMemEval V2
+
+Repository / project source:
+- https://github.com/xiaowu0162/LongMemEval-V2
+
+TESSERA use:
+- later-stage evaluation once Foundation/ablation adapter is reliable;
+- not part of basic CI.
+
+---
+
+# Recent research signals mapped to Test Cards
 
 ## GraphMemix
 
@@ -96,54 +109,58 @@ TESSERA relationship:
 ArXiv: https://arxiv.org/abs/2608.26983  
 Published: 2026-08-27
 
-Source claim:
+Source signal:
+```text
+query-aware candidate graph
++ direct evidence utility
++ relation activation/reliability cost
++ maximum evidence budget
++ forest optimization
+```
 
-- constructs query-aware candidate graphs/evidence forests;
-- separates direct memory utility from relation activation/reliability cost;
-- selects evidence under a maximum budget;
-- reports a quality/cost Pareto improvement across four multimodal long-term-memory benchmarks.
+Paper reports a new quality/lifecycle-cost Pareto frontier across four long-term multimodal memory benchmarks.
 
 TESSERA interpretation:
-
-> relation existence is not enough; traversal should be query-conditioned and budgeted.
+> relation existence does not imply that the relation should be traversed for the current query.
 
 Derived Test Card:
+- #25 Query-aware graph expansion / Evidence Budget
+- parent #14 Typed Relations / Controlled Expansion
 
-- #25 Query-aware graph expansion with evidence budget;
-- parent #14 Typed Relations / Controlled Expansion.
-
-Not implemented yet.
+Status: planned experiment, not implemented capability.
 
 ---
 
 ## CaSKG
 
-**Paper:** *Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval*  
+**Paper:** *CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval*  
 ArXiv: https://arxiv.org/abs/2608.25500  
-Published: 2026-08-26
+Published: 2026-08-26  
+Code: https://github.com/ZhiyuanLi218/Caskg
 
-Project research note summary:
+Source signal:
+- high-recall directed candidate graph;
+- semantic, lexical, I/O and structural signals;
+- counterfactual remove/substitute/reorder probes;
+- calibrated weighted graph before task-conditioned expansion.
 
-- candidate relations are generated from multiple signals;
-- relation quality is calibrated/validated before graph expansion;
-- the central lesson for TESSERA is that unreliable edges can make graph retrieval actively harmful.
+Reported comparison against Graph-of-Skills:
+- ScienceWorld six-model macro-average: 72.62 → 80.50;
+- ALFWorld success: 80.01% → 86.79%.
 
 TESSERA interpretation:
-
 ```text
-relation type
-≠ relation origin
-≠ relation confidence
-≠ query relevance
+relation_type
+≠ relation_origin
+≠ relation_confidence
+≠ query_relevance
 ```
 
 Derived Test Card:
-
-- #26 Relation confidence and edge validation.
+- #26 Relation Confidence / Edge Validation
 
 Important boundary:
-
-- TESSERA should not add `relation_confidence` directly to the default final retrieval score without an explicit ablation.
+- relation confidence must not silently become another default `FINAL_SCORE` weight.
 
 ---
 
@@ -153,25 +170,27 @@ Important boundary:
 ArXiv: https://arxiv.org/abs/2608.26295  
 Published: 2026-08-26
 
-Source claim:
-
+Source signal:
 - 6,504 controlled episodes from 542 factual questions;
-- instruction-tuned models often over-follow tools even when the tool is wrong;
-- improvements to arbitration can reduce abstention in undesirable ways.
+- independently controlled correctness of model-memory answer and tool return;
+- strong tool-following bias even when tools are wrong;
+- many attempted improvements reduce abstention in undesirable ways.
 
-Why it matters:
+Reported observations include:
+- instruction-tuned models retain a verified-correct answer against a wrong tool only 6.5–17.1% of eligible cases;
+- when both sources are wrong, tool output is repeated in 78.4–86.0% of cases.
 
-- conflict is broader than memory-vs-memory;
-- tools, memory and current documents can disagree;
-- source preference must be evaluated together with correctness and abstention.
+TESSERA interpretation:
+```text
+memory-vs-memory conflict
+≠
+source arbitration across memory / tool / document
+```
 
 Derived Test Cards:
-
-- #27 Evidence / Source Arbitration;
-- #20 Evidence Sufficiency / Abstention;
-- #32 Source Authority / Scope / Instruction Precedence.
-
-Not implemented yet.
+- #27 Evidence / Source Arbitration
+- #20 four-state Evidence Sufficiency / Abstention
+- #32 Source Authority / Scope / Instruction Precedence
 
 ---
 
@@ -181,20 +200,20 @@ Not implemented yet.
 ArXiv: https://arxiv.org/abs/2608.23568  
 Original submission: 2026-06-05
 
-Source claim:
-
-- reader-facing representation alone can materially change downstream memory/QA scores;
-- on LongMemEval, matched-budget resolved packets outperform recency-truncated raw dialogue by large margins;
-- formal/ledger-like representations can be difficult for some readers even when they contain the same facts.
+Source signal:
+- reader-facing artifact is itself an evaluation variable;
+- same underlying information can produce materially different downstream memory/QA results;
+- reported matched-budget resolved packets outperform recency-truncated raw dialogue by 42.4–72.6 points depending on model/setup.
 
 TESSERA interpretation:
-
-> retrieval quality and rendering quality are different experimental variables.
+```text
+retrieval quality
+≠ rendering quality
+```
 
 Derived Test Cards:
-
-- #28 Structured Evidence rendering ablation;
-- #18 LongMemEval adapter/benchmark controls.
+- #28 RAW vs EVIDENCE vs STRUCTURED renderer ablation
+- parent #18 LongMemEval controls
 
 ---
 
@@ -202,161 +221,184 @@ Derived Test Cards:
 
 ## Mem0
 
-Official docs:
-
-- Overview: https://docs.mem0.ai/platform/overview
+Primary docs verified:
 - Graph Memory: https://docs.mem0.ai/open-source/features/graph-memory
-- New memory algorithm / hybrid retrieval: https://docs.mem0.ai/platform/features/graph-memory
+- OSS v2 → v3 migration: https://docs.mem0.ai/migration/oss-v2-to-v3
+- Long-term memory CLI: https://docs.mem0.ai/platform/cli
+- Paper: https://arxiv.org/abs/2504.19413
 
-Paper:
+Current-source caution:
 
-- *Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory*  
-  https://arxiv.org/abs/2504.19413
+Mem0 documentation reflects more than one architectural generation. A Graph Memory page describes entity/relationship extraction into an external graph backend beside vector retrieval. The newer OSS migration guide says external graph-store support was removed from the newer open-source algorithm and replaced with built-in entity linking, alongside semantic + BM25 + entity hybrid retrieval.
 
-Relevant documented behaviors:
+Therefore do not summarize Mem0 as simply:
 
-- extracts salient facts/preferences from messages;
-- uses vector storage and optional graph memory;
-- current graph-memory docs describe graph retrieval running alongside vector search and returning relations without automatically reordering vector hits;
-- current open-source docs describe hybrid retrieval using semantic + BM25 + entity matching.
+```text
+"vector + graph"
+```
 
-Use in competitive analysis:
+without specifying version/product path.
 
-- strong production-oriented reference for extraction + hybrid retrieval + graph augmentation;
-- TESSERA should compare representation/provenance/auditability, not only headline QA metrics.
+Relevant TESSERA comparison:
+- extracted memory vs source-backed atomic representation;
+- hybrid retrieval quality;
+- scope/user/agent boundaries;
+- provenance and source preservation;
+- latency/context cost.
 
 ---
 
 ## Zep / Graphiti
 
-Official docs:
-
-- Zep overview: https://help.getzep.com/overview
+Primary docs verified:
+- Zep v3: https://help.getzep.com/v3/overview
 - Graph overview: https://help.getzep.com/graph-overview
 - Graphiti overview: https://help.getzep.com/graphiti/getting-started/overview
+- Graphiti welcome: https://help.getzep.com/graphiti/getting-started/welcome
+- Zep vs Graphiti: https://help.getzep.com/zep-vs-graphiti
+- Paper: https://arxiv.org/abs/2501.13956
 
-Paper:
+Documented signals:
+- Graphiti = open-source temporal Context Graph framework;
+- entity/relationship/fact graph;
+- episodic ingestion/provenance;
+- bi-temporal validity/fact invalidation;
+- incremental updates;
+- time/full-text/semantic/graph hybrid retrieval;
+- Zep = managed enterprise-scale Context Lake on top of Context Graph infrastructure.
 
-- *Zep: A Temporal Knowledge Graph Architecture for Agent Memory*  
-  https://arxiv.org/abs/2501.13956
+TESSERA comparison:
+- Graphiti makes temporal graph structure central;
+- TESSERA currently makes source documents + canonical identity + Evidence Ledger the stable substrate and treats advanced graph behavior as an ablation.
 
-Relevant documented behaviors:
-
-- builds temporal knowledge/context graphs;
-- represents entities, relationships/facts and episodic nodes;
-- supports changing facts with temporal invalidation/history;
-- Graphiti supports incremental updates and hybrid full-text/semantic/graph search;
-- Zep serves prompt-ready context blocks as a managed product.
-
-Use in competitive analysis:
-
-- strongest direct reference for temporal graph memory;
-- important comparison for #15/#16 and later graph experiments.
+Related: #12, #14, #15, #16, #25, #26, #27.
 
 ---
 
 ## Letta / MemGPT lineage
 
-Official docs:
+Primary docs verified:
+- https://docs.letta.com/
 
-- Memory blocks: https://docs.letta.com/tutorials/attaching-detaching-blocks/
-- Agent archival memory/passages API: https://docs.letta.com/api/resources/agents
+Current positioning:
+- platform for stateful agents;
+- persistent memory/state is tightly integrated with the agent runtime/harness.
 
-Relevant documented behaviors:
+TESSERA comparison:
+```text
+Letta
+→ memory/state integrated with agent runtime
 
-- persistent in-context memory blocks can be attached/detached from agents;
-- archival memory stores passages searchable outside core context;
-- agent state persists enough information to recreate the agent.
+TESSERA
+→ memory mechanics abstracted behind a layer
+→ evidence/provenance remains visible
+```
 
-Use in competitive analysis:
-
-- important reference for agent-managed memory/context tiers;
-- differs from TESSERA's default goal of hiding memory architecture from the agent while preserving evidence.
+Future evaluation should test whether hiding memory mechanics reduces failure modes or removes useful agent control.
 
 ---
 
-## LangGraph / LangMem
+## LangGraph / LangChain memory patterns
 
-Official docs:
+Primary docs verified:
+- https://docs.langchain.com/oss/python/langchain/long-term-memory
+- https://docs.langchain.com/oss/python/concepts/memory
 
-- LangChain/LangGraph long-term memory: https://docs.langchain.com/oss/python/langchain/long-term-memory
-- Memory concepts: https://docs.langchain.com/oss/python/concepts/memory
-- LangMem conceptual guide: https://langchain-ai.github.io/langmem/concepts/conceptual_guide/
+Documented signals:
+- long-term memory persists across threads;
+- LangGraph stores JSON documents by namespace/key;
+- conceptual taxonomy includes semantic, episodic and procedural memory;
+- write timing can be hot-path or background.
 
-Relevant documented behaviors:
+TESSERA distinction:
+```text
+facts / preferences / insights
+≠
+semantic / episodic / procedural
+```
 
-- long-term memories stored as JSON documents organized by namespace/key;
-- conceptual split among semantic, episodic and procedural memory;
-- LangMem commonly uses LLM-driven extraction/consolidation to update memory state.
-
-Use in competitive analysis:
-
-- useful application-framework baseline;
-- TESSERA's three drawers and text-first provenance model are different abstractions from LangGraph's semantic/episodic/procedural taxonomy.
+TESSERA also keeps harness instructions as instruction/document semantics with `drawer: null` rather than treating them as another semantic drawer.
 
 ---
 
 ## MemOS
 
-Official/open-source references:
-
+Primary/open-source sources verified:
 - Repository: https://github.com/MemTensor/MemOS
 - Intro: https://github.com/MemTensor/MemOS/blob/main/docs/en/open_source/home/memos_intro.md
+- Core concepts: https://github.com/MemTensor/MemOS/blob/main/docs/en/open_source/home/core_concepts.md
 
-Relevant documented behaviors:
+Documented signals:
+- Memory Operating System positioning;
+- memory as a first-class orchestrated resource;
+- MOS orchestration layer;
+- MemCubes;
+- multiple memory forms/types;
+- lifecycle/scheduling/governance abstractions.
 
-- positions memory as a first-class operating-system-like resource;
-- supports multiple memory types and scheduling/lifecycle management;
-- aims to unify storing, retrieval and management behind a memory OS abstraction.
-
-Use in competitive analysis:
-
-- relevant at the product-positioning layer because TESSERA is also an abstraction layer;
-- TESSERA is intentionally narrower today: text-first, auditable evidence and deterministic Foundation before broad multimodal/multi-memory orchestration.
+TESSERA distinction:
+- intentionally narrower current Foundation;
+- text-first source truth, stable identity, provenance and structured evidence before broader memory-OS orchestration.
 
 ---
 
 ## MemPalace
 
-Official repository:
+**Verified official public repository:**
+- https://github.com/bassemhalawani/memorypalace
 
-- https://github.com/MemPalace/mempalace
+Repository warning states the official sources are that repository, the PyPI package, and `mempalaceofficial.com` documentation.
 
-Repository claims / documented behavior:
-
+Documented signals:
 - local-first;
-- stores conversation/project content verbatim rather than summarizing/extracting by default;
-- default retrieval uses semantic search with a pluggable backend;
-- publishes LongMemEval retrieval-recall benchmark artifacts;
-- also includes a local temporal entity/relationship graph.
+- verbatim storage rather than summarize/extract/paraphrase by default;
+- pluggable retrieval backend;
+- structured palace organization;
+- local temporal entity/relationship graph;
+- reproducible benchmark artifacts.
 
-Why it matters:
+Repository reports:
+- 96.6% raw R@5 on LongMemEval for its stated zero-API-call retrieval path.
 
-- provides an important **verbatim-memory baseline** against atomic extraction/representation;
-- its published raw retrieval result is a reminder that representation ablations must compare against strong simple baselines.
-
-TESSERA relationship:
-
-- #18 should compare Raw/Verbatim vs Atomic under controlled encoders/readers/token budgets;
-- do not compare MemPalace R@5 directly to TESSERA sanity Hit@k.
+TESSERA use:
+- important raw/verbatim baseline for #18;
+- do not compare this R@5 directly to TESSERA's internal four-query sanity Hit@5;
+- fair comparison requires same source histories, encoder controls where relevant, session normalization, token budgets and same reader/rendering policy.
 
 ---
 
-# Reference hygiene rules
+# Research-to-roadmap rule
 
-When adding a new source:
-
-1. Prefer primary source / official docs / official repository.
-2. Record publication/update date when relevant.
-3. Write the external claim separately from TESSERA interpretation.
-4. Link a Test Card if the source changes the roadmap.
-5. Mark implementation status:
+When a source changes architecture thinking:
 
 ```text
-implemented
-experimental
-planned
-rejected/deferred
+SOURCE
+  ↓
+SOURCE CLAIM
+  ↓
+TESSERA INTERPRETATION
+  ↓
+ISSUE / TEST CARD
+  ↓
+CONTROLLED EXPERIMENT
+  ↓
+TESSERA EVIDENCE
+  ↓
+KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-6. Never write “TESSERA outperforms X” without a controlled benchmark in this repository.
+The research bibliography should make that path auditable rather than functioning as a list of fashionable papers.
+
+---
+
+# Reference hygiene checklist
+
+When adding/updating a source:
+
+1. Prefer the paper, official docs or official repository.
+2. Record publication/update/verification date when useful.
+3. Separate source claim from TESSERA interpretation.
+4. Link the corresponding Test Card.
+5. Mark implementation status: `implemented`, `experimental`, `planned`, `dropped/deferred`.
+6. Revalidate fast-moving product behavior before external publication.
+7. Never write “TESSERA outperforms X” without a controlled TESSERA benchmark result.
