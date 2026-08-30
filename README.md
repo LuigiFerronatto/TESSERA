@@ -226,6 +226,11 @@ TESSERA is research-driven, but a cited paper is a **reference signal**, not pro
 | [LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory](https://arxiv.org/abs/2410.10813) | Extraction, multi-session reasoning, updates, temporal reasoning, abstention |
 | [LongMemEval V2](https://github.com/xiaowu0162/LongMemEval-V2) | Static/dynamic state, workflow knowledge, environment gotchas, premise awareness |
 | [GraphMemix: Query-Aware Evidence Forests for Long-Term Multimodal Agent Memory](https://arxiv.org/abs/2608.26983) | Query-aware graph expansion and bounded evidence budgets |
+| [LiveMem: Maintaining Memory State Continuity in Long-Running LLM Inference](https://arxiv.org/abs/2608.02515) | State continuity across context turnover and the boundary between intrinsic and external memory |
+| [FinPerMA: A Theory-Informed, Event-Grounded Personalized-Memory Benchmark for LLM Agents](https://arxiv.org/abs/2608.04095) | Event-driven preference updates, post-shock personalization, and benchmark controls |
+| [Enabling Personalized Long-term Interactions in LLM-based Agents through Persistent Memory and User Profiles](https://arxiv.org/abs/2510.07925) | Persistent user profiles, adaptive personalization, coordination, and self-validation |
+| [State Contamination in Memory-Augmented LLM Agents](https://arxiv.org/abs/2605.16746) | Memory laundering, pre-persistence sanitization, and safety across state evolution |
+| [MemORAI: Memory Organization and Retrieval via Adaptive Graph Intelligence for LLM Conversational Agents](https://aclanthology.org/2026.findings-acl.1408/) | Selective storage, turn-level provenance, multi-relational graphs, and query-adaptive retrieval |
 | [CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval](https://arxiv.org/abs/2608.25500) | Relation confidence, edge validation, controlled graph traversal |
 | [MemToC: Benchmarking Memory-Tool Conflict Resolution in Large Language Models](https://arxiv.org/abs/2608.26295) | Source arbitration, disagreement visibility, abstention |
 | [RENDER: Controlling Reader-Facing Evidence in LLM Memory Evaluation](https://arxiv.org/abs/2608.23568) | Structured evidence rendering as an independent evaluation variable |
