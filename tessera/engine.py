@@ -159,8 +159,8 @@ class TesseraEngine:
         except Exception:
             pass
 
-    def _resolve_persistent_id(self, filepath: str, raw_text: str) -> Optional[str]:
-        """Resolves or generates a persistent ID that survives rename/move of source files."""
+    def _resolve_persistent_id(self, filepath: str, raw_text: str) -> Tuple[str, str]:
+        """Resolves or generates both persistent memory ID and stable document ID."""
         import posixpath
         import re
         rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
@@ -169,33 +169,50 @@ class TesseraEngine:
         from .canonical import _split_markdown, compute_sha256
         frontmatter, body = _split_markdown(raw_text)
         explicit_id = frontmatter.get("id") or frontmatter.get("memory_id")
-        if explicit_id:
-            return str(explicit_id).strip()
-            
+        
         # 2. Extract content hash
         content_hash = compute_sha256(body)
         
         # 3. Look up in identity manifest by path
         if rel_path in self.identity_manifest:
-            return self.identity_manifest[rel_path]["id"]
+            entry = self.identity_manifest[rel_path]
+            mem_id = explicit_id or entry["id"]
+            doc_id = entry.get("document_id") or f"doc_{compute_sha256(rel_path)[:12]}"
+            return str(mem_id).strip(), doc_id
             
         # 4. Look up in identity manifest by content_hash to detect Rename/Move! (F5)
+        # Verify old path no longer exists on disk to distinguish rename from copy/duplicates (F5)
+        candidates = []
         for path, entry in self.identity_manifest.items():
             if entry["content_hash"] == content_hash:
-                stable_id = entry["id"]
-                return stable_id
-                
+                full_old_path = os.path.join(self.storage_dir, path.replace("/", os.sep))
+                if not os.path.exists(full_old_path):
+                    candidates.append((path, entry))
+                    
+        if len(candidates) == 1:
+            # Unambiguous move/rename detected!
+            old_path, entry = candidates[0]
+            mem_id = explicit_id or entry["id"]
+            doc_id = entry.get("document_id") or f"doc_{compute_sha256(old_path)[:12]}"
+            return str(mem_id).strip(), doc_id
+            
         # 5. Not found -> generate a new stable ID (clean path slug based)
-        slug = os.path.splitext(rel_path)[0]
-        slug = re.sub(r'^\.+/', '', slug)
-        slug = re.sub(r'/+', '/', slug)
-        stable_id = slug.strip("/")
-        return stable_id
+        if explicit_id:
+            mem_id = str(explicit_id).strip()
+        else:
+            slug = os.path.splitext(rel_path)[0]
+            slug = re.sub(r'^\.+/', '', slug)
+            slug = re.sub(r'/+', '/', slug)
+            mem_id = slug.strip("/")
+            
+        doc_id = f"doc_{compute_sha256(rel_path)[:12]}"
+        return mem_id, doc_id
 
     def _update_identity_manifest(self, filepath: str, canonical_meta: Any) -> None:
         """Updates the stable identity manifest with a parsed document's metadata."""
         rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
         stable_id = canonical_meta.identity.id
+        doc_id = canonical_meta.source.document_id
         
         # Remove any stale path references sharing the same ID (Move detection)
         old_paths = [p for p, entry in self.identity_manifest.items() if entry["id"] == stable_id and p != rel_path]
@@ -204,6 +221,7 @@ class TesseraEngine:
             
         self.identity_manifest[rel_path] = {
             "id": stable_id,
+            "document_id": doc_id,
             "content_hash": canonical_meta.source.content_hash,
             "updated_at": datetime.datetime.now().isoformat()
         }
@@ -545,6 +563,8 @@ class TesseraEngine:
         if not os.path.exists(self.storage_dir):
             return
 
+        explicit_ids_indexed = {}
+
         for filepath in self._iter_markdown_files(recursive=recursive):
             filename = os.path.relpath(filepath, self.storage_dir)
             try:
@@ -552,25 +572,41 @@ class TesseraEngine:
                     raw_text = f.read()
 
                 # Integrate Canonical Metadata Model (F2/F3/F4/F5/F7)
-                from .canonical import parse_and_normalize
-                persistent_id = self._resolve_persistent_id(filepath, raw_text)
-                canonical_meta = parse_and_normalize(raw_text, filepath, self.storage_dir, persistent_id=persistent_id)
+                from .canonical import parse_and_normalize, compute_sha256
+                persistent_id, persistent_doc_id = self._resolve_persistent_id(filepath, raw_text)
+                
+                canonical_meta = parse_and_normalize(
+                    raw_text, filepath, self.storage_dir,
+                    persistent_id=persistent_id, persistent_doc_id=persistent_doc_id
+                )
                 self._update_identity_manifest(filepath, canonical_meta)
 
                 mem_id = canonical_meta.identity.id
                 if not mem_id:
                     continue
+                
+                # Check for explicit ID collisions (F3)
+                if canonical_meta.metadata_origin.get("id") == "explicit":
+                    if mem_id in explicit_ids_indexed:
+                        raise ValueError(
+                            f"Collision de IDs Explícitos Detectada: O ID '{mem_id}' foi declarado explicitamente "
+                            f"em múltiplos arquivos: '{filepath}' e '{explicit_ids_indexed[mem_id]}'."
+                        )
+                    explicit_ids_indexed[mem_id] = filepath
+
                 if mem_id in self.graph:
-                    # Duplicate id across files — disambiguate deterministically
-                    mem_id = f"{mem_id}__{abs(hash(filepath)) % 10_000}"
+                    # Inferred collision suffix must be 100% deterministic (F3)
+                    suffix = compute_sha256(filename.replace(os.sep, "/"))[:6]
+                    mem_id = f"{mem_id}__{suffix}"
 
                 self.file_registry[mem_id] = filepath
                 
                 # node_type represents classification kind for compatible graph lookups
                 node_type = canonical_meta.classification.kind
                 
-                # Adapting existing tags and entities from canonical relations/raw_frontmatter
-                frontmatter_compat = canonical_meta.raw_frontmatter or {}
+                # Clone truly raw frontmatter to avoid mutating original (F4)
+                import copy
+                frontmatter_compat = copy.deepcopy(canonical_meta.raw_frontmatter or {})
                 # Ensure frontmatter_compat has legacy fields
                 frontmatter_compat["id"] = mem_id
                 frontmatter_compat["node_type"] = node_type
@@ -641,7 +677,10 @@ class TesseraEngine:
                         (mem_id, rel.target, rel.type)
                     )
 
-            except Exception as e:  # noqa: BLE001 - keep indexing resilient to one bad file
+            except Exception as e:
+                # Re-raise explicit collisions to fail build_index properly
+                if isinstance(e, ValueError) and "Collision de IDs Explícitos" in str(e):
+                    raise e
                 print(f"[Aviso] Falha ao processar a nota física {filename}: {e}")
                 continue
 
