@@ -125,6 +125,8 @@ class TesseraEngine:
         self.index_cache_dir = os.path.join(storage_dir, ".tessera_index")
         self.index_cache_pkl = os.path.join(self.index_cache_dir, "graph.pkl")
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
+        self.manifest_path = os.path.join(self.index_cache_dir, "identity_manifest.json")
+        self.identity_manifest = self._load_identity_manifest()
 
     def set_today_provider(self, provider: Any) -> None:
         """Injects a custom provider to fetch 'today's date for determinism in testing."""
@@ -135,6 +137,76 @@ class TesseraEngine:
         if self._today_provider:
             return self._today_provider()
         return datetime.date.today()
+
+    def _load_identity_manifest(self) -> Dict[str, Any]:
+        """Loads the stable identity manifest from disk."""
+        if os.path.exists(self.manifest_path):
+            try:
+                import json
+                with open(self.manifest_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def _save_identity_manifest(self) -> None:
+        """Saves the stable identity manifest to disk."""
+        os.makedirs(os.path.dirname(self.manifest_path), exist_ok=True)
+        try:
+            import json
+            with open(self.manifest_path, "w", encoding="utf-8") as f:
+                json.dump(self.identity_manifest, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+
+    def _resolve_persistent_id(self, filepath: str, raw_text: str) -> Optional[str]:
+        """Resolves or generates a persistent ID that survives rename/move of source files."""
+        import posixpath
+        import re
+        rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
+        
+        # 1. First, check if there is an explicit ID in the frontmatter
+        from .canonical import _split_markdown, compute_sha256
+        frontmatter, body = _split_markdown(raw_text)
+        explicit_id = frontmatter.get("id") or frontmatter.get("memory_id")
+        if explicit_id:
+            return str(explicit_id).strip()
+            
+        # 2. Extract content hash
+        content_hash = compute_sha256(body)
+        
+        # 3. Look up in identity manifest by path
+        if rel_path in self.identity_manifest:
+            return self.identity_manifest[rel_path]["id"]
+            
+        # 4. Look up in identity manifest by content_hash to detect Rename/Move! (F5)
+        for path, entry in self.identity_manifest.items():
+            if entry["content_hash"] == content_hash:
+                stable_id = entry["id"]
+                return stable_id
+                
+        # 5. Not found -> generate a new stable ID (clean path slug based)
+        slug = os.path.splitext(rel_path)[0]
+        slug = re.sub(r'^\.+/', '', slug)
+        slug = re.sub(r'/+', '/', slug)
+        stable_id = slug.strip("/")
+        return stable_id
+
+    def _update_identity_manifest(self, filepath: str, canonical_meta: Any) -> None:
+        """Updates the stable identity manifest with a parsed document's metadata."""
+        rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
+        stable_id = canonical_meta.identity.id
+        
+        # Remove any stale path references sharing the same ID (Move detection)
+        old_paths = [p for p, entry in self.identity_manifest.items() if entry["id"] == stable_id and p != rel_path]
+        for old_p in old_paths:
+            del self.identity_manifest[old_p]
+            
+        self.identity_manifest[rel_path] = {
+            "id": stable_id,
+            "content_hash": canonical_meta.source.content_hash,
+            "updated_at": datetime.datetime.now().isoformat()
+        }
 
     # ------------------------------------------------------------------
     # Write path
@@ -479,41 +551,67 @@ class TesseraEngine:
                 with open(filepath, "r", encoding="utf-8") as f:
                     raw_text = f.read()
 
-                frontmatter, body = self._parse_markdown(raw_text)
-                if frontmatter is None:
-                    # File has no YAML frontmatter block (e.g. CLAUDE.md, GEMINI.md, README.md)
-                    # Use an empty dictionary so _normalize_frontmatter can synthesize its ID and properties.
-                    frontmatter = {}
+                # Integrate Canonical Metadata Model (F2/F3/F4/F5/F7)
+                from .canonical import parse_and_normalize
+                persistent_id = self._resolve_persistent_id(filepath, raw_text)
+                canonical_meta = parse_and_normalize(raw_text, filepath, self.storage_dir, persistent_id=persistent_id)
+                self._update_identity_manifest(filepath, canonical_meta)
 
-                frontmatter = self._normalize_frontmatter(frontmatter, filepath)
-
-                mem_id = frontmatter.get("id")
+                mem_id = canonical_meta.identity.id
                 if not mem_id:
                     continue
                 if mem_id in self.graph:
-                    # Duplicate id across files (e.g. two notes sharing a slug) —
-                    # disambiguate deterministically instead of silently
-                    # overwriting the earlier node.
+                    # Duplicate id across files — disambiguate deterministically
                     mem_id = f"{mem_id}__{abs(hash(filepath)) % 10_000}"
 
                 self.file_registry[mem_id] = filepath
-                node_type = frontmatter.get("node_type", "factual")
+                
+                # node_type represents classification kind for compatible graph lookups
+                node_type = canonical_meta.classification.kind
+                
+                # Adapting existing tags and entities from canonical relations/raw_frontmatter
+                frontmatter_compat = canonical_meta.raw_frontmatter or {}
+                # Ensure frontmatter_compat has legacy fields
+                frontmatter_compat["id"] = mem_id
+                frontmatter_compat["node_type"] = node_type
+                frontmatter_compat["drawer"] = canonical_meta.classification.drawer
+                
+                # For compatibility with display/search, we keep tags, entities, created_at, etc., in frontmatter
+                frontmatter_compat["tags"] = frontmatter_compat.get("tags", [])
+                frontmatter_compat["entities"] = frontmatter_compat.get("entities", [])
+                
+                # Map active_connections to canonical explicit relations
+                active_connections_compat = []
+                for rel in canonical_meta.relations:
+                    if rel.origin == "explicit":
+                        active_connections_compat.append({
+                            "target_memory_id": rel.target,
+                            "relation_type": rel.type
+                        })
+                frontmatter_compat["active_connections"] = active_connections_compat
 
-                tags_str = " ".join(frontmatter.get("tags", []))
-                entities_str = " ".join([e.get("name", "") for e in frontmatter.get("entities", [])])
-                description = frontmatter.get("description", "") or ""
+                body = canonical_meta.raw_frontmatter.get("body", raw_text.split("---", 2)[2] if raw_text.startswith("---") and len(raw_text.split("---", 2)) >= 3 else raw_text)
+                body = body.strip()
+
+                tags_str = " ".join(frontmatter_compat["tags"])
+                entities_str = " ".join([e.get("name", "") if isinstance(e, dict) else "" for e in frontmatter_compat["entities"]])
+                description = frontmatter_compat.get("description", "") or ""
                 self.node_corpus[mem_id] = f"{description} {body} {tags_str} {entities_str}"
 
+                # Store the canonical metadata directly on the node!
                 self.graph.add_node(
                     mem_id,
                     node_type=node_type,
                     filepath=filepath,
                     filename=filename,
-                    frontmatter=frontmatter,
+                    frontmatter=frontmatter_compat,
                     body=body,
+                    canonical_metadata=canonical_meta,
                 )
 
-                for ent in frontmatter.get("entities", []):
+                for ent in frontmatter_compat["entities"]:
+                    if not isinstance(ent, dict):
+                        continue
                     ent_name = ent.get("name")
                     if not ent_name:
                         continue
@@ -526,7 +624,7 @@ class TesseraEngine:
 
                     self.graph.add_edge(mem_id, ent_id, relation_type="mentions")
 
-                for tag in frontmatter.get("tags", []):
+                for tag in frontmatter_compat["tags"]:
                     tag_id = f"tag_{tag.lower()}"
                     if tag_id not in self.graph:
                         self.graph.add_node(tag_id, node_type="tag", tag_name=tag)
@@ -534,9 +632,13 @@ class TesseraEngine:
 
                     self.graph.add_edge(mem_id, tag_id, relation_type="tagged_with")
 
-                for conn in frontmatter.get("active_connections", []):
+                # Add relations (explicit links, wikilinks, etc.) (F7)
+                for rel in canonical_meta.relations:
+                    # Ignore tag/entity connections that we already added above
+                    if rel.target.startswith(("tag_", "ent_")):
+                        continue
                     pending_connections.append(
-                        (mem_id, conn.get("target_memory_id"), conn.get("relation_type"))
+                        (mem_id, rel.target, rel.type)
                     )
 
             except Exception as e:  # noqa: BLE001 - keep indexing resilient to one bad file
@@ -590,6 +692,7 @@ class TesseraEngine:
         import pickle
 
         os.makedirs(self.index_cache_dir, exist_ok=True)
+        self._save_identity_manifest()
 
         fingerprint = self._source_fingerprint()
         snapshot = {
