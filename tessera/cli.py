@@ -151,12 +151,15 @@ def cmd_query(args):
     console = get_console(force_plain=getattr(args, "plain", False))
     if console is not None:
         render_query_results(
-            results, console, show_related=args.show_related, show_body=not args.no_body
+            results, console, show_related=args.show_related, show_body=not args.no_body, show_debug=getattr(args, "debug", False)
         )
         return
 
     for i, r in enumerate(results, 1):
         print(f"\n[{i}] {r['id']} ({r['type']}) — score={r['score']:.4f}  [{r.get('filename', '')}]")
+        if getattr(args, "debug", False) and r.get("score_explain"):
+            exp = r["score_explain"]
+            print(f"    debug: final={r['score']:.3f} | tfidf={exp.get('lexical_tfidf', 0.0):.2f} | overlap={exp.get('lexical_overlap', 0.0):.2f} | title={exp.get('title', 0.0):.2f} | metadata={exp.get('metadata', 0.0):.2f} | raw_pr={exp.get('raw_pagerank', 0.0):.4f} | relations={exp.get('normalized_relations', 0.0):.2f} | type_boost={exp.get('type_boost', 1.0):.1f} | recency_boost={exp.get('recency_boost', 1.0):.1f}")
         if r.get("related_ids"):
             print(f"    relacionadas: {', '.join(r['related_ids'])}")
         if not args.no_body:
@@ -457,16 +460,18 @@ def build_parser():
 
     p_query = sub.add_parser("query", help="Retrieve relevant memories for a query", parents=[plain_parent])
     p_query.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                          help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+                           help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
     p_query.add_argument("query")
     p_query.add_argument("--top-n", type=int, default=7)
     p_query.add_argument("--no-resolve-conflicts", action="store_true")
     p_query.add_argument("--paths-only", action="store_true",
-                          help="Print only the filepath of each hit (one per line), no body/score")
+                           help="Print only the filepath of each hit (one per line), no body/score")
     p_query.add_argument("--show-related", action="store_true",
-                          help="Also print the ids of directly-connected notes (graph neighbors)")
+                           help="Also print the ids of directly-connected notes (graph neighbors)")
     p_query.add_argument("--no-body", action="store_true",
-                          help="Print id/score/filename/related but skip the note body text")
+                           help="Print id/score/filename/related but skip the note body text")
+    p_query.add_argument("--debug", action="store_true",
+                           help="Show explainable score breakdown for retrieved memories")
     p_query.set_defaults(func=cmd_query)
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])
