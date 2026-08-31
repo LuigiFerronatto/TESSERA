@@ -301,6 +301,9 @@ def test_issue_93_open_candidate_and_dependency_routing_are_truthful() -> None:
     assert "5d43a2d4cdda0c17be6516f47920121070339d0f" in audit
     for delivery in ("#83", "#98", "#108", "#126", "#127"):
         assert delivery in audit
+    assert "#128" in audit
+    assert "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1" in audit
+    assert "parallel architecture delivery, not part of #93" in audit
     assert "candidate and merge counted once" in audit
     assert "already satisfied by #95" in audit
     assert "still broken" in audit

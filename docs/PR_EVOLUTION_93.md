@@ -5,10 +5,16 @@ Audited starting main:
 from PR #127. It includes the canonical #95 implementation merge
 `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`. Candidate branch:
 `test-card/93-storage-config-parity`; [PR #129](https://github.com/LuigiFerronatto/TESSERA/pull/129).
-Audited runtime/test candidate:
-`ec4d624b8e19404cfb5470de85a2bc85fda2be59`; a later evidence-only refresh
-does not change runtime behavior. The record remains `IN_PROGRESS` and no merge
-commit is claimed while the PR is open.
+The pre-reconciliation candidate was
+`8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c`.
+
+Issue #115 ran in parallel and later advanced `main` through PR #128 at
+`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. Before merge, the #93 branch was
+rebased onto that newer canonical main. This preserves the original #93 audit
+base as history while incorporating ADR 0002, the #115 evolution audit and Test
+Card, repository-layout ownership findings, package/benchmark/test distribution
+findings, and current #115/#116 routing. PR #128 is a parallel architecture delivery, not part of #93's capability delivery. The record remains
+`IN_PROGRESS` and no #93 merge commit is claimed while PR #129 is open.
 
 ## Previous capability state
 
@@ -40,6 +46,7 @@ not separate capabilities.
 | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | RUNTIME_IMPLEMENTATION | MERGED | `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` | write gate, path validation, Python/CLI/MCP write surfaces | contained truthful writes | stable logical IDs and no write escape | #92 KEEP evidence | unsafe/ambiguous write result |
 | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | MERGED | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | config, CLI, MCP, diagnostics/quickstart, optional compatibility, docs/tests | shared storage resolver and generic runtime boundary | explicit → canonical → legacy warning → default; canonical quickstart; no `.claude/memory` discovery | audited candidate `1fcd71d`, #95 KEEP evidence, green CI | historical #93 configuration divergence; candidate and merge counted once |
 | [#127](https://github.com/LuigiFerronatto/TESSERA/pull/127) | DOCUMENTATION_CORRECTION | MERGED | `5d43a2d4cdda0c17be6516f47920121070339d0f` | #95 audit/stage/roadmap/tests | lifecycle synchronization | #95 `VALIDATED`; #67 still `BLOCKED` | green lifecycle CI | stale post-merge state; no runtime delivery |
+| [#128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | ARCHITECTURE_DECISION | MERGED in parallel | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` | ADR 0002, #115 audit/Test Card, roadmap and architecture assertions | accepted repository-layout and distribution ownership plan | no migrations; no #93 runtime hypothesis/result change | canonical current main incorporated by rebase | parallel #115 work; counted only as #115 delivery |
 | Issue #93 candidate | RUNTIME_IMPLEMENTATION | OPEN | Not merged | Engine corpus iterator, golden integration, stage/audit/roadmap/docs assertions | exact configured-corpus boundary plus write-once/read-everywhere proof | removes only implicit out-of-store scanning; resolver/ranking/evidence/write contracts unchanged | 13 focused cases plus required regression/sanity/CI evidence | residual hidden corpus expansion |
 
 ## Current-main executable storage audit
@@ -80,6 +87,10 @@ when requested. It retains the existing derived-index and dependency-directory
 exclusions. There is no ranking, scoring, graph, temporal, conflict, Evidence
 Ledger, write-admission, path-validation or persistence-schema change.
 
+Rebasing onto `b475f1c` did not change this implementation. The reconciled tree
+contains both the complete #115/ADR 0002 architecture assertions from current
+main and the additive #93 `IN_PROGRESS` audit/assertions.
+
 The golden fixture resolves one absolute store, writes `issue-93/golden-storage-parity`
 once through Python, builds once, and queries through Python, a real CLI
 subprocess and actual MCP module startup. All three results are byte-equivalent
@@ -88,7 +99,9 @@ structured evidence, and expose filepaths contained by the selected store.
 
 ## What remains unimplemented
 
-- #115 owns repository/package layout; no files are moved.
+- #115's repository-layout architecture decision is delivered through PR #128;
+  its planned migrations remain unimplemented. Packaging execution remains
+  owned by #116, which is not started here.
 - #117 owns an explicit project/global registry and interactive initialization;
   removing a hidden heuristic does not implement a replacement registry.
 - #120 owns the larger MCP/optional-adapter lifecycle; direct MCP tools and
@@ -136,7 +149,8 @@ No versioned file under `benchmarks/` is changed.
 None while the PR is open. #93 remains `IN_PROGRESS`. #67 remains `BLOCKED` on
 #93 merge/lifecycle synchronization and regression-gate integration. Merging
 #93 will satisfy only that named dependency; it will not itself implement or
-start #67. #115, #117 and #120 are not absorbed.
+start #67. The merged #115 architecture is preserved but not counted as #93;
+#116, #117 and #120 are not started or absorbed.
 
 ## Roadmap evolution
 
@@ -147,7 +161,9 @@ historical CLI/quickstart/MCP mismatch (#93 baseline)
 → contained writes (#108)
 → shared resolver/generic quickstart (#126)
 → #95 lifecycle synchronized (#127)
-→ exact-corpus defect reproduced + golden #93 candidate
+→ exact-corpus defect reproduced + golden #93 candidate from `5d43a2d`
+→ parallel #115 architecture merge #128 / `b475f1c` advances main
+→ #93 rebased additively onto `b475f1c` without changing its runtime result
 → merge/lifecycle synchronization required before #93 VALIDATED
 → #67 remains blocked on its separate regression-gate integration
 ```

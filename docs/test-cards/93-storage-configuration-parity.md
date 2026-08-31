@@ -6,7 +6,7 @@
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
 | Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
-| Head commit | [`ec4d624`](https://github.com/LuigiFerronatto/TESSERA/commit/ec4d624b8e19404cfb5470de85a2bc85fda2be59) audited runtime/test candidate; later evidence-only refresh does not change runtime |
+| Head commit | Pre-reconciliation candidate [`8f3827b`](https://github.com/LuigiFerronatto/TESSERA/commit/8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c); final reconciled head recorded in Issue evidence |
 | Merge commit | Not merged |
 | Decision | `KEEP` candidate |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -40,6 +40,10 @@ TESSERA_STORAGE_DIR=/tmp/audit/canonical-store
 
 The executable reproduction returned `issue-93/golden-parity` together with
 unselected `../pr95_body` and `../issue95_evidence` memories.
+
+PR #128 / Issue #115 later advanced main to the canonical architecture merge
+`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. PR #129 was reconciled onto that
+newer main before merge without rewriting the original audit history.
 
 ## What changed or is being tested?
 
@@ -104,17 +108,20 @@ Deterministic sanity remains Hit@1 `0.75`, Hit@3 `1.00`, Hit@5 `1.00`, MRR
 
 ## What remains unimplemented?
 
-This card does not implement repository restructuring (#115), a project/global
-registry or interactive initialization (#117), optional adapter/MCP lifecycle
-architecture (#120), retrieval/ranking changes, graph expansion, temporal or
-conflict behavior, Evidence Ledger semantics, write admission, persistence
-schema, or benchmark changes. Those issues remain separate.
+The #115 repository-layout architecture decision is now delivered through PR
+#128 and is preserved here; its migrations remain unimplemented. This card does
+not implement packaging execution (#116), a project/global registry or
+interactive initialization (#117), optional adapter/MCP lifecycle architecture
+(#120), retrieval/ranking changes, graph expansion, temporal or conflict
+behavior, Evidence Ledger semantics, write admission, persistence schema, or
+benchmark changes. Those issues remain separate.
 
 ## What is unlocked next?
 
 Nothing is promoted while this pull request is open. #67 remains `BLOCKED` on
 the merge and lifecycle synchronization of #93 and on its own regression-gate
-integration. #115, #117 and #120 are not started or absorbed.
+integration. The merged #115 architecture is not counted as #93 work; #116,
+#117 and #120 are not started or absorbed.
 
 ## Technical provenance
 
@@ -135,6 +142,8 @@ integration. #115, #117 and #120 are not started or absorbed.
 → #108 contained writes
 → #126 shared resolver and generic quickstart
 → #127 #95 lifecycle synchronization
-→ #93 exact-corpus containment + golden integration candidate
+→ #93 exact-corpus containment + golden integration candidate from `5d43a2d`
+→ parallel #128 / `b475f1c` delivers #115 architecture
+→ #93 reconciled onto the newer main with both contracts preserved
 → after merge/lifecycle sync, #67 loses only its #93 dependency
 ```
