@@ -120,11 +120,11 @@ def test_issue_and_pr_templates_require_evolution_audit_and_final_state() -> Non
         assert marker in pr_template
 
     for marker in (
-        "## Previous capability state",
-        "## Deliveries that established the current state",
-        "## Target capability state",
-        "## What will remain unimplemented",
-        "## Roadmap evolution",
+        "### Previous capability state",
+        "### Deliveries that established the current state",
+        "### Target capability state",
+        "### What will remain unimplemented",
+        "### Roadmap evolution",
     ):
         assert marker in issue_template
 
