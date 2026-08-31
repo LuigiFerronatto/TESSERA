@@ -102,6 +102,10 @@ persistence format validation (`md` only)
    ├─ unsupported → deterministic failure, no mutation
    └─ supported
    ↓
+portable memory-ID validation + resolved storage containment
+   ├─ invalid/outside/symlink escape → reject, no mutation
+   └─ contained destination
+   ↓
 candidate memory content
    ↓
 WriteGatingEngine.evaluate()
@@ -126,15 +130,17 @@ any filesystem/runtime mutation.
 
 `content_changed` is derived from SHA-256 hashes of the exact UTF-8 original
 payload and persistence candidate. The compatibility `sanitized` field is true
-only for `accept_sanitized`. Quoted/documentary hostile examples are routed to
-review without canonical persistence rather than silently redacted. This gate
-does not claim comprehensive semantic prompt-injection protection; #19 remains
-the separate evidence-aware memory-admission experiment.
+only for `accept_sanitized`. The current version emits no sanitized admission:
+direct known hostile instructions are rejected, while quoted/documentary
+examples are routed to review without canonical persistence. The schema keeps
+`accept_sanitized` only for a future versioned, complete bounded transformation.
+This gate does not claim comprehensive semantic prompt-injection protection;
+#19 remains the separate evidence-aware memory-admission experiment.
 
 This is different from roadmap #19:
 
 ```text
-basic heuristic sanitization          IMPLEMENTED
+basic deterministic write admission  IMPLEMENTED in PR candidate #108; not on main
 full evidence-aware memory admission  PLANNED (#19)
 ```
 

@@ -350,7 +350,9 @@ rebuild; ingestão arbitrária de JSON não é suportada.
 
 O retorno inclui o contrato canônico `threat_detected`, `content_changed`,
 `admission`, `reasons`, `original_hash`, `persisted_hash`, `persisted` e o alias
-compatível `is_sanitized`. `reject` e `review` não gravam nem reindexam.
+compatível `is_sanitized`. IDs usam segmentos com `/`, sem caminhos absolutos,
+`..`, barras invertidas ou escape por symlink. `reject` e `review` não gravam
+nem reindexam; instruções hostis diretas conhecidas são rejeitadas.
 
 ### `get_memory(memory_id)`
 Devolve o corpo bruto de uma nota específica pelo id.
@@ -473,7 +475,10 @@ lança `WriteGatingViolationError` em `reject`/`review`.
 
 Na CLI, `tessera write ... --json` imprime exatamente o mesmo contrato do
 Engine/MCP. Texto seguro permanece igual e nunca é marcado sanitizado; exemplos
-hostis claramente citados/documentais vão para revisão sem persistência.
+hostis claramente citados/documentais vão para revisão sem persistência, e
+instruções hostis diretas conhecidas são rejeitadas. `accept_sanitized` fica no
+schema, mas o avaliador atual não o emite sem uma transformação integral e
+versionada.
 
 ### Decomposição automática de episódio (`decompose_and_write_episode`)
 

@@ -10,7 +10,9 @@ Contamination protection.
 ## Pipeline and mutation boundary
 
 ```text
-detection
+Markdown-only format validation
+→ portable memory-ID and resolved-path containment validation
+→ detection
 → optional deterministic transformation
 → admission decision
 → atomic Markdown persistence
@@ -21,6 +23,16 @@ Admission is final before any write-specific durable mutation. `reject` and
 `review` create or overwrite no memory file, update no registry/graph/ledger,
 and trigger no index rebuild. Review means “return the decision to the caller
 for external/manual handling”; TESSERA has no canonical quarantine store.
+
+Path validation runs before warnings, timestamps, frontmatter, directory or
+temporary-file creation, gate evaluation, and every canonical or derived
+mutation. Canonical logical IDs are non-empty forward-slash-separated segments.
+Absolute POSIX/Windows paths, drive/UNC forms, backslashes, NUL, empty/dot/dotdot
+segments, repeated/trailing separators, non-NFC or platform-ambiguous segments,
+and resolved destinations outside the resolved storage root are rejected with
+`invalid_memory_id_or_path`. Existing symlinked parents are resolved, so an
+escape through one is rejected. Containment uses path ancestry, not a string
+prefix.
 
 ## Canonical result
 
@@ -46,8 +58,9 @@ decision and persistence.
 - `content_changed` is true exactly when an accepted candidate's original and
   persisted hashes differ.
 - `accept` has an unchanged candidate and `is_sanitized=false`.
-- `accept_sanitized` requires a changed candidate and no confirmed hostile
-  pattern remaining in it.
+- `accept_sanitized` requires a changed candidate, no confirmed hostile pattern,
+  and the versioned complete bounded transformation. The current evaluator does
+  not emit this state; it rejects direct known hostile instructions.
 - `reject` and `review` have `persisted_hash=null`, `persisted=false`, and no
   persistence candidate.
 - Reasons are unique and deterministically ordered.
@@ -55,8 +68,11 @@ decision and persistence.
   `admission=accept_sanitized AND content_changed=true`.
 - Unsupported persistence formats still fail before the gate and every side
   effect under the Markdown-only #94 contract.
-- Persistence uses a same-directory temporary file and atomic replacement; a
-  failed write returns no false success result and preserves an existing file.
+- Persistence uses a same-directory temporary file, file flush/fsync, and
+  `os.replace`; a failed write returns no false success result, cleans temporary
+  files/new empty parents, and preserves an existing file. This is atomic
+  replacement, not a claim of crash durability for the directory entry because
+  the parent directory is not fsynced.
 
 Impossible states are rejected by the result model, including unchanged
 `accept_sanitized`, changed `accept`, successful rejected persistence, or a
@@ -67,11 +83,17 @@ sanitized candidate that still contains a known hostile pattern.
 | Input class | Admission | Mutation |
 |---|---|---|
 | safe non-empty content | `accept` | exact content persisted |
-| known direct hostile instruction that can be removed | `accept_sanitized` | transformed content persisted |
+| known direct hostile instruction | `reject` | none |
 | empty or whitespace-only content | `reject` | none |
 | known hostile text in explicit quote/code/documentary context | `review` | none |
-| suspicious tag without a transformable direct pattern | `review` | none |
-| detected pattern that remains after attempted transformation | `review` | none |
+| suspicious tag without a direct pattern | `review` | none |
+| invalid or escaping logical memory ID | `reject` | none |
+
+`accept_sanitized` remains an explicit schema state for a future deterministic
+rule, but construction currently requires the exact versioned whole-content
+redaction candidate. Partial line removal, retained payload lines, or an
+unversioned transformation is an impossible state. No current input is routed
+to this admission by `WriteGatingEngine.evaluate()`.
 
 Quoted/documentary handling is deliberately conservative: recognized quote,
 code, or security-analysis contexts are not silently destroyed, but they are
@@ -91,3 +113,13 @@ of scope.
 - Markdown: accepted source frontmatter records the same decision and hashes.
 
 No surface may infer or report stronger protection than this canonical result.
+
+## Limitations
+
+The pattern list is deliberately small and deterministic. It is not a semantic
+classifier, cannot prove general intent, and does not cover all paraphrases or
+languages. Quote/code/documentary recognition is syntactic and conservative.
+Path resolution rejects existing symlink escapes, but it does not defend
+against a privileged concurrent actor swapping filesystem components between
+validation and replacement. No quarantine store, LLM, network classifier,
+State Contamination benchmark, or evidence-aware admission policy is included.

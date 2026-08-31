@@ -65,12 +65,14 @@ registry, graph, index, or Evidence Ledger mutation; arbitrary JSON ingestion is
 not supported.
 
 Every write is decided before persistence using the deterministic contract
-`detection → optional transformation → admission → persistence`. Safe content
-is accepted unchanged and is never labeled sanitized. Known direct hostile
-instructions are persisted only after a hash-proven transformation removes the
-matched pattern; empty input is rejected, while quoted/documentary examples and
-suspicious-tag-only inputs go to `review`, which has no canonical persistence
-side effects. See [`docs/WRITE_GATE_CONTRACT.md`](docs/WRITE_GATE_CONTRACT.md).
+`path validation → detection → optional transformation → admission →
+persistence`. Logical memory IDs use portable forward-slash segments and must
+resolve strictly inside the configured store. Safe content is accepted
+unchanged and is never labeled sanitized. Direct known hostile instructions are
+rejected; empty input is rejected; quoted/documentary examples and
+suspicious-tag-only inputs go to `review`. Those non-accepting outcomes have no
+canonical persistence side effects. See
+[`docs/WRITE_GATE_CONTRACT.md`](docs/WRITE_GATE_CONTRACT.md).
 
 ### Query existing project knowledge
 

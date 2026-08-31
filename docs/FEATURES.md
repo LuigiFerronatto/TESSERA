@@ -228,10 +228,19 @@ admission finalized before mutation
    └─ accepted → atomic Markdown persistence + truthful metadata
 ```
 
-Safe unchanged text has `sanitized=false`. `accept_sanitized` requires distinct
-original/persisted hashes and a persistence candidate without the detected
-hostile pattern. Quoted/documentary examples and suspicious-tag-only ambiguity
-are review-only and are not written to the canonical corpus.
+Safe unchanged text has `sanitized=false`. Direct known hostile instructions
+are rejected because the current deterministic policy cannot prove the full
+logical payload safe. Quoted/documentary examples and suspicious-tag-only
+ambiguity are review-only and are not written to the canonical corpus.
+`accept_sanitized` remains in the schema but is constructable only for the
+versioned complete whole-content transformation; the current evaluator does
+not emit it.
+
+Before gate evaluation, a canonical path validator requires a non-empty,
+portable, forward-slash logical ID whose resolved `.md` destination is a strict
+descendant of the resolved storage root. Absolute, drive/UNC, dot-segment,
+non-canonical separator, reserved-name, case-alias, NUL, trailing-separator and
+existing symlink escape forms are rejected without mutation.
 
 ### Important boundary
 

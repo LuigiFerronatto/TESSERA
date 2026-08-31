@@ -31,7 +31,7 @@ from .models import (
     MemoryFrontmatter,
     WriteGatingViolationError,
 )
-from .security import WriteAdmission, WriteGatingEngine, WriteResult
+from .security import WriteAdmission, WriteGatingEngine, WriteResult, validate_memory_path
 
 # Relation types that receive a retrieval boost — they anchor procedural
 # stability (skills that stabilize a service/deployment/generalization).
@@ -245,42 +245,31 @@ class TesseraEngine:
         persist_format: Literal["md"] = "md",
     ) -> WriteResult:
         """
-        Canonical write flow returning the complete gate/persistence contract:
-        1. Validates the Markdown-only persistence contract before side effects.
-        2. Runs security audit + sanitization (write-side gating).
-        3. Formats the note as an atomic card (Markdown + YAML frontmatter).
-        4. Persists it physically to disk.
-        5. Returns a truthful result describing the actual mutation.
+        Canonical write flow returning the complete gate/persistence contract.
+
+        Persistence format and logical memory ID are validated before warnings,
+        timestamps, admission, directory creation, or durable/derived mutation.
+        Accepted logical IDs use portable forward-slash-separated segments and
+        resolve to a strict descendant of ``storage_dir``.
 
         ``persist_format`` accepts exactly ``"md"``. Any other value raises
         ``ValueError`` before warnings, sanitization, timestamps, frontmatter,
         filesystem writes, registry/graph updates, index rebuilds, or Evidence
         Ledger updates. Arbitrary JSON persistence/ingestion is not supported.
 
-        `mem_id` SHOULD carry a domain prefix ("<domain>/<slug>", e.g.
-        "research/browser-actions/thesis" or "lao/some-learning") so the
-        note lands inside a topical subdirectory of storage_dir instead of
-        loose at its root. A bare, unprefixed mem_id (no "/" at all) is
-        accepted — writing must never hard-fail an autonomous run over a
-        naming nit — but is a near-certain sign the caller (an LLM agent
-        following a system prompt, most often) skipped that convention.
-        Confirmed live 2026-08-25/26: a Gemini-driven `/lao` run wrote
-        mem_id="voice-ai-blip-integration-strategy" with no prefix at all
-        and the note silently landed at .claude/memory/'s own root, next to
-        MEMORY.md/README.md/STRUCTURE.md, instead of inside e.g.
-        research/<topic>/ or lao/ - nothing in this engine (or the write_memory
-        MCP tool's docstring) told it any different. This warning is a
-        stopgap until every caller-facing surface (MCP tool docstring, CLI
-        --help, hooks.py's on_task_end mem_id default) is updated to make
-        the domain prefix impossible to miss - see the "Improvements found
-        auditing against the QUMem paper" notes in Tessera/docs/ for the full
-        list this belongs to.
+        A bare valid ID remains accepted for compatibility and emits the
+        existing domain-prefix warning only after path validation succeeds.
         """
         if persist_format != "md":
             raise ValueError(
                 f"Unsupported persist_format {persist_format!r}; supported format is "
                 "'md'. No memory was persisted."
             )
+
+        path_validation = validate_memory_path(self.storage_dir, mem_id)
+        if not path_validation.valid or path_validation.destination is None:
+            decision = self.gating_engine.reject_invalid_memory_id(content)
+            return WriteResult(mem_id, None, False, decision)
 
         provenance_turns = provenance_turns or []
         active_connections = active_connections or []
@@ -334,27 +323,12 @@ class TesseraEngine:
         )
 
         frontmatter_dict = frontmatter_data.to_dict()
-        filepath_base = os.path.join(self.storage_dir, mem_id)
-        
-        # `mem_id` commonly carries a domain prefix (e.g. "lao/some-slug") so
-        # notes land inside a topical subdirectory instead of loose at
-        # storage_dir's root. Without creating that subdirectory first, a
-        # first-ever write to a brand-new domain prefix crashes with
-        # FileNotFoundError deep inside an autonomous run (confirmed live
-        # 2026-08-25/26: a Gemini-driven /lao run wrote mem_id="voice-ai-..."
-        # with NO domain prefix at all and silently landed the note at
-        # .claude/memory/'s root instead of e.g. research/<topic>/ - the
-        # engine had no way to reject or redirect that, since it never
-        # validates mem_id shape). This makedirs alone only fixes the crash
-        # for prefixed ids that don't have their subdirectory yet; it does
-        # NOT enforce a prefix - see write_memory_note's docstring/callers
-        # for the convention every caller (CLI, MCP tool, hooks) must follow.
         yaml_frontmatter = yaml.dump(
             frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
         )
         markdown_body = f"---\n{yaml_frontmatter}---\n\n{persistence_candidate}"
-        filepath = f"{filepath_base}.md"
-        parent = os.path.dirname(filepath_base) or self.storage_dir
+        filepath = str(path_validation.destination)
+        parent = os.path.dirname(filepath)
         missing_parents = []
         cursor = parent
         while cursor and not os.path.exists(cursor):
@@ -364,17 +338,21 @@ class TesseraEngine:
                 break
             cursor = next_cursor
 
+        descriptor = None
         temporary_path = None
         try:
             os.makedirs(parent, exist_ok=True)
             descriptor, temporary_path = tempfile.mkstemp(prefix=".tessera-write-", suffix=".tmp", dir=parent)
             with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as handle:
+                descriptor = None
                 handle.write(markdown_body)
                 handle.flush()
                 os.fsync(handle.fileno())
             os.replace(temporary_path, filepath)
             temporary_path = None
         except Exception:
+            if descriptor is not None:
+                os.close(descriptor)
             if temporary_path and os.path.exists(temporary_path):
                 os.unlink(temporary_path)
             for created_parent in missing_parents:

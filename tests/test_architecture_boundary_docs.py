@@ -114,11 +114,12 @@ def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
     ):
         assert marker in contract
     assert "merge `0c0b638`" in roadmap
-    assert "PR #107 / #74" in roadmap
-    assert "PR #108 / #92" in roadmap
+    assert "https://github.com/LuigiFerronatto/TESSERA/pull/107" in roadmap
+    assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
+    assert "https://github.com/LuigiFerronatto/TESSERA/pull/108" in roadmap
     assert "PR_EVOLUTION_92.md" in roadmap
-    assert "existing deterministic write gate" in roadmap
-    assert "#19, still BLOCKED" in roadmap
+    assert "| [#92]" in roadmap and "IN_PROGRESS" in roadmap
+    assert "| [#19]" in roadmap and "BLOCKED" in roadmap
 
 
 def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:

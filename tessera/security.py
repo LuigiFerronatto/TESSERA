@@ -8,7 +8,9 @@ canonical memory, index, graph, registry, or Evidence Ledger mutation.
 from dataclasses import dataclass
 from enum import Enum
 import hashlib
+from pathlib import Path, PureWindowsPath
 import re
+import unicodedata
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 
@@ -22,14 +24,14 @@ class WriteAdmission(str, Enum):
 REDACTION_MARK = "[CONTEÚDO REMOVIDO POR INFRAÇÃO DE SEGURANÇA]"
 
 HOSTILE_PATTERNS: Tuple[Tuple[str, str], ...] = (
-    ("ignore_previous_instructions_pt", r"ignore as (?:instruções|instrucoes|regras) anteriores"),
-    ("change_primary_directive_pt", r"mude sua diretriz principal"),
-    ("hostile_system_role_pt", r"aja como um sistema hostil"),
-    ("delete_memories_pt", r"delete todas as memórias"),
-    ("hate_directive_pt", r"você deve odiar"),
-    ("pretend_role_pt", r"finja ser"),
-    ("ignore_previous_instructions_en", r"ignore (?:all |the )?previous instructions"),
-    ("disregard_prior_rules_en", r"disregard (?:all |the )?prior (?:rules|instructions)"),
+    ("ignore_previous_instructions_pt", r"ignore\s+as\s+(?:instruções|instrucoes|regras)\s+anteriores"),
+    ("change_primary_directive_pt", r"mude\s+sua\s+diretriz\s+principal"),
+    ("hostile_system_role_pt", r"aja\s+como\s+um\s+sistema\s+hostil"),
+    ("delete_memories_pt", r"delete\s+todas\s+as\s+memórias"),
+    ("hate_directive_pt", r"você\s+deve\s+odiar"),
+    ("pretend_role_pt", r"finja\s+ser"),
+    ("ignore_previous_instructions_en", r"ignore\s+(?:(?:all|the)\s+)?previous\s+instructions"),
+    ("disregard_prior_rules_en", r"disregard\s+(?:(?:all|the)\s+)?prior\s+(?:rules|instructions)"),
 )
 
 # Backward-compatible public pattern list.
@@ -41,15 +43,25 @@ DOCUMENTARY_MARKERS = re.compile(
 )
 HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 REASON_ORDER = {
-    "empty_content": 0,
-    "hostile_instruction_detected": 10,
-    "suspicious_tag_detected": 20,
-    "documentary_context_detected": 30,
-    "hostile_instruction_redacted": 40,
-    "hostile_pattern_remains": 50,
-    "manual_review_required": 60,
-    "safe_content": 70,
+    "invalid_memory_id_or_path": 0,
+    "empty_content": 10,
+    "hostile_instruction_detected": 20,
+    "suspicious_tag_detected": 30,
+    "documentary_context_detected": 40,
+    "direct_hostile_instruction_rejected": 50,
+    "hostile_instruction_redacted": 60,
+    "hostile_pattern_remains": 70,
+    "manual_review_required": 80,
+    "safe_content": 90,
 }
+
+WINDOWS_RESERVED_NAMES = {
+    "CON", "PRN", "AUX", "NUL",
+    *(f"COM{number}" for number in range(1, 10)),
+    *(f"LPT{number}" for number in range(1, 10)),
+}
+WINDOWS_FORBIDDEN_CHARACTERS = frozenset('<>:"\\|?*')
+WHOLE_CONTENT_REDACTION_RULE = "whole_content_redaction_v1"
 
 
 def content_sha256(content: str) -> str:
@@ -96,11 +108,84 @@ def _is_documentary(content: str, matches: Sequence[Tuple[str, re.Match]]) -> bo
     return False
 
 
-def _redact_directives(content: str) -> str:
-    transformed = content
-    for _reason, pattern in HOSTILE_PATTERNS:
-        transformed = re.sub(rf"(?i){pattern}[^\n]*", REDACTION_MARK, transformed)
-    return transformed
+@dataclass(frozen=True)
+class MemoryPathValidation:
+    valid: bool
+    destination: Optional[Path]
+    reason: Optional[str]
+
+
+def validate_memory_path(storage_dir: str, memory_id: str) -> MemoryPathValidation:
+    """Resolve a portable logical ID to a contained Markdown destination.
+
+    Validation follows existing symlinks and rejects destinations outside the
+    resolved storage root. The result is computed before any write-side
+    mutation. Forward slashes are the only accepted logical separator.
+    """
+    invalid = MemoryPathValidation(False, None, "invalid_memory_id_or_path")
+    if not isinstance(memory_id, str) or not memory_id:
+        return invalid
+    if "\x00" in memory_id or "\\" in memory_id:
+        return invalid
+    if memory_id.startswith("/") or memory_id.endswith("/") or "//" in memory_id:
+        return invalid
+    windows_path = PureWindowsPath(memory_id)
+    if windows_path.drive or windows_path.root or windows_path.is_absolute():
+        return invalid
+
+    segments = memory_id.split("/")
+    if any(segment in {"", ".", ".."} for segment in segments):
+        return invalid
+    for segment in segments:
+        if unicodedata.normalize("NFC", segment) != segment:
+            return invalid
+        if segment.endswith((" ", ".")):
+            return invalid
+        if any(ord(character) < 32 or character in WINDOWS_FORBIDDEN_CHARACTERS for character in segment):
+            return invalid
+        if segment.split(".", 1)[0].upper() in WINDOWS_RESERVED_NAMES:
+            return invalid
+
+    try:
+        root = Path(storage_dir).resolve(strict=False)
+        candidate = root.joinpath(*segments).with_name(segments[-1] + ".md")
+        destination = candidate.resolve(strict=False)
+    except (OSError, RuntimeError):
+        return invalid
+    try:
+        relative = destination.relative_to(root)
+    except ValueError:
+        return invalid
+    if not relative.parts or destination == root:
+        return invalid
+
+    # Reject case-fold aliases while walking existing parents. This prevents
+    # one logical ID from naming different files on case-sensitive and
+    # case-insensitive supported platforms.
+    logical_parent = root
+    try:
+        for segment in segments[:-1]:
+            resolved_parent = logical_parent.resolve(strict=False)
+            resolved_parent.relative_to(root)
+            if logical_parent.is_dir():
+                collisions = [
+                    child.name for child in logical_parent.iterdir()
+                    if child.name.casefold() == segment.casefold() and child.name != segment
+                ]
+                if collisions:
+                    return invalid
+            logical_parent = logical_parent / segment
+        if logical_parent.is_dir():
+            expected_name = segments[-1] + ".md"
+            if any(
+                child.name.casefold() == expected_name.casefold()
+                and child.name != expected_name
+                for child in logical_parent.iterdir()
+            ):
+                return invalid
+    except (OSError, RuntimeError, ValueError):
+        return invalid
+    return MemoryPathValidation(True, destination, None)
 
 
 @dataclass(frozen=True)
@@ -113,6 +198,7 @@ class WriteGateDecision:
     persisted_hash: Optional[str]
     threat_score: float
     persistence_candidate: Optional[str] = None
+    transformation_rule: Optional[str] = None
 
     def __post_init__(self) -> None:
         if not HASH_RE.fullmatch(self.original_hash):
@@ -137,8 +223,18 @@ class WriteGateDecision:
                 raise ValueError("accept_sanitized requires changed persisted content")
             if contains_hostile_pattern(self.persistence_candidate or ""):
                 raise ValueError("accept_sanitized cannot retain a confirmed hostile pattern")
+            if (
+                self.transformation_rule != WHOLE_CONTENT_REDACTION_RULE
+                or self.persistence_candidate != REDACTION_MARK
+            ):
+                raise ValueError("accept_sanitized requires a complete bounded transformation")
         elif self.admission in {WriteAdmission.REJECT, WriteAdmission.REVIEW}:
-            if has_candidate or self.persisted_hash is not None or self.content_changed:
+            if (
+                has_candidate
+                or self.persisted_hash is not None
+                or self.content_changed
+                or self.transformation_rule is not None
+            ):
                 raise ValueError("reject/review cannot carry an accepted persistence candidate")
 
     @property
@@ -207,16 +303,9 @@ class WriteGatingEngine:
             )
 
         if matches:
-            transformed = _redact_directives(content_text)
-            if transformed != content_text and not contains_hostile_pattern(transformed):
-                return WriteGateDecision(
-                    True, True, WriteAdmission.ACCEPT_SANITIZED,
-                    _ordered_reasons(("hostile_instruction_detected", "hostile_instruction_redacted")),
-                    original_hash, content_sha256(transformed), threat_score, transformed,
-                )
             return WriteGateDecision(
-                True, False, WriteAdmission.REVIEW,
-                _ordered_reasons(("hostile_instruction_detected", "hostile_pattern_remains", "manual_review_required")),
+                True, False, WriteAdmission.REJECT,
+                _ordered_reasons(("hostile_instruction_detected", "direct_hostile_instruction_rejected")),
                 original_hash, None, threat_score,
             )
 
@@ -230,6 +319,13 @@ class WriteGatingEngine:
         return WriteGateDecision(
             False, False, WriteAdmission.ACCEPT, ("safe_content",),
             original_hash, original_hash, threat_score, content_text,
+        )
+
+    def reject_invalid_memory_id(self, content_text: str) -> WriteGateDecision:
+        """Return a fail-closed decision without running content admission."""
+        return WriteGateDecision(
+            False, False, WriteAdmission.REJECT, ("invalid_memory_id_or_path",),
+            content_sha256(content_text), None, 0.0,
         )
 
     def audit_and_sanitize(self, content_text: str, tags: List[str]) -> Tuple[str, float, bool]:
