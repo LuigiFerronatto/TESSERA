@@ -14,6 +14,13 @@ access, console entry points, benchmark setup/constraints, CI, a detached
 current-main build, exact wheel/sdist members and clean installed-artifact
 behavior. Titles alone were not treated as capability evidence.
 
+The first candidate CI run confirmed an important development/distribution
+distinction: after benchmarks ceased being editable-installed packages, the
+standalone `pytest` script could not import repository-only benchmark modules.
+Using the repository contract `python -m pytest` intentionally places the
+checkout on the development test path; the separate installed-wheel job proves
+that `benchmarks` is unavailable to artifact consumers.
+
 ## Deliveries that established the boundary
 
 | Delivery | Merge and state | Type | Packaging-relevant evidence | Capability accounting |

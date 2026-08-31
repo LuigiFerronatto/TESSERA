@@ -30,6 +30,13 @@ Editable installs were weak evidence because the repository root remained on
 the import path. A missing packaged module or data file could be read from the
 checkout and appear to work.
 
+The first CI candidate also exposed the inverse boundary: invoking the
+environment's `pytest` console script no longer placed the checkout root on
+`sys.path`, so repository-only benchmark tests could not import repository-only
+benchmark modules. CI now uses `python -m pytest`, the documented repository
+test command, while the separate artifact job proves benchmarks are absent from
+an installed wheel outside the checkout.
+
 ## How did TESSERA behave before?
 
 At audited current `main` `055a35f4a7e8298013bcb816b30f67d9706b9516`,

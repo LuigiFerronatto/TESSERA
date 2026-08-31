@@ -109,6 +109,7 @@ jobs:
               assert getattr(tessera, public_name) is not None
           assert importlib.util.find_spec("mcp") is None
           assert importlib.util.find_spec("requests") is None
+          assert importlib.util.find_spec("benchmarks") is None
           skills = importlib.resources.files("tessera").joinpath("skills_library")
           assert len(list(skills.glob("sk_*.md"))) == 5
           assert not any(name in os.environ for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY") if os.environ[name])
@@ -169,7 +170,7 @@ jobs:
           OPENAI_API_KEY: ""
           ANTHROPIC_API_KEY: ""
           GEMINI_API_KEY: ""
-        run: pytest -ra
+        run: python -m pytest -ra
 
   smoke:
     name: smoke
