@@ -13,6 +13,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Test Cards now have versioned plain-language stage records that preserve current-vs-target status, understandable before/after behavior, technical provenance, evidence, limitations and next dependencies. ([#109](https://github.com/LuigiFerronatto/TESSERA/issues/109))
 - The experimental roadmap now derives status from GitHub state, merged
   implementation/evidence, declared dependencies, and benchmark records. It
   records completed #68/#94/#96/#100 work, accepted ADR #74 in progress, the
