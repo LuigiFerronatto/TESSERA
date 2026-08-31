@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime branding contract` |
 | Pull request | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
-| Head commit | See current head on PR #113 |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Candidate head | `817ec65e6e792cfaf84f27f6bd0359f874384d23` |
+| Merge commit | [`a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2) |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-08-31 |
 
@@ -36,7 +36,7 @@ The candidate replaces the active glyphs with an inspectable `TESSERA_BANNER_LIN
 
 ## How does it work now?
 
-**CANDIDATE — NOT YET ON MAIN.**
+**VALIDATED ON `main`.**
 
 Rich terminal output renders the six canonical TESSERA rows. Plain output continues to print the product name and tagline. Tests scan active Python runtime files for legacy AMem identity while deliberately preserving A-MEM research citations and archived history.
 
@@ -51,11 +51,11 @@ Research documentation still says “A-MEM: Agentic Memory for LLM Agents” whe
 
 ## How was it validated?
 
-Validation is pending the implementation PR and CI. Required gates are focused banner tests, the full suite, Python 3.9/3.12, CLI smoke, sanity evaluation and benchmark applicability.
+PR #113 passed Python 3.9, Python 3.12, CLI smoke, deterministic sanity evaluation and offline benchmark reporting/applicability. LongMemEval dev-50 was correctly skipped because retrieval semantics did not change.
 
 ## What improved?
 
-Nothing on `main` until merge. The candidate makes active terminal identity internally consistent and testable.
+The active terminal identity is now internally consistent and guarded by exact rich/plain regression tests.
 
 ## What remains unimplemented?
 
@@ -71,8 +71,8 @@ After merge, the exact ASCII regression is closed. #95 remains a broader indepen
 |---|---|
 | Issue/Test Card | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
 | Pull request | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending |
+| Merge commit | [`a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2) |
+| Evidence/Learnings/Decision | [Issue comment](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) |
 | Benchmark record | LongMemEval not applicable; smoke/sanity required |
 | PR Evolution Audit | Initial `9cc8c38`; PR #2 / merge `5590b1d`; PR #83 / merge `a6dc12c` |
 
