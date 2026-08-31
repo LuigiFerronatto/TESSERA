@@ -34,6 +34,9 @@ Closes #
 **Documentation impact:** `YES | NO`
 <!-- Link docs changed or explain why none are needed. -->
 
+**Plain-language stage record:** `docs/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
+<!-- Update status, PR/head evidence, before/after, validation and limitations. -->
+
 ## Benchmark applicability
 
 <!-- Replace the choices below with exactly one value. A rationale is mandatory for SMOKE_ONLY and NOT_APPLICABLE. -->
@@ -122,5 +125,6 @@ Benchmark rationale:
 - [ ] Tests green
 - [ ] Relevant contract/smoke/sanity/benchmark gate green or explicitly waived with rationale
 - [ ] Evidence & Learnings updated in the Issue/Test Card
+- [ ] Plain-language stage record created/updated or explicitly NOT_APPLICABLE
 - [ ] Known regressions recorded
 - [ ] Final decision recorded
