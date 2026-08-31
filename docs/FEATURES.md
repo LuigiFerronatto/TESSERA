@@ -188,9 +188,9 @@ new entity
 
 ---
 
-## 8. Basic heuristic write-side sanitization
+## 8. Truthful deterministic write-gate contract
 
-**Tracking:** existing write path; documentation correction Issue #54
+**Tracking:** Issue #92
 
 ### Persistence-format contract
 
@@ -200,33 +200,52 @@ timestamps, source writes, registry/graph changes, index rebuilds, or Evidence
 Ledger changes. This keeps every acknowledged write discoverable by the current
 Markdown source pipeline. Arbitrary JSON persistence/ingestion is not supported.
 
-The current `write_memory_note()` path instantiates `WriteGatingEngine` and runs:
+The canonical `write_memory_note_result()` path instantiates
+`WriteGatingEngine` and runs:
 
 ```python
-audit_and_sanitize(content, tags)
+evaluate(content, tags)
 ```
 
-before persisting the memory.
-
-Today this gate performs deterministic checks for a small known set of hostile-instruction patterns and suspicious tags, and applies deterministic redaction for matched patterns.
+before persisting the memory. It returns threat detection, actual content
+change, admission, stable reasons, exact UTF-8 SHA-256 hashes, and whether
+persistence occurred. The legacy filepath-returning method remains compatible
+for accepted writes and raises with the canonical result for reject/review.
 
 Conceptually:
 
 ```text
 candidate memory
    ↓
-known-pattern / suspicious-tag audit
+known-pattern / suspicious-tag detection
    ↓
-optional redaction
+optional deterministic transformation
    ↓
-MemoryFrontmatter security metadata
+accept | accept_sanitized | reject | review
    ↓
-Markdown persistence
+admission finalized before mutation
+   ├─ reject/review → no canonical persistence/index side effects
+   └─ accepted → atomic Markdown persistence + truthful metadata
 ```
+
+Safe unchanged text has `sanitized=false`. Direct known hostile instructions
+are rejected because the current deterministic policy cannot prove the full
+logical payload safe. Quoted/documentary examples and suspicious-tag-only
+ambiguity are review-only and are not written to the canonical corpus.
+`accept_sanitized` remains in the schema but is constructable only for the
+versioned complete whole-content transformation; the current evaluator does
+not emit it.
+
+Before gate evaluation, a canonical path validator requires a non-empty,
+portable, forward-slash logical ID whose resolved `.md` destination is a strict
+descendant of the resolved storage root. Absolute, drive/UNC, dot-segment,
+non-canonical separator, reserved-name, case-alias, NUL, trailing-separator and
+existing symlink escape forms are rejected without mutation.
 
 ### Important boundary
 
-This is a **basic security/sanitization gate**, not the full future memory-admission system.
+This is a **small deterministic known-pattern gate**, not comprehensive semantic
+prompt-injection protection or the full future memory-admission system.
 
 It does not yet decide comprehensively:
 

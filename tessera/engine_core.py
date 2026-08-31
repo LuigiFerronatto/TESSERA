@@ -8,6 +8,7 @@ subgraph retrieval, and temporal conflict resolution.
 
 import datetime
 import os
+import tempfile
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import networkx as nx
@@ -28,8 +29,9 @@ from .models import (
     Episode,
     InvalidFrontmatterError,
     MemoryFrontmatter,
+    WriteGatingViolationError,
 )
-from .security import WriteGatingEngine
+from .security import WriteAdmission, WriteGatingEngine, WriteResult, validate_memory_path
 
 # Relation types that receive a retrieval boost — they anchor procedural
 # stability (skills that stabilize a service/deployment/generalization).
@@ -229,7 +231,7 @@ class TesseraEngine:
     # ------------------------------------------------------------------
     # Write path
     # ------------------------------------------------------------------
-    def write_memory_note(
+    def write_memory_note_result(
         self,
         mem_id: str,
         mem_type: str,
@@ -241,44 +243,39 @@ class TesseraEngine:
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
-    ) -> str:
+    ) -> WriteResult:
         """
-        Secure, incremental write flow:
-        1. Validates the Markdown-only persistence contract before side effects.
-        2. Runs security audit + sanitization (write-side gating).
-        3. Formats the note as an atomic card (Markdown + YAML frontmatter).
-        4. Persists it physically to disk.
-        5. Returns the generated file path.
+        Canonical write flow returning the complete gate/persistence contract.
+
+        Persistence format and logical memory ID are validated before warnings,
+        timestamps, admission, directory creation, or durable/derived mutation.
+        Accepted logical IDs use portable forward-slash-separated segments and
+        resolve to a strict descendant of ``storage_dir``.
 
         ``persist_format`` accepts exactly ``"md"``. Any other value raises
         ``ValueError`` before warnings, sanitization, timestamps, frontmatter,
         filesystem writes, registry/graph updates, index rebuilds, or Evidence
         Ledger updates. Arbitrary JSON persistence/ingestion is not supported.
 
-        `mem_id` SHOULD carry a domain prefix ("<domain>/<slug>", e.g.
-        "research/browser-actions/thesis" or "lao/some-learning") so the
-        note lands inside a topical subdirectory of storage_dir instead of
-        loose at its root. A bare, unprefixed mem_id (no "/" at all) is
-        accepted — writing must never hard-fail an autonomous run over a
-        naming nit — but is a near-certain sign the caller (an LLM agent
-        following a system prompt, most often) skipped that convention.
-        Confirmed live 2026-08-25/26: a Gemini-driven `/lao` run wrote
-        mem_id="voice-ai-blip-integration-strategy" with no prefix at all
-        and the note silently landed at .claude/memory/'s own root, next to
-        MEMORY.md/README.md/STRUCTURE.md, instead of inside e.g.
-        research/<topic>/ or lao/ - nothing in this engine (or the write_memory
-        MCP tool's docstring) told it any different. This warning is a
-        stopgap until every caller-facing surface (MCP tool docstring, CLI
-        --help, hooks.py's on_task_end mem_id default) is updated to make
-        the domain prefix impossible to miss - see the "Improvements found
-        auditing against the QUMem paper" notes in Tessera/docs/ for the full
-        list this belongs to.
+        A bare valid ID remains accepted for compatibility and emits the
+        existing domain-prefix warning only after path validation succeeds.
         """
         if persist_format != "md":
             raise ValueError(
                 f"Unsupported persist_format {persist_format!r}; supported format is "
                 "'md'. No memory was persisted."
             )
+
+        path_validation = validate_memory_path(self.storage_dir, mem_id)
+        if not path_validation.valid or path_validation.destination is None:
+            decision = self.gating_engine.reject_invalid_memory_id(content)
+            return WriteResult(mem_id, None, False, decision)
+
+        provenance_turns = provenance_turns or []
+        active_connections = active_connections or []
+        decision = self.gating_engine.evaluate(content, tags)
+        if decision.admission in {WriteAdmission.REJECT, WriteAdmission.REVIEW}:
+            return WriteResult(mem_id, None, False, decision)
 
         if "/" not in mem_id.strip("/"):
             import warnings
@@ -292,16 +289,15 @@ class TesseraEngine:
                 stacklevel=2,
             )
 
-        provenance_turns = provenance_turns or []
-        active_connections = active_connections or []
+        persistence_candidate = decision.persistence_candidate
+        if persistence_candidate is None:  # guarded by WriteGateDecision invariants
+            raise RuntimeError("accepted write decision has no persistence candidate")
 
-        sanitized_content, threat_score, is_sanitized = self.gating_engine.audit_and_sanitize(
-            content, tags
+        gating_status = (
+            "flagged_and_sanitized"
+            if decision.admission == WriteAdmission.ACCEPT_SANITIZED
+            else "passed"
         )
-
-        gating_status = "passed"
-        if threat_score > self.gating_engine.toxicity_threshold:
-            gating_status = "flagged_and_sanitized"
 
         now = datetime.datetime.now().astimezone().isoformat()
         frontmatter_data = MemoryFrontmatter(
@@ -316,38 +312,93 @@ class TesseraEngine:
             entities=entities,
             active_connections=active_connections,
             gating_status=gating_status,
-            toxicity_score=threat_score,
-            sanitized=is_sanitized,
+            toxicity_score=decision.threat_score,
+            sanitized=decision.is_sanitized,
+            threat_detected=decision.threat_detected,
+            content_changed=decision.content_changed,
+            admission=decision.admission.value,
+            reasons=list(decision.reasons),
+            original_hash=decision.original_hash,
+            persisted_hash=decision.persisted_hash or "",
         )
 
         frontmatter_dict = frontmatter_data.to_dict()
-        filepath_base = os.path.join(self.storage_dir, mem_id)
-        
-        # `mem_id` commonly carries a domain prefix (e.g. "lao/some-slug") so
-        # notes land inside a topical subdirectory instead of loose at
-        # storage_dir's root. Without creating that subdirectory first, a
-        # first-ever write to a brand-new domain prefix crashes with
-        # FileNotFoundError deep inside an autonomous run (confirmed live
-        # 2026-08-25/26: a Gemini-driven /lao run wrote mem_id="voice-ai-..."
-        # with NO domain prefix at all and silently landed the note at
-        # .claude/memory/'s root instead of e.g. research/<topic>/ - the
-        # engine had no way to reject or redirect that, since it never
-        # validates mem_id shape). This makedirs alone only fixes the crash
-        # for prefixed ids that don't have their subdirectory yet; it does
-        # NOT enforce a prefix - see write_memory_note's docstring/callers
-        # for the convention every caller (CLI, MCP tool, hooks) must follow.
-        os.makedirs(os.path.dirname(filepath_base) or self.storage_dir, exist_ok=True)
-
         yaml_frontmatter = yaml.dump(
             frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
         )
-        markdown_body = f"---\n{yaml_frontmatter}---\n\n{sanitized_content.strip()}\n"
-        filepath = f"{filepath_base}.md"
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(markdown_body)
+        markdown_body = f"---\n{yaml_frontmatter}---\n\n{persistence_candidate}"
+        filepath = str(path_validation.destination)
+        parent = os.path.dirname(filepath)
+        missing_parents = []
+        cursor = parent
+        while cursor and not os.path.exists(cursor):
+            missing_parents.append(cursor)
+            next_cursor = os.path.dirname(cursor)
+            if next_cursor == cursor:
+                break
+            cursor = next_cursor
+
+        descriptor = None
+        temporary_path = None
+        try:
+            os.makedirs(parent, exist_ok=True)
+            descriptor, temporary_path = tempfile.mkstemp(prefix=".tessera-write-", suffix=".tmp", dir=parent)
+            with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as handle:
+                descriptor = None
+                handle.write(markdown_body)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary_path, filepath)
+            temporary_path = None
+        except Exception:
+            if descriptor is not None:
+                os.close(descriptor)
+            if temporary_path and os.path.exists(temporary_path):
+                os.unlink(temporary_path)
+            for created_parent in missing_parents:
+                try:
+                    os.rmdir(created_parent)
+                except OSError:
+                    pass
+            raise
 
         self.file_registry[mem_id] = filepath
-        return filepath
+        return WriteResult(mem_id, filepath, True, decision)
+
+    def write_memory_note(
+        self,
+        mem_id: str,
+        mem_type: str,
+        episode_id: str,
+        content: str,
+        tags: List[str],
+        entities: List[Entity],
+        description: str = "",
+        provenance_turns: Optional[List[int]] = None,
+        active_connections: Optional[List[Connection]] = None,
+        persist_format: Literal["md"] = "md",
+    ) -> str:
+        """Compatibility API returning a filepath for accepted writes.
+
+        Reject/review decisions raise ``WriteGatingViolationError`` carrying
+        the canonical ``WriteResult``. New integrations should call
+        ``write_memory_note_result`` to consume all decision fields directly.
+        """
+        result = self.write_memory_note_result(
+            mem_id=mem_id,
+            mem_type=mem_type,
+            episode_id=episode_id,
+            content=content,
+            tags=tags,
+            entities=entities,
+            description=description,
+            provenance_turns=provenance_turns,
+            active_connections=active_connections,
+            persist_format=persist_format,
+        )
+        if not result.persisted:
+            raise WriteGatingViolationError(result)
+        return result.filepath or ""
 
     # ------------------------------------------------------------------
     # Typed stores ("gavetas") — facts / preferences / insights

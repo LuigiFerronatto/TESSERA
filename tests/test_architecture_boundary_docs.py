@@ -94,3 +94,53 @@ def test_roadmap_uses_reconciled_status_contract() -> None:
     assert "✅" not in text
     assert "🟡" not in text
     assert "⬜" not in text
+
+
+def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
+    contract = (ROOT / "docs" / "WRITE_GATE_CONTRACT.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "detection",
+        "optional deterministic transformation",
+        "admission decision",
+        "atomic Markdown persistence",
+        "accept_sanitized",
+        "review",
+        "content_changed",
+        "original_hash",
+        "persisted_hash",
+        "not a semantic",
+    ):
+        assert marker in contract
+    assert "merge `0c0b638`" in roadmap
+    assert "https://github.com/LuigiFerronatto/TESSERA/pull/107" in roadmap
+    assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
+    assert "https://github.com/LuigiFerronatto/TESSERA/pull/108" in roadmap
+    assert "PR_EVOLUTION_92.md" in roadmap
+    assert "| [#92]" in roadmap and "IN_PROGRESS" in roadmap
+    assert "| [#19]" in roadmap and "BLOCKED" in roadmap
+
+
+def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
+    audit = (ROOT / "docs" / "PR_EVOLUTION_92.md").read_text(encoding="utf-8")
+
+    for classification in (
+        "RUNTIME_IMPLEMENTATION",
+        "BENCHMARK_INFRASTRUCTURE",
+        "DOCUMENTATION_CORRECTION",
+        "GOVERNANCE",
+        "ARCHITECTURE_DECISION",
+        "SUPERSEDED_OPERATIONAL_PR",
+    ):
+        assert classification in audit
+    for pr in (
+        "#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101",
+        "#102", "#107", "#110", "#111", "#113", "#122", "#123",
+        "#124", "#108",
+    ):
+        assert pr in audit
+    assert "26 distinct merged deliveries" in audit
+    assert "CLOSED_UNMERGED" in audit
+    assert "NOT_RERUN" in audit
+    assert "LongMemEval V1 dev-50" in audit

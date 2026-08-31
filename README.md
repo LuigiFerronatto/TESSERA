@@ -64,6 +64,16 @@ discover. Unsupported formats are rejected before sanitization or any storage,
 registry, graph, index, or Evidence Ledger mutation; arbitrary JSON ingestion is
 not supported.
 
+Every write is decided before persistence using the deterministic contract
+`path validation → detection → optional transformation → admission →
+persistence`. Logical memory IDs use portable forward-slash segments and must
+resolve strictly inside the configured store. Safe content is accepted
+unchanged and is never labeled sanitized. Direct known hostile instructions are
+rejected; empty input is rejected; quoted/documentary examples and
+suspicious-tag-only inputs go to `review`. Those non-accepting outcomes have no
+canonical persistence side effects. See
+[`docs/WRITE_GATE_CONTRACT.md`](docs/WRITE_GATE_CONTRACT.md).
+
 ### Query existing project knowledge
 
 TESSERA can also index existing Markdown with complete, partial, or absent frontmatter. It recognizes textual artifacts such as:

@@ -72,7 +72,7 @@ def cmd_write(args):
     tags = args.tags.split(",") if args.tags else []
     entities = _parse_entities(args.entity)
     active_connections = _parse_connections(args.related_to)
-    filepath = engine.write_memory_note(
+    result = engine.write_memory_note_result(
         mem_id=args.id,
         mem_type=args.type,
         episode_id=args.episode,
@@ -81,6 +81,20 @@ def cmd_write(args):
         entities=entities,
         active_connections=active_connections,
     )
+    if getattr(args, "json", False):
+        print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
+        return 0 if result.persisted else 2
+
+    if not result.persisted:
+        decision = result.decision
+        print(
+            f"✘ Nota não gravada: admission={decision.admission.value}; "
+            f"reasons={','.join(decision.reasons)}",
+            file=sys.stderr,
+        )
+        return 2
+
+    filepath = result.filepath or ""
     conn_ids = [c.target_memory_id for c in active_connections]
 
     from .display import get_console, render_write_result
@@ -88,11 +102,17 @@ def cmd_write(args):
     console = get_console(force_plain=getattr(args, "plain", False))
     if console is not None:
         render_write_result(console, filepath, args.id, args.type, conn_ids)
-        return
+        return 0
     print(f"✔ Nota de memória gravada em: {filepath}")
+    print(
+        f"  security: admission={result.decision.admission.value}; "
+        f"content_changed={str(result.decision.content_changed).lower()}; "
+        f"is_sanitized={str(result.decision.is_sanitized).lower()}"
+    )
     if active_connections:
         print(f"  ({len(active_connections)} conexão(ões) explícita(s) registrada(s): "
               f"{', '.join(conn_ids)})")
+    return 0
 
 
 def cmd_index(args):
@@ -450,6 +470,7 @@ def build_parser():
     p_write.add_argument("--episode", required=True)
     p_write.add_argument("--content", required=True)
     p_write.add_argument("--tags", default="")
+    p_write.add_argument("--json", action="store_true", help="Emit the canonical write decision as JSON")
     p_write.add_argument("--entity", action="append", help='Format "Name:description", repeatable')
     p_write.add_argument("--related-to", action="append",
                           help='Format "target_memory_id:relation_type" (relation_type defaults to '
@@ -568,7 +589,7 @@ def main(argv=None):
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
-        args.func(args)
+        return args.func(args) or 0
     except BrokenPipeError:
         # Harmless: happens when output is piped into `head`/`grep -m` and the
         # reader closes early. Exit quietly instead of printing a traceback.

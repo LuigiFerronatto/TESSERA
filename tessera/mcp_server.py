@@ -101,9 +101,10 @@ def write_memory(
     persist_format: Literal["md"] = "md",
 ) -> Dict[str, Any]:
     """
-    Writes (or overwrites) a memory note. Content is passed through the
-    write-side gating engine (sanitization against state contamination /
-    hostile instruction injection) before anything is persisted to disk.
+    Evaluates and, only when admitted, writes a memory note. The returned
+    canonical contract separates threat detection, actual transformation,
+    admission, hashes, and persistence. Review/reject never rebuild the index.
+    This narrow deterministic gate is not comprehensive semantic protection.
 
     `mem_type` must be one of: factual, preference, procedural_anchor.
 
@@ -132,7 +133,7 @@ def write_memory(
         for target_id in (connect_to or [])
     ]
 
-    filepath = _engine.write_memory_note(
+    result = _engine.write_memory_note_result(
         mem_id=mem_id,
         mem_type=mem_type,
         episode_id=episode_id,
@@ -143,12 +144,12 @@ def write_memory(
         description=description,
         persist_format=persist_format,
     )
-    _engine.build_index()
-    return {
-        "filepath": filepath,
-        "mem_id": mem_id,
-        "connected_to": [c.target_memory_id for c in active_connections],
-    }
+    if result.persisted:
+        _engine.build_index()
+    payload = result.to_dict()
+    payload["mem_id"] = mem_id  # compatibility alias for existing MCP clients
+    payload["connected_to"] = [c.target_memory_id for c in active_connections]
+    return payload
 
 
 @mcp.resource("memories://{memory_id}")

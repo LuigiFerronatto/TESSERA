@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | Issue | [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
-| Record status | `PLANNED` |
+| Record status | `IN_PROGRESS` |
 | Capability type | `runtime safety contract` |
-| Pull request | Not started |
-| Head commit | Not applicable |
+| Pull request | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) |
+| Head commit | [`b38ec89`](https://github.com/LuigiFerronatto/TESSERA/commit/b38ec89e66eb5130d45bca8f8146e01181754639) (audited implementation snapshot; live PR head includes evidence-only follow-up) |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -33,45 +33,61 @@ detect suspicious text
 
 ## What changed or is being tested?
 
-**TARGET — NOT YET ON MAIN.**
+**CANDIDATE — IN PR #108, NOT YET ON MAIN.**
 
-Issue #92 will separate detection, transformation, admission and persistence. It will use hashes as fingerprints of the exact original and persistence-candidate text.
+PR #108 separates path validation, detection, transformation, admission and
+persistence. It uses hashes as fingerprints of the exact original and
+persistence-candidate text.
 
 ## How does it work now?
 
-**CURRENT MAIN:** the known inconsistency still exists. This page documents the planned correction; it does not claim that the fix is implemented.
+**CURRENT MAIN (`a0a482c`):** the known inconsistency and unconstrained memory-ID
+join still exist.
 
-**TARGET:**
+**PR CANDIDATE:**
 
 ```text
-detect
-→ transform when deterministic and safe
+validate portable ID and contained destination
+→ detect
+→ transform only under a complete versioned rule
 → choose accept | accept_sanitized | reject | review
 → persist only after an accepting decision
 ```
 
-`accept_sanitized` will require different original and persisted hashes. Reject/review paths must not mutate the canonical corpus, registry, graph, Evidence Ledger or index.
+The current evaluator rejects direct known hostile instruction blocks and sends
+quoted/documentary or suspicious-tag-only ambiguity to review. It emits no
+`accept_sanitized`; the schema permits that state only for a complete bounded
+whole-content rule. Reject/review/invalid-path outcomes do not mutate the
+canonical corpus, registry, graph, Evidence Ledger or index.
 
 ## Concrete example
 
 | Input | Target result |
 |---|---|
 | Safe fact | Accept unchanged; never call it sanitized |
-| Transformable hostile instruction | Persist only the demonstrably changed candidate |
-| Non-transformable hostile instruction | Reject or review; do not persist canonically |
+| Direct known hostile instruction, including multiline payload | Reject; do not persist canonically |
 | Quoted security example | Preserve under an explicit policy or review it; do not silently destroy it |
+| Absolute/traversal/UNC/symlink-escaping memory ID | Reject before warnings, timestamps or filesystem mutation |
 
 ## How was it validated?
 
-Not yet validated. The issue contains the reproduced baseline and required multilingual, hash-consistency, side-effect and cross-surface tests. Evidence belongs here only after an implementation PR runs them.
+The candidate passes focused multilingual/adversarial, path-containment,
+hash-invariant, atomic-failure, zero-side-effect and Python/CLI/MCP parity tests.
+Final CI evidence remains attached to the open PR and issue; the stage remains
+`IN_PROGRESS` until merge.
 
 ## What improved?
 
-Nothing on `main` yet. The Test Card makes the inconsistency explicit and decisionable.
+The open candidate turns path escape and partial-redaction overclaim into
+deterministic non-persisting rejection, while preserving safe writes and
+same-directory atomic replacement. Nothing is promoted on `main` before merge.
 
 ## What remains unimplemented?
 
-The truthful result contract, deterministic transformation/reject/review behavior, mutation-boundary proof and Python/CLI/MCP parity still need implementation. General semantic prompt-injection defense and State Contamination evaluation remain out of scope.
+General semantic prompt-injection defense, quarantine/review storage, a broadly
+safe sanitizer, directory-fsync crash durability, State Contamination
+evaluation, #95 project-agnostic runtime cleanup and #67 Quality Gate
+integration remain unimplemented.
 
 ## What is unlocked next?
 
@@ -82,17 +98,17 @@ No capability is unlocked until the implementation is merged and validated. Afte
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
-| Pull request | Not started |
+| Pull request | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) |
 | Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending |
+| Evidence/Learnings/Decision | Candidate evidence in PR #108 and issue #92; final merge lifecycle pending |
 | Benchmark record | LongMemEval not applicable; smoke/sanity required |
-| PR Evolution Audit | Required in the future implementation PR |
+| PR Evolution Audit | [Current deduplicated audit](../PR_EVOLUTION_92.md) |
 
 ## Evolution
 
 ```text
 truthful Markdown format gate (#94)
-→ known sanitizer-status inconsistency (#92)
-→ planned detect/transform/admit/persist contract
+→ known sanitizer-status and path-containment defects (#92)
+→ path-contained conservative detect/transform/admit/persist candidate (PR #108)
 → later State Contamination experiment
 ```

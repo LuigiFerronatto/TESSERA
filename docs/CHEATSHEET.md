@@ -348,6 +348,12 @@ repetível da CLI). `persist_format` aceita somente `"md"`: Markdown é o format
 canônico gravável e indexável. Outros valores falham antes da gravação e do
 rebuild; ingestão arbitrária de JSON não é suportada.
 
+O retorno inclui o contrato canônico `threat_detected`, `content_changed`,
+`admission`, `reasons`, `original_hash`, `persisted_hash`, `persisted` e o alias
+compatível `is_sanitized`. IDs usam segmentos com `/`, sem caminhos absolutos,
+`..`, barras invertidas ou escape por symlink. `reject` e `review` não gravam
+nem reindexam; instruções hostis diretas conhecidas são rejeitadas.
+
 ### `get_memory(memory_id)`
 Devolve o corpo bruto de uma nota específica pelo id.
 
@@ -447,7 +453,7 @@ for r in results:
     print(r["id"], r["score"], r.get("related_ids"))
 
 # escrita com conexões explícitas
-engine.write_memory_note(
+result = engine.write_memory_note_result(
     mem_id="lao/exemplo",
     mem_type="factual",
     episode_id="start",
@@ -456,12 +462,23 @@ engine.write_memory_note(
     entities=[Entity("Strategist", "agente de hipoteses")],
     active_connections=[Connection(target_memory_id="lao-charter", relation_type="supports")],
 )
+print(result.to_dict())
 engine.build_index()  # reindexar após escrever
 ```
 
 `write_memory_note(..., persist_format="md")` é o único formato público de
 persistência. O default já é `"md"`; qualquer outro valor é rejeitado antes de
 efeitos colaterais, e ingestão arbitrária de JSON não é suportada.
+`write_memory_note_result()` expõe a decisão completa. O método legado
+`write_memory_note()` continua retornando filepath para escritas aceitas e
+lança `WriteGatingViolationError` em `reject`/`review`.
+
+Na CLI, `tessera write ... --json` imprime exatamente o mesmo contrato do
+Engine/MCP. Texto seguro permanece igual e nunca é marcado sanitizado; exemplos
+hostis claramente citados/documentais vão para revisão sem persistência, e
+instruções hostis diretas conhecidas são rejeitadas. `accept_sanitized` fica no
+schema, mas o avaliador atual não o emite sem uma transformação integral e
+versionada.
 
 ### Decomposição automática de episódio (`decompose_and_write_episode`)
 

@@ -94,23 +94,32 @@ STRUCTURED RETRIEVAL RESULT
 
 ## Current write path
 
-The existing `write_memory_note()` path already contains a **basic heuristic security gate**:
+The write path contains a **narrow deterministic security gate** governed by
+[`WRITE_GATE_CONTRACT.md`](WRITE_GATE_CONTRACT.md):
 
 ```text
 persistence format validation (`md` only)
    ├─ unsupported → deterministic failure, no mutation
    └─ supported
    ↓
+portable memory-ID validation + resolved storage containment
+   ├─ invalid/outside/symlink escape → reject, no mutation
+   └─ contained destination
+   ↓
 candidate memory content
    ↓
-WriteGatingEngine.audit_and_sanitize()
-   ├─ known hostile-instruction patterns
-   ├─ suspicious-tag signal
-   └─ deterministic redaction for matched patterns
+WriteGatingEngine.evaluate()
+   ├─ detection (known patterns / suspicious tags)
+   ├─ optional deterministic transformation
+   └─ admission: accept | accept_sanitized | reject | review
    ↓
-MemoryFrontmatter
+admission finalized before mutation
+   ├─ reject/review → no canonical side effect
+   └─ accept/accept_sanitized
+       ↓
+atomic Markdown persistence + truthful security metadata
    ↓
-Markdown source file
+derived registry/index/graph/Evidence Ledger updates
 ```
 
 Markdown is the only canonical writable persistence format because it is the
@@ -119,10 +128,19 @@ therefore indexable after rebuild. JSON writing and arbitrary JSON ingestion
 are not supported; unsupported format values fail before the security gate or
 any filesystem/runtime mutation.
 
+`content_changed` is derived from SHA-256 hashes of the exact UTF-8 original
+payload and persistence candidate. The compatibility `sanitized` field is true
+only for `accept_sanitized`. The current version emits no sanitized admission:
+direct known hostile instructions are rejected, while quoted/documentary
+examples are routed to review without canonical persistence. The schema keeps
+`accept_sanitized` only for a future versioned, complete bounded transformation.
+This gate does not claim comprehensive semantic prompt-injection protection;
+#19 remains the separate evidence-aware memory-admission experiment.
+
 This is different from roadmap #19:
 
 ```text
-basic heuristic sanitization          IMPLEMENTED
+basic deterministic write admission  IMPLEMENTED in PR candidate #108; not on main
 full evidence-aware memory admission  PLANNED (#19)
 ```
 
