@@ -7,13 +7,13 @@ from PR #127. It includes the canonical #95 implementation merge
 `test-card/93-storage-config-parity`; [PR #129](https://github.com/LuigiFerronatto/TESSERA/pull/129).
 The pre-reconciliation candidate was
 `8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c`.
-The reconciled runtime/test head validated locally is
-`b2b15c10f4c068020962bbe8626b27f4adfce5b5`; later evidence-only metadata may
-advance the PR head without changing runtime behavior.
+The final rebased candidate is recorded in the Issue evidence and PR;
+validation was repeated after the last rebase.
 
 Issue #115 ran in parallel and later advanced `main` through PR #128 at
-`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. Before merge, the #93 branch was
-rebased onto that newer canonical main. This preserves the original #93 audit
+`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`; PR #130 then finalized its
+post-merge lifecycle at `055a35f4a7e8298013bcb816b30f67d9706b9516`.
+Before merge, the #93 branch was rebased onto that latest canonical main. This preserves the original #93 audit
 base as history while incorporating ADR 0002, the #115 evolution audit and Test
 Card, repository-layout ownership findings, package/benchmark/test distribution
 findings, and current #115/#116 routing. PR #128 is a parallel architecture delivery, not part of #93's capability delivery. The record remains
@@ -49,7 +49,7 @@ not separate capabilities.
 | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | RUNTIME_IMPLEMENTATION | MERGED | `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` | write gate, path validation, Python/CLI/MCP write surfaces | contained truthful writes | stable logical IDs and no write escape | #92 KEEP evidence | unsafe/ambiguous write result |
 | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | MERGED | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | config, CLI, MCP, diagnostics/quickstart, optional compatibility, docs/tests | shared storage resolver and generic runtime boundary | explicit → canonical → legacy warning → default; canonical quickstart; no `.claude/memory` discovery | audited candidate `1fcd71d`, #95 KEEP evidence, green CI | historical #93 configuration divergence; candidate and merge counted once |
 | [#127](https://github.com/LuigiFerronatto/TESSERA/pull/127) | DOCUMENTATION_CORRECTION | MERGED | `5d43a2d4cdda0c17be6516f47920121070339d0f` | #95 audit/stage/roadmap/tests | lifecycle synchronization | #95 `VALIDATED`; #67 still `BLOCKED` | green lifecycle CI | stale post-merge state; no runtime delivery |
-| [#128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | ARCHITECTURE_DECISION | MERGED in parallel | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` | ADR 0002, #115 audit/Test Card, roadmap and architecture assertions | accepted repository-layout and distribution ownership plan | no migrations; no #93 runtime hypothesis/result change | canonical current main incorporated by rebase | parallel #115 work; counted only as #115 delivery |
+| [#128](https://github.com/LuigiFerronatto/TESSERA/pull/128) / [#130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | ARCHITECTURE_DECISION / DOCUMENTATION_CORRECTION | MERGED in parallel | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` / `055a35f4a7e8298013bcb816b30f67d9706b9516` | ADR 0002, #115 audit/Test Card and assertions; then lifecycle synchronization | accepted repository-layout plan and finalized #115 lifecycle | no migrations; no #93 runtime hypothesis/result change | latest canonical main incorporated by rebase | parallel #115 work; counted only as #115 delivery/lifecycle |
 | Issue #93 candidate | RUNTIME_IMPLEMENTATION | OPEN | Not merged | Engine corpus iterator, golden integration, stage/audit/roadmap/docs assertions | exact configured-corpus boundary plus write-once/read-everywhere proof | removes only implicit out-of-store scanning; resolver/ranking/evidence/write contracts unchanged | 13 focused cases plus required regression/sanity/CI evidence | residual hidden corpus expansion |
 
 ## Current-main executable storage audit
@@ -90,7 +90,7 @@ when requested. It retains the existing derived-index and dependency-directory
 exclusions. There is no ranking, scoring, graph, temporal, conflict, Evidence
 Ledger, write-admission, path-validation or persistence-schema change.
 
-Rebasing onto `b475f1c` did not change this implementation. The reconciled tree
+Rebasing onto `055a35f` (including #128 at `b475f1c`) did not change this implementation. The reconciled tree
 contains both the complete #115/ADR 0002 architecture assertions from current
 main and the additive #93 `IN_PROGRESS` audit/assertions.
 
@@ -102,9 +102,10 @@ structured evidence, and expose filepaths contained by the selected store.
 
 ## What remains unimplemented
 
-- #115's repository-layout architecture decision is delivered through PR #128;
-  its planned migrations remain unimplemented. Packaging execution remains
-  owned by #116, which is not started here.
+- #115's repository-layout architecture decision and lifecycle are delivered
+  through PRs #128 and #130; its planned migrations remain unimplemented.
+  Packaging execution remains owned by #116, which is `READY` but not started
+  or absorbed here.
 - #117 owns an explicit project/global registry and interactive initialization;
   removing a hidden heuristic does not implement a replacement registry.
 - #120 owns the larger MCP/optional-adapter lifecycle; direct MCP tools and
@@ -165,7 +166,8 @@ historical CLI/quickstart/MCP mismatch (#93 baseline)
 → #95 lifecycle synchronized (#127)
 → exact-corpus defect reproduced + golden #93 candidate from `5d43a2d`
 → parallel #115 architecture merge #128 / `b475f1c` advances main
-→ #93 rebased additively onto `b475f1c` without changing its runtime result
+→ #115 lifecycle merge #130 / `055a35f` finalizes its routing
+→ #93 rebased additively onto `055a35f` without changing its runtime result
 → merge/lifecycle synchronization required before #93 VALIDATED
 → #67 remains blocked on its separate regression-gate integration
 ```
