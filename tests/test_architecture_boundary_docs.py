@@ -66,3 +66,31 @@ def test_current_docs_link_the_accepted_adr() -> None:
         text = path.read_text(encoding="utf-8")
         assert "0001-core-vs-optional-llm-boundary.md" in text, path
 
+
+def test_roadmap_uses_reconciled_status_contract() -> None:
+    text = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+
+    for status in (
+        "`IMPLEMENTED`",
+        "`VALIDATED`",
+        "`READY`",
+        "`IN_PROGRESS`",
+        "`BLOCKED`",
+        "`DEFERRED`",
+        "`TRACKER`",
+        "`DROPPED`",
+        "`SUPERSEDED`",
+    ):
+        assert status in text
+
+    for issue in ("#68", "#74", "#94", "#96", "#100", "#103", "#104", "#105", "#106"):
+        assert issue in text
+
+    assert "## Reconciliation matrix" in text
+    assert "#28 rendering ablation" in text
+    assert "#25 graph-expansion card DoR completion" in text
+    assert "LongMemEval V1 dev-50 historical" in text
+    assert "deterministic sanity fixture" in text
+    assert "✅" not in text
+    assert "🟡" not in text
+    assert "⬜" not in text
