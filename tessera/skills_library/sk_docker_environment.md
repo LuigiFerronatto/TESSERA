@@ -13,7 +13,10 @@ active_connections: []
 security:
   gating_status: passed
   toxicity_score: 0.02
-  sanitized: true
+  sanitized: false
+  threat_detected: false
+  content_changed: false
+  admission: accept
 ---
 
 # sk_docker_environment: Resiliência de Ambientes e Containers Docker

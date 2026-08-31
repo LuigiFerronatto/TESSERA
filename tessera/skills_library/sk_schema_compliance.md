@@ -14,7 +14,10 @@ active_connections: []
 security:
   gating_status: passed
   toxicity_score: 0.01
-  sanitized: true
+  sanitized: false
+  threat_detected: false
+  content_changed: false
+  admission: accept
 ---
 
 # sk_schema_compliance: Conformidade de Esquemas e Formatos de Saída

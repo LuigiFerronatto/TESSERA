@@ -94,7 +94,8 @@ STRUCTURED RETRIEVAL RESULT
 
 ## Current write path
 
-The existing `write_memory_note()` path already contains a **basic heuristic security gate**:
+The write path contains a **narrow deterministic security gate** governed by
+[`WRITE_GATE_CONTRACT.md`](WRITE_GATE_CONTRACT.md):
 
 ```text
 persistence format validation (`md` only)
@@ -103,14 +104,18 @@ persistence format validation (`md` only)
    ↓
 candidate memory content
    ↓
-WriteGatingEngine.audit_and_sanitize()
-   ├─ known hostile-instruction patterns
-   ├─ suspicious-tag signal
-   └─ deterministic redaction for matched patterns
+WriteGatingEngine.evaluate()
+   ├─ detection (known patterns / suspicious tags)
+   ├─ optional deterministic transformation
+   └─ admission: accept | accept_sanitized | reject | review
    ↓
-MemoryFrontmatter
+admission finalized before mutation
+   ├─ reject/review → no canonical side effect
+   └─ accept/accept_sanitized
+       ↓
+atomic Markdown persistence + truthful security metadata
    ↓
-Markdown source file
+derived registry/index/graph/Evidence Ledger updates
 ```
 
 Markdown is the only canonical writable persistence format because it is the
@@ -118,6 +123,13 @@ format discovered by the current source iterator. Acknowledged writes are
 therefore indexable after rebuild. JSON writing and arbitrary JSON ingestion
 are not supported; unsupported format values fail before the security gate or
 any filesystem/runtime mutation.
+
+`content_changed` is derived from SHA-256 hashes of the exact UTF-8 original
+payload and persistence candidate. The compatibility `sanitized` field is true
+only for `accept_sanitized`. Quoted/documentary hostile examples are routed to
+review without canonical persistence rather than silently redacted. This gate
+does not claim comprehensive semantic prompt-injection protection; #19 remains
+the separate evidence-aware memory-admission experiment.
 
 This is different from roadmap #19:
 

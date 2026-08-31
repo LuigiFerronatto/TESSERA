@@ -15,7 +15,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ### Changed
 - The experimental roadmap now derives status from GitHub state, merged
   implementation/evidence, declared dependencies, and benchmark records. It
-  records completed #68/#94/#96/#100 work, accepted ADR #74 in progress, the
+  records completed #68/#74/#94/#96/#100 work, the
   #103–#106 evaluation chain, and the current M0–M5 critical path without stale
   emoji markers. ([#74](https://github.com/LuigiFerronatto/TESSERA/issues/74))
 - Root README is now the progressive product entrypoint: executive first, plain-language explanation next, technical details and experimental roadmap deeper down. ([#82](https://github.com/LuigiFerronatto/TESSERA/pull/82))
@@ -23,6 +23,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- Write-gate metadata now separates detection, real transformation, admission,
+  and persistence. Safe text is no longer falsely marked sanitized; review and
+  reject are mutation-free; accepted transformations are hash-proven and
+  shared across Python, CLI, MCP, and Markdown metadata. ([#92](https://github.com/LuigiFerronatto/TESSERA/issues/92))
 - Memory writes now accept only canonical Markdown persistence and reject unsupported formats before mutation, preventing acknowledged-but-unindexable JSON files. ([#94](https://github.com/LuigiFerronatto/TESSERA/issues/94))
 - Public package metadata no longer points to an external development repository or publishes an external project identity as the package author. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 

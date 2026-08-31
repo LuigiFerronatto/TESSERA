@@ -14,7 +14,10 @@ active_connections: []
 security:
   gating_status: passed
   toxicity_score: 0.01
-  sanitized: true
+  sanitized: false
+  threat_detected: false
+  content_changed: false
+  admission: accept
 ---
 
 # sk_service_lifecycle: Gestão do Ciclo de Vida de Serviços em Segundo Plano

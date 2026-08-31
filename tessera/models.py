@@ -9,7 +9,15 @@ class InvalidFrontmatterError(Exception):
 
 
 class WriteGatingViolationError(Exception):
-    """Raised when a memory is rejected outright by the write-side security gate."""
+    """Raised by the compatibility write API when admission is reject/review."""
+
+    def __init__(self, result: Any):
+        self.result = result
+        decision = result.decision
+        super().__init__(
+            f"Write not persisted: admission={decision.admission.value}; "
+            f"reasons={','.join(decision.reasons)}"
+        )
 
 
 @dataclass
@@ -138,7 +146,13 @@ class MemoryFrontmatter:
     active_connections: List[Connection] = field(default_factory=list)
     gating_status: str = "passed"
     toxicity_score: float = 0.0
-    sanitized: bool = True
+    sanitized: bool = False
+    threat_detected: bool = False
+    content_changed: bool = False
+    admission: str = "accept"
+    reasons: List[str] = field(default_factory=list)
+    original_hash: str = ""
+    persisted_hash: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         desc = self.description if self.description else f"{self.memory_type.title()} memory note"
@@ -161,5 +175,11 @@ class MemoryFrontmatter:
                 "gating_status": self.gating_status,
                 "toxicity_score": self.toxicity_score,
                 "sanitized": self.sanitized,
+                "threat_detected": self.threat_detected,
+                "content_changed": self.content_changed,
+                "admission": self.admission,
+                "reasons": self.reasons,
+                "original_hash": self.original_hash,
+                "persisted_hash": self.persisted_hash,
             },
         }

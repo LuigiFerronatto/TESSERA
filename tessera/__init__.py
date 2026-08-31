@@ -38,7 +38,13 @@ from .models import (
     STORE_PREFERENCES,
     STORE_INSIGHTS,
 )
-from .security import WriteGatingEngine
+from .security import (
+    WriteAdmission,
+    WriteGateDecision,
+    WriteGatingEngine,
+    WriteResult,
+    content_sha256,
+)
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
 from .orchestrator import TesseraOrchestrator, OrchestratorResult
@@ -73,6 +79,10 @@ __all__ = [
     "Episode",
     "MemoryFrontmatter",
     "WriteGatingEngine",
+    "WriteAdmission",
+    "WriteGateDecision",
+    "WriteResult",
+    "content_sha256",
     "ConflictResolver",
     "InvalidFrontmatterError",
     "WriteGatingViolationError",

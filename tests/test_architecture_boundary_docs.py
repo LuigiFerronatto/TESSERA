@@ -94,3 +94,25 @@ def test_roadmap_uses_reconciled_status_contract() -> None:
     assert "✅" not in text
     assert "🟡" not in text
     assert "⬜" not in text
+
+
+def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
+    contract = (ROOT / "docs" / "WRITE_GATE_CONTRACT.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "detection",
+        "optional deterministic transformation",
+        "admission decision",
+        "atomic Markdown persistence",
+        "accept_sanitized",
+        "review",
+        "content_changed",
+        "original_hash",
+        "persisted_hash",
+        "not a semantic",
+    ):
+        assert marker in contract
+    assert "merge `0c0b638`" in roadmap
+    assert "PR #107 / #74" in roadmap
+    assert "PR pending / #92" in roadmap
