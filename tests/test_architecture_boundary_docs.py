@@ -115,4 +115,4 @@ def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
         assert marker in contract
     assert "merge `0c0b638`" in roadmap
     assert "PR #107 / #74" in roadmap
-    assert "PR pending / #92" in roadmap
+    assert "PR #108 / #92" in roadmap
