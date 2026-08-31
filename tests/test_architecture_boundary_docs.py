@@ -182,7 +182,8 @@ def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
     assert "one runtime delivery" in audit
 
     assert "`BLOCKED`" in issue_67
-    assert "still depends on #93 and regression-gate integration" in issue_67
+    assert "#92, #93 and #95 dependencies are satisfied" in issue_67
+    assert "still blocked on regression-gate integration" in issue_67
     assert "still depends on #93, #95" not in issue_67
     assert "`VALIDATED`" in issue_115
     assert CANONICAL_115_MERGE_SHA in issue_115
@@ -289,14 +290,17 @@ def test_issue_115_canonical_delivery_is_deduplicated() -> None:
     assert "migrations are not implemented" in record
 
 
-def test_issue_93_open_candidate_and_dependency_routing_are_truthful() -> None:
+def test_issue_93_post_merge_lifecycle_and_dependency_routing_are_truthful() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_93_AUDIT.read_text(encoding="utf-8")
 
     issue_93 = _markdown_table_row(roadmap, "#93")
     issue_67 = _markdown_table_row(roadmap, "#67")
 
-    assert "`IN_PROGRESS`" in issue_93
+    assert "closed" in issue_93
+    assert "`VALIDATED`" in issue_93
+    assert "`KEEP`" in issue_93
+    assert "c6124548f32b6dc5e1b7acf5127632bc6c75fccc" in issue_93
     assert "PR_EVOLUTION_93.md" in issue_93
     assert "5d43a2d4cdda0c17be6516f47920121070339d0f" in audit
     for delivery in ("#83", "#98", "#108", "#126", "#127"):
@@ -308,7 +312,13 @@ def test_issue_93_open_candidate_and_dependency_routing_are_truthful() -> None:
     assert "already satisfied by #95" in audit
     assert "still broken" in audit
     assert "SMOKE_ONLY" in audit
+    assert "NOT_APPLICABLE" in audit
+    assert "c460e2f1c7d477a40f046e5e54da8d71aee45bac" in audit
+    assert "c6124548f32b6dc5e1b7acf5127632bc6c75fccc" in audit
+    assert "one runtime delivery" in audit
+    assert "DOCUMENTATION_CORRECTION" in audit
     assert "LongMemEval V1 dev-50 remains `NOT_RERUN`" in audit
 
     assert "`BLOCKED`" in issue_67
-    assert "still depends on #93 and regression-gate integration" in issue_67
+    assert "#92, #93 and #95 dependencies are satisfied" in issue_67
+    assert "still blocked on regression-gate integration" in issue_67

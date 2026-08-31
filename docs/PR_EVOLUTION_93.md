@@ -7,8 +7,9 @@ from PR #127. It includes the canonical #95 implementation merge
 `test-card/93-storage-config-parity`; [PR #129](https://github.com/LuigiFerronatto/TESSERA/pull/129).
 The pre-reconciliation candidate was
 `8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c`.
-The final rebased candidate is recorded in the Issue evidence and PR;
-validation was repeated after the last rebase.
+The audited final candidate was
+`c460e2f1c7d477a40f046e5e54da8d71aee45bac`; canonical PR #129 squash merge
+`c6124548f32b6dc5e1b7acf5127632bc6c75fccc` is the same single runtime delivery.
 
 Issue #115 ran in parallel and later advanced `main` through PR #128 at
 `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`; PR #130 then finalized its
@@ -16,8 +17,8 @@ post-merge lifecycle at `055a35f4a7e8298013bcb816b30f67d9706b9516`.
 Before merge, the #93 branch was rebased onto that latest canonical main. This preserves the original #93 audit
 base as history while incorporating ADR 0002, the #115 evolution audit and Test
 Card, repository-layout ownership findings, package/benchmark/test distribution
-findings, and current #115/#116 routing. PR #128 is a parallel architecture delivery, not part of #93's capability delivery. The record remains
-`IN_PROGRESS` and no #93 merge commit is claimed while PR #129 is open.
+findings, and current #115/#116 routing. PR #128 is a parallel architecture delivery, not part of #93's capability delivery. PR #129 is now merged, the
+decision remains `KEEP`, and #93 is `VALIDATED`.
 
 ## Previous capability state
 
@@ -50,7 +51,8 @@ not separate capabilities.
 | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | MERGED | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | config, CLI, MCP, diagnostics/quickstart, optional compatibility, docs/tests | shared storage resolver and generic runtime boundary | explicit → canonical → legacy warning → default; canonical quickstart; no `.claude/memory` discovery | audited candidate `1fcd71d`, #95 KEEP evidence, green CI | historical #93 configuration divergence; candidate and merge counted once |
 | [#127](https://github.com/LuigiFerronatto/TESSERA/pull/127) | DOCUMENTATION_CORRECTION | MERGED | `5d43a2d4cdda0c17be6516f47920121070339d0f` | #95 audit/stage/roadmap/tests | lifecycle synchronization | #95 `VALIDATED`; #67 still `BLOCKED` | green lifecycle CI | stale post-merge state; no runtime delivery |
 | [#128](https://github.com/LuigiFerronatto/TESSERA/pull/128) / [#130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | ARCHITECTURE_DECISION / DOCUMENTATION_CORRECTION | MERGED in parallel | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` / `055a35f4a7e8298013bcb816b30f67d9706b9516` | ADR 0002, #115 audit/Test Card and assertions; then lifecycle synchronization | accepted repository-layout plan and finalized #115 lifecycle | no migrations; no #93 runtime hypothesis/result change | latest canonical main incorporated by rebase | parallel #115 work; counted only as #115 delivery/lifecycle |
-| Issue #93 candidate | RUNTIME_IMPLEMENTATION | OPEN | Not merged | Engine corpus iterator, golden integration, stage/audit/roadmap/docs assertions | exact configured-corpus boundary plus write-once/read-everywhere proof | removes only implicit out-of-store scanning; resolver/ranking/evidence/write contracts unchanged | 13 focused cases plus required regression/sanity/CI evidence | residual hidden corpus expansion |
+| [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) | RUNTIME_IMPLEMENTATION | MERGED | audited candidate `c460e2f1c7d477a40f046e5e54da8d71aee45bac`; canonical squash merge `c6124548f32b6dc5e1b7acf5127632bc6c75fccc` | Engine corpus iterator, golden integration, stage/audit/roadmap/docs assertions | exact configured-corpus boundary plus write-once/read-everywhere proof | removes only implicit out-of-store scanning; resolver/ranking/evidence/write contracts unchanged | 13 focused cases, final-candidate CI and post-merge maintainer audit | residual hidden corpus expansion; candidate and canonical merge are one runtime delivery |
+| LIFECYCLE_PR | DOCUMENTATION_CORRECTION | OPEN | lifecycle candidate recorded in PR | #93 audit, Test Card, roadmap, index and architecture assertions | post-merge lifecycle synchronization | #93 `VALIDATED`; #67's #93 dependency satisfied while regression-gate integration remains | documentation tests and empty runtime/benchmark diffs | stale open-candidate lifecycle; no runtime delivery |
 
 ## Current-main executable storage audit
 
@@ -83,7 +85,7 @@ uninitialized.
 | selected store is the exact corpus | still broken | current-main ancestor/sibling leak reproduced; minimal iterator fix added |
 | historical CLI-vs-MCP variable mismatch | obsolete/superseded | replaced by PR #126; not reimplemented |
 
-## Candidate capability state
+## Validated capability state
 
 The Engine scans only Markdown files contained by `storage_dir`, recursively
 when requested. It retains the existing derived-index and dependency-directory
@@ -92,7 +94,7 @@ Ledger, write-admission, path-validation or persistence-schema change.
 
 Rebasing onto `055a35f` (including #128 at `b475f1c`) did not change this implementation. The reconciled tree
 contains both the complete #115/ADR 0002 architecture assertions from current
-main and the additive #93 `IN_PROGRESS` audit/assertions.
+main and the additive #93 lifecycle assertions.
 
 The golden fixture resolves one absolute store, writes `issue-93/golden-storage-parity`
 once through Python, builds once, and queries through Python, a real CLI
@@ -147,13 +149,18 @@ No versioned file under `benchmarks/` is changed.
   service or network call occurs. Full Evidence/Learnings/Decision:
   [Issue comment](https://github.com/LuigiFerronatto/TESSERA/issues/93#issuecomment-5483152212).
 
-## Newly unlocked work
+## Dependency effect
 
-None while the PR is open. #93 remains `IN_PROGRESS`. #67 remains `BLOCKED` on
-#93 merge/lifecycle synchronization and regression-gate integration. Merging
-#93 will satisfy only that named dependency; it will not itself implement or
-start #67. The merged #115 architecture is preserved but not counted as #93;
-#116, #117 and #120 are not started or absorbed.
+#93 is `VALIDATED`. Its dependency edge for #67 is satisfied, but #67 remains
+`BLOCKED` on its separate regression-gate integration. This lifecycle update
+does not implement or start #67. The merged #115 architecture/lifecycle remains
+independent and preserved: #115 is `VALIDATED`, #116 is `READY`, and #117–#121
+remain `BLOCKED`. None is started or absorbed here.
+
+Implementation applicability is `SMOKE_ONLY`. Lifecycle synchronization
+applicability is `NOT_APPLICABLE` because it changes documentation, governance
+and contract assertions only. Candidate and canonical squash merge are counted
+once as one runtime delivery; this lifecycle correction adds no capability.
 
 ## Roadmap evolution
 
@@ -168,6 +175,7 @@ historical CLI/quickstart/MCP mismatch (#93 baseline)
 → parallel #115 architecture merge #128 / `b475f1c` advances main
 → #115 lifecycle merge #130 / `055a35f` finalizes its routing
 → #93 rebased additively onto `055a35f` without changing its runtime result
-→ merge/lifecycle synchronization required before #93 VALIDATED
-→ #67 remains blocked on its separate regression-gate integration
+→ #129 candidate `c460e2f` squashed to canonical merge `c612454` (one runtime delivery)
+→ lifecycle synchronization marks #93 VALIDATED
+→ #67's #93 dependency is satisfied; regression-gate integration remains BLOCKED
 ```
