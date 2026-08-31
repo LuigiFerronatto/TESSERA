@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `governance contract` |
 | Pull request | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Merge commit | [`a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943) |
+| Decision | `KEEP` |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-08-31 |
 
@@ -29,7 +29,7 @@ The candidate makes that reconstruction a required part of both templates. It ad
 
 ## How does it work now?
 
-**CANDIDATE — NOT YET ON MAIN.**
+**VALIDATED ON `main`.**
 
 An Issue records current and target capability states before implementation. Its PR then verifies the relevant merged and superseded history, reports the candidate delta, and declares how canonical merge evidence will replace temporary head evidence after merge.
 
@@ -45,11 +45,11 @@ Two PR records sharing one head/merge commit are one delivery, not two independe
 
 ## How was it validated?
 
-Contract tests assert the required columns, state reconciliation, delivery classifications, duplicate-delivery rule and post-merge lifecycle markers. Full repository CI remains required.
+Contract tests assert the required columns, state reconciliation, delivery classifications, duplicate-delivery rule and post-merge lifecycle markers. PR #123 passed Python 3.9, Python 3.12, smoke, sanity and offline benchmark reporting/applicability.
 
 ## What improved?
 
-Nothing on `main` until merge. The candidate reduces title-based inference, duplicate counting and stale completion claims.
+The templates on `main` now make title-based inference, duplicate counting and stale completion claims visible contract violations.
 
 ## What remains unimplemented?
 
@@ -66,7 +66,7 @@ Templates cannot prove that a human or agent performed a correct audit; they mak
 | Issue/Test Card | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) |
 | Pull request | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
 | Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending |
+| Evidence/Learnings/Decision | [Issue comment](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) |
 | Benchmark record | Not applicable; governance contract tests |
 | PR Evolution Audit | PR #24 / merge `089590c`; PR #85 / merge `864a38e`; PR #97 / merge `3fdaa0d`; PR #102 / merge `39febe3`; PR #110 / merge `7f92dd9` |
 
