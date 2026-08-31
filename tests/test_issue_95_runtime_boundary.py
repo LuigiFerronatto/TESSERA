@@ -213,9 +213,12 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         "docs/slides/assets/LOGO_PRIMARIA_fundo_claro.svg",
         "docs/slides/assets/LOGO_SECUNDARIA_fundo_escuro.svg",
         "docs/test-cards/112-tessera-ascii-banner.md",
+        "docs/test-cards/93-storage-configuration-parity.md",
         "docs/test-cards/95-remove-legacy-runtime-coupling.md",
+        "docs/PR_EVOLUTION_93.md",
         "tessera/config.py", "tessera/legacy_compat.py", "tessera/llm_bridge.py",
         "tests/test_canonical_compatibility.py", "tests/test_issue_95_runtime_boundary.py",
+        "tests/test_issue_93_storage_config_parity.py",
     }
     unexpected = []
     for path in ROOT.rglob("*"):

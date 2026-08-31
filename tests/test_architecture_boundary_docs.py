@@ -7,6 +7,7 @@ ROADMAP = ROOT / "docs" / "ROADMAP.md"
 ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
 ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
 LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
+ISSUE_93_AUDIT = ROOT / "docs" / "PR_EVOLUTION_93.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
 ISSUE_115_CANDIDATE_SHA = "25afd31b910dec97cffea34a25092c6e7f8b4f2e"
 CANONICAL_115_MERGE_SHA = "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1"
@@ -286,3 +287,28 @@ def test_issue_115_canonical_delivery_is_deduplicated() -> None:
     assert CANONICAL_115_MERGE_SHA in record
     assert "**VALIDATED ON `main`.**" in record
     assert "migrations are not implemented" in record
+
+
+def test_issue_93_open_candidate_and_dependency_routing_are_truthful() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = ISSUE_93_AUDIT.read_text(encoding="utf-8")
+
+    issue_93 = _markdown_table_row(roadmap, "#93")
+    issue_67 = _markdown_table_row(roadmap, "#67")
+
+    assert "`IN_PROGRESS`" in issue_93
+    assert "PR_EVOLUTION_93.md" in issue_93
+    assert "5d43a2d4cdda0c17be6516f47920121070339d0f" in audit
+    for delivery in ("#83", "#98", "#108", "#126", "#127"):
+        assert delivery in audit
+    assert "#128" in audit
+    assert "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1" in audit
+    assert "parallel architecture delivery, not part of #93" in audit
+    assert "candidate and merge counted once" in audit
+    assert "already satisfied by #95" in audit
+    assert "still broken" in audit
+    assert "SMOKE_ONLY" in audit
+    assert "LongMemEval V1 dev-50 remains `NOT_RERUN`" in audit
+
+    assert "`BLOCKED`" in issue_67
+    assert "still depends on #93 and regression-gate integration" in issue_67

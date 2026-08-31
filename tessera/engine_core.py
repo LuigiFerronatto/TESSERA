@@ -830,79 +830,42 @@ class TesseraEngine:
         return True
 
     def _iter_markdown_files(self, recursive: bool):
-        """Yields absolute paths to every ``.md`` file to index."""
-        scan_dirs = [self.storage_dir]
-        individual_files = []
+        """Yield Markdown sources contained by the configured storage directory.
 
-        # Find potential project roots (current working dir or 2 steps up from storage_dir)
-        roots = [os.getcwd()]
+        ``storage_dir`` is the complete corpus boundary. Project-wide discovery
+        belongs to an explicit adapter/registry contract, not index bootstrap;
+        silently adding sibling ``docs`` folders or ancestor Markdown files can
+        make two identically configured processes observe unrelated memories.
+        """
+        if recursive:
+            for root, dirs, files in os.walk(self.storage_dir):
+                # Derived indexes and common dependency/build directories are
+                # not canonical memory sources even when nested in the store.
+                dirs[:] = [
+                    directory
+                    for directory in dirs
+                    if directory
+                    not in (
+                        ".tessera_index",
+                        ".git",
+                        "node_modules",
+                        "venv",
+                        ".venv-browser-agent",
+                        ".browser-harness",
+                        "Tessera",
+                    )
+                ]
+                for filename in files:
+                    if filename.endswith(".md"):
+                        yield os.path.join(root, filename)
+            return
+
         try:
-            two_up = os.path.dirname(os.path.dirname(os.path.abspath(self.storage_dir)))
-            if os.path.exists(two_up) and os.path.isdir(two_up):
-                roots.append(two_up)
-        except Exception:
-            pass
-
-        # Deduplicate roots while preserving order
-        seen_roots = set()
-        unique_roots = []
-        for r in roots:
-            abs_r = os.path.abspath(r)
-            if abs_r not in seen_roots:
-                seen_roots.add(abs_r)
-                unique_roots.append(abs_r)
-
-        # Map the monorepo folders ONLY if storage_dir resides inside the project root
-        # This keeps clean temporary/sandbox test environments isolated and pristine.
-        for root in unique_roots:
-            storage_dir_abs = os.path.abspath(self.storage_dir)
-            root_abs = os.path.abspath(root)
-            if storage_dir_abs.startswith(root_abs):
-                # 1. Add specific research folders if they exist
-                for folder in ["experiments", "newsletters", "docs"]:
-                    path = os.path.join(root, folder)
-                    if os.path.exists(path) and os.path.isdir(path):
-                        abs_path = os.path.abspath(path)
-                        if abs_path not in [os.path.abspath(d) for d in scan_dirs]:
-                            scan_dirs.append(abs_path)
-                
-                # 2. Add individual top-level markdown files in the project root (e.g. GEMINI.md, AGENTS.md, README.md)
-                try:
-                    for filename in os.listdir(root):
-                        if filename.endswith(".md"):
-                            abs_filepath = os.path.abspath(os.path.join(root, filename))
-                            if abs_filepath not in individual_files:
-                                individual_files.append(abs_filepath)
-                except Exception:
-                    pass
-
-        # Yield from directories
-        for s_dir in scan_dirs:
-            if recursive:
-                for root, dirs, files in os.walk(s_dir):
-                    # Exclude typical build/env/git/dependency folders from recursion
-                    dirs[:] = [
-                        d for d in dirs 
-                        if d not in (
-                            ".tessera_index", ".git", "node_modules", "venv", 
-                            ".venv-browser-agent", ".browser-harness", "Tessera"
-                        )
-                    ]
-                    for filename in files:
-                        if filename.endswith(".md"):
-                            yield os.path.join(root, filename)
-            else:
-                try:
-                    for filename in os.listdir(s_dir):
-                        if filename.endswith(".md"):
-                            yield os.path.join(s_dir, filename)
-                except Exception:
-                    pass
-
-        # Yield individual top-level files
-        for filepath in individual_files:
-            if os.path.exists(filepath):
-                yield filepath
+            for filename in os.listdir(self.storage_dir):
+                if filename.endswith(".md"):
+                    yield os.path.join(self.storage_dir, filename)
+        except OSError:
+            return
 
     def _normalize_frontmatter(self, frontmatter: Dict[str, Any], filepath: str) -> Dict[str, Any]:
         """
