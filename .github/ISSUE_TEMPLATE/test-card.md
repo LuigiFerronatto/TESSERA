@@ -38,6 +38,29 @@ target behavior, evidence and limitations separate. An open PR is never
 IMPLEMENTED or VALIDATED.
 -->
 
+## Capability state and repository evolution
+
+### Previous capability state
+<!-- What exists on main now? Distinguish runtime, benchmark, documentation, governance and ADR state. -->
+
+### Deliveries that established the current state
+<!-- Audit relevant merged PRs and merge commits. Include closed-unmerged/superseded PRs. Do not infer delivery from titles alone. -->
+
+| PR | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
+|---|---|---|---|---|---|---|---|
+|  |  |  |  |  |  |  |  |
+
+<!-- Do not count identical heads or merge commits as separate deliveries. -->
+
+### Target capability state
+<!-- State the exact observable contract if this card earns KEEP. -->
+
+### What will remain unimplemented
+<!-- Prevent this card from silently absorbing adjacent roadmap work. -->
+
+### Roadmap evolution
+<!-- Name the docs/ROADMAP.md entry/status/dependency change expected from this work. -->
+
 ## Objetivo
 <!-- One concrete task. One Issue = one decisionable unit of work. -->
 
