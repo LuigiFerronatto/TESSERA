@@ -5,8 +5,8 @@
 | Issue | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Pending publication from `test-card/93-storage-config-parity` |
-| Head commit | Pending final candidate |
+| Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
+| Head commit | [`ec4d624`](https://github.com/LuigiFerronatto/TESSERA/commit/ec4d624b8e19404cfb5470de85a2bc85fda2be59) audited runtime/test candidate; later evidence-only refresh does not change runtime |
 | Merge commit | Not merged |
 | Decision | `KEEP` candidate |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -83,10 +83,12 @@ ordering and evidence object. A Markdown note beside `project/`, outside
 
 The focused suite contains 13 executable cases: seven cross-surface matrix
 cases, four MCP bootstrap precedence cases, one containment regression and one
-golden write-once/read-everywhere case. It uses real temporary stores, the real
-CLI subprocess and the installed MCP transport package; no provider or network
-is contacted. Required regression suites, compile checks, the full suite,
-sanity before/after and GitHub Actions are recorded in
+golden write-once/read-everywhere case. It uses real temporary stores and the
+real CLI/MCP server code. An installed MCP transport is used directly; core-only
+CI replaces only decorator registration while keeping storage resolution,
+Engine construction and tools real. No provider or network is contacted.
+Required regression suites, compile checks, the full suite, sanity before/after
+and GitHub Actions are recorded in
 [`docs/PR_EVOLUTION_93.md`](../PR_EVOLUTION_93.md) and the Issue evidence.
 
 Deterministic sanity remains Hit@1 `0.75`, Hit@3 `1.00`, Hit@5 `1.00`, MRR
@@ -119,9 +121,9 @@ integration. #115, #117 and #120 are not started or absorbed.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) |
-| Pull request | Pending publication |
+| Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
 | Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending superseding Issue #93 comment |
+| Evidence/Learnings/Decision | [Superseding KEEP evidence](https://github.com/LuigiFerronatto/TESSERA/issues/93#issuecomment-5483152212) |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity only; LongMemEval not rerun |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_93.md`](../PR_EVOLUTION_93.md) |
 

@@ -4,10 +4,11 @@ Audited starting main:
 `5d43a2d4cdda0c17be6516f47920121070339d0f`, the canonical lifecycle merge
 from PR #127. It includes the canonical #95 implementation merge
 `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`. Candidate branch:
-`test-card/93-storage-config-parity`. Candidate commit, pull request, Issue
-evidence URL and CI runs are filled from the published final candidate; the
-record remains `IN_PROGRESS` and no merge commit is claimed while the PR is
-open.
+`test-card/93-storage-config-parity`; [PR #129](https://github.com/LuigiFerronatto/TESSERA/pull/129).
+Audited runtime/test candidate:
+`ec4d624b8e19404cfb5470de85a2bc85fda2be59`; a later evidence-only refresh
+does not change runtime behavior. The record remains `IN_PROGRESS` and no merge
+commit is claimed while the PR is open.
 
 ## Previous capability state
 
@@ -103,24 +104,32 @@ changed, not retrieval semantics. LongMemEval V1 dev-50 remains `NOT_RERUN`.
 
 | Metric | Audited main | Candidate | Delta |
 |---|---:|---:|---:|
-| Hit@1 | 0.75 | pending final rerun | expected 0.00 |
-| Hit@3 | 1.00 | pending final rerun | expected 0.00 |
-| Hit@5 | 1.00 | pending final rerun | expected 0.00 |
-| MRR | 0.875 | pending final rerun | expected 0.00 |
-| Evidence hit rate | 1.00 | pending final rerun | expected 0.00 |
-| Missing-evidence check | passed | pending final rerun | expected unchanged |
+| Hit@1 | 0.75 | 0.75 | 0.00 |
+| Hit@3 | 1.00 | 1.00 | 0.00 |
+| Hit@5 | 1.00 | 1.00 | 0.00 |
+| MRR | 0.875 | 0.875 | 0.00 |
+| Evidence hit rate | 1.00 | 1.00 | 0.00 |
+| Missing-evidence check | passed | passed | unchanged |
 
 No versioned file under `benchmarks/` is changed.
 
 ## Validation record
 
 - Focused #93 integration: 13 passed.
-- Required #95, retrieval parity, architecture, plain-language and benchmark
-  reporting suites: pending final consolidated run.
-- Full suite, compileall, diff checks, final sanity and GitHub Actions: pending
-  final candidate publication.
+- #95 runtime boundary: 16 passed; retrieval parity: 3 passed; architecture:
+  8 passed; plain-language records: 7 passed; benchmark reporting: 51 passed.
+- Full suite: 272 passed with 14 expected warnings. Compileall, `git diff
+  --check` and the empty `benchmarks/` diff passed.
+- [TESSERA CI 33428499798](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428499798):
+  Python 3.9/3.12, smoke and sanity all passed.
+- [Benchmark Ledger 33428499819](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428499819):
+  passed; LongMemEval was skipped under `SMOKE_ONLY`.
+- The first CI attempt exposed that core CI omits the optional MCP transport.
+  The fixture now substitutes only decorator registration when absent; actual
+  server bootstrap, resolution, Engine construction and tool calls remain real.
 - Tests use temporary directories and subprocesses only. No provider, external
-  service or network call occurs.
+  service or network call occurs. Full Evidence/Learnings/Decision:
+  [Issue comment](https://github.com/LuigiFerronatto/TESSERA/issues/93#issuecomment-5483152212).
 
 ## Newly unlocked work
 
