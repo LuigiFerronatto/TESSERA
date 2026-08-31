@@ -20,4 +20,6 @@ def test_package_metadata_is_tessera_native():
 def test_mcp_runtime_uses_tessera_storage_identifier():
     text = (ROOT / "tessera" / "mcp_server.py").read_text(encoding="utf-8")
     assert _legacy_project_token().lower() not in text.lower()
-    assert 'os.environ.get("TESSERA_STORAGE_DIR", "./memories")' in text
+    assert "resolve_storage_dir()" in text
+    config = (ROOT / "tessera" / "config.py").read_text(encoding="utf-8")
+    assert 'CANONICAL_STORAGE_ENV = "TESSERA_STORAGE_DIR"' in config

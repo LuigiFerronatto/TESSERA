@@ -5,8 +5,7 @@ Diagnostics & onboarding helpers for Tessera, shared by both the CLI
 added here is instantly available to a human on a terminal AND an agent
 calling the MCP tool.
 
-Implements items 1-2 and 6 of the plug-and-play roadmap
-(lao/tessera-plug-and-play-vision-roadmap):
+Implements the current project-neutral doctor and quickstart boundary:
   - `tessera doctor`: post-install smoke test (MCP config found? storage_dir
     writable? index builds without error? write+read round-trip works?)
   - `tessera quickstart`: detects the current project, proposes a storage_dir,
@@ -28,6 +27,8 @@ import tempfile
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+
+from .config import CANONICAL_STORAGE_ENV, LEGACY_STORAGE_ENV, resolve_storage_dir
 
 
 @dataclass
@@ -167,14 +168,11 @@ def run_doctor(storage_dir: str) -> DoctorReport:
             required=False,
         ))
 
-    # 6. LLM backend reachability (best-effort, informational — offline mode
-    #    is a first-class citizen, so a missing key is NOT a failure)
-    azure_key = bool(os.environ.get("TESSERA_AZURE_GATEWAY_API_KEY"))
+    # 6. Optional assisted mode is deliberately unselected by default. Doctor
+    #    does not inspect provider-specific credentials or project files.
     report.checks.append(CheckResult(
-        "backend Azure Gateway configurado (opcional)", azure_key,
-        "TESSERA_AZURE_GATEWAY_API_KEY presente no ambiente" if azure_key else
-        "não configurado — 'tessera start --use-llm' cairá no fallback engine_router (mais lento) ou na simulação offline",
-        hint=None if azure_key else "Sem essa chave, --use-llm ainda funciona via fallback, só mais devagar. Não é obrigatório.",
+        "backend assistido opcional", True,
+        "nenhum backend é sondado ou ativado pelo doctor; configure um llm_fn explicitamente",
         required=False,
     ))
 
@@ -214,17 +212,8 @@ def _detect_project_type(project_root: str) -> str:
 
 
 def _suggest_storage_dir(project_root: str) -> str:
-    """Prefers an existing '.claude/memory'-shaped dir if one is already
-    present (common in LAO-derived projects); otherwise proposes './memories'
-    at the project root, Tessera's generic default."""
-    candidates = [
-        os.path.join(project_root, ".claude", "memory"),
-        os.path.join(project_root, "memories"),
-    ]
-    for c in candidates:
-        if os.path.isdir(c):
-            return c
-    return candidates[1]
+    """Return the generic project-local fallback without directory discovery."""
+    return os.path.join(project_root, "memories")
 
 
 def build_quickstart_plan(project_root: Optional[str] = None, storage_dir: Optional[str] = None) -> QuickstartPlan:
@@ -236,7 +225,12 @@ def build_quickstart_plan(project_root: Optional[str] = None, storage_dir: Optio
     """
     project_root = os.path.abspath(project_root or os.getcwd())
     project_type = _detect_project_type(project_root)
-    resolved_storage_dir = os.path.abspath(storage_dir) if storage_dir else _suggest_storage_dir(project_root)
+    if storage_dir:
+        resolved_storage_dir = os.path.abspath(resolve_storage_dir(storage_dir))
+    elif os.environ.get(CANONICAL_STORAGE_ENV) or os.environ.get(LEGACY_STORAGE_ENV):
+        resolved_storage_dir = os.path.abspath(resolve_storage_dir())
+    else:
+        resolved_storage_dir = _suggest_storage_dir(project_root)
 
     tessera_mcp_bin = shutil.which("tessera-mcp") or os.path.join(
         os.path.dirname(sys.executable), "tessera-mcp"
@@ -245,7 +239,7 @@ def build_quickstart_plan(project_root: Optional[str] = None, storage_dir: Optio
         "mcpServers": {
             "tessera": {
                 "command": tessera_mcp_bin,
-                "env": {"LAO_MEM_DIR": resolved_storage_dir},
+                "env": {"TESSERA_STORAGE_DIR": resolved_storage_dir},
             }
         }
     }

@@ -13,19 +13,19 @@ import argparse
 import os
 import sys
 import json
+import warnings
 from typing import Dict
 
+from .config import resolve_storage_dir
 from .engine import TesseraEngine
 from .models import Connection, Entity
 from .orchestrator import TesseraOrchestrator
 from .skills import install_default_skills, list_default_skill_files
 
-# Default storage directory, used whenever `storage_dir` is omitted from the
-# command line. Resolution order: `--dir` flag > `LAO_MEM_DIR` env var >
-# `./memories` in the current working directory. This lets `tessera list`,
-# `tessera query "..."`, etc. work without repeating the path every time once
-# `LAO_MEM_DIR` is exported (e.g. `export LAO_MEM_DIR=.claude/memory`).
-DEFAULT_STORAGE_DIR = os.environ.get("LAO_MEM_DIR", "./memories")
+STORAGE_HELP = (
+    "Path to memory storage (default precedence: explicit argument, "
+    "TESSERA_STORAGE_DIR, ./memories)"
+)
 
 
 def _parse_entities(raw_entities):
@@ -148,7 +148,7 @@ def cmd_query(args):
     if engine.graph.number_of_nodes() == 0:
         print(
             f"Nenhuma nota de memória indexada em '{args.storage_dir}'. "
-            "Verifique o caminho (ou exporte LAO_MEM_DIR)."
+            "Verifique o caminho (ou defina TESSERA_STORAGE_DIR)."
         )
         return
     results = engine.retrieve_context(
@@ -266,30 +266,25 @@ def cmd_start(args):
 
     from .llm_bridge import resolve_llm_fn
 
-    llm_fn, backend_name = resolve_llm_fn(return_backend_name=True)
+    try:
+        llm_fn, backend_name = resolve_llm_fn(
+            backend=args.llm_backend, endpoint=args.compat_endpoint,
+            api_key=args.compat_api_key, contact_id=args.compat_contact_id,
+            subscription_id=args.compat_subscription_id,
+            tenant_id=args.compat_tenant_id, router_path=args.compat_router_path,
+            return_backend_name=True,
+        )
+    except RuntimeError as exc:
+        print(f"[tessera] optional backend configuration failed: {exc}", file=sys.stderr)
+        return 2
     if llm_fn is None:
-        print("[tessera] FATAL: A real LLM backend is required but none is configured.", file=sys.stderr)
-        sys.exit(1)
-        
-    if backend_name == "azure":
         print(
-            "[tessera] backend=azure (Azure AI Gateway, ~2s/call, "
-            "~6s total for the 3-step pipeline).",
+            "[tessera] No optional backend selected. Pass a custom llm_fn in "
+            "Python or explicitly select a configured compatibility adapter.",
             file=sys.stderr,
         )
-    else:
-        azure_key_present = bool(os.environ.get("TESSERA_AZURE_GATEWAY_API_KEY"))
-        hint = (
-            "" if azure_key_present else
-            " (dica: TESSERA_AZURE_GATEWAY_API_KEY não está no ambiente atual — "
-            "rode 'set -a && source .env && set +a' antes, se quiser o backend "
-            "Azure, ~5-6x mais rápido)"
-        )
-        print(
-            f"[tessera] backend=engine_router (subprocess CLI, "
-            f"~9-13s/call, ~30-40s total for the 3-step pipeline){hint}.",
-            file=sys.stderr,
-        )
+        return 2
+    print(f"[tessera] backend={backend_name} (explicit compatibility selection).", file=sys.stderr)
 
     from .display import get_console, print_banner, render_query_results
 
@@ -347,10 +342,20 @@ def cmd_decompose(args):
 
     from .llm_bridge import resolve_llm_fn
 
-    llm_fn, backend_name = resolve_llm_fn(return_backend_name=True)
+    try:
+        llm_fn, backend_name = resolve_llm_fn(
+            backend=args.llm_backend, endpoint=args.compat_endpoint,
+            api_key=args.compat_api_key, contact_id=args.compat_contact_id,
+            subscription_id=args.compat_subscription_id,
+            tenant_id=args.compat_tenant_id, router_path=args.compat_router_path,
+            return_backend_name=True,
+        )
+    except RuntimeError as exc:
+        print(f"[tessera] optional backend configuration failed: {exc}", file=sys.stderr)
+        return 2
     if llm_fn is None:
-        print("[tessera] FATAL: A real LLM backend is required but none is configured.", file=sys.stderr)
-        sys.exit(1)
+        print("[tessera] No optional backend selected.", file=sys.stderr)
+        return 2
         
     print(f"[tessera] backend={backend_name}.", file=sys.stderr)
 
@@ -445,6 +450,21 @@ def cmd_banner(args):
     print_banner(console)
 
 
+def _add_optional_backend_arguments(parser):
+    parser.add_argument(
+        "--llm-backend",
+        metavar="NAME",
+        default=None,
+        help="Explicitly select a deprecated compatibility adapter (no default backend).",
+    )
+    parser.add_argument("--compat-endpoint", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--compat-api-key", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--compat-contact-id", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--compat-subscription-id", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--compat-tenant-id", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--compat-router-path", default=None, help=argparse.SUPPRESS)
+
+
 def build_parser():
     parser = argparse.ArgumentParser(prog="tessera", description="Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -458,13 +478,11 @@ def build_parser():
                                help="Force plain-text output (no colors/tables), even on a TTY.")
 
     p_init = sub.add_parser("init", help="Initialize a memory storage directory", parents=[plain_parent])
-    p_init.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                         help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r}, from --dir/LAO_MEM_DIR/./memories)")
+    p_init.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_init.set_defaults(func=cmd_init)
 
     p_write = sub.add_parser("write", help="Write a new memory note", parents=[plain_parent])
-    p_write.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                          help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_write.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_write.add_argument("--id", required=True)
     p_write.add_argument("--type", required=True, choices=["factual", "preference", "procedural_anchor"])
     p_write.add_argument("--episode", required=True)
@@ -475,18 +493,16 @@ def build_parser():
     p_write.add_argument("--related-to", action="append",
                           help='Format "target_memory_id:relation_type" (relation_type defaults to '
                                '"related_to"), repeatable. Creates explicit graph edges, mirroring '
-                               'what /lao-save-learning documents.')
+                               'the generic connection schema.')
     p_write.set_defaults(func=cmd_write)
 
     p_index = sub.add_parser("index", help="Rebuild the in-memory knowledge graph index", parents=[plain_parent])
-    p_index.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                          help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_index.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_index.set_defaults(func=cmd_index)
 
     p_query = sub.add_parser("query", help="Retrieve relevant memories for a query", parents=[plain_parent])
-    p_query.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                           help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
-    p_query.add_argument("query")
+    p_query.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    p_query.add_argument("query", nargs="?", help="Query text (storage path may be omitted)")
     p_query.add_argument("--top-n", type=int, default=7)
     p_query.add_argument("--no-resolve-conflicts", action="store_true")
     p_query.add_argument("--paths-only", action="store_true",
@@ -502,8 +518,7 @@ def build_parser():
     p_query.set_defaults(func=cmd_query)
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])
-    p_list.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                         help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_list.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_list.add_argument("--type", choices=["factual", "preference", "procedural_anchor"], default=None)
     p_list.add_argument("--paths-only", action="store_true",
                          help="Print only the filepath of each note (one per line)")
@@ -516,8 +531,7 @@ def build_parser():
 
     p_skills_install = skills_sub.add_parser("install", help="Install the 5 bundled default skills into a storage dir",
                                               parents=[plain_parent])
-    p_skills_install.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                                   help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_skills_install.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_skills_install.set_defaults(func=cmd_skills_install)
 
     p_skills_list = skills_sub.add_parser("list", help="List the bundled default skill IDs", parents=[plain_parent])
@@ -527,10 +541,10 @@ def build_parser():
         "start", help="Run the full Need->Planner->Retrieval->Inference orchestrator pipeline for a task",
         parents=[plain_parent],
     )
-    p_start.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                          help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
-    p_start.add_argument("task")
+    p_start.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    p_start.add_argument("task", nargs="?", help="Task text (storage path may be omitted)")
     p_start.add_argument("--top-n", type=int, default=7)
+    _add_optional_backend_arguments(p_start)
     p_start.set_defaults(func=cmd_start)
 
     p_decompose = sub.add_parser(
@@ -538,10 +552,9 @@ def build_parser():
         help="QUMem-style: mechanically extract N atomic facts/preferences/insights from a raw episode",
         parents=[plain_parent],
     )
-    p_decompose.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                              help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_decompose.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_decompose.add_argument("--mem-id-prefix", required=True,
-                              help='Domain-prefixed prefix, e.g. "research/some-topic" or "lao/some-run" - '
+                              help='Domain-prefixed prefix, e.g. "research/some-topic" or "project/some-run" - '
                                    'each extracted memory is written as "{prefix}/{type}-{n}".')
     p_decompose.add_argument("--episode-id", default=None,
                               help="Episode id to stamp on every extracted note (default: same as --mem-id-prefix).")
@@ -549,6 +562,7 @@ def build_parser():
     p_decompose.add_argument("--middle", required=True, help="Episode's middle (what actually happened).")
     p_decompose.add_argument("--end", required=True, help="Episode's end (outcome/resolution/lesson).")
     p_decompose.add_argument("--tags", default="", help="Comma-separated tags applied to every extracted note.")
+    _add_optional_backend_arguments(p_decompose)
     p_decompose.set_defaults(func=cmd_decompose)
 
     p_banner = sub.add_parser("banner", help="Print the Tessera ASCII logo/banner", parents=[plain_parent])
@@ -558,16 +572,14 @@ def build_parser():
         "stats", help="Show index composition: real notes vs. internal tag/entity graph nodes",
         parents=[plain_parent],
     )
-    p_stats.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                          help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_stats.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_stats.set_defaults(func=cmd_stats)
 
     p_doctor = sub.add_parser(
         "doctor", help="Run post-install smoke tests (writable dir, index builds, write/read round-trip, deps)",
         parents=[plain_parent],
     )
-    p_doctor.add_argument("storage_dir", nargs="?", default=DEFAULT_STORAGE_DIR,
-                           help=f"Path to the memory storage dir (default: {DEFAULT_STORAGE_DIR!r})")
+    p_doctor.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_doctor.set_defaults(func=cmd_doctor)
 
     p_quickstart = sub.add_parser(
@@ -588,6 +600,19 @@ def build_parser():
 def main(argv=None):
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command in {"query", "start"}:
+        text_field = "query" if args.command == "query" else "task"
+        if getattr(args, text_field) is None:
+            setattr(args, text_field, args.storage_dir)
+            args.storage_dir = None
+        if getattr(args, text_field) is None:
+            parser.error(f"{args.command} requires {text_field} text")
+    if hasattr(args, "storage_dir") and args.command != "quickstart":
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            args.storage_dir = resolve_storage_dir(args.storage_dir)
+        for warning in caught:
+            print(f"[tessera] warning: {warning.message}", file=sys.stderr)
     try:
         return args.func(args) or 0
     except BrokenPipeError:

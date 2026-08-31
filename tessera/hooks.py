@@ -11,7 +11,7 @@ This is the "in practice" piece of the 3-pillar memory architecture:
     2. Typed stores — everything learned is filed into exactly 3 drawers:
        facts / preferences / insights (see `tessera.engine.STORE_*` +
        `TesseraEngine.write_fact/write_preference/write_insight`).
-    3. The hook + detective trio — this module. When the main agent (LAO)
+    3. The hook + detective trio — this module. When the consuming agent
        is about to run a task, `on_task_start` intercepts it, runs the
        3-agent orchestrator pipeline (Need -> Planner -> Inference) against
        the 3 typed stores, and returns a validated context block ready to
@@ -91,8 +91,16 @@ class TesseraTaskHook:
         subscribers: Optional[List[HookSubscriber]] = None,
     ):
         self.engine = engine
-        self.orchestrator = TesseraOrchestrator(engine, llm_fn=llm_fn)
+        self._llm_fn = llm_fn
+        self._orchestrator: Optional[TesseraOrchestrator] = None
         self.subscribers = list(subscribers or [])
+
+    @property
+    def orchestrator(self) -> TesseraOrchestrator:
+        """Construct assisted orchestration only when an assisted call needs it."""
+        if self._orchestrator is None:
+            self._orchestrator = TesseraOrchestrator(self.engine, llm_fn=self._llm_fn)
+        return self._orchestrator
 
     def subscribe(self, callback: HookSubscriber) -> None:
         """Registers a callback invoked with the raw OrchestratorResult on every
@@ -125,8 +133,8 @@ class TesseraTaskHook:
 
         `llm_fn`: overrides this call's LLM backend for the 3 pipeline
         steps, without needing to re-instantiate the hook/orchestrator.
-        None (default) keeps whatever `llm_fn` the hook was constructed
-        with (offline simulation if none was ever provided).
+        None (default) keeps the explicit `llm_fn` the hook was constructed
+        with; if none exists, the assisted call fails before provider activity.
 
         Returns a `TaskInterceptionResult` ready to inject into the main
         agent's context/prompt.
@@ -214,7 +222,7 @@ class TesseraTaskHook:
         through the same gated typed-store path.
 
         `mem_id_prefix` MUST carry a domain prefix (e.g. "research/topic" or
-        "lao/some-run"); defaults to "episode_<sha1-of-task>" (bare, no
+        "project/some-run"); defaults to "episode_<sha1-of-task>" (bare, no
         domain) with a warning from the underlying write path if omitted —
         always pass an explicit, domain-prefixed prefix in real usage.
 
@@ -234,7 +242,7 @@ class TesseraTaskHook:
             digest = hashlib.sha1(task_instruction.encode("utf-8")).hexdigest()[:10]
             mem_id_prefix = f"episode_{digest}"
 
-        resolved_llm_fn = llm_fn if llm_fn is not None else getattr(self.orchestrator, "llm_fn", None)
+        resolved_llm_fn = llm_fn if llm_fn is not None else self._llm_fn
 
         return decompose_and_write(
             engine=self.engine,

@@ -114,15 +114,16 @@ both generated context and `raw_memories`. Explicit `on_task_end()` writes a
 caller-provided memory. `on_task_end_auto()` delegates assisted episode
 decomposition and writes its outputs through the normal write path.
 
-**CURRENT** `resolve_llm_fn()` auto-probes an Azure HTTP adapter and an external
-`engine_router.py`. Azure requires `TESSERA_AZURE_GATEWAY_API_KEY`; the router
-requires its external script and provider CLI configuration. Provider imports
-and calls are lazy and are not in the deterministic Engine path.
+**CURRENT** `resolve_llm_fn()` selects no backend by default and performs no
+provider credential or project-file inspection. The deprecated project-specific
+gateway and engine-router adapters require an explicit compatibility name plus
+an endpoint or exact router path. Calls fail with typed errors and never echo
+the raw prompt as output.
 
-**CURRENT** Importing `tessera.mcp_server` eagerly constructs a task hook, which
-constructs the orchestrator and resolves a provider. Therefore the current MCP
-server can fail at startup without an LLM backend even though direct MCP
-retrieval itself is deterministic.
+**CURRENT** Importing `tessera.mcp_server` eagerly constructs the deterministic
+Engine and task-hook wrapper but does not resolve or probe a provider. Assisted
+MCP tools still need the lifecycle/envelope refactor owned by #120; direct MCP
+retrieval remains deterministic.
 
 **CURRENT** `decompose_episode()` invokes an LLM and returns no extracted
 memories on call or parse failure. A heuristic helper exists but is not reached
@@ -457,4 +458,3 @@ issues.
 | 9 | LongMemEval V2 adapter | Evaluate V2 only after V1 ownership and controls are stable | full-500 decision and separate V2 Test Card | pinned dataset/schema, no V1 contract contamination, independently reproducible report |
 
 **PROPOSED FOLLOW-UP** None of these cards is started by accepting this ADR.
-

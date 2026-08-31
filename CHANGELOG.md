@@ -13,6 +13,13 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Default storage resolution is now project-neutral and shared across current
+  runtime surfaces: explicit path → `TESSERA_STORAGE_DIR` → deprecated
+  `LAO_MEM_DIR` alias → `./memories`. Quickstart emits the canonical variable
+  and never auto-selects a project-specific directory. ([#95](https://github.com/LuigiFerronatto/TESSERA/issues/95))
+- Optional project-specific LLM integrations now require explicit deprecated
+  compatibility selection and explicit endpoint/router configuration; generic
+  resolution performs no provider probing. ([#95](https://github.com/LuigiFerronatto/TESSERA/issues/95))
 - Issue and pull-request templates now require canonical PR Evolution Audits, capability-state reconciliation, duplicate-delivery protection and explicit post-merge lifecycle synchronization. ([#114](https://github.com/LuigiFerronatto/TESSERA/issues/114))
 - Test Cards now have versioned plain-language stage records that preserve current-vs-target status, understandable before/after behavior, technical provenance, evidence, limitations and next dependencies. ([#109](https://github.com/LuigiFerronatto/TESSERA/issues/109))
 - The experimental roadmap now derives status from GitHub state, merged
@@ -38,7 +45,9 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - No new experimental capability has been promoted in this documentation/governance round. Existing graph, temporal, arbitration, abstention and adaptive-retrieval work remains governed by its Test Cards.
 
 ### Deprecated
-- Legacy project-specific MCP storage configuration is deprecated by removal; migrate to `TESSERA_STORAGE_DIR`.
+- `LAO_MEM_DIR` remains temporarily as a lower-priority warning-emitting storage
+  alias; migrate to `TESSERA_STORAGE_DIR`. Project-specific LLM adapters remain
+  only behind the explicit deprecated compatibility boundary.
 
 ### Removed
 - Legacy external-project identity from package metadata and MCP-facing examples/configuration. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))

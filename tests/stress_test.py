@@ -52,7 +52,7 @@ def generate_stress_dataset(engine: TesseraEngine):
             episode_id=f"ep_pref_lang_01",
             content=content,
             tags=["linguagem", "evolucao_preferencia"],
-            entities=[Entity("Alex", "Usuário principal do LAO.")]
+            entities=[Entity("Alex", "Operador principal do agente.")]
         )
         
         # Ajustamos manualmente a data física da nota gerada para garantir a ordem cronológica estrita nos testes
@@ -83,7 +83,7 @@ def generate_stress_dataset(engine: TesseraEngine):
             episode_id=f"ep_pref_db_01",
             content=content,
             tags=["banco_dados", "evolucao_preferencia"],
-            entities=[Entity("Alex", "Usuário principal do LAO.")]
+            entities=[Entity("Alex", "Operador principal do agente.")]
         )
         
         filepath = os.path.join(engine.storage_dir, f"mem_pref_db_{i}.md")
@@ -121,17 +121,17 @@ Known Pitfalls: Tentar subir sem alocação prévia de socket de escuta local.""
         )
 
 def run_suite():
-    with tempfile.TemporaryDirectory() as lao_test_dir:
+    with tempfile.TemporaryDirectory() as test_storage_dir:
         print("===========================================================================")
-        print("🧪 PERFORMANCE & ESTRESSE SUITE: MOTOR DE BUSCA Tessera EM ESCALA (LAO)")
+        print("🧪 PERFORMANCE & ESTRESSE SUITE: MOTOR DE BUSCA TESSERA EM ESCALA")
         print("===========================================================================")
         
         # Inicializa o motor do Tessera no diretório limpo
-        engine = TesseraEngine(storage_dir=lao_test_dir)
+        engine = TesseraEngine(storage_dir=test_storage_dir)
         
         # --- BENCHMARK 1: ESCRITA E INGESTÃO ---
         print(f"📥 Gerando dataset sintético de 190 memórias físicas (.md) usando write_memory_note em:")
-        print(f"   {lao_test_dir}...")
+        print(f"   {test_storage_dir}...")
         
         start_write = time.perf_counter()
         generate_stress_dataset(engine)
