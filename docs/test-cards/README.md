@@ -44,6 +44,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #96 LongMemEval V1 dev-50 baseline | `VALIDATED` | [96-longmemeval-v1-dev-50.md](96-longmemeval-v1-dev-50.md) | [Issue #96](https://github.com/LuigiFerronatto/TESSERA/issues/96), [PR #99](https://github.com/LuigiFerronatto/TESSERA/pull/99) |
 | #100 Benchmark ledger and CI | `VALIDATED` | [100-benchmark-ledger-and-ci.md](100-benchmark-ledger-and-ci.md) | [Issue #100](https://github.com/LuigiFerronatto/TESSERA/issues/100), [PR #102](https://github.com/LuigiFerronatto/TESSERA/pull/102) |
 | #92 Truthful write gate | `PLANNED` | [92-write-gate-integrity.md](92-write-gate-integrity.md) | [Issue #92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
+| #109 Plain-language stage-record system | `IMPLEMENTED` | This index and [TEMPLATE.md](TEMPLATE.md) | [Issue #109](https://github.com/LuigiFerronatto/TESSERA/issues/109), [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110) |
 
 ## Stage map
 
