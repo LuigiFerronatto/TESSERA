@@ -69,7 +69,7 @@ This portfolio was reconciled through merged [PR #124](https://github.com/LuigiF
 and documentation Test Card [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109)
 against GitHub issue state, authoritative routing blocks, merged pull requests,
 merge commits, evidence comments, versioned benchmark records, and the code on
-`main` at `a0a482c22a3f105becdbfb5b3e5ba68a64aabaa9`. Historical prose and emoji
+`main` at `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`. Historical prose and emoji
 markers are not status evidence.
 
 ## Status contract
@@ -106,13 +106,13 @@ therefore `BLOCKED` here.
 | [#66](https://github.com/LuigiFerronatto/TESSERA/issues/66) | stale planned marker | closed | completed governance card | [PR #85](https://github.com/LuigiFerronatto/TESSERA/pull/85), [merge `864a38e`](https://github.com/LuigiFerronatto/TESSERA/commit/864a38e12277498b56eb9245b31a75dfc71b3b5e), PR evidence/decision | PR-contract tests | `VALIDATED` |
 | [#68](https://github.com/LuigiFerronatto/TESSERA/issues/68) | planned | closed | stale “running” | [PR #98](https://github.com/LuigiFerronatto/TESSERA/pull/98), [merge `fb23012`](https://github.com/LuigiFerronatto/TESSERA/commit/fb23012ba4b2fddc3912d7cb593391a04fe45ae7), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/68#issuecomment-5471122707) | parity fixture + CI | `VALIDATED` |
 | [#75](https://github.com/LuigiFerronatto/TESSERA/issues/75) | stale in-progress marker | closed | previous roadmap sync | [PR #76](https://github.com/LuigiFerronatto/TESSERA/pull/76), [merge `32a2aa6`](https://github.com/LuigiFerronatto/TESSERA/commit/32a2aa63db0024497cdee4cf16911cc3634770ca), PR evidence | not applicable | `SUPERSEDED` |
-| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | M0 planned | open | active [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108); no dependencies | [candidate `b38ec89`](https://github.com/LuigiFerronatto/TESSERA/commit/b38ec89e66eb5130d45bca8f8146e01181754639), [plain-language record](test-cards/92-write-gate-integrity.md), [PR Evolution Audit](PR_EVOLUTION_92.md); current-main merge integrated; not merged | `SMOKE_ONLY`; contract/persistence/sanity gates | `IN_PROGRESS` |
+| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | M0 planned | closed | completed by [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108); no dependencies | [merge `9ab03f7`](https://github.com/LuigiFerronatto/TESSERA/commit/9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05), [KEEP Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479001151), [plain-language record](test-cards/92-write-gate-integrity.md), [PR Evolution Audit](PR_EVOLUTION_92.md) | `SMOKE_ONLY`; 241 local tests plus Python 3.9/3.12, smoke, sanity and reporting CI passed | `VALIDATED` |
 | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) | M0 planned | open | ready; no dependencies | partial naming/config cleanup exists, but no closing PR or golden integration proof | smoke-only when executed | `READY` |
 | [#94](https://github.com/LuigiFerronatto/TESSERA/issues/94) | planned | closed | completed bug card | [PR #101](https://github.com/LuigiFerronatto/TESSERA/pull/101), [merge `467ba64`](https://github.com/LuigiFerronatto/TESSERA/commit/467ba649f53312cedcecf40caf548af5f766c67b), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/94#issuecomment-5471509112) | smoke-only contract validation | `VALIDATED` |
 | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | M0 planned | open | ready; no dependencies | project-agnostic work is partial; runtime inventory and closing PR are absent | smoke-only when executed | `READY` |
 | [#96](https://github.com/LuigiFerronatto/TESSERA/issues/96) | planned | closed | completed benchmark card | [PR #99](https://github.com/LuigiFerronatto/TESSERA/pull/99), [merge `812c3aa`](https://github.com/LuigiFerronatto/TESSERA/commit/812c3aa37b59a3e99135a9d8b39245aeb71356d0), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/96#issuecomment-5471323841) | [historical dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/baseline.md) | `VALIDATED` |
 | [#100](https://github.com/LuigiFerronatto/TESSERA/issues/100) | absent | closed | completed measurement card | [PR #102](https://github.com/LuigiFerronatto/TESSERA/pull/102), [merge `39febe3`](https://github.com/LuigiFerronatto/TESSERA/commit/39febe36f016997f0c54ede9824f15dec04cc1ee), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/100#issuecomment-5471939801) | [forward dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/forward.md) + conditional CI | `VALIDATED` |
-| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | planned | open | depends on #68, #92–#95 and #100 | test shell may start; final gate absent | reporting CI exists, full Quality Gate v2 does not | `BLOCKED` |
+| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | planned | open | #92 is satisfied; still depends on #93, #95 and regression-gate integration | test shell may start; final gate absent | reporting CI exists, full Quality Gate v2 does not | `BLOCKED` |
 | [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | planned | closed | completed architecture decision | [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [merge `0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2), [accepted ADR 0001](adr/0001-core-vs-optional-llm-boundary.md), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472168701) | not applicable; docs/contract only | `VALIDATED` |
 | [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109) | absent | closed | completed documentation/governance card | [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110), [merge `7f92dd9`](https://github.com/LuigiFerronatto/TESSERA/commit/7f92dd95584aa1f3adf57d47080853bf2e289087) | not applicable | `IMPLEMENTED` |
 | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | untracked runtime branding defect | closed | completed branding correction | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113), [merge `a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
@@ -146,7 +146,7 @@ therefore `BLOCKED` here.
 | [#72](https://github.com/LuigiFerronatto/TESSERA/issues/72) | planned | open | depends on #71 and #32 | deterministic resolver absent | benchmark pending | `BLOCKED` |
 | [#27](https://github.com/LuigiFerronatto/TESSERA/issues/27) | planned | open | depends on #15, #16, #32, #72 and #96 | arbitration absent | dev-50 alone is insufficient | `BLOCKED` |
 | [#20](https://github.com/LuigiFerronatto/TESSERA/issues/20) | planned | open | depends on #15, #16, #27 and #96 | sufficiency/abstention classifier absent | abstention retrieval metric only | `BLOCKED` |
-| [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | planned | open | depends on #92, #13, #16 and #73 | basic sanitization exists; evidence-aware admission absent | admission benchmark pending | `BLOCKED` |
+| [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | planned | open | #92 is satisfied; still depends on #13, #16 and #73 | truthful deterministic write gate exists; evidence-aware admission absent | admission benchmark pending | `BLOCKED` |
 | [#17](https://github.com/LuigiFerronatto/TESSERA/issues/17) | planned/deferred | open | depends on #20, #74 and #96 | current hard-coded intent heuristics are baseline | dev-50 available | `BLOCKED` |
 | [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | planned/deferred | open | depends on #19, #20 and #96 | utility-feedback runtime absent | benchmark pending | `BLOCKED` |
 | [#38](https://github.com/LuigiFerronatto/TESSERA/issues/38) | active documentation program | open | epic/tracker | child documentation PRs only | not applicable | `TRACKER` |
@@ -158,6 +158,8 @@ therefore `BLOCKED` here.
 - `VALIDATED` — lossless Engine/CLI/MCP direct-query parity (#68).
 - `VALIDATED` — Markdown-only persistence contract with pre-mutation rejection
   of unsupported formats (#94).
+- `VALIDATED` — truthful, path-contained deterministic write admission with
+  cross-surface parity and zero-side-effect rejection/review (#92).
 - `VALIDATED` — reproducible LongMemEval V1 retrieval-only dev-50 adapter and
   historical baseline (#96).
 - `VALIDATED` — versioned benchmark ledger, immediate-parent gate, canonical
@@ -184,8 +186,8 @@ answer-quality result.
 ## Current critical path, M0 through M5
 
 ```text
-M0  IN_PROGRESS #92 + READY #93 + READY #95 + READY #16 containment
-      └─ completed foundations: #68 + #74 + #94 + #96 + #100
+M0  READY #93 + READY #95 + READY #16 containment
+      └─ completed foundations: #68 + #74 + #92 + #94 + #96 + #100
       ↓
     #67 Quality Gate v2
       ↓
@@ -237,15 +239,14 @@ Execution policy:
 existing deterministic write gate
 → Markdown-only persistence integrity (#94 / PR #101)
 → deterministic-core boundary (#74 / PR #107)
-→ truthful detection/transformation/admission plus path containment (#92 / PR #108, IN_PROGRESS)
+→ truthful detection/transformation/admission plus path containment (#92 / PR #108 / merge `9ab03f7`, VALIDATED)
 → future State Contamination evaluation (#19, still BLOCKED)
 ```
 
-#92 contributes one required contract to #67 and only its own prerequisite to
-#19. While PR #108 remains open, neither dependency is complete: #67 also
-remains blocked on #93 and #95 plus their regression checks, while #19 remains
-blocked on #13, #16 and #73. No downstream card becomes `READY` from an open
-PR.
+#92 now satisfies one required contract for #67 and only its own prerequisite
+for #19. #67 remains blocked on #93, #95 and regression-gate integration; #19
+remains blocked on #13, #16 and #73. This merge changes no unrelated readiness
+state.
 
 ## Productization and integration lane
 

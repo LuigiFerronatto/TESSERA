@@ -1,9 +1,10 @@
 # Issue #92 — Write-Gate PR Evolution Audit
 
 Audit date: 2026-08-31
-Starting/current integrated `main`: `a0a482c22a3f105becdbfb5b3e5ba68a64aabaa9`
-Candidate PR: [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108)
-Candidate implementation snapshot audited before this documentation commit: `b38ec89e66eb5130d45bca8f8146e01181754639`
+Current `main`: `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`
+Canonical delivery: [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108)
+Audited candidate head: `4679965050498a4d9dcc67de67c15e5407b5201c`
+Canonical squash merge: `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`
 
 This audit reconstructs repository evidence rather than treating issue state,
 PR titles, or documentation as proof of implementation. Merge SHAs below are
@@ -46,11 +47,12 @@ files, and the original security frontmatter.
 | [#122](https://github.com/LuigiFerronatto/TESSERA/pull/122) | `DOCUMENTATION_CORRECTION` | `MERGED` | [`2fca25e`](https://github.com/LuigiFerronatto/TESSERA/commit/2fca25e3e18b822d265f637917a64435dce1c7a7) | roadmap and #112 stage record/index | Synchronized banner lifecycle after merge. | No runtime contract change. | [#112 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Post-merge lifecycle for #113 |
 | [#123](https://github.com/LuigiFerronatto/TESSERA/pull/123) | `GOVERNANCE` | `MERGED` | [`a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943) | issue/PR templates, roadmap, #114 stage record/index, governance tests | Evolution-auditable templates and productization routing #115–#121. | Made PR evolution audit/reconciliation mandatory; routed future work without implementing it. | [#114 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | — |
 | [#124](https://github.com/LuigiFerronatto/TESSERA/pull/124) | `DOCUMENTATION_CORRECTION` | `MERGED` | [`a0a482c`](https://github.com/LuigiFerronatto/TESSERA/commit/a0a482c22a3f105becdbfb5b3e5ba68a64aabaa9) | roadmap and #114 stage record/index | Synchronized governance lifecycle after merge. | No runtime contract change; establishes current `main` integrated by #108. | [#114 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | Post-merge lifecycle for #123 |
-| [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | `RUNTIME_IMPLEMENTATION` | `OPEN` | — | `security.py`, `engine_core.py`, result/frontmatter projections, CLI/MCP behavior, security metadata, contract/docs/tests/roadmap | Canonical portable ID/path containment plus deterministic detection→transformation→admission→persistence result. | Rejects direct hostile blocks and invalid/escaping IDs without mutation; keeps exact hashes, atomic same-directory replacement and Python/CLI/MCP/Markdown parity. | [#92 live candidate evidence](https://github.com/LuigiFerronatto/TESSERA/issues/92) | — |
+| [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | `RUNTIME_IMPLEMENTATION` | `MERGED` | [`9ab03f7`](https://github.com/LuigiFerronatto/TESSERA/commit/9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05) | `security.py`, `engine_core.py`, result/frontmatter projections, CLI/MCP behavior, security metadata, contract/docs/tests/roadmap | Canonical portable ID/path containment plus deterministic detection→transformation→admission→persistence result. | Rejects direct hostile blocks and invalid/escaping IDs without mutation; keeps exact hashes, atomic same-directory replacement and Python/CLI/MCP/Markdown parity. Candidate head `4679965` was squash-merged as this single delivery. | [#92 KEEP Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479001151), [post-merge audit](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479489764) | — |
 
-There are **26 distinct merged deliveries** in this scoped PR history, one open
-candidate delivery (#108), and four superseded operational PR rows (#5, #23,
-#52, #57). PRs #5 and #6 are one delivery because both point to head
+There are **27 distinct merged deliveries** in this scoped PR history and four
+superseded operational PR rows (#5, #23, #52, #57). The #108 candidate head and
+canonical squash merge count as one runtime delivery. PRs #5 and #6 are one
+delivery because both point to head
 `b9fc3496689b06b9325ffd65462f97ac4ba5559b` and merge commit `b3a1501...`.
 The superseded rows add audit history but do not inflate the delivery count.
 
@@ -66,23 +68,24 @@ root implementation: heuristic WriteGatingEngine + direct Markdown writes
 → versioned benchmark applicability and regression records (#96/#100)
 → accepted deterministic-core boundary (#74 / #107)
 → plain-language/evolution governance and current lifecycle state (#109/#114)
-→ current main still joins unvalidated IDs and can overclaim partial sanitization
-→ #92 reproduces absolute-path escape and multiline hostile-payload retention
+→ historical main joined unvalidated IDs and could overclaim partial sanitization
+→ #92 reproduced absolute-path escape and multiline hostile-payload retention
 → #108 validates contained paths first and rejects unbounded hostile blocks
+→ canonical squash merge `9ab03f7` places that contract on current main
 ```
 
 ### Status of fields and behavior
 
 | Status | Fields/behavior |
 |---|---|
-| Canonical in the #108 candidate | `WriteGateDecision`, `WriteResult`, portable logical memory-ID/path validation, `threat_detected`, hash-derived `content_changed`, `admission`, ordered `reasons`, exact UTF-8 `original_hash`/`persisted_hash`, `persisted`, `filepath`, and `write_memory_note_result()` |
+| Canonical on current main through #108 | `WriteGateDecision`, `WriteResult`, portable logical memory-ID/path validation, `threat_detected`, hash-derived `content_changed`, `admission`, ordered `reasons`, exact UTF-8 `original_hash`/`persisted_hash`, `persisted`, `filepath`, and `write_memory_note_result()` |
 | Compatibility-only | `write_memory_note()` filepath return for accepted writes; `audit_and_sanitize()` tuple projection; `is_sanitized`; MCP `mem_id`/`connected_to`; historical `gating_status`/`toxicity_score` metadata |
 | Deprecated by accepted architecture | Implicit optional-provider startup/selection and generated-context paths listed in ADR 0001; they are reachable but are not part of the deterministic write decision. |
 | Documented but not implemented | Comprehensive semantic injection protection, a quarantine/review store, evidence-aware novelty/duplication/utility admission (#19), State Contamination evaluation, O1–O4 adapter migration, and #67 CI enforcement. |
 | Implemented but previously documented too strongly | The small regex/tag gate was implemented, but “sanitization before persistence” obscured that detection and transformation had different coverage. |
-| Invalid on current `main` | Absolute/drive/traversal IDs could escape `storage_dir`; partial line redaction could retain a hostile payload while reporting `accept_sanitized`; older main also overclaimed unchanged text before #108's first candidate. |
+| Invalid before #108 | Absolute/drive/traversal IDs could escape `storage_dir`; partial line redaction could retain a hostile payload while reporting `accept_sanitized`; older main also overclaimed unchanged text. |
 
-The starting-main public write surfaces all delegated to the same Engine write,
+The pre-#108 public write surfaces all delegated to the same Engine write,
 but did not share a write-result contract: Python returned only a filepath, CLI
 rendered success, MCP returned filepath/ID/connections and always rebuilt the
 index after a returned write. Evidence Ledger provenance was derived later by
@@ -143,11 +146,14 @@ existing deterministic write gate
 → future State Contamination and evidence-aware admission (#19; still blocked)
 ```
 
-#92 contributes one required contract to #67. An open PR does not complete that
-dependency: #67 remains blocked until #92 is merged and #93/#95 plus their
-regression checks are completed. #92 satisfies only its portion of #19; #19
-also depends on #13, #16 and #73 and remains blocked. No downstream card becomes
-READY solely because #108 exists.
+#92 now satisfies one required contract for #67. #67 remains blocked on #93,
+#95 and regression-gate integration. #92 also satisfies only its portion of
+#19; #19 still depends on #13, #16 and #73 and remains blocked. No unrelated
+card becomes READY because #108 merged.
+
+This post-merge lifecycle synchronization is a documentation correction, not a
+second runtime capability. It does not increase the 27-delivery count or treat
+candidate head `4679965` and squash merge `9ab03f7` as separate deliveries.
 
 ## Remaining scope
 
