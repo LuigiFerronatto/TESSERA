@@ -5,7 +5,7 @@
 | Issue | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `governance contract` |
-| Pull request | Pending publication from `governance/114-evolution-auditable-templates` |
+| Pull request | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `NOT_APPLICABLE` |
@@ -64,7 +64,7 @@ Templates cannot prove that a human or agent performed a correct audit; they mak
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) |
-| Pull request | Pending |
+| Pull request | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending |
 | Benchmark record | Not applicable; governance contract tests |
