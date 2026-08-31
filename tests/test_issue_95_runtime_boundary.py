@@ -5,6 +5,7 @@ import importlib
 import re
 import subprocess
 import sys
+import types
 import warnings
 from pathlib import Path
 from types import SimpleNamespace
@@ -160,6 +161,27 @@ def test_mcp_import_does_not_resolve_an_optional_provider(tmp_path, monkeypatch)
         "tessera.llm_bridge.resolve_llm_fn",
         lambda **_kwargs: (_ for _ in ()).throw(AssertionError("provider resolution during import")),
     )
+    class FakeFastMCP:
+        def __init__(self, _name):
+            pass
+
+        @staticmethod
+        def tool():
+            return lambda function: function
+
+        @staticmethod
+        def resource(_uri):
+            return lambda function: function
+
+    fastmcp_module = types.ModuleType("mcp.server.fastmcp")
+    fastmcp_module.FastMCP = FakeFastMCP
+    server_module = types.ModuleType("mcp.server")
+    server_module.fastmcp = fastmcp_module
+    mcp_module = types.ModuleType("mcp")
+    mcp_module.server = server_module
+    monkeypatch.setitem(sys.modules, "mcp", mcp_module)
+    monkeypatch.setitem(sys.modules, "mcp.server", server_module)
+    monkeypatch.setitem(sys.modules, "mcp.server.fastmcp", fastmcp_module)
     sys.modules.pop("tessera.mcp_server", None)
     module = importlib.import_module("tessera.mcp_server")
     assert module._hook._orchestrator is None
@@ -200,6 +222,8 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         if not path.is_file() or ".git" in path.parts or ".codex" in path.parts:
             continue
         relative = path.relative_to(ROOT).as_posix()
+        if ".egg-info/" in relative:
+            continue
         if relative.startswith("archive/") or relative.startswith("docs/slides/assets/mascots/"):
             continue
         try:
