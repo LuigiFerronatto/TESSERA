@@ -1,0 +1,10 @@
+include README.md
+include pyproject.toml
+recursive-include tessera *.py
+recursive-include tessera/skills_library *.md
+prune benchmarks
+prune tests
+prune docs
+prune archive
+prune examples
+prune .github

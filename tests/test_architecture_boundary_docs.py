@@ -6,6 +6,7 @@ ADR = ROOT / "docs" / "adr" / "0001-core-vs-optional-llm-boundary.md"
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
 ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
+ISSUE_116_AUDIT = ROOT / "docs" / "PR_EVOLUTION_116.md"
 LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
 ISSUE_93_AUDIT = ROOT / "docs" / "PR_EVOLUTION_93.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
@@ -187,7 +188,8 @@ def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
     assert "still depends on #93, #95" not in issue_67
     assert "`VALIDATED`" in issue_115
     assert CANONICAL_115_MERGE_SHA in issue_115
-    assert "`READY`" in issue_116
+    assert "`IN_PROGRESS`" in issue_116
+    assert "#74, #95 and canonical #115 are satisfied" in issue_116
 
 
 def test_repository_layout_adr_defines_distribution_ownership_without_migration() -> None:
@@ -255,7 +257,7 @@ def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
     assert "PR #128" in issue_115
     assert CANONICAL_115_MERGE_SHA in issue_115
     assert "`KEEP`" in issue_115
-    assert "`READY`" in issue_116
+    assert "`IN_PROGRESS`" in issue_116
     assert "#74, #95 and canonical #115 are satisfied" in issue_116
 
     for issue in ("#117", "#118", "#119", "#120", "#121"):
@@ -322,3 +324,33 @@ def test_issue_93_post_merge_lifecycle_and_dependency_routing_are_truthful() -> 
     assert "`BLOCKED`" in issue_67
     assert "#92, #93 and #95 dependencies are satisfied" in issue_67
     assert "still blocked on regression-gate integration" in issue_67
+
+
+def test_issue_116_tracks_distribution_without_starting_downstream_work() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = ISSUE_116_AUDIT.read_text(encoding="utf-8")
+    record = (ROOT / "docs/test-cards/116-packaging-hardening.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#116")
+    for issue in ("#117", "#118", "#119", "#120", "#121"):
+        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+
+    for marker in (
+        "055a35f4a7e8298013bcb816b30f67d9706b9516",
+        "Wheel before — 46 files",
+        "Sdist before — 77 entries",
+        "candidate wheel contains 30 files",
+        "sdist contains 40",
+        "BASE_RUNTIME_REQUIRED",
+        "OPTIONAL_RUNTIME",
+        "DEV_ONLY",
+        "#87 owns the standalone license",
+        "No misleading benchmark extra",
+    ):
+        assert marker in audit
+
+    assert "| Record status | `IN_PROGRESS` |" in record
+    assert "CANDIDATE — NOT YET ON `main`" in record
+    assert "LongMemEval remains skipped" in record

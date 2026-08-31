@@ -13,6 +13,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Built distributions now contain the TESSERA runtime and its five required
+  Markdown resources without repository-only benchmark packages or partial
+  tests; clean wheel installs are continuously exercised on Python 3.9 and
+  3.12. ([#116](https://github.com/LuigiFerronatto/TESSERA/issues/116))
 - Default storage resolution is now project-neutral and shared across current
   runtime surfaces: explicit path → `TESSERA_STORAGE_DIR` → deprecated
   `LAO_MEM_DIR` alias → `./memories`. Quickstart emits the canonical variable

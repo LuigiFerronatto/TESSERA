@@ -118,7 +118,7 @@ therefore `BLOCKED` here.
 | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | untracked runtime branding defect | closed | completed branding correction | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113), [merge `a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
 | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | absent | closed | completed governance contract | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123), [merge `a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | contract tests + Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
 | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | absent | closed | completed by [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128); [ADR 0002](adr/0002-repository-layout-and-distribution-boundary.md) accepted with `KEEP` | [canonical squash merge `b475f1c`](https://github.com/LuigiFerronatto/TESSERA/commit/b475f1cd805f86cc8ad9526e563e3c6fb8409ff1), [post-merge audit](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483321070), [plain-language record](test-cards/115-repository-layout-architecture.md), [PR Evolution Audit](PR_EVOLUTION_115.md); architecture accepted, migrations unimplemented | implementation `SMOKE_ONLY`; lifecycle synchronization `NOT_APPLICABLE` | `VALIDATED` |
-| [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | absent | open | #74, #95 and canonical #115 are satisfied; packaging hardening may start after this lifecycle synchronization lands | #115 proves benchmark packages are accidentally shipped and tests are partially in sdist; no packaging migration has started | smoke-only when executed | `READY` |
+| [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | absent | open | active packaging PR; #74, #95 and canonical #115 are satisfied | explicit `tessera`-only package contract, clean wheel/sdist assertions and Python 3.9/3.12 artifact CI are under review; no runtime or benchmark semantics changed | `SMOKE_ONLY`; LongMemEval skipped | `IN_PROGRESS` |
 | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | absent | open | depends on #94, #115 and #116 | no project/global discovery schema or `tessera init` contract | smoke-only when executed | `BLOCKED` |
 | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | absent | open | depends on #116 and #117 | checkout CI exists; clean wheel install/bootstrap gate absent | smoke-only when executed | `BLOCKED` |
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | absent | open | depends on #112, #116 and #117 | banner corrected; complete CLI UX/output audit absent | smoke-only when executed | `BLOCKED` |
@@ -259,9 +259,9 @@ claim new retrieval intelligence.
   ↓
 #95 generic runtime / explicit compatibility (VALIDATED)
   ↓
-#115 repository-layout ADR (READY)
+#115 repository-layout ADR (VALIDATED)
   ↓
-#116 clean Python distribution (BLOCKED until #115)
+#116 clean Python distribution (IN_PROGRESS)
   ↓
 #117 project/global configuration and tessera init (BLOCKED)
   ├─ #118 clean install + CI onboarding (BLOCKED)
