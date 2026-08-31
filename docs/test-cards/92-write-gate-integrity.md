@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime safety contract` |
 | Pull request | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) |
-| Head commit | [`b38ec89`](https://github.com/LuigiFerronatto/TESSERA/commit/b38ec89e66eb5130d45bca8f8146e01181754639) (audited implementation snapshot; live PR head includes evidence-only follow-up) |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Head commit | [`4679965`](https://github.com/LuigiFerronatto/TESSERA/commit/4679965050498a4d9dcc67de67c15e5407b5201c) (audited candidate) |
+| Merge commit | [`9ab03f7`](https://github.com/LuigiFerronatto/TESSERA/commit/9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05) (canonical squash merge) |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-08-31 |
 
@@ -18,7 +18,10 @@ TESSERA must not say “I removed the dangerous instruction” unless the text i
 
 ## What problem existed?
 
-The current write gate can report that safe text was sanitized without changing it. It can also detect a hostile English instruction without neutralizing it, while persistence metadata still sounds stronger than the real protection.
+Before #92, the write gate could report that safe text was sanitized without
+changing it. It could also detect a hostile instruction without neutralizing
+the complete payload, while persistence metadata sounded stronger than the
+real protection.
 
 Colloquially, the gate can claim that it removed a dangerous item from a bag even though the item is still inside.
 
@@ -33,18 +36,15 @@ detect suspicious text
 
 ## What changed or is being tested?
 
-**CANDIDATE — IN PR #108, NOT YET ON MAIN.**
+**CURRENT — MERGED ON MAIN THROUGH `9ab03f7`.**
 
-PR #108 separates path validation, detection, transformation, admission and
+PR #108 separated path validation, detection, transformation, admission and
 persistence. It uses hashes as fingerprints of the exact original and
 persistence-candidate text.
 
 ## How does it work now?
 
-**CURRENT MAIN (`a0a482c`):** the known inconsistency and unconstrained memory-ID
-join still exist.
-
-**PR CANDIDATE:**
+**CURRENT MAIN (`9ab03f7` and later):**
 
 ```text
 validate portable ID and contained destination
@@ -54,7 +54,7 @@ validate portable ID and contained destination
 → persist only after an accepting decision
 ```
 
-The current evaluator rejects direct known hostile instruction blocks and sends
+The merged evaluator rejects direct known hostile instruction blocks and sends
 quoted/documentary or suspicious-tag-only ambiguity to review. It emits no
 `accept_sanitized`; the schema permits that state only for a complete bounded
 whole-content rule. Reject/review/invalid-path outcomes do not mutate the
@@ -62,7 +62,7 @@ canonical corpus, registry, graph, Evidence Ledger or index.
 
 ## Concrete example
 
-| Input | Target result |
+| Input | Current result |
 |---|---|
 | Safe fact | Accept unchanged; never call it sanitized |
 | Direct known hostile instruction, including multiline payload | Reject; do not persist canonically |
@@ -71,16 +71,17 @@ canonical corpus, registry, graph, Evidence Ledger or index.
 
 ## How was it validated?
 
-The candidate passes focused multilingual/adversarial, path-containment,
-hash-invariant, atomic-failure, zero-side-effect and Python/CLI/MCP parity tests.
-Final CI evidence remains attached to the open PR and issue; the stage remains
-`IN_PROGRESS` until merge.
+The merged implementation passed 67 focused write-gate tests and 241 tests in
+the complete local suite, including multilingual/adversarial, path-containment,
+hash-invariant, atomic-failure, zero-side-effect and Python/CLI/MCP parity
+coverage. Python 3.9, Python 3.12, smoke, sanity and benchmark-reporting CI were
+green; LongMemEval was correctly skipped under `SMOKE_ONLY`.
 
 ## What improved?
 
-The open candidate turns path escape and partial-redaction overclaim into
-deterministic non-persisting rejection, while preserving safe writes and
-same-directory atomic replacement. Nothing is promoted on `main` before merge.
+The merged contract turns path escape and partial-redaction overclaim into
+deterministic non-persisting rejection, while preserving safe writes,
+same-directory atomic replacement and truthful public metadata.
 
 ## What remains unimplemented?
 
@@ -91,7 +92,9 @@ integration remain unimplemented.
 
 ## What is unlocked next?
 
-No capability is unlocked until the implementation is merged and validated. After that, #92 will satisfy one dependency of #67 and #19; their other dependencies remain.
+#92 now satisfies only its own dependency edge for #67 and #19. #67 remains
+blocked on #93, #95 and regression-gate integration. #19 remains blocked on
+#13, #16 and #73. No unrelated Test Card became ready.
 
 ## Technical provenance
 
@@ -99,9 +102,10 @@ No capability is unlocked until the implementation is merged and validated. Afte
 |---|---|
 | Issue/Test Card | [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
 | Pull request | [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Candidate evidence in PR #108 and issue #92; final merge lifecycle pending |
-| Benchmark record | LongMemEval not applicable; smoke/sanity required |
+| Merge commit | [`9ab03f7`](https://github.com/LuigiFerronatto/TESSERA/commit/9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05) |
+| Evidence/Learnings/Decision | [Superseding KEEP record](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479001151), [post-merge audit](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479489764) |
+| Implementation CI | [Python 3.9/3.12, smoke and sanity](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33396222206), [benchmark reporting](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33396222211) |
+| Benchmark record | Implementation applicability `SMOKE_ONLY`; LongMemEval not rerun |
 | PR Evolution Audit | [Current deduplicated audit](../PR_EVOLUTION_92.md) |
 
 ## Evolution
@@ -109,6 +113,6 @@ No capability is unlocked until the implementation is merged and validated. Afte
 ```text
 truthful Markdown format gate (#94)
 → known sanitizer-status and path-containment defects (#92)
-→ path-contained conservative detect/transform/admit/persist candidate (PR #108)
+→ path-contained conservative detect/transform/admit/persist contract (PR #108 / merge `9ab03f7`)
 → later State Contamination experiment
 ```

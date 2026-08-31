@@ -118,7 +118,8 @@ def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
     assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
     assert "https://github.com/LuigiFerronatto/TESSERA/pull/108" in roadmap
     assert "PR_EVOLUTION_92.md" in roadmap
-    assert "| [#92]" in roadmap and "IN_PROGRESS" in roadmap
+    assert "| [#92]" in roadmap and "9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05" in roadmap
+    assert "`VALIDATED`" in roadmap
     assert "| [#19]" in roadmap and "BLOCKED" in roadmap
 
 
@@ -137,10 +138,11 @@ def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
     for pr in (
         "#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101",
         "#102", "#107", "#110", "#111", "#113", "#122", "#123",
-        "#124", "#108",
+        "#124", "#108", "#125",
     ):
         assert pr in audit
-    assert "26 distinct merged deliveries" in audit
+    assert "27 distinct merged deliveries" in audit
+    assert "9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05" in audit
     assert "CLOSED_UNMERGED" in audit
     assert "NOT_RERUN" in audit
     assert "LongMemEval V1 dev-50" in audit
