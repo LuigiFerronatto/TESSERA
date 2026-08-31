@@ -21,6 +21,11 @@ passed reporting/applicability and correctly skipped LongMemEval V1 dev-50.
 The lifecycle synchronization applicability is `NOT_APPLICABLE`: it changes
 documentation/governance records and static assertions only.
 
+Post-merge lifecycle branch `docs/115-post-merge-lifecycle-sync` started from
+freshly fetched `main` at the canonical PR #128 merge
+`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130)
+is the lifecycle-only delivery.
+
 The [implementation Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483088072)
 and [post-merge maintainer audit](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483321070)
 confirm the accepted decision. #115 is `VALIDATED`; #116 becomes `READY` after
@@ -305,7 +310,7 @@ MCP shim migration or a later zero-reference audit finds an unowned candidate.
 | PR #126 | `RUNTIME_IMPLEMENTATION` | `6d4a32b` | made default runtime generic and compatibility explicit |
 | PR #127 | `DOCUMENTATION_CORRECTION` | `5d43a2d` | lifecycle sync only; made #115 READY |
 | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | `ARCHITECTURE_DECISION` | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` (MERGED, squash) | audited candidate `25afd31b910dec97cffea34a25092c6e7f8b4f2e`; accepted ADR 0002 with `KEEP`; no migration/runtime implementation |
-| this post-merge lifecycle PR | `DOCUMENTATION_CORRECTION` | open / pending | synchronizes canonical merge, `VALIDATED`/`READY` routing and static assertions; adds no architecture/runtime capability |
+| [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | `DOCUMENTATION_CORRECTION` | OPEN | synchronizes canonical merge, `VALIDATED`/`READY` routing and static assertions; adds no architecture/runtime capability |
 
 PR #5 and #6 share canonical merge `b3a1501` and are one Evidence Ledger
 delivery, not two capabilities. The PR #128 candidate and canonical squash

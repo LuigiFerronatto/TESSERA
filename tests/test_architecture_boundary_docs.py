@@ -277,6 +277,7 @@ def test_issue_115_canonical_delivery_is_deduplicated() -> None:
         "implementation applicability is `SMOKE_ONLY`",
         "lifecycle synchronization applicability is `NOT_APPLICABLE`",
         "`DOCUMENTATION_CORRECTION`",
+        "PR #130",
     ):
         assert marker in audit
 
