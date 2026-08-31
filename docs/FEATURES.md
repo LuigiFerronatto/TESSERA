@@ -285,7 +285,7 @@ write_memory_note
 Still experimental/planned:
 
 ```text
-Engine/CLI/MCP contract parity              #68
+Engine/CLI/MCP direct-query parity           #68 implemented
 incremental indexing                         #12
 plain-text ingestion                         #69
 structural segmentation                      #70
@@ -302,10 +302,28 @@ evidence/source arbitration                  #27
 LongMemEval                                   #18
 renderer ablation                             #28
 adaptive retrieval                            #17
-core vs optional LLM orchestrator boundary   #74
+core vs optional LLM boundary                #74 ADR accepted; migration follows
 evidence-aware memory admission              #19
 experience learning                           #21
 ```
+
+## Deterministic core and optional assisted behavior
+
+The binding contract is
+[`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
+
+**CURRENT:** Python Engine retrieval, CLI `query`, and MCP
+`query_memories()` are deterministic and return the same lossless structured
+evidence contract. They do not call a provider or inspect credentials.
+
+**CURRENT:** `TesseraOrchestrator`, `TesseraTaskHook`, CLI `start`, assisted
+episode decomposition, and MCP assisted tools are legacy optional LLM surfaces.
+They are available only when a real backend resolves; they are not the basic
+retrieval contract and do not own the consuming agent's final answer.
+
+**TARGET:** planners, context consolidation, readers, and benchmark judges are
+explicitly selected adapters outside the core. The O0–O4 modes in the ADR are
+future-facing contracts, not an implemented feature list.
 
 ---
 

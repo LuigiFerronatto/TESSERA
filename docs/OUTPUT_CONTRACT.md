@@ -307,7 +307,9 @@ engine.retrieve_context(query_text, top_n=...)
 
 Current CLI text should therefore not be parsed as a stable machine protocol when the same data is available through the structured engine result.
 
-Contract parity across Python, CLI and MCP is tracked explicitly in #68. Renderers/transports may differ; semantic evidence must not disappear silently.
+Direct-query contract parity across Python, CLI JSON and MCP
+`query_memories()` was established by #68. Renderers/transports may differ;
+semantic evidence must not disappear silently.
 
 ---
 
@@ -361,6 +363,10 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
 - `recency_boost` debug naming is less explicit than the desired raw/weight/applied model.
 - `frontmatter` remains a compatibility surface; canonical semantics should be preferred internally.
 - Human CLI formatting is not a formal machine serialization protocol.
-- MCP currently exposes a reduced subset of the engine result; #68 exists to close that transport-parity gap.
+- MCP `query_memories()` exposes the lossless engine contract. The separate
+  typed-store helper `query_store()` currently uses a reduced projection.
+- Generated context from the legacy assisted orchestrator is derived output,
+  not source evidence and not a replacement for this retrieval contract. See
+  [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.

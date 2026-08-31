@@ -307,13 +307,45 @@ Two additional Foundation gaps are explicit rather than implied:
 
 The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
 
-A currently audited gap is that the MCP adapter exposes a smaller subset than the engine's evidence-rich result. Contract parity is tracked in #68 rather than being silently treated as solved.
+Direct Engine retrieval, CLI JSON query output and MCP `query_memories()` use
+the same lossless evidence contract; #68 closed that parity gap. The typed-store
+MCP helper `query_store()` still uses a smaller hand-projected shape and is not
+the canonical direct-query contract.
 
 # 9. Optional orchestration boundary
 
-The repository contains an assisted orchestration path for information-need analysis, retrieval planning and state inference. TESSERA's core product identity remains the deterministic evidence layer.
+The binding decision is
+[`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md). **CURRENT:** the
+repository contains a legacy assisted orchestration path that makes LLM calls
+for information-need analysis, retrieval-query planning and context synthesis
+around deterministic Engine retrieval. It preserves retrieval hits as
+`raw_memories`, but generated context has no machine-checked grounding envelope.
 
-Whether assisted planning/synthesis belongs as an optional adapter, and what value it adds over direct structured evidence, is tracked explicitly in #74/#17/#28.
+**TARGET:** core retrieval ends at structured evidence with provenance. Optional
+planner, consolidation and reader adapters consume that contract; the consuming
+agent owns cognition, final-answer policy and abstention. Benchmark judges are
+benchmark-only infrastructure. O0–O4 in the ADR constrain future work and are
+not all implemented today.
+
+```text
+CURRENT direct path
+Python / CLI query / MCP query_memories
+→ TesseraEngine
+→ deterministic retrieval
+→ structured evidence + provenance
+
+CURRENT legacy assisted path
+CLI start / MCP pipeline / task hook
+→ implicit backend resolver
+→ LLM need analysis + planning
+→ deterministic retrieval
+→ LLM-generated context + raw_memories
+```
+
+Current deviations include eager assisted-hook initialization during MCP server
+startup, implicit provider probing, prompt-echo degradation after provider
+failure, and stale legacy claims of offline simulation. They are documented for
+migration in the ADR; this architecture decision changes no runtime behavior.
 
 # 10. CI and experimental governance
 
@@ -343,8 +375,8 @@ Sanity metrics are regression indicators, not competitive benchmark claims.
 | `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
 | `tessera/models.py` | Domain models for memory/write paths |
 | `tessera/cli.py` | Human CLI surface |
-| `tessera/mcp_server.py` | MCP transport surface; parity hardening tracked in #68/#77 |
-| `tessera/orchestrator.py` | Optional assisted retrieval/synthesis path; boundary tracked in #74 |
+| `tessera/mcp_server.py` | MCP transport; direct `query_memories()` has #68 parity, while legacy assisted-hook startup is an ADR 0001 deviation |
+| `tessera/orchestrator.py` | Legacy optional assisted planning/synthesis path governed by ADR 0001 |
 | `benchmarks/sanity/` | Deterministic project-agnostic regression evaluation |
 
 ## Implemented vs planned
@@ -368,7 +400,7 @@ Test Card governance
 Planned / experimental:
 
 ```text
-#68 Engine / CLI / MCP contract parity
+#68 Engine / CLI / MCP direct-query contract parity (implemented)
 #12 incremental/idempotent indexing
 #69 text ingestion coverage
 #70 structural segmentation
@@ -384,7 +416,7 @@ Planned / experimental:
 #18 LongMemEval
 #28 rendering ablation
 #17 adaptive retrieval
-#74 core vs optional LLM orchestrator boundary
+#74 core vs optional LLM orchestrator boundary (ADR accepted)
 #19 evidence-aware memory admission
 #21 experience learning / utility feedback
 ```

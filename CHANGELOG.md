@@ -13,6 +13,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- The experimental roadmap now derives status from GitHub state, merged
+  implementation/evidence, declared dependencies, and benchmark records. It
+  records completed #68/#94/#96/#100 work, accepted ADR #74 in progress, the
+  #103–#106 evaluation chain, and the current M0–M5 critical path without stale
+  emoji markers. ([#74](https://github.com/LuigiFerronatto/TESSERA/issues/74))
 - Root README is now the progressive product entrypoint: executive first, plain-language explanation next, technical details and experimental roadmap deeper down. ([#82](https://github.com/LuigiFerronatto/TESSERA/pull/82))
 - Package metadata and MCP runtime configuration are TESSERA-native and standalone. The canonical MCP storage variable is now `TESSERA_STORAGE_DIR`. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
@@ -31,6 +36,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Legacy external-project identity from package metadata and MCP-facing examples/configuration. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 
 ### Architecture Decisions
+- Accepted ADR 0001: deterministic TESSERA memory infrastructure ends at
+  structured evidence with provenance; optional planner/reader adapters consume
+  that contract, consuming agents own final cognition, and LLM judges remain
+  benchmark-only infrastructure. This records current legacy deviations without
+  changing runtime behavior. ([#74](https://github.com/LuigiFerronatto/TESSERA/issues/74))
 - TESSERA's public product boundary is project-agnostic: public docs, examples, fixtures, benchmarks and runtime-facing configuration must describe TESSERA itself rather than a development environment. ([#62](https://github.com/LuigiFerronatto/TESSERA/issues/62))
 - Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
 - The root README describes **implemented capabilities separately from hypotheses/Test Cards**. ([#63](https://github.com/LuigiFerronatto/TESSERA/issues/63))

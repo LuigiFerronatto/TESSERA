@@ -152,6 +152,20 @@ TESSERA is memory infrastructure, not the final reasoning agent. It does not:
 - claim experimental temporal, arbitration, abstention, or adaptive-retrieval work as finished;
 - use source-code indexing as its primary memory model.
 
+The binding boundary is recorded in
+[`ADR 0001`](docs/adr/0001-core-vs-optional-llm-boundary.md): deterministic
+TESSERA retrieval ends at structured evidence with provenance; cognition and
+the final response belong to the consuming agent. The repository also contains
+a legacy, explicitly assisted orchestration path for LLM planning and context
+synthesis. It is optional behavior, is not part of the deterministic retrieval
+contract, and currently requires a configured Azure gateway or external engine
+router. Target O0–O4 adapter semantics in the ADR are architecture constraints,
+not claims that those future modes are implemented.
+
+Base installation does not install an LLM provider SDK. `tessera[mcp]` adds the
+MCP transport and `tessera[llm]` adds the current HTTP bridge dependency; these
+extras do not change ownership of reasoning or final-answer policy.
+
 ## Benchmarks
 
 TESSERA versions a compact, non-sensitive ledger for its deterministic
@@ -227,10 +241,10 @@ TESSERA is an evolving Foundation. The current implementation is usable, but sev
 - explicit relation parsing/navigation;
 - Python, CLI, and MCP surfaces;
 - deterministic CI and sanity evaluation.
+- lossless Engine/CLI/MCP direct-query contract parity.
 
 ### Being tested next
 
-- Engine / CLI / MCP contract parity;
 - incremental and idempotent indexing;
 - broader text ingestion and structural segmentation;
 - LongMemEval baseline;
@@ -238,6 +252,10 @@ TESSERA is an evolving Foundation. The current implementation is usable, but sev
 - temporal state and state keys;
 - authority, precedence, conflict, and evidence arbitration;
 - adaptive retrieval and evidence sufficiency.
+
+The deterministic-core/optional-LLM responsibility boundary is accepted in
+[`ADR 0001`](docs/adr/0001-core-vs-optional-llm-boundary.md). Its migration and
+experimental follow-ups remain separate Test Cards.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the experimental sequence and linked Test Cards.
 
