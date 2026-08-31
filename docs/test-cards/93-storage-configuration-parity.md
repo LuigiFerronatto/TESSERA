@@ -6,7 +6,7 @@
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
 | Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
-| Head commit | Pre-reconciliation candidate [`8f3827b`](https://github.com/LuigiFerronatto/TESSERA/commit/8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c); final reconciled head recorded in Issue evidence |
+| Head commit | Pre-reconciliation candidate [`8f3827b`](https://github.com/LuigiFerronatto/TESSERA/commit/8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c); reconciled runtime/test head [`b2b15c1`](https://github.com/LuigiFerronatto/TESSERA/commit/b2b15c10f4c068020962bbe8626b27f4adfce5b5); final evidence-only head recorded in Issue evidence |
 | Merge commit | Not merged |
 | Decision | `KEEP` candidate |
 | Benchmark applicability | `SMOKE_ONLY` |

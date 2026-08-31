@@ -7,6 +7,9 @@ from PR #127. It includes the canonical #95 implementation merge
 `test-card/93-storage-config-parity`; [PR #129](https://github.com/LuigiFerronatto/TESSERA/pull/129).
 The pre-reconciliation candidate was
 `8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c`.
+The reconciled runtime/test head validated locally is
+`b2b15c10f4c068020962bbe8626b27f4adfce5b5`; later evidence-only metadata may
+advance the PR head without changing runtime behavior.
 
 Issue #115 ran in parallel and later advanced `main` through PR #128 at
 `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. Before merge, the #93 branch was
@@ -130,13 +133,12 @@ No versioned file under `benchmarks/` is changed.
 
 - Focused #93 integration: 13 passed.
 - #95 runtime boundary: 16 passed; retrieval parity: 3 passed; architecture:
-  8 passed; plain-language records: 7 passed; benchmark reporting: 51 passed.
-- Full suite: 272 passed with 14 expected warnings. Compileall, `git diff
+  11 passed; plain-language records: 7 passed; benchmark reporting: 51 passed.
+- Full suite: 275 passed with 14 expected warnings. Compileall, `git diff
   --check` and the empty `benchmarks/` diff passed.
-- [TESSERA CI 33428499798](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428499798):
-  Python 3.9/3.12, smoke and sanity all passed.
-- [Benchmark Ledger 33428499819](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428499819):
-  passed; LongMemEval was skipped under `SMOKE_ONLY`.
+- Fresh post-reconciliation Python 3.9/3.12, smoke, sanity and Benchmark Ledger
+  results are linked from [PR #129 checks](https://github.com/LuigiFerronatto/TESSERA/pull/129/checks)
+  and the Issue evidence; LongMemEval remains routed to skip under `SMOKE_ONLY`.
 - The first CI attempt exposed that core CI omits the optional MCP transport.
   The fixture now substitutes only decorator registration when absent; actual
   server bootstrap, resolution, Engine construction and tool calls remain real.
