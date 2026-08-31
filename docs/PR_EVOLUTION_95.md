@@ -4,8 +4,17 @@ Audited starting main: `270bc29a0b0bb93ab1885947303caa6887a8b809` (includes
 runtime merge `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` and lifecycle
 merge `270bc29a0b0bb93ab1885947303caa6887a8b809`). Candidate branch:
 `test-card/95-remove-legacy-runtime-coupling`; [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126).
-Status: `IN_PROGRESS` until the
-candidate is independently audited and merged.
+Audited candidate head: `1fcd71df95993cfbfd8b8fe1e833fa879e947930`.
+Canonical delivery: [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126),
+merged at `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`; Issue #95 is
+`VALIDATED` with decision `KEEP`.
+
+GitHub and local Git both show that the canonical SHA is a two-parent merge
+commit whose parents are the audited starting main and audited candidate. Its
+tree is identical to the candidate tree. The task's pre-supplied “squash” label
+was therefore not retained as a merge-method claim. Candidate/squash deduplication
+still applies to delivery accounting: the candidate head and
+canonical merge commit represent one runtime delivery, never two capabilities.
 
 ## Previous capability state
 
@@ -39,7 +48,7 @@ call the discovered router or gateway.
 
 ## Deliveries that established the state
 
-Candidate, head and squash commits are counted once per canonical PR delivery.
+Candidate, head and merge commits are counted once per canonical PR delivery.
 
 | PR | Delivery type | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
 |---|---|---|---|---|---|---|---|---|
@@ -57,7 +66,7 @@ Candidate, head and squash commits are counted once per canonical PR delivery.
 | [#123](https://github.com/LuigiFerronatto/TESSERA/pull/123) | GOVERNANCE | MERGED | `a79b5ae` | issue/PR templates, roadmap, tests | mandatory evolution audits | canonical delivery deduplication and lifecycle sync | Issue #114 evidence | incomplete audits |
 | [#125](https://github.com/LuigiFerronatto/TESSERA/pull/125) | DOCUMENTATION_CORRECTION | MERGED | `270bc29` | #92 audit/roadmap/stage/tests | synchronized lifecycle state | #92 becomes `VALIDATED`; #95 remains separate | green CI and merge | stale #92 state |
 | #57, #59 and earlier superseded documentation candidates | SUPERSEDED_OPERATIONAL_PR | CLOSED_UNMERGED | — | architecture/source-audit candidate branches | no canonical delivery | none; later merged PRs are authoritative | GitHub closed-PR audit | — |
-| [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | OPEN / IN_PROGRESS | not merged | config, CLI, diagnostics, compatibility bridge, hooks, docs, generic fixtures/tests | generic defaults plus explicit deprecated compatibility | removes implicit project behavior without changing retrieval/write semantics | head `d8221dc`, this audit, focused/full tests, sanity CI | remaining initial-runtime coupling |
+| [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | MERGED | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | config, CLI, diagnostics, compatibility bridge, hooks, docs, generic fixtures/tests | generic defaults plus explicit deprecated compatibility | removes implicit project behavior without changing retrieval/write semantics | audited candidate `1fcd71df95993cfbfd8b8fe1e833fa879e947930`, canonical merge with identical tree, focused/full tests, [TESSERA CI 33410027311](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33410027311), [Benchmark Ledger 33410027344](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33410027344) | remaining initial-runtime coupling; candidate and canonical merge counted as one delivery |
 
 ## Exact current-main reference inventory
 
@@ -104,7 +113,7 @@ exist as a safe boundary on audited main; it is introduced by this candidate.
 The old optional runtime references were runtime-reachable and therefore
 classified `OPTIONAL_RUNTIME`, not retroactively relabeled compatibility.
 
-## Candidate inventory and retained allowlist
+## Merged inventory and retained allowlist
 
 - Project-specific text removed from default runtime: package description,
   CLI storage/help/warnings/examples, diagnostics/doctor/quickstart, Engine and
@@ -118,7 +127,7 @@ classified `OPTIONAL_RUNTIME`, not retroactively relabeled compatibility.
   other broad documentation prose; #115 owns repository/package layout; #117
   owns registry/interactive discovery; #120 owns MCP/adapter envelopes.
 
-## Change introduced by this PR
+## Change introduced by PR #126
 
 ```text
 before: explicit CLI path → LAO_MEM_DIR → ./memories
@@ -135,11 +144,19 @@ exact router path, warn, and fail deterministically without prompt echo.
 
 ## Candidate capability state
 
-The default runtime is project-neutral on this branch. Compatibility is narrow,
+The audited candidate made the default runtime project-neutral. Compatibility
+is narrow,
 deprecated, explicit, reversible and covered without network/subprocess calls.
 Retrieval, ranking, graph expansion, temporal/conflict behavior, Evidence
-Ledger and #92 write admission/path containment are unchanged. The record stays
-`IN_PROGRESS` until merge.
+Ledger and #92 write admission/path containment are unchanged.
+
+## Current merged capability state
+
+PR #126 is integrated on `main` at canonical merge
+`6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`. Required implementation CI
+remained successful for candidate `1fcd71df95993cfbfd8b8fe1e833fa879e947930`,
+the merged tree is identical to that candidate, and Issue #95 is `VALIDATED`
+with decision `KEEP`.
 
 ## What remains unimplemented
 
@@ -152,23 +169,30 @@ Ledger and #92 write admission/path containment are unchanged. The record stays
 
 ## Benchmark before/after
 
-Benchmark applicability: `SMOKE_ONLY`. Baseline and candidate deterministic
+Implementation benchmark applicability: `SMOKE_ONLY`. Baseline and candidate deterministic
 sanity expectations are Hit@1 `0.75`, Hit@3 `1.00`, Hit@5 `1.00`, MRR `0.875`,
 evidence hit rate `1.00`, missing-evidence check `passed`. `benchmarks/` has no
-candidate diff; LongMemEval dev-50 is intentionally skipped.
+candidate diff; LongMemEval dev-50 was intentionally skipped. This lifecycle
+synchronization changes no runtime contract, adds no second runtime capability,
+does not increase runtime-delivery accounting, and declares benchmark
+applicability `NOT_APPLICABLE` because it changes only documentation and static
+documentation assertions.
 
 ## Newly unlocked work
 
-After merge, #95's dependency edge is satisfied. #67 remains blocked on #93
-and regression-gate integration. #115 may proceed only after merge and
-lifecycle synchronization. No unrelated issue is promoted.
+#95's dependency edge is satisfied for #67 and #115. #67 remains `BLOCKED` on
+#93 and regression-gate integration. #74, #95 and #112 are satisfied, so #115
+becomes `READY`. #116–#121 keep their declared dependency chain; no unrelated
+issue is promoted.
 
 ## Roadmap evolution
 
 ```text
 partial product naming (#79/#83)
 → project-coupled CLI/diagnostics/provider defaults remained
-→ #95 generic defaults + explicit deprecated compatibility (IN_PROGRESS)
-→ merge/lifecycle sync
-→ #115 layout audit and later #117/#120 redesigns
+→ PR #126 candidate `1fcd71df95993cfbfd8b8fe1e833fa879e947930`
+→ canonical merge `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`
+→ #95 VALIDATED
+→ #115 READY
+→ later #117/#120 work under their own cards
 ```

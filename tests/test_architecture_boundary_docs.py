@@ -3,6 +3,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / "docs" / "adr" / "0001-core-vs-optional-llm-boundary.md"
+ROADMAP = ROOT / "docs" / "ROADMAP.md"
+ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
+CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
+
+
+def _markdown_table_row(text: str, issue: str) -> str:
+    prefix = f"| [{issue}]"
+    rows = [line for line in text.splitlines() if line.startswith(prefix)]
+    assert len(rows) == 1, (issue, rows)
+    return rows[0]
 
 
 def test_core_optional_llm_adr_contains_binding_contract() -> None:
@@ -146,3 +156,29 @@ def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
     assert "CLOSED_UNMERGED" in audit
     assert "NOT_RERUN" in audit
     assert "LongMemEval V1 dev-50" in audit
+
+
+def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = ISSUE_95_AUDIT.read_text(encoding="utf-8")
+
+    issue_95 = _markdown_table_row(roadmap, "#95")
+    issue_67 = _markdown_table_row(roadmap, "#67")
+    issue_115 = _markdown_table_row(roadmap, "#115")
+    issue_116 = _markdown_table_row(roadmap, "#116")
+
+    assert "#95" in roadmap
+    assert CANONICAL_95_MERGE_SHA in roadmap
+    assert "`VALIDATED`" in issue_95
+
+    assert "[#126]" in audit
+    assert CANONICAL_95_MERGE_SHA in audit
+    assert "Candidate/squash deduplication" in audit
+    assert "one runtime delivery" in audit
+
+    assert "`BLOCKED`" in issue_67
+    assert "still depends on #93 and regression-gate integration" in issue_67
+    assert "still depends on #93, #95" not in issue_67
+    assert "`READY`" in issue_115
+    assert "#74, #95 and #112 satisfied" in issue_115
+    assert "`BLOCKED`" in issue_116

@@ -65,11 +65,11 @@ in-progress until merge and validation evidence exist.
 
 # Authoritative execution portfolio — audited 2026-08-31
 
-This portfolio was reconciled through merged [PR #124](https://github.com/LuigiFerronatto/TESSERA/pull/124)
+This portfolio was reconciled through merged [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126)
 and documentation Test Card [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109)
 against GitHub issue state, authoritative routing blocks, merged pull requests,
 merge commits, evidence comments, versioned benchmark records, and the code on
-`main` at `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`. Historical prose and emoji
+`main` at `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`. Historical prose and emoji
 markers are not status evidence.
 
 ## Status contract
@@ -109,15 +109,15 @@ therefore `BLOCKED` here.
 | [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | M0 planned | closed | completed by [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108); no dependencies | [merge `9ab03f7`](https://github.com/LuigiFerronatto/TESSERA/commit/9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05), [KEEP Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5479001151), [plain-language record](test-cards/92-write-gate-integrity.md), [PR Evolution Audit](PR_EVOLUTION_92.md) | `SMOKE_ONLY`; 241 local tests plus Python 3.9/3.12, smoke, sanity and reporting CI passed | `VALIDATED` |
 | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) | M0 planned | open | ready; no dependencies | partial naming/config cleanup exists, but no closing PR or golden integration proof | smoke-only when executed | `READY` |
 | [#94](https://github.com/LuigiFerronatto/TESSERA/issues/94) | planned | closed | completed bug card | [PR #101](https://github.com/LuigiFerronatto/TESSERA/pull/101), [merge `467ba64`](https://github.com/LuigiFerronatto/TESSERA/commit/467ba649f53312cedcecf40caf548af5f766c67b), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/94#issuecomment-5471509112) | smoke-only contract validation | `VALIDATED` |
-| [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | M0 candidate | open | active [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126); no dependencies | [head `d8221dc`](https://github.com/LuigiFerronatto/TESSERA/commit/d8221dcf10a78f6e00a431909785b43f7bd9bed3), [plain-language record](test-cards/95-remove-legacy-runtime-coupling.md), [PR Evolution Audit](PR_EVOLUTION_95.md) | `SMOKE_ONLY`; deterministic sanity metrics must remain fixed | `IN_PROGRESS` |
+| [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | M0 candidate | closed | completed by [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126); no dependencies | [canonical merge `6d4a32b`](https://github.com/LuigiFerronatto/TESSERA/commit/6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599), [KEEP Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/95#issuecomment-5480777109), [plain-language record](test-cards/95-remove-legacy-runtime-coupling.md), [PR Evolution Audit](PR_EVOLUTION_95.md) | `SMOKE_ONLY`; 257 local tests; Python 3.9/3.12, smoke, sanity and reporting passed; LongMemEval dev-50 correctly skipped | `VALIDATED` |
 | [#96](https://github.com/LuigiFerronatto/TESSERA/issues/96) | planned | closed | completed benchmark card | [PR #99](https://github.com/LuigiFerronatto/TESSERA/pull/99), [merge `812c3aa`](https://github.com/LuigiFerronatto/TESSERA/commit/812c3aa37b59a3e99135a9d8b39245aeb71356d0), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/96#issuecomment-5471323841) | [historical dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/baseline.md) | `VALIDATED` |
 | [#100](https://github.com/LuigiFerronatto/TESSERA/issues/100) | absent | closed | completed measurement card | [PR #102](https://github.com/LuigiFerronatto/TESSERA/pull/102), [merge `39febe3`](https://github.com/LuigiFerronatto/TESSERA/commit/39febe36f016997f0c54ede9824f15dec04cc1ee), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/100#issuecomment-5471939801) | [forward dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/forward.md) + conditional CI | `VALIDATED` |
-| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | planned | open | #92 is satisfied; still depends on #93, #95 and regression-gate integration | test shell may start; final gate absent | reporting CI exists, full Quality Gate v2 does not | `BLOCKED` |
+| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | planned | open | #92 and #95 are satisfied; still depends on #93 and regression-gate integration | test shell may start; final gate absent | reporting CI exists, full Quality Gate v2 does not | `BLOCKED` |
 | [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | planned | closed | completed architecture decision | [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [merge `0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2), [accepted ADR 0001](adr/0001-core-vs-optional-llm-boundary.md), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472168701) | not applicable; docs/contract only | `VALIDATED` |
 | [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109) | absent | closed | completed documentation/governance card | [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110), [merge `7f92dd9`](https://github.com/LuigiFerronatto/TESSERA/commit/7f92dd95584aa1f3adf57d47080853bf2e289087) | not applicable | `IMPLEMENTED` |
 | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | untracked runtime branding defect | closed | completed branding correction | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113), [merge `a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
 | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | absent | closed | completed governance contract | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123), [merge `a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | contract tests + Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
-| [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | absent | open | depends on #74, #95 and #112 | repository tree sampled; full reference/package audit absent | smoke-only when executed | `BLOCKED` |
+| [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | absent | open | #74, #95 and #112 satisfied; architecture/inventory Test Card ready to start | repository tree sampled; full reference/package audit absent | smoke-only when executed | `READY` |
 | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | absent | open | depends on #74, #95 and #115 | `pyproject.toml` exists; clean wheel/sdist contract unproven | smoke-only when executed | `BLOCKED` |
 | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | absent | open | depends on #94, #115 and #116 | no project/global discovery schema or `tessera init` contract | smoke-only when executed | `BLOCKED` |
 | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | absent | open | depends on #116 and #117 | checkout CI exists; clean wheel install/bootstrap gate absent | smoke-only when executed | `BLOCKED` |
@@ -186,8 +186,8 @@ answer-quality result.
 ## Current critical path, M0 through M5
 
 ```text
-M0  READY #93 + IN_PROGRESS #95 + READY #16 containment
-      └─ completed foundations: #68 + #74 + #92 + #94 + #96 + #100
+M0  READY #93 + READY #16 containment
+      └─ validated foundations: #68 + #74 + #92 + #94 + #95 + #96 + #100
       ↓
     #67 Quality Gate v2
       ↓
@@ -243,10 +243,10 @@ existing deterministic write gate
 → future State Contamination evaluation (#19, still BLOCKED)
 ```
 
-#92 now satisfies one required contract for #67 and only its own prerequisite
-for #19. #67 remains blocked on #93, #95 and regression-gate integration; #19
-remains blocked on #13, #16 and #73. This merge changes no unrelated readiness
-state.
+#92 and #95 now satisfy their required dependency edges for #67; #92 also
+satisfies only its own prerequisite for #19. #67 remains `BLOCKED` on #93 and
+regression-gate integration; #19 remains blocked on #13, #16 and #73. No
+unrelated readiness state changes.
 
 ## Productization and integration lane
 
@@ -257,18 +257,18 @@ claim new retrieval intelligence.
 ```text
 #114 auditable templates
   ↓
-#95 project-coupled defaults → generic defaults + explicit compatibility (IN_PROGRESS)
-  ↓ after merge and lifecycle synchronization
-#115 repository-layout ADR
+#95 generic runtime / explicit compatibility (VALIDATED)
   ↓
-#116 clean Python distribution
+#115 repository-layout ADR (READY)
   ↓
-#117 project/global configuration and tessera init
-  ├─ #118 clean install + CI onboarding
-  ├─ #119 CLI experience
-  └─ #120 MCP robustness
+#116 clean Python distribution (BLOCKED until #115)
+  ↓
+#117 project/global configuration and tessera init (BLOCKED)
+  ├─ #118 clean install + CI onboarding (BLOCKED)
+  ├─ #119 CLI experience (BLOCKED)
+  └─ #120 MCP robustness (BLOCKED)
        ↓
-     #121 official TESSERA Skills
+     #121 official TESSERA Skills (BLOCKED)
 ```
 
 The repository already declares a Python package. #116 is therefore distribution
