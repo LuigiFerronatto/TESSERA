@@ -5,6 +5,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ADR = ROOT / "docs" / "adr" / "0001-core-vs-optional-llm-boundary.md"
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
+ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
+LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
 
 
@@ -179,6 +181,71 @@ def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
     assert "`BLOCKED`" in issue_67
     assert "still depends on #93 and regression-gate integration" in issue_67
     assert "still depends on #93, #95" not in issue_67
-    assert "`READY`" in issue_115
+    assert "`IN_PROGRESS`" in issue_115
     assert "#74, #95 and #112 satisfied" in issue_115
     assert "`BLOCKED`" in issue_116
+
+
+def test_repository_layout_adr_defines_distribution_ownership_without_migration() -> None:
+    text = LAYOUT_ADR.read_text(encoding="utf-8")
+
+    for marker in (
+        "**Status:** Accepted",
+        "Audited main:** `5d43a2d4cdda0c17be6516f47920121070339d0f`",
+        "Option A",
+        "Option B",
+        "Option C",
+        "`PACKAGE_RUNTIME`",
+        "`BENCHMARK_TOOLING`",
+        "`HISTORICAL_PROVENANCE`",
+        "Target dependency rules",
+        "#116",
+        "#117",
+        "#118",
+        "#119",
+        "#120",
+        "#121",
+        "No item is approved for immediate deletion",
+    ):
+        assert marker in text
+
+    assert "src/tessera" in text
+    assert "Runtime may import only runtime" in text
+    assert "Issue #115 accepts the plan, not its migrations" in text
+
+
+def test_issue_115_audit_records_current_artifacts_and_no_runtime_scope() -> None:
+    audit = ISSUE_115_AUDIT.read_text(encoding="utf-8")
+
+    for marker in (
+        "146 tracked files",
+        "128 internal import edges",
+        "Wheel — 46 files",
+        "Sdist — 69 files",
+        "KEEP / MOVE / ARCHIVE / DELETE / SPLIT / DEFER",
+        "RUNTIME_IMPLEMENTATION",
+        "PACKAGING",
+        "DOCUMENTATION_CORRECTION",
+        "GOVERNANCE",
+        "ARCHITECTURE_DECISION",
+        "BENCHMARK_INFRASTRUCTURE",
+        "SUPERSEDED_OPERATIONAL_PR",
+        "No path is classified `DEAD`",
+        "git diff origin/main -- tessera/",
+        "LongMemEval V1 remains",
+    ):
+        assert marker in audit
+
+    assert "benchmark Python packages are accidentally/incompletely shipped" in audit
+    assert "No new child Test Card is necessary now" in audit
+
+
+def test_issue_115_does_not_unlock_116_early() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    issue_115 = _markdown_table_row(roadmap, "#115")
+    issue_116 = _markdown_table_row(roadmap, "#116")
+
+    assert "`IN_PROGRESS`" in issue_115
+    assert "ADR 0002" in issue_115
+    assert "`BLOCKED`" in issue_116
+    assert "canonical merged/lifecycle-synchronized #115" in issue_116
