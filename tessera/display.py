@@ -37,6 +37,18 @@ TYPE_LABEL = {
     "tag": "TAG",
 }
 
+TESSERA_BANNER_LINES = (
+    "████████╗███████╗███████╗███████╗██████╗  █████╗ ",
+    "╚══██╔══╝██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗",
+    "   ██║   █████╗  ███████╗███████╗██████╔╝███████║",
+    "   ██║   ██╔══╝  ╚════██║╚════██║██╔══██╗██╔══██║",
+    "   ██║   ███████╗███████║███████║██║  ██║██║  ██║",
+    "   ╚═╝   ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝",
+)
+TESSERA_TAGLINE = (
+    "Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories"
+)
+
 
 def _use_color(force_plain: bool = False) -> bool:
     """
@@ -92,19 +104,11 @@ def print_banner(console=None) -> None:
         return
     from rich.text import Text
 
-    banner_lines = [
-        " █████╗ ███╗   ███╗███████╗███╗   ███╗",
-        "██╔══██╗████╗ ████║██╔════╝████╗ ████║",
-        "███████║██╔████╔██║█████╗  ██╔████╔██║",
-        "██╔══██║██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║",
-        "██║  ██║██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║",
-        "╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝",
-    ]
     gradient = ["#ff9966", "#ff8b61", "#ff805d", "#ff7458", "#ff6a5f", "#ffa34e"]
     text = Text()
-    for line, color in zip(banner_lines, gradient):
+    for line, color in zip(TESSERA_BANNER_LINES, gradient):
         text.append(line + "\n", style=color)
-    text.append("Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories\n", style="dim italic")
+    text.append(TESSERA_TAGLINE + "\n", style="dim italic")
     console.print(text)
 
 
