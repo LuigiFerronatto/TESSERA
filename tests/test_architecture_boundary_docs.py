@@ -134,9 +134,13 @@ def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
         "SUPERSEDED_OPERATIONAL_PR",
     ):
         assert classification in audit
-    for pr in ("#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101", "#102", "#107", "#108"):
+    for pr in (
+        "#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101",
+        "#102", "#107", "#110", "#111", "#113", "#122", "#123",
+        "#124", "#108",
+    ):
         assert pr in audit
-    assert "20 distinct merged deliveries" in audit
+    assert "26 distinct merged deliveries" in audit
     assert "CLOSED_UNMERGED" in audit
     assert "NOT_RERUN" in audit
     assert "LongMemEval V1 dev-50" in audit

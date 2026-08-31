@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 import types
+import warnings
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -237,6 +238,16 @@ def test_invalid_memory_ids_are_rejected_before_any_mutation(tmp_path, memory_id
     assert _runtime_snapshot(engine) == runtime_before
 
 
+def test_invalid_memory_id_is_rejected_before_warning(monkeypatch, tmp_path):
+    warn = Mock()
+    monkeypatch.setattr(warnings, "warn", warn)
+    result = TesseraEngine(str(tmp_path / "storage")).write_memory_note_result(
+        "/tmp/outside", "factual", "issue-92", SAFE, [], []
+    )
+    assert result.decision.reasons == ("invalid_memory_id_or_path",)
+    warn.assert_not_called()
+
+
 def test_existing_symlinked_parent_cannot_escape_storage(tmp_path):
     storage = tmp_path / "storage"
     outside = tmp_path / "outside"
@@ -464,6 +475,7 @@ def test_human_cli_invalid_path_is_actionable_and_does_not_leak_path(tmp_path):
         ({"admission": WriteAdmission.ACCEPT, "content_changed": True, "persisted_hash": content_sha256("changed"), "persistence_candidate": "changed"}, "accept requires"),
         ({"content_changed": True, "persisted_hash": content_sha256(ENGLISH), "persistence_candidate": ENGLISH}, "hostile pattern"),
         ({"content_changed": True, "persisted_hash": content_sha256("partial\npayload"), "persistence_candidate": "partial\npayload", "transformation_rule": WHOLE_CONTENT_REDACTION_RULE}, "complete bounded transformation"),
+        ({"threat_detected": False}, "detected hostile instruction"),
     ),
 )
 def test_impossible_write_gate_states_are_rejected(kwargs, error):

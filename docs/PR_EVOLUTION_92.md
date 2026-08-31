@@ -1,9 +1,9 @@
 # Issue #92 — Write-Gate PR Evolution Audit
 
-Audit date: 2026-08-30  
-Starting `main`: `0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2`  
-Candidate PR: [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108)  
-Candidate head audited before this documentation commit: `8169da3d5b6c0cfbc1bab9cd6372a86aa251c64d`
+Audit date: 2026-08-31
+Starting/current integrated `main`: `a0a482c22a3f105becdbfb5b3e5ba68a64aabaa9`
+Candidate PR: [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108)
+Candidate implementation snapshot audited before this documentation commit: `b38ec89e66eb5130d45bca8f8146e01181754639`
 
 This audit reconstructs repository evidence rather than treating issue state,
 PR titles, or documentation as proof of implementation. Merge SHAs below are
@@ -40,9 +40,15 @@ files, and the original security frontmatter.
 | [#101](https://github.com/LuigiFerronatto/TESSERA/pull/101) | `RUNTIME_IMPLEMENTATION` | `MERGED` | [`467ba64`](https://github.com/LuigiFerronatto/TESSERA/commit/467ba649f53312cedcecf40caf548af5f766c67b) | `engine_core.py`, MCP types, persistence tests, README/architecture/features/cheatsheet/changelog | Markdown-only write contract and first-line rejection of unsupported formats. | Fixed the P0 acknowledged-but-unindexable JSON write; rejection precedes sanitizer, warnings, timestamps, files, registry, graph, ledger and MCP rebuild. It did not validate sanitizer truthfulness. | [#94 Evidence/Learnings/KEEP](https://github.com/LuigiFerronatto/TESSERA/issues/94#issuecomment-5471509112) | — |
 | [#102](https://github.com/LuigiFerronatto/TESSERA/pull/102) | `BENCHMARK_INFRASTRUCTURE` | `MERGED` | [`39febe3`](https://github.com/LuigiFerronatto/TESSERA/commit/39febe36f016997f0c54ede9824f15dec04cc1ee) | benchmark workflow/reporting/schema/records/constraints/docs/tests | Versioned benchmark ledger, applicability metadata, immediate-parent and canonical comparisons, forward environment fingerprint. | Review fixed three P0s: hard-coded future issue attribution, absent immediate-parent gate, and hidden environment drift. Establishes why #92 is `SMOKE_ONLY`. | [#100 final Evidence/Learnings/KEEP](https://github.com/LuigiFerronatto/TESSERA/issues/100#issuecomment-5471939801) | — |
 | [#107](https://github.com/LuigiFerronatto/TESSERA/pull/107) | `ARCHITECTURE_DECISION` | `MERGED` | [`0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2) | ADR 0001, architecture/output/features/cheatsheet/roadmap/readme docs, static tests | Accepted deterministic-core vs optional-LLM boundary. | Core writes/retrieval may not require provider SDK/key/network; optional failures may not mutate source memory; O1–O4 runtime deviations remain unimplemented. | [#74 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472247141) | — |
-| [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | `RUNTIME_IMPLEMENTATION` | `OPEN` | — | `security`, write path/result models, CLI/MCP, bundled metadata, contract docs/tests/roadmap | Canonical deterministic detection→transformation→admission→persistence result with exact hashes and mutation-free reject/review. | Makes sanitization truthful across Python/CLI/MCP/Markdown while preserving Markdown-only and provenance boundaries. | [#92 Evidence/Learnings/KEEP candidate](https://github.com/LuigiFerronatto/TESSERA/issues/92#issuecomment-5472677026) | — |
+| [#110](https://github.com/LuigiFerronatto/TESSERA/pull/110) | `GOVERNANCE` | `MERGED` | [`7f92dd9`](https://github.com/LuigiFerronatto/TESSERA/commit/7f92dd95584aa1f3adf57d47080853bf2e289087) | issue/PR templates, roadmap, Test Card records/index, docs tests | Plain-language stage records and lifecycle rules. | Required #92 to distinguish open candidate from merged implementation and link a head snapshot. | [#109 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/109#issuecomment-5473124995) | — |
+| [#111](https://github.com/LuigiFerronatto/TESSERA/pull/111) | `DOCUMENTATION_CORRECTION` | `MERGED` | [`dcdd132`](https://github.com/LuigiFerronatto/TESSERA/commit/dcdd132b50ad91f9070e650ba91bfcaf12784938) | roadmap and Test Card index | Synchronized #109 after merge. | Promoted only merged governance state; no runtime contract. | [#109 final state](https://github.com/LuigiFerronatto/TESSERA/issues/109#issuecomment-5473141211) | Post-merge lifecycle for #110 |
+| [#113](https://github.com/LuigiFerronatto/TESSERA/pull/113) | `RUNTIME_IMPLEMENTATION` | `MERGED` | [`a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2) | `display.py`, banner tests, changelog/roadmap/stage record | Correct TESSERA terminal banner. | Changed presentation only; write admission and persistence unchanged. | [#112 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | — |
+| [#122](https://github.com/LuigiFerronatto/TESSERA/pull/122) | `DOCUMENTATION_CORRECTION` | `MERGED` | [`2fca25e`](https://github.com/LuigiFerronatto/TESSERA/commit/2fca25e3e18b822d265f637917a64435dce1c7a7) | roadmap and #112 stage record/index | Synchronized banner lifecycle after merge. | No runtime contract change. | [#112 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Post-merge lifecycle for #113 |
+| [#123](https://github.com/LuigiFerronatto/TESSERA/pull/123) | `GOVERNANCE` | `MERGED` | [`a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943) | issue/PR templates, roadmap, #114 stage record/index, governance tests | Evolution-auditable templates and productization routing #115–#121. | Made PR evolution audit/reconciliation mandatory; routed future work without implementing it. | [#114 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | — |
+| [#124](https://github.com/LuigiFerronatto/TESSERA/pull/124) | `DOCUMENTATION_CORRECTION` | `MERGED` | [`a0a482c`](https://github.com/LuigiFerronatto/TESSERA/commit/a0a482c22a3f105becdbfb5b3e5ba68a64aabaa9) | roadmap and #114 stage record/index | Synchronized governance lifecycle after merge. | No runtime contract change; establishes current `main` integrated by #108. | [#114 Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | Post-merge lifecycle for #123 |
+| [#108](https://github.com/LuigiFerronatto/TESSERA/pull/108) | `RUNTIME_IMPLEMENTATION` | `OPEN` | — | `security.py`, `engine_core.py`, result/frontmatter projections, CLI/MCP behavior, security metadata, contract/docs/tests/roadmap | Canonical portable ID/path containment plus deterministic detection→transformation→admission→persistence result. | Rejects direct hostile blocks and invalid/escaping IDs without mutation; keeps exact hashes, atomic same-directory replacement and Python/CLI/MCP/Markdown parity. | [#92 live candidate evidence](https://github.com/LuigiFerronatto/TESSERA/issues/92) | — |
 
-There are **20 distinct merged deliveries** in this scoped PR history, one open
+There are **26 distinct merged deliveries** in this scoped PR history, one open
 candidate delivery (#108), and four superseded operational PR rows (#5, #23,
 #52, #57). PRs #5 and #6 are one delivery because both point to head
 `b9fc3496689b06b9325ffd65462f97ac4ba5559b` and merge commit `b3a1501...`.
@@ -59,21 +65,22 @@ root implementation: heuristic WriteGatingEngine + direct Markdown writes
 → Markdown-only pre-mutation persistence integrity (#94 / #101)
 → versioned benchmark applicability and regression records (#96/#100)
 → accepted deterministic-core boundary (#74 / #107)
-→ current main still returns (content, score, is_sanitized=True)
-→ #92 reproduces safe-text overclaim and detected English text left intact
-→ #108 adds a canonical truthful write decision before durable mutation
+→ plain-language/evolution governance and current lifecycle state (#109/#114)
+→ current main still joins unvalidated IDs and can overclaim partial sanitization
+→ #92 reproduces absolute-path escape and multiline hostile-payload retention
+→ #108 validates contained paths first and rejects unbounded hostile blocks
 ```
 
 ### Status of fields and behavior
 
 | Status | Fields/behavior |
 |---|---|
-| Canonical in the #108 candidate | `WriteGateDecision`, `WriteResult`, `threat_detected`, hash-derived `content_changed`, `admission`, ordered `reasons`, exact UTF-8 `original_hash`/`persisted_hash`, `persisted`, `filepath`, and `write_memory_note_result()` |
+| Canonical in the #108 candidate | `WriteGateDecision`, `WriteResult`, portable logical memory-ID/path validation, `threat_detected`, hash-derived `content_changed`, `admission`, ordered `reasons`, exact UTF-8 `original_hash`/`persisted_hash`, `persisted`, `filepath`, and `write_memory_note_result()` |
 | Compatibility-only | `write_memory_note()` filepath return for accepted writes; `audit_and_sanitize()` tuple projection; `is_sanitized`; MCP `mem_id`/`connected_to`; historical `gating_status`/`toxicity_score` metadata |
 | Deprecated by accepted architecture | Implicit optional-provider startup/selection and generated-context paths listed in ADR 0001; they are reachable but are not part of the deterministic write decision. |
 | Documented but not implemented | Comprehensive semantic injection protection, a quarantine/review store, evidence-aware novelty/duplication/utility admission (#19), State Contamination evaluation, O1–O4 adapter migration, and #67 CI enforcement. |
 | Implemented but previously documented too strongly | The small regex/tag gate was implemented, but “sanitization before persistence” obscured that detection and transformation had different coverage. |
-| Invalid on starting `main` | Safe unchanged content had `sanitized=true`; detected English/mixed hostile content could remain byte-identical while frontmatter said `flagged_and_sanitized`; no explicit reject/review result existed. |
+| Invalid on current `main` | Absolute/drive/traversal IDs could escape `storage_dir`; partial line redaction could retain a hostile payload while reporting `accept_sanitized`; older main also overclaimed unchanged text before #108's first candidate. |
 
 The starting-main public write surfaces all delegated to the same Engine write,
 but did not share a write-result contract: Python returned only a filepath, CLI
@@ -97,6 +104,13 @@ indexing and did not prove whether gate metadata was truthful.
   forward environment fingerprinting were corrected.
 - ADR 0001 records current optional-LLM deviations as follow-up work; it did not
   silently implement them.
+- Review of PR #108 reproduced an absolute-memory-ID write outside
+  `storage_dir`; the remediated candidate now validates portable logical IDs,
+  resolves ancestry, and rejects traversal/drive/UNC/symlink escapes before any
+  warning, timestamp, directory, temporary file or runtime mutation.
+- Review also reproduced `accept_sanitized` for a multiline instruction whose
+  payload survived line redaction. The remediated evaluator rejects every
+  direct known hostile block and cannot construct a partial sanitized state.
 - PR #108 initially failed benchmark-reporting because its PR metadata omitted
   the required `Benchmark rationale`; metadata was corrected and the complete
   `SMOKE_ONLY` CI rerun passed.
@@ -109,7 +123,7 @@ PR #79 and a fresh run from an isolated worktree at starting-main commit
 
 | Evaluation | Previous state | Candidate state | Delta | Applicability |
 |---|---|---|---|---|
-| Focused write-gate contract | One legacy hostile-redaction test passed but no truthful result schema, multilingual matrix, hash invariant or mutation snapshots existed; reproduced fixtures exposed the false sanitation state | 29 focused contract tests pass; eight deterministic fixtures; normalized repeated-run SHA-256 `524285669c29e388bd3fec7b638e973dbfd3dc4e9f078939eb6adc2827967f5d` | Explicit canonical schema plus 29 focused assertions; demonstrated overclaim removed | `REQUIRED` |
+| Focused write-gate contract | One legacy hostile-redaction test passed, absolute IDs could escape storage, and multiline payloads survived sanitized status | 67 focused contract tests pass; 11 ordered deterministic fixtures produce identical normalized SHA-256 `6747f48cd7fb076fd87d1edb9b29ced2ca7c37b9bd0775393682754cce6f2717` twice | Portable path containment, conservative hostile rejection, canonical schema and side-effect snapshots | `REQUIRED` |
 | Persistence contract | 15/15 #94 Markdown-only tests passed | 15/15 pass unchanged, plus atomic failure and reject/review mutation snapshots in #92 tests | 0 regressions; stronger admitted-write boundary | `REQUIRED` |
 | Deterministic sanity evaluation | Hit@1 0.75; Hit@3 1.00; Hit@5 1.00; MRR 0.875; evidence hit 1.00; missing-evidence passed | Same metrics and missing-evidence result | 0.00 on every quality metric | `SMOKE_ONLY` |
 | LongMemEval V1 dev-50 | [Canonical historical/forward records](../benchmarks/results/longmemeval-v1-dev-50/) remain versioned | `NOT_RERUN` | N/A | `NOT_APPLICABLE` |

@@ -221,6 +221,8 @@ class WriteGateDecision:
         elif self.admission == WriteAdmission.ACCEPT_SANITIZED:
             if not has_candidate or not self.content_changed:
                 raise ValueError("accept_sanitized requires changed persisted content")
+            if not self.threat_detected or "hostile_instruction_detected" not in self.reasons:
+                raise ValueError("accept_sanitized requires a detected hostile instruction")
             if contains_hostile_pattern(self.persistence_candidate or ""):
                 raise ValueError("accept_sanitized cannot retain a confirmed hostile pattern")
             if (
