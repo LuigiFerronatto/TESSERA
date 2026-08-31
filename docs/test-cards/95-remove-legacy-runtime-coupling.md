@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime` |
 | Pull request | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) |
-| Head commit | [`d8221dc`](https://github.com/LuigiFerronatto/TESSERA/commit/d8221dcf10a78f6e00a431909785b43f7bd9bed3) implementation candidate; final PR head recorded in Issue evidence |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Head commit | [`1fcd71d`](https://github.com/LuigiFerronatto/TESSERA/commit/1fcd71df95993cfbfd8b8fe1e833fa879e947930) audited candidate |
+| Merge commit | [`6d4a32b`](https://github.com/LuigiFerronatto/TESSERA/commit/6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599) canonical merge commit; its tree matches the audited candidate |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-08-31 |
 
@@ -47,8 +47,8 @@ require explicit configuration and raise actionable errors.
 
 ## How does it work now?
 
-**TARGET — NOT YET ON MAIN.** Deterministic import, indexing, retrieval, help,
-doctor and quickstart do not activate or probe LAO/Blip behavior. A legacy user
+**CURRENT ON MAIN.** Deterministic import, indexing, retrieval, help, doctor and
+quickstart do not activate or probe LAO/Blip behavior. A legacy user
 can temporarily keep `LAO_MEM_DIR` with one warning or explicitly select the
 deprecated compatibility adapter and supply its endpoint/router path.
 
@@ -73,7 +73,7 @@ passed 67, persistence 15, retrieval parity 3, documentation contracts 13 and
 benchmark reporting 51. Compileall and diff checks passed. Sanity remained
 Hit@1 0.75, Hit@3/5 1.00, MRR 0.875, evidence hit rate 1.00 and missing-evidence
 check passed. Python 3.9/3.12, smoke, sanity and reporting CI links are recorded
-on PR #126 and in the final Issue #95 evidence.
+on PR #126 and in the Issue #95 evidence.
 
 ## What improved?
 
@@ -92,9 +92,9 @@ separate.
 
 ## What is unlocked next?
 
-After merge and lifecycle synchronization, #95's dependency edge is satisfied
-for #67 and #115. #67 remains blocked on #93 and regression-gate integration;
-#115 must not start before this candidate is merged.
+#95 satisfies its dependency edge for #67 and #115. #67 remains `BLOCKED` on
+#93 and regression-gate integration. Because #74, #95 and #112 are satisfied,
+#115 becomes `READY`. No unrelated Test Card becomes ready.
 
 ## Technical provenance
 
@@ -102,16 +102,21 @@ for #67 and #115. #67 remains blocked on #93 and regression-gate integration;
 |---|---|
 | Issue/Test Card | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) |
 | Pull request | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending final Issue #95 comment |
-| Benchmark record | `SMOKE_ONLY`; deterministic sanity output in PR evidence |
+| Audited candidate | [`1fcd71d`](https://github.com/LuigiFerronatto/TESSERA/commit/1fcd71df95993cfbfd8b8fe1e833fa879e947930) |
+| Canonical merge | [`6d4a32b`](https://github.com/LuigiFerronatto/TESSERA/commit/6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599) |
+| Evidence/Learnings/Decision | [Superseding pre-merge KEEP evidence](https://github.com/LuigiFerronatto/TESSERA/issues/95#issuecomment-5480777109) |
+| Post-merge audit | [Maintainer audit](https://github.com/LuigiFerronatto/TESSERA/issues/95#issuecomment-5482216967) |
+| Implementation CI | [TESSERA CI 33410027311](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33410027311), [Benchmark Ledger 33410027344](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33410027344) |
+| Benchmark record | `SMOKE_ONLY`; unchanged deterministic sanity output in implementation evidence |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_95.md`](../PR_EVOLUTION_95.md) |
 
 ## Evolution
 
 ```text
 project-coupled defaults
-→ #95 generic runtime + explicit compatibility candidate
-→ IN_PROGRESS until audited merge
-→ #115/#117/#120 productization work under their own cards
+→ PR #126 candidate `1fcd71df95993cfbfd8b8fe1e833fa879e947930`
+→ canonical merge `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`
+→ VALIDATED
+→ #115 READY
+→ later #117/#120 work under their own cards
 ```
