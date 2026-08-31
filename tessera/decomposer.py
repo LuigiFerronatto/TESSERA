@@ -105,7 +105,7 @@ def decompose_and_write(
     normal write-side gating/sanitization path exactly like a manual write.
 
     `mem_id_prefix` MUST itself already carry a domain prefix (e.g.
-    "research/some-topic" or "lao/some-run") - each extracted memory gets
+    "research/some-topic" or "project/some-run") - each extracted memory gets
     written as "{mem_id_prefix}/{mem_type}-{n}" so multiple atomic memories
     from the same episode land together in the same topical subdirectory
     instead of colliding on one filename.

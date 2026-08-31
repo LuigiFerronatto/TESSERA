@@ -18,13 +18,13 @@ def populated_engine():
         
         # 1. Old but highly relevant factual note (from 1 year ago)
         engine.write_memory_note(
-            mem_id="lao/charter",
+            mem_id="project/charter",
             mem_type="factual",
-            episode_id="ep_lao_001",
-            content="""# LAO Charter
-O propósito do LAO (Lab Autonomous Officer) é fornecer um runtime de execução de agentes autônomos de alta confiabilidade.""",
-            tags=["lao", "purpose", "charter"],
-            entities=[Entity("LAO", "Lab Autonomous Officer")]
+            episode_id="ep_project_001",
+            content="""# Project Charter
+O propósito do projeto é fornecer um runtime de execução de agentes autônomos de alta confiabilidade.""",
+            tags=["project", "purpose", "charter"],
+            entities=[Entity("Project", "Example autonomous project")]
         )
         
         # Modify the created_at/date/last_updated_at of the old note in frontmatter to simulate 1 year ago (365 days ago)
@@ -41,20 +41,20 @@ O propósito do LAO (Lab Autonomous Officer) é fornecer um runtime de execuçã
         
         # 2. Node about learning process (procedural anchor)
         engine.write_memory_note(
-            mem_id="lao/learning-process",
+            mem_id="project/learning-process",
             mem_type="procedural_anchor",
-            episode_id="ep_lao_002",
-            content="O LAO aprende registrando episódios de forma atômica no TESSERA.",
-            tags=["lao", "learning"],
-            entities=[Entity("LAO", "Lab Autonomous Officer")]
+            episode_id="ep_project_002",
+            content="O agente aprende registrando episódios de forma atômica no TESSERA.",
+            tags=["project", "learning"],
+            entities=[Entity("Project", "Example autonomous project")]
         )
         
         # 3. Node with a multi-word tag "long term memory"
         engine.write_memory_note(
-            mem_id="lao/memory-design",
+            mem_id="project/memory-design",
             mem_type="factual",
-            episode_id="ep_lao_003",
-            content="O TESSERA foi concebido como uma memória para o LAO.",
+            episode_id="ep_project_003",
+            content="O TESSERA foi concebido como uma memória para agentes.",
             tags=["long term memory", "architecture"],
             entities=[]
         )
@@ -65,7 +65,7 @@ O propósito do LAO (Lab Autonomous Officer) é fornecer um runtime de execuçã
 
 def test_explainable_score_contains_all_hardened_signals(populated_engine):
     """Verify that score_explain is present and populated with the correct, hardened nomenclatures."""
-    results = populated_engine.retrieve_context("propósito do LAO", top_n=1)
+    results = populated_engine.retrieve_context("propósito do projeto", top_n=1)
     assert len(results) > 0
     hit = results[0]
     
@@ -91,15 +91,15 @@ def test_explainable_score_contains_all_hardened_signals(populated_engine):
 
 
 def test_old_but_relevant_wins_over_new_unrelated(populated_engine):
-    """Verify that an older, highly relevant node (lao/charter) wins over a recent newsletter by default (recency weight is 0.0)."""
-    # Overwrite the dates of lao/charter to be 1 year ago (2025-08-30) vs recent/newsletter (2026-08-29)
+    """Verify that an older, highly relevant charter wins over a recent newsletter by default."""
+    # Compare project/charter from one year ago with recent/newsletter.
     # The charter note has explicit purpose content, while newsletter is just a recent mention of 'agentes'.
-    # Query: "Qual o propósito do LAO?"
-    results = populated_engine.retrieve_context("Qual o propósito do LAO?", top_n=2)
+    # Query: "Qual o propósito do projeto?"
+    results = populated_engine.retrieve_context("Qual o propósito do projeto?", top_n=2)
     assert len(results) > 0
     
-    # lao/charter must be #1, despite being old
-    assert results[0]["id"] == "lao/charter"
+    # project/charter must be #1, despite being old
+    assert results[0]["id"] == "project/charter"
 
 
 def test_substring_matching_trap_how_vs_show(populated_engine):
@@ -110,11 +110,11 @@ def test_substring_matching_trap_how_vs_show(populated_engine):
     assert len(results) > 0
     
     # Find the charter results
-    charter_hit = [r for r in results if r["id"] == "lao/charter"]
+    charter_hit = [r for r in results if r["id"] == "project/charter"]
     if charter_hit:
         # Since it is a factual note, it shouldn't get procedural boost anyway.
-        # But let's check a procedural note: lao/learning-process
-        learning_hit = [r for r in results if r["id"] == "lao/learning-process"]
+        # But let's check a procedural note: project/learning-process
+        learning_hit = [r for r in results if r["id"] == "project/learning-process"]
         if learning_hit:
             # Under 'show me the charter' (factual query), learning-process (procedural) must NOT receive a type boost (type_boost == 1.0)
             assert learning_hit[0]["score_explain"]["type_boost"] == 1.0
@@ -127,8 +127,8 @@ def test_multiword_tag_tokenization(populated_engine):
     results = populated_engine.retrieve_context("memory", top_n=3)
     assert len(results) > 0
     
-    # lao/memory-design should have a high metadata score due to matching "memory" inside "long term memory"
-    memory_design_hits = [r for r in results if r["id"] == "lao/memory-design"]
+    # project/memory-design should match "memory" inside "long term memory"
+    memory_design_hits = [r for r in results if r["id"] == "project/memory-design"]
     assert len(memory_design_hits) > 0
     assert memory_design_hits[0]["score_explain"]["metadata"] > 0.0
 
@@ -146,7 +146,7 @@ def test_absence_of_overlap_results_in_no_evidence(populated_engine):
 
 def test_pagerank_calculations_and_influence(populated_engine):
     """Verify that PageRank continues to be calculated and populates relations scores."""
-    results = populated_engine.retrieve_context("LAO", top_n=3)
+    results = populated_engine.retrieve_context("project", top_n=3)
     assert len(results) > 0
     
     for r in results:

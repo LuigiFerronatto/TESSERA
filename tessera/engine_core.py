@@ -52,24 +52,7 @@ SEED_NODE_MIN_SIMILARITY = 0.01
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
 
 # Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
-# Some external corpora (e.g. LAO's own `.claude/memory/`) use a different,
-# equally valid frontmatter shape: `name` / `description` / `metadata.type`.
-# These are the `metadata.type` values recognized as indexable memory notes
-# when a file uses that "foreign" schema instead of Tessera's native one.
-FOREIGN_MEMORY_METADATA_TYPES = {
-    "learning",
-    "project",
-    "reference",
-    "user",
-    "feedback",
-    "experiment-result",
-    "hypothesis",
-    "governance",
-    "pipeline",
-}
-
-# Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
-# Some external corpora (e.g. LAO's own `.claude/memory/`) use a different,
+# Some external corpora use a different,
 # equally valid frontmatter shape: `name` / `description` / `metadata.type`.
 # These are the `metadata.type` values recognized as indexable memory notes
 # when a file uses that "foreign" schema instead of Tessera's native one.
@@ -283,7 +266,7 @@ class TesseraEngine:
             warnings.warn(
                 f"write_memory_note: mem_id={mem_id!r} has no domain prefix "
                 "(expected '<domain>/<slug>', e.g. 'research/some-topic/note' "
-                "or 'lao/some-learning') - this note will be written loose at "
+                "or 'agent/some-learning') - this note will be written loose at "
                 "storage_dir's root instead of inside a topical subdirectory. "
                 "This is very likely unintentional.",
                 stacklevel=2,
@@ -595,7 +578,7 @@ class TesseraEngine:
         Args:
             recursive: when True (default), walks all subdirectories of
                 ``storage_dir`` too — needed for corpora organized into
-                topic folders (e.g. LAO's ``.claude/memory/research/<topic>/``).
+                topic folders (for example ``memories/research/<topic>/``).
             use_cache: when True (default), first tries to load a previously
                 persisted index (``.tessera_index/graph.pkl``) if its fingerprint
                 (file count + latest mtime across the corpus) still matches
@@ -928,8 +911,8 @@ class TesseraEngine:
 
         Tessera's own writer (``write_memory_note``) already produces the native
         shape, so this is a no-op for those notes. For "foreign" corpora that
-        use ``name`` / ``description`` / ``metadata.type`` instead (e.g. LAO's
-        ``.claude/memory/`` learnings), this maps fields across so the same
+        use ``name`` / ``description`` / ``metadata.type`` instead, this maps
+        fields across so the same
         engine (graph, DW-PR, conflict resolution) works unmodified on both.
         """
         if "id" in frontmatter and "node_type" in frontmatter:
@@ -983,8 +966,8 @@ class TesseraEngine:
         if "active_connections" not in normalized:
             normalized["active_connections"] = []
 
-        # Fold `metadata.related_to` (a plain list of target ids, LAO's
-        # preferred foreign frontmatter shape) into real active_connections
+        # Fold `metadata.related_to` (a plain list of target ids in a supported
+        # foreign frontmatter shape) into real active_connections
         # edges, so a note authored with that shape gets the same explicit
         # graph linking as a native Tessera note written via --related-to.
         # Without this, related_to only ever fed the TF-IDF corpus above —
@@ -1273,7 +1256,7 @@ class TesseraEngine:
                 frontmatter = yaml.safe_load(frontmatter_raw)
                 return frontmatter, body
             except yaml.YAMLError:
-                # Some hand-authored corpora (e.g. LAO's own memory notes) have
+                # Some hand-authored corpora have
                 # unquoted colons inside single-line scalar values (most often
                 # `description: Some claim: with a colon in it`), which breaks
                 # strict YAML parsing. Recover by auto-quoting the offending
@@ -1303,7 +1286,7 @@ class TesseraEngine:
             stripped = value.strip()
 
             # A value that STARTS with a quote but has trailing content after
-            # the closing quote (e.g. `"Voice by Blip" (Thesis 2B, ...)`) is
+            # the closing quote (e.g. `"Example title" (Thesis 2B, ...)`) is
             # invalid YAML — a scalar can't have unquoted text following a
             # quoted string on the same line. Re-quote the whole value.
             starts_quoted_with_trailer = (

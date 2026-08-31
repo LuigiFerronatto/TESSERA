@@ -1,8 +1,8 @@
 # Tessera Cheatsheet — Todos os Comandos, Flags e Exemplos
 
 > Referência rápida de todos os comandos do Tessera: CLI, MCP tools e API Python.
-> Todo exemplo aqui foi testado ao vivo contra `.claude/memory` real
-> (2026-08-25). Pense nisso como o "keybinds cheatsheet" do Tessera — cole o
+> Os exemplos usam o diretório genérico `./memories`. Pense nisso como o
+> "keybinds cheatsheet" do Tessera — cole o
 > comando, ajuste os argumentos, rode.
 
 ---
@@ -33,11 +33,11 @@ conseguir distinguir "isso é onde está salvo" de "isso é o que está escrito"
   de `tessera start` quando cor está ativa).
 
 ```bash
-tessera query .claude/memory "backend de llm mais rapido"      # painéis coloridos
-tessera query .claude/memory "backend de llm mais rapido" --plain  # texto puro
-tessera list .claude/memory --table                              # tabela colorida
-tessera list .claude/memory --table | less -R                     # colorida + paginada
-FORCE_COLOR=1 tessera list .claude/memory --table | head -15       # colorida + head
+tessera query ./memories "decisão de arquitetura"      # painéis coloridos
+tessera query ./memories "decisão de arquitetura" --plain  # texto puro
+tessera list ./memories --table                              # tabela colorida
+tessera list ./memories --table | less -R                     # colorida + paginada
+FORCE_COLOR=1 tessera list ./memories --table | head -15       # colorida + head
 tessera banner                                                    # só o logo
 ```
 
@@ -54,9 +54,8 @@ tessera banner                                                    # só o logo
 # ativa o venv que tem o `tessera` instalado (modo editável -e .)
 source .venv-browser-agent/bin/activate
 
-# somente para os comandos assistidos legados (`start` / `decompose`),
-# carregue as credenciais do Azure Gateway antes:
-set -a && source .env && set +a
+# opcional: escolha o storage canônico para os comandos sem caminho explícito
+export TESSERA_STORAGE_DIR="$PWD/memories"
 ```
 
 > Limite arquitetural: `query` é o caminho determinístico e não precisa de
@@ -81,7 +80,7 @@ set -a && source .env && set +a
 ### `tessera init <dir>` — inicializar um diretório de memórias
 
 ```bash
-tessera init .claude/memory
+tessera init ./memories
 ```
 Constrói o índice pela primeira vez e confirma quantos nós já existem.
 
@@ -91,7 +90,7 @@ Constrói o índice pela primeira vez e confirma quantos nós já existem.
 
 | Flag | Obrigatória? | Descrição |
 |---|---|---|
-| `--id` | ✅ | ID/slug da nota. Use `"dominio/nome"` (ex: `"lao/minha-nota"`) para gravar em subpasta — **a subpasta precisa já existir**, não é criada automaticamente. |
+| `--id` | ✅ | ID/slug da nota. Use `"dominio/nome"` (ex: `"project/minha-nota"`) para gravar em subpasta. |
 | `--type` | ✅ | `factual` \| `preference` \| `procedural_anchor` |
 | `--episode` | ✅ | ID do episódio/sessão (use `"start"` se não tiver um real) |
 | `--content` | ✅ | Corpo da nota (texto livre) |
@@ -101,29 +100,29 @@ Constrói o índice pela primeira vez e confirma quantos nós já existem.
 
 ```bash
 # exemplo simples
-tessera write .claude/memory \
-  --id "lao/minha-nota" \
+tessera write ./memories \
+  --id "project/minha-nota" \
   --type factual \
   --episode start \
   --tags "exemplo,teste" \
   --content "Corpo da nota aqui."
 
 # com entidades e múltiplas conexões explícitas
-tessera write .claude/memory \
-  --id "lao/hipotese-classificacao" \
+tessera write ./memories \
+  --id "project/hipotese-classificacao" \
   --type factual \
   --episode start \
   --tags "governance,verification" \
   --entity "Strategist:agente que formula hipoteses" \
   --related-to "test-card-vs-product-hypothesis:supports" \
   --related-to "strategist-hypothesis-gate" \
-  --content "LAO deve classificar hipoteses como Test Card ou Product Hypothesis..."
+  --content "O agente deve classificar hipóteses antes de executá-las."
 ```
 
 Depois de escrever, **sempre reindexe** (a não ser que a próxima chamada já
 rode `build_index()`, como `query`/`list` fazem automaticamente):
 ```bash
-tessera index .claude/memory
+tessera index ./memories
 ```
 
 ---
@@ -140,13 +139,13 @@ tessera index .claude/memory
 
 ```bash
 # busca básica
-tessera query .claude/memory "governanca de aprovacao de hipoteses" --top-n 5
+tessera query ./memories "governanca de aprovacao de hipoteses" --top-n 5
 
 # só os caminhos (bom pra pipe: cat, xargs, abrir no editor)
-tessera query .claude/memory "backend de llm mais rapido" --paths-only
+tessera query ./memories "decisão de arquitetura" --paths-only
 
 # ver notas relacionadas sem carregar o corpo inteiro
-tessera query .claude/memory "backend de llm mais rapido" --show-related --no-body
+tessera query ./memories "decisão de arquitetura" --show-related --no-body
 ```
 
 **Não usa LLM.** É TF-IDF + cosine similarity + Personalized PageRank sobre
@@ -163,10 +162,10 @@ um subgrafo local — roda em ~1-2s, offline, sem custo de rede.
 | `--paths-only` | **(novo)** Só os caminhos de arquivo, um por linha |
 
 ```bash
-tessera list .claude/memory --table | head -10
-tessera list .claude/memory --type factual
-tessera list .claude/memory --paths-only
-tessera list .claude/memory | grep "notas indexadas"   # total rápido
+tessera list ./memories --table | head -10
+tessera list ./memories --type factual
+tessera list ./memories --paths-only
+tessera list ./memories | grep "notas indexadas"   # total rápido
 ```
 
 > ℹ️ **Por que `tessera list` mostra 200 notas mas o índice tem 272 nós?**
@@ -178,7 +177,7 @@ tessera list .claude/memory | grep "notas indexadas"   # total rápido
 > perdido, é só uma camada interna do índice que `list` não mostra por não
 > ser uma "nota de memória" de verdade. Veja a distribuição completa com:
 > ```bash
-> tessera stats .claude/memory
+> tessera stats ./memories
 > ```
 > (novo comando, mostra a tabela colorida notas-reais vs. nós-internos —
 > não precisa mais inspecionar `graph.json` na mão)
@@ -188,10 +187,10 @@ tessera list .claude/memory | grep "notas indexadas"   # total rápido
 ### `tessera index <dir>` — reconstruir o índice manualmente
 
 ```bash
-tessera index .claude/memory
+tessera index ./memories
 ```
 Roda um rebuild completo do grafo (parseia todos os `.md`, refaz TF-IDF,
-persiste em `.claude/memory/.tessera_index/graph.pkl` + `graph.json`).
+persiste em `./memories/.tessera_index/graph.pkl` + `graph.json`).
 `query`/`list`/`write` já chamam isso internamente (com cache por
 fingerprint de arquivos), então normalmente você não precisa rodar manual —
 só se quiser forçar um rebuild do zero.
@@ -207,9 +206,8 @@ O comando mais avançado: roda o orquestrador Need → Planner → Inference.
 | `--top-n N` | Quantas memórias brutas alimentar no pipeline (default: 3) |
 
 ```bash
-# requer um backend real: Azure Gateway ou engine_router externo
-set -a && source .env && set +a
-tessera start .claude/memory "Qual backend de LLM devo usar para o pipeline do Tessera?"
+# sem seleção explícita, nenhum backend opcional é ativado
+tessera start ./memories "Resuma as decisões do projeto"
 ```
 ⚠️ `task` é **posicional**, não tem flag — sempre vem depois do `storage_dir`.
 O comando faz três chamadas reais (Need → Planner → Inference) e falha se
@@ -238,7 +236,7 @@ procedural_anchor) e grava todas de uma vez em `{prefix}/{tipo}-{n}.md`.
 ```bash
 # requer backend LLM real configurado
 set -a && source .env && set +a
-tessera decompose .claude/memory \
+tessera decompose ./memories \
   --mem-id-prefix "research/meu-topico" \
   --beginning "Investigando timeout intermitente no serviço de pagamentos." \
   --middle "Encontramos que o pool de conexões do Postgres esgota sob carga; prefiro usar pgbouncer a aumentar o pool bruto." \
@@ -265,7 +263,7 @@ a tabela de paridade Engine/Hook/CLI/MCP.
 tessera skills list                          # lista as 5 skills embutidas
 # sk_docker_environment, sk_runtime_verification, sk_schema_compliance,
 # sk_service_lifecycle, sk_shell_execution
-tessera skills install .claude/memory        # instala as 5 no storage_dir
+tessera skills install ./memories        # instala as 5 no storage_dir
 ```
 
 ---
@@ -273,7 +271,7 @@ tessera skills install .claude/memory        # instala as 5 no storage_dir
 ### `tessera stats <dir>` — **(novo 2026-08-25)** composição do índice
 
 ```bash
-tessera stats .claude/memory
+tessera stats ./memories
 ```
 Tabela colorida mostrando quantos nós de cada tipo existem no grafo —
 `factual`/`preference`/`procedural_anchor` (notas reais em `.md`) vs.
@@ -286,19 +284,17 @@ tem 272 nós" sem precisar abrir `graph.json` na mão.
 ### `tessera doctor <dir>` — **(novo 2026-08-25)** smoke test pós-instalação
 
 ```bash
-tessera doctor .claude/memory
+tessera doctor ./memories
 ```
 Roda uma bateria de checagens independentes (uma falha não esconde as
 outras): `storage_dir` existe e é gravável, o índice constrói sem erro,
 um round-trip de escrita+leitura funciona de fato (grava uma nota num
 diretório temporário, reconstrói o índice, confirma que a busca acha a
-nota de volta), `rich` está instalado, o extra `mcp` está instalado, e se
-`TESSERA_AZURE_GATEWAY_API_KEY` está configurada. As duas últimas são
-**opcionais** (marcadas `○` em amarelo, não fazem o comando falhar) — o
+nota de volta), `rich` está instalado e o extra `mcp` está instalado. O
+doctor não inspeciona credenciais ou arquivos de provedores. As dependências
+opcionais não fazem o comando falhar — o
 resto é obrigatório. Exit code `0` = tudo OK, `1` = alguma checagem
 obrigatória falhou (útil em CI/script).
-
-Implementa o item 6 do roadmap plug-and-play (`lao/tessera-plug-and-play-vision-roadmap`).
 
 ---
 
@@ -318,9 +314,8 @@ tessera quickstart
 tessera quickstart --project-root ~/meu-outro-projeto --apply
 ```
 Detecta o tipo de projeto (`package.json`→node, `pyproject.toml`→python,
-`Cargo.toml`→rust, `go.mod`→go, `.git`→genérico), reaproveita um
-`.claude/memory` já existente se achar um, senão propõe `./memories` na
-raiz do projeto, e imprime o bloco JSON pronto pra colar em `.mcp.json`/
+`Cargo.toml`→rust, `go.mod`→go, `.git`→genérico), propõe `./memories` na
+raiz do projeto e imprime o bloco JSON com `TESSERA_STORAGE_DIR` pronto para `.mcp.json`/
 `.gemini/settings.json`/config do Claude Desktop. Implementa os itens 2 e
 3 do roadmap plug-and-play.
 
@@ -368,26 +363,15 @@ Python — ver nota de troubleshooting abaixo).
 Pipeline completo Need→Planner→Retrieval→Inference via MCP (equivalente ao
 `tessera start`, sem sair do agente/CLI hospedeiro).
 
-O backend real é resolvido automaticamente entre Azure Gateway e o
-`engine_router.py` externo. A assinatura atual não aceita `use_llm`,
-`llm_backend` nem `llm_engine`, e não oferece simulação offline:
+Nenhum backend é resolvido automaticamente. A assinatura MCP atual não aceita
+seleção de adapter; a ampliação desse envelope pertence à issue #120:
 
 ```jsonc
 { "task_instruction": "...", "top_n": 7 }
 ```
 
-- Azure Gateway requer `TESSERA_AZURE_GATEWAY_API_KEY` no
-  **ambiente do processo `tessera-mcp`** (não no shell de quem chama a tool).
-- O fallback de disponibilidade é o `engine_router.py` externo. Se nenhum
-  backend estiver disponível, a tool falha claramente antes de executar.
-- O retorno informa `llm_backend_used` e mantém `raw_memories`. Falhas depois
-  da seleção do backend atualmente podem degradar para eco do prompt; esse
-  comportamento é legado/depreciado pelo ADR 0001.
-
-> ⚠️ Mesma pegadinha de env var da CLI: o processo MCP lê
-> `TESSERA_AZURE_GATEWAY_API_KEY` **uma vez**, no boot. Exportar a chave
-> depois que o MCP já está conectado não tem efeito até reiniciar a
-> conexão (ver nota de troubleshooting no fim desta seção).
+- Sem um adapter configurado pela aplicação, a tool falha antes de executar.
+- Falhas de compatibilidade são tipadas e nunca degradam para eco do prompt.
 
 ### `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id="start", tags=None)`
 Equivalente MCP de `tessera decompose`: extrai N memórias tipadas de um
@@ -408,10 +392,10 @@ disponível pro agente sem precisar rodar CLI.
 ### `run_doctor(storage_dir=None)` — **(novo 2026-08-25)**
 Equivalente MCP de `tessera doctor`: roda as mesmas checagens (storage_dir
 gravável, índice constrói, round-trip escrita+leitura, `rich`/`mcp`
-instalados, Azure Gateway configurado) e retorna um relatório estruturado
+instalados e fronteira opcional não sondada) e retorna um relatório estruturado
 (`all_ok`, lista de checks com `ok`/`required`/`detail`). Se
 `storage_dir` for omitido, usa o mesmo dir com que o servidor MCP foi
-inicializado (`LAO_MEM_DIR`).
+inicializado (`TESSERA_STORAGE_DIR`).
 
 ### `run_quickstart(project_root=None, storage_dir=None, apply=False)` — **(novo 2026-08-25)**
 Equivalente MCP de `tessera quickstart`: detecta o tipo de projeto,
@@ -444,7 +428,7 @@ sys.path.insert(0, "Tessera")
 from tessera.engine import TesseraEngine
 from tessera.models import Entity, Connection
 
-engine = TesseraEngine(storage_dir=".claude/memory")
+engine = TesseraEngine(storage_dir="./memories")
 engine.build_index()
 
 # busca
@@ -454,13 +438,13 @@ for r in results:
 
 # escrita com conexões explícitas
 result = engine.write_memory_note_result(
-    mem_id="lao/exemplo",
+    mem_id="project/exemplo",
     mem_type="factual",
     episode_id="start",
     content="Corpo da nota.",
     tags=["exemplo"],
     entities=[Entity("Strategist", "agente de hipoteses")],
-    active_connections=[Connection(target_memory_id="lao-charter", relation_type="supports")],
+    active_connections=[Connection(target_memory_id="project/charter", relation_type="supports")],
 )
 print(result.to_dict())
 engine.build_index()  # reindexar após escrever
@@ -483,11 +467,8 @@ versionada.
 ### Decomposição automática de episódio (`decompose_and_write_episode`)
 
 ```python
-from tessera.llm_bridge import resolve_llm_fn
-
-llm_fn = resolve_llm_fn(prefer="azure")
-if llm_fn is None:
-    raise RuntimeError("backend LLM assistido indisponível")
+# A aplicação fornece seu próprio callable; TESSERA não escolhe provedor.
+llm_fn = application_llm_fn
 
 paths = engine.decompose_and_write_episode(
     mem_id_prefix="research/meu-topico",
@@ -558,7 +539,7 @@ Duas formas, ambas persistidas na mesma nota:
    ranking DW-PR, sem nenhuma configuração.
 
 2. **Explícita** (`active_connections`, campo `related_to` no frontmatter
-   estilo LAO): uma aresta direta nota→nota, com um `relation_type`. Grave
+   compatível): uma aresta direta nota→nota, com um `relation_type`. Grave
    via `--related-to` (CLI), `connect_to=[...]` (MCP), ou escrevendo
    `metadata.related_to: [id1, id2]` no frontmatter à mão — as três formas
    viram arestas reais no grafo.
@@ -608,5 +589,4 @@ metadata:
 - `docs/adr/0001-core-vs-optional-llm-boundary.md` — limite entre core determinístico, adapters opcionais e agente consumidor
 - `Tessera/docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md` — arquitetura completa (3 pilares, grafo DW-PR, roadmap plug-and-play)
 - `Tessera/docs/ROTEIRO-DEMO-VIDEO.md` — roteiro de gravação testado ao vivo
-- `.agents/skills/lao-memory-query/SKILL.md` — como o LAO usa isso (taxonomia de domínios `.claude/memory/`)
-- `.agents/skills/lao-save-learning/SKILL.md` — como salvar aprendizados seguindo o padrão Tessera
+- `docs/adr/0001-core-vs-optional-llm-boundary.md` — contrato de core e adapters opcionais

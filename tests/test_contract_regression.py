@@ -12,21 +12,21 @@ def populated_engine():
         
         # Write some real-world-style sample notes
         engine.write_memory_note(
-            mem_id="lao/charter",
+            mem_id="project/charter",
             mem_type="factual",
-            episode_id="ep_lao_001",
-            content="O LAO (Lab Autonomous Officer) existe para servir de ambiente de execução autônomo, não apenas como um agente isolado.",
-            tags=["lao", "purpose", "charter"],
-            entities=[Entity("LAO", "Lab Autonomous Officer")]
+            episode_id="ep_project_001",
+            content="O projeto existe para servir de ambiente de execução autônomo, não apenas como um agente isolado.",
+            tags=["project", "purpose", "charter"],
+            entities=[Entity("Project", "Example autonomous project")]
         )
         
         engine.write_memory_note(
-            mem_id="lao/learning-process",
+            mem_id="project/learning-process",
             mem_type="procedural_anchor",
-            episode_id="ep_lao_002",
-            content="O LAO aprende registrando episódios de forma atômica no TESSERA e recuperando âncoras procedimentais diante de erros.",
-            tags=["lao", "learning"],
-            entities=[Entity("LAO", "Lab Autonomous Officer")]
+            episode_id="ep_project_002",
+            content="O agente aprende registrando episódios de forma atômica no TESSERA e recuperando âncoras procedimentais diante de erros.",
+            tags=["project", "learning"],
+            entities=[Entity("Project", "Example autonomous project")]
         )
         
         engine.write_memory_note(
@@ -39,24 +39,24 @@ def populated_engine():
         )
         
         engine.write_memory_note(
-            mem_id="lao/memory-structure",
+            mem_id="project/memory-structure",
             mem_type="procedural_anchor",
             episode_id="ep_tessera_001",
-            content="A memória do LAO funciona usando TESSERA como infraestrutura para separar fatos, preferências e insights (procedural anchors).",
+            content="A memória do agente funciona usando TESSERA para separar fatos, preferências e insights (procedural anchors).",
             tags=["tessera", "memory", "structure"],
             entities=[Entity("TESSERA", "Memory infrastructure")],
-            active_connections=[Connection(target_memory_id="lao/learning-process", relation_type="supports")]
+            active_connections=[Connection(target_memory_id="project/learning-process", relation_type="supports")]
         )
         
         engine.build_index()
         yield engine
 
 @pytest.mark.parametrize("query", [
-    "pq o LAO existe?",
-    "qual o propósito do LAO?",
-    "como o LAO aprende?",
+    "por que o projeto existe?",
+    "qual o propósito do projeto?",
+    "como o agente aprende?",
     "qual erro tivemos com o Copilot?",
-    "como funciona a memória do LAO?"
+    "como funciona a memória do agente?"
 ])
 def test_output_contract_preservation(populated_engine, query):
     """

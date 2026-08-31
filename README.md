@@ -168,13 +168,40 @@ TESSERA retrieval ends at structured evidence with provenance; cognition and
 the final response belong to the consuming agent. The repository also contains
 a legacy, explicitly assisted orchestration path for LLM planning and context
 synthesis. It is optional behavior, is not part of the deterministic retrieval
-contract, and currently requires a configured Azure gateway or external engine
-router. Target O0–O4 adapter semantics in the ADR are architecture constraints,
-not claims that those future modes are implemented.
+contract, and project-specific adapters require explicit deprecated
+compatibility selection plus an endpoint or exact router path. No provider is
+auto-probed. Target O0–O4 adapter semantics in the ADR are architecture
+constraints, not claims that those future modes are implemented.
 
 Base installation does not install an LLM provider SDK. `tessera[mcp]` adds the
 MCP transport and `tessera[llm]` adds the current HTTP bridge dependency; these
 extras do not change ownership of reasoning or final-answer policy.
+
+Storage resolution is deterministic: an explicit command/API path wins, then
+`TESSERA_STORAGE_DIR`, then the deprecated `LAO_MEM_DIR` compatibility alias,
+then `./memories`. The canonical variable always outranks the alias, alias use
+warns on the human-facing channel, and no project-specific directory is
+auto-discovered. An explicitly supplied path remains valid regardless of name.
+
+Existing project-specific assisted users can migrate through the deprecated
+explicit boundary while moving to an application-owned `llm_fn`:
+
+```python
+from tessera.llm_bridge import resolve_llm_fn
+
+llm_fn = resolve_llm_fn(
+    backend="legacy-blip-gateway",
+    endpoint=configured_endpoint,
+    api_key=configured_key,
+    contact_id=configured_contact,
+    subscription_id=configured_subscription,
+    tenant_id=configured_tenant,
+)
+```
+
+The endpoint and identifiers have no TESSERA defaults. The router adapter
+likewise requires `backend="legacy-lao-engine-router"` and an exact
+`router_path`; no parent-directory search is performed.
 
 ## Benchmarks
 

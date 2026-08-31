@@ -352,18 +352,19 @@ Python / CLI query / MCP query_memories
 → deterministic retrieval
 → structured evidence + provenance
 
-CURRENT legacy assisted path
+CURRENT explicit assisted path
 CLI start / MCP pipeline / task hook
-→ implicit backend resolver
+→ application llm_fn or explicitly selected deprecated compatibility adapter
 → LLM need analysis + planning
 → deterministic retrieval
 → LLM-generated context + raw_memories
 ```
 
-Current deviations include eager assisted-hook initialization during MCP server
-startup, implicit provider probing, prompt-echo degradation after provider
-failure, and stale legacy claims of offline simulation. They are documented for
-migration in the ADR; this architecture decision changes no runtime behavior.
+Current limitations include an eager task-hook wrapper during MCP startup and
+assisted MCP signatures that cannot yet carry the full adapter selection
+envelope. Issue #120 owns that lifecycle refactor. Generic startup performs no
+project-specific provider probing, and compatibility failures never become raw
+prompt output.
 
 # 10. CI and experimental governance
 

@@ -2,8 +2,7 @@
 Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories
 =================================
 
-Long-term memory engine for autonomous agents (built for LAO — Lab
-Autonomous Officer). Memories are stored as human-readable Markdown
+Long-term memory engine for autonomous agents. Memories are stored as human-readable Markdown
 files with YAML frontmatter and indexed in-memory as a heterogeneous
 knowledge graph, retrieved via a Dynamic Weighted PageRank (DW-PR)
 subgraph search.

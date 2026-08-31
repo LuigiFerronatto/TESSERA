@@ -19,12 +19,10 @@ preferences / insights) before the main agent ever acts:
        a validated summary of current state, ready to inject into the main
        agent's context.
 
-Each "agent" step is just a prompt template + a call to `llm_fn`. By default
-`llm_fn` is a deterministic, offline simulation (no API key required) so the
-whole pipeline is runnable and testable without any LLM provider configured.
-Pass your own `llm_fn` (e.g. wrapping `lao_core.engine_router.invoke`, the
-Anthropic/OpenAI SDK, or any callable of `(system_prompt, user_prompt) -> str`)
-to plug in a real model.
+Each "agent" step is a prompt template plus a call to an explicitly supplied
+`llm_fn`. Pass an application-owned callable of
+`(system_prompt, user_prompt) -> str`; deterministic Engine retrieval remains
+available independently and needs no provider.
 
 See `tessera.hooks` for the mechanism that *automatically* intercepts a task and
 triggers this pipeline (rather than the caller invoking it by hand).
@@ -238,4 +236,3 @@ class TesseraOrchestrator:
             raw_memories=raw_memories,
             consolidated_context=consolidated_context,
         )
-

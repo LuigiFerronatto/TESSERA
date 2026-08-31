@@ -337,8 +337,10 @@ evidence contract. They do not call a provider or inspect credentials.
 
 **CURRENT:** `TesseraOrchestrator`, `TesseraTaskHook`, CLI `start`, assisted
 episode decomposition, and MCP assisted tools are legacy optional LLM surfaces.
-They are available only when a real backend resolves; they are not the basic
-retrieval contract and do not own the consuming agent's final answer.
+They are available only with an application-provided callable or an explicitly
+selected deprecated compatibility adapter; no provider resolves implicitly.
+They are not the basic retrieval contract and do not own the consuming agent's
+final answer.
 
 **TARGET:** planners, context consolidation, readers, and benchmark judges are
 explicitly selected adapters outside the core. The O0–O4 modes in the ADR are
