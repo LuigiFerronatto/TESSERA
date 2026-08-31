@@ -138,7 +138,7 @@ def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
     for pr in (
         "#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101",
         "#102", "#107", "#110", "#111", "#113", "#122", "#123",
-        "#124", "#108",
+        "#124", "#108", "#125",
     ):
         assert pr in audit
     assert "27 distinct merged deliveries" in audit
