@@ -134,8 +134,8 @@ No versioned file under `benchmarks/` is changed.
 
 - Focused #93 integration: 13 passed.
 - #95 runtime boundary: 16 passed; retrieval parity: 3 passed; architecture:
-  11 passed; plain-language records: 7 passed; benchmark reporting: 51 passed.
-- Full suite: 275 passed with 14 expected warnings. Compileall, `git diff
+  12 passed; plain-language records: 7 passed; benchmark reporting: 51 passed.
+- Full suite: 276 passed with 14 expected warnings. Compileall, `git diff
   --check` and the empty `benchmarks/` diff passed.
 - Fresh post-reconciliation Python 3.9/3.12, smoke, sanity and Benchmark Ledger
   results are linked from [PR #129 checks](https://github.com/LuigiFerronatto/TESSERA/pull/129/checks)
