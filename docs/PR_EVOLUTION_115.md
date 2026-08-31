@@ -6,14 +6,26 @@ before the branch was created. It includes canonical #95 runtime merge
 `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` and canonical #95 lifecycle merge
 `5d43a2d4cdda0c17be6516f47920121070339d0f`.
 
-Candidate branch: `test-card/115-repository-layout-audit`;
-[PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128). Audited content
-candidate: `874fea2a1f06efbac43ea4a8c7414509306cbe1c`; evidence-bearing candidate
-before final link synchronization: `1db5698658878a1eef5b46f7f7e574ec1b8a51df`.
-[Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483088072).
-This audit counts a
-candidate head and its later canonical merge as one delivery. It does not treat
-lifecycle-only PRs as new runtime capability.
+Canonical architecture delivery: [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128),
+delivery type `ARCHITECTURE_DECISION`. Its audited candidate was
+`25afd31b910dec97cffea34a25092c6e7f8b4f2e`; GitHub squash-merged it as
+`b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`. The candidate and canonical
+squash merge are one architecture delivery, not two capabilities. Decision:
+`KEEP`.
+
+The implementation applicability is `SMOKE_ONLY`. [TESSERA CI
+33428299771](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428299771)
+passed Python 3.9, Python 3.12, smoke and sanity; [Benchmark Ledger
+33428299778](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33428299778)
+passed reporting/applicability and correctly skipped LongMemEval V1 dev-50.
+The lifecycle synchronization applicability is `NOT_APPLICABLE`: it changes
+documentation/governance records and static assertions only.
+
+The [implementation Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483088072)
+and [post-merge maintainer audit](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483321070)
+confirm the accepted decision. #115 is `VALIDATED`; #116 becomes `READY` after
+this lifecycle synchronization; #117–#121 keep their declared dependency
+chains. Migrations remain unimplemented and owned by #78 and #116–#121.
 
 ## Audit method
 
@@ -292,13 +304,15 @@ MCP shim migration or a later zero-reference audit finds an unowned candidate.
 | PR #124 | `DOCUMENTATION_CORRECTION` | `a0a482c` | lifecycle sync only, no new capability |
 | PR #126 | `RUNTIME_IMPLEMENTATION` | `6d4a32b` | made default runtime generic and compatibility explicit |
 | PR #127 | `DOCUMENTATION_CORRECTION` | `5d43a2d` | lifecycle sync only; made #115 READY |
-| issue #115 candidate | `ARCHITECTURE_DECISION` | pending | inventories and accepts target; no migration/runtime implementation |
+| [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | `ARCHITECTURE_DECISION` | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` (MERGED, squash) | audited candidate `25afd31b910dec97cffea34a25092c6e7f8b4f2e`; accepted ADR 0002 with `KEEP`; no migration/runtime implementation |
+| this post-merge lifecycle PR | `DOCUMENTATION_CORRECTION` | open / pending | synchronizes canonical merge, `VALIDATED`/`READY` routing and static assertions; adds no architecture/runtime capability |
 
 PR #5 and #6 share canonical merge `b3a1501` and are one Evidence Ledger
-delivery, not two capabilities. Candidate commits and a later canonical merge
-likewise remain one architecture decision. PRs #124/#127 synchronize lifecycle
-records and do not duplicate the governance/runtime deliveries they document.
-A closed-unmerged attempt is a `SUPERSEDED_OPERATIONAL_PR`, not a capability.
+delivery, not two capabilities. The PR #128 candidate and canonical squash
+merge likewise remain one architecture decision. PRs #124/#127 and this
+lifecycle PR are `DOCUMENTATION_CORRECTION` deliveries; they synchronize records
+and do not increment architecture or runtime capability counts. A
+closed-unmerged attempt is a `SUPERSEDED_OPERATIONAL_PR`, not a capability.
 
 ## Candidate validation
 
@@ -338,6 +352,9 @@ behavior, conflict resolution, Evidence Ledger, write gate, persistence, path
 containment, storage precedence, optional backend selection, MCP protocol and
 CLI behavior remain unchanged.
 
-Decision: `KEEP` the accepted architecture. Migration status remains explicitly
-unimplemented. Benchmark applicability is `SMOKE_ONLY`; LongMemEval V1 remains
-skipped.
+Decision: `KEEP` the accepted architecture. PR #128 is canonically merged and
+#115 is `VALIDATED`; migration status remains explicitly unimplemented. The
+historical implementation applicability remains `SMOKE_ONLY`; this lifecycle
+synchronization is `NOT_APPLICABLE`, and LongMemEval V1 is not rerun. #116 is
+`READY` after synchronization, while #78 and #117–#121 retain their ownership
+and dependency boundaries.

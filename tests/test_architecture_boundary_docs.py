@@ -8,6 +8,8 @@ ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
 ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
 LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
+ISSUE_115_CANDIDATE_SHA = "25afd31b910dec97cffea34a25092c6e7f8b4f2e"
+CANONICAL_115_MERGE_SHA = "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1"
 
 
 def _markdown_table_row(text: str, issue: str) -> str:
@@ -181,9 +183,9 @@ def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
     assert "`BLOCKED`" in issue_67
     assert "still depends on #93 and regression-gate integration" in issue_67
     assert "still depends on #93, #95" not in issue_67
-    assert "`IN_PROGRESS`" in issue_115
-    assert "#74, #95 and #112 satisfied" in issue_115
-    assert "`BLOCKED`" in issue_116
+    assert "`VALIDATED`" in issue_115
+    assert CANONICAL_115_MERGE_SHA in issue_115
+    assert "`READY`" in issue_116
 
 
 def test_repository_layout_adr_defines_distribution_ownership_without_migration() -> None:
@@ -232,7 +234,7 @@ def test_issue_115_audit_records_current_artifacts_and_no_runtime_scope() -> Non
         "SUPERSEDED_OPERATIONAL_PR",
         "No path is classified `DEAD`",
         "git diff origin/main -- tessera/",
-        "LongMemEval V1 remains",
+        "LongMemEval V1 is not rerun",
     ):
         assert marker in audit
 
@@ -240,12 +242,46 @@ def test_issue_115_audit_records_current_artifacts_and_no_runtime_scope() -> Non
     assert "No new child Test Card is necessary now" in audit
 
 
-def test_issue_115_does_not_unlock_116_early() -> None:
+def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     issue_115 = _markdown_table_row(roadmap, "#115")
     issue_116 = _markdown_table_row(roadmap, "#116")
 
-    assert "`IN_PROGRESS`" in issue_115
+    assert "closed" in issue_115
+    assert "`VALIDATED`" in issue_115
     assert "ADR 0002" in issue_115
-    assert "`BLOCKED`" in issue_116
-    assert "canonical merged/lifecycle-synchronized #115" in issue_116
+    assert "PR #128" in issue_115
+    assert CANONICAL_115_MERGE_SHA in issue_115
+    assert "`KEEP`" in issue_115
+    assert "`READY`" in issue_116
+    assert "#74, #95 and canonical #115 are satisfied" in issue_116
+
+    for issue in ("#117", "#118", "#119", "#120", "#121"):
+        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+
+
+def test_issue_115_canonical_delivery_is_deduplicated() -> None:
+    audit = ISSUE_115_AUDIT.read_text(encoding="utf-8")
+    record = (ROOT / "docs/test-cards/115-repository-layout-architecture.md").read_text(
+        encoding="utf-8"
+    )
+
+    for marker in (
+        "PR #128",
+        "`ARCHITECTURE_DECISION`",
+        ISSUE_115_CANDIDATE_SHA,
+        CANONICAL_115_MERGE_SHA,
+        "squash",
+        "one architecture delivery",
+        "`KEEP`",
+        "implementation applicability is `SMOKE_ONLY`",
+        "lifecycle synchronization applicability is `NOT_APPLICABLE`",
+        "`DOCUMENTATION_CORRECTION`",
+    ):
+        assert marker in audit
+
+    assert "| Record status | `VALIDATED` |" in record
+    assert ISSUE_115_CANDIDATE_SHA in record
+    assert CANONICAL_115_MERGE_SHA in record
+    assert "**VALIDATED ON `main`.**" in record
+    assert "migrations are not implemented" in record
