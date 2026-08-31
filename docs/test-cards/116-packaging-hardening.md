@@ -5,7 +5,7 @@
 | Issue | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `packaging` |
-| Pull request | Active implementation PR (linked from the Issue) |
+| Pull request | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) |
 | Head commit | Current PR head; canonical delivery is recorded after merge |
 | Merge commit | Not merged |
 | Decision | `KEEP` candidate |
@@ -139,7 +139,7 @@ dependency chains and no downstream implementation has started.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) |
-| Pull request | Active implementation PR (linked from Issue #116) |
+| Pull request | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Published before merge on Issue #116 |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, LongMemEval skipped |

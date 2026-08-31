@@ -28,7 +28,7 @@ behavior. Titles alone were not treated as capability evidence.
 | [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`, merged | `RUNTIME_IMPLEMENTATION` | made generic runtime/default storage and optional compatibility boundaries explicit | one runtime delivery |
 | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`, merged | `ARCHITECTURE_DECISION` | accepted ADR 0002: keep root package, exclude benchmarks/tests from artifacts through #116 | audited candidate and squash merge count once |
 | [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | `055a35f4a7e8298013bcb816b30f67d9706b9516`, merged | `DOCUMENTATION_CORRECTION` | synchronized #115 to `VALIDATED` and #116 to `READY` | no architecture/runtime count |
-| Issue #116 implementation PR | open | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | one candidate packaging delivery; not counted as merged |
+| [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) | open | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | one candidate packaging delivery; not counted as merged |
 
 No `SUPERSEDED_OPERATIONAL_PR` materially established the current packaging
 boundary. Candidate heads and later squash merges represent one delivery, not
