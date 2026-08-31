@@ -18,6 +18,33 @@ Closes #
 
 **Decision:** `PENDING | KEEP | ITERATE | REVERT | DROP | DEFER`
 
+## PR Evolution Audit
+
+<!--
+Before implementation, reconstruct the repository evolution relevant to this
+contract. Inspect merged PRs, canonical merge commits, changed files, linked
+issues/decisions, benchmark records, review-time P0 fixes and current main.
+Include closed-unmerged PRs when superseded. Do not infer delivery from titles.
+Do not count identical heads or merge commits as separate deliveries.
+-->
+
+| PR | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
+|---|---|---|---|---|---|---|---|
+|  |  |  |  |  |  |  |  |
+
+**Primary delivery type:** `runtime implementation | benchmark infrastructure | documentation correction | governance | architecture decision | superseded operational PR`
+
+## Capability-state reconciliation
+
+1. **Previous capability state:**
+2. **PRs/commits that established it:**
+3. **Change introduced by this PR:**
+4. **Candidate/current capability state:**
+5. **What remains unimplemented:**
+6. **Benchmark before/after:**
+7. **Newly unlocked work:**
+8. **Roadmap evolution entry:**
+
 ## Change classification
 
 **Category:** `Added | Changed | Fixed | Experimental | Deprecated | Removed | N/A`
@@ -114,6 +141,20 @@ Benchmark rationale:
 - [ ] No silent mutation of user source files.
 - [ ] Current capabilities and target/experimental architecture are not presented as the same thing.
 
+## Post-merge lifecycle sync
+<!--
+Before claiming completion, replace candidate/head evidence with the canonical
+merge commit; update Evidence/Learnings/Decision, docs/ROADMAP.md and the
+plain-language stage record. If this cannot happen in the implementation PR,
+open a minimal lifecycle-sync PR and link it here.
+-->
+
+- [ ] Canonical merge commit recorded after merge
+- [ ] Issue state and Decision reconciled
+- [ ] Roadmap status/dependencies reconciled
+- [ ] Plain-language record moved from IN_PROGRESS to final state only after merge
+- [ ] Closed-unmerged/superseded operational PRs preserved in the audit
+
 ## Follow-ups
 <!-- Unrelated/new work becomes a new Issue/Test Card. -->
 - [ ] None
@@ -128,3 +169,6 @@ Benchmark rationale:
 - [ ] Plain-language stage record created/updated or explicitly NOT_APPLICABLE
 - [ ] Known regressions recorded
 - [ ] Final decision recorded
+- [ ] PR Evolution Audit verified against canonical merge commits and changed files
+- [ ] Capability-state reconciliation and roadmap evolution completed
+- [ ] Post-merge lifecycle sync path declared

@@ -95,3 +95,53 @@ def test_documentation_map_and_roadmap_link_stage_records() -> None:
     assert "docs/test-cards/" in roadmap
     assert "#109" in roadmap
     assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
+
+
+def test_issue_and_pr_templates_require_evolution_audit_and_final_state() -> None:
+    issue_template = (
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "test-card.md"
+    ).read_text(encoding="utf-8")
+    pr_template = (
+        ROOT / ".github" / "pull_request_template.md"
+    ).read_text(encoding="utf-8")
+
+    audit_columns = (
+        "PR",
+        "Merge status",
+        "Merge commit",
+        "Files/surfaces changed",
+        "Capability added",
+        "Contract changed",
+        "Evidence",
+        "Supersedes",
+    )
+    for marker in audit_columns:
+        assert marker in issue_template
+        assert marker in pr_template
+
+    for marker in (
+        "### Previous capability state",
+        "### Deliveries that established the current state",
+        "### Target capability state",
+        "### What will remain unimplemented",
+        "### Roadmap evolution",
+    ):
+        assert marker in issue_template
+
+    for marker in (
+        "## PR Evolution Audit",
+        "## Capability-state reconciliation",
+        "Previous capability state",
+        "What remains unimplemented",
+        "Benchmark before/after",
+        "Newly unlocked work",
+        "Roadmap evolution entry",
+        "## Post-merge lifecycle sync",
+        "Canonical merge commit recorded after merge",
+        "Closed-unmerged/superseded operational PRs",
+    ):
+        assert marker in pr_template
+
+    assert "Do not count identical heads or merge commits" in issue_template
+    assert "Do not count identical heads or merge commits" in pr_template
+    assert "runtime implementation | benchmark infrastructure" in pr_template

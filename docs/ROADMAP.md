@@ -116,6 +116,14 @@ therefore `BLOCKED` here.
 | [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | planned | closed | completed architecture decision | [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [merge `0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2), [accepted ADR 0001](adr/0001-core-vs-optional-llm-boundary.md), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472168701) | not applicable; docs/contract only | `VALIDATED` |
 | [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109) | absent | closed | completed documentation/governance card | [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110), [merge `7f92dd9`](https://github.com/LuigiFerronatto/TESSERA/commit/7f92dd95584aa1f3adf57d47080853bf2e289087) | not applicable | `IMPLEMENTED` |
 | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | untracked runtime branding defect | closed | completed branding correction | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113), [merge `a80a5f1`](https://github.com/LuigiFerronatto/TESSERA/commit/a80a5f19671a002e6ec2ed1846d041afb090b7a2), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/112#issuecomment-5473210880) | Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
+| [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | absent | open | governance implementation active | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123), branch `governance/114-evolution-auditable-templates` | contract tests; LongMemEval N/A | `IN_PROGRESS` |
+| [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | absent | open | depends on #74, #95 and #112 | repository tree sampled; full reference/package audit absent | smoke-only when executed | `BLOCKED` |
+| [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | absent | open | depends on #74, #95 and #115 | `pyproject.toml` exists; clean wheel/sdist contract unproven | smoke-only when executed | `BLOCKED` |
+| [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | absent | open | depends on #94, #115 and #116 | no project/global discovery schema or `tessera init` contract | smoke-only when executed | `BLOCKED` |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | absent | open | depends on #116 and #117 | checkout CI exists; clean wheel install/bootstrap gate absent | smoke-only when executed | `BLOCKED` |
+| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | absent | open | depends on #112, #116 and #117 | banner corrected; complete CLI UX/output audit absent | smoke-only when executed | `BLOCKED` |
+| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | absent | open | depends on #68, #74, #92, #116 and #117 | direct-query parity exists; eager optional initialization and protocol gaps remain | smoke-only unless retrieval changes | `BLOCKED` |
+| [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | absent | open | depends on #68, #92, #116, #117 and #120 | bundled Markdown library exists; official versioned integration Skills absent | smoke-only when executed | `BLOCKED` |
 | [#16 containment](https://github.com/LuigiFerronatto/TESSERA/issues/16) | one undifferentiated planned card | open | containment has no dependencies | current silent heuristic is documented; containment PR absent | regression fixture required | `READY` |
 | [#16 full](https://github.com/LuigiFerronatto/TESSERA/issues/16) | one undifferentiated planned card | open | depends on #15, #73 and #96 | existing heuristic is baseline only | dev-50 available | `BLOCKED` |
 | [#18](https://github.com/LuigiFerronatto/TESSERA/issues/18) | planned capability | open | active epic; tracks #96, #100, #28, #103–#106 | no direct implementation PR by design | V1 dev-50 is available through children | `TRACKER` |
@@ -221,6 +229,33 @@ Execution policy:
   never reverse dependencies.
 - See [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) for the full
   Definition of Ready, stop conditions, and handoff contract.
+
+## Productization and integration lane
+
+This lane improves how TESSERA is packaged, discovered and consumed. It runs
+alongside the memory-quality roadmap; it does not replace the M0 safety gates or
+claim new retrieval intelligence.
+
+```text
+#114 auditable templates
+  ↓
+#95 legacy-coupling boundary + #115 repository-layout ADR
+  ↓
+#116 clean Python distribution
+  ↓
+#117 project/global configuration and tessera init
+  ├─ #118 clean install + CI onboarding
+  ├─ #119 CLI experience
+  └─ #120 MCP robustness
+       ↓
+     #121 official TESSERA Skills
+```
+
+The repository already declares a Python package. #116 is therefore distribution
+hardening, not a claim that no library exists. #115 must classify every candidate
+before deletion; names such as `legacy` or `archive` are not sufficient
+evidence. #117 treats global state as a registry of named stores, never as silent
+cross-project memory merging.
 
 ---
 
