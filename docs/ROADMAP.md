@@ -56,14 +56,20 @@ Templates:
 
 Documentation/governance tracker: **Issue #38**.
 
+Plain-language stage records: [`docs/test-cards/`](test-cards/). Each meaningful
+Test Card keeps an understandable before/after explanation alongside its
+technical PR Evolution Audit. Open work remains explicitly planned or
+in-progress until merge and validation evidence exist.
+
 ---
 
-# Authoritative execution portfolio — audited 2026-08-30
+# Authoritative execution portfolio — audited 2026-08-31
 
-This portfolio was reconciled for [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107)
+This portfolio was reconciled through merged [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107)
+and documentation Test Card [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109)
 against GitHub issue state, authoritative routing blocks, merged pull requests,
 merge commits, evidence comments, versioned benchmark records, and the code on
-`main` at `39febe36f016997f0c54ede9824f15dec04cc1ee`. Historical prose and emoji
+`main` at `0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2`. Historical prose and emoji
 markers are not status evidence.
 
 ## Status contract
@@ -107,7 +113,8 @@ therefore `BLOCKED` here.
 | [#96](https://github.com/LuigiFerronatto/TESSERA/issues/96) | planned | closed | completed benchmark card | [PR #99](https://github.com/LuigiFerronatto/TESSERA/pull/99), [merge `812c3aa`](https://github.com/LuigiFerronatto/TESSERA/commit/812c3aa37b59a3e99135a9d8b39245aeb71356d0), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/96#issuecomment-5471323841) | [historical dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/baseline.md) | `VALIDATED` |
 | [#100](https://github.com/LuigiFerronatto/TESSERA/issues/100) | absent | closed | completed measurement card | [PR #102](https://github.com/LuigiFerronatto/TESSERA/pull/102), [merge `39febe3`](https://github.com/LuigiFerronatto/TESSERA/commit/39febe36f016997f0c54ede9824f15dec04cc1ee), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/100#issuecomment-5471939801) | [forward dev-50 record](../benchmarks/results/longmemeval-v1-dev-50/forward.md) + conditional CI | `VALIDATED` |
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | planned | open | depends on #68, #92–#95 and #100 | test shell may start; final gate absent | reporting CI exists, full Quality Gate v2 does not | `BLOCKED` |
-| [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | planned | open | ready; no dependencies | [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [accepted ADR candidate](adr/0001-core-vs-optional-llm-boundary.md), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472168701) | not applicable; docs/contract only | `IN_PROGRESS` |
+| [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | planned | closed | completed architecture decision | [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [merge `0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2), [accepted ADR 0001](adr/0001-core-vs-optional-llm-boundary.md), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/74#issuecomment-5472168701) | not applicable; docs/contract only | `VALIDATED` |
+| [#109](https://github.com/LuigiFerronatto/TESSERA/issues/109) | absent | open | documentation/governance card in progress | branch `docs/109-plain-language-test-card-records`; PR link added when opened | not applicable | `IN_PROGRESS` |
 | [#16 containment](https://github.com/LuigiFerronatto/TESSERA/issues/16) | one undifferentiated planned card | open | containment has no dependencies | current silent heuristic is documented; containment PR absent | regression fixture required | `READY` |
 | [#16 full](https://github.com/LuigiFerronatto/TESSERA/issues/16) | one undifferentiated planned card | open | depends on #15, #73 and #96 | existing heuristic is baseline only | dev-50 available | `BLOCKED` |
 | [#18](https://github.com/LuigiFerronatto/TESSERA/issues/18) | planned capability | open | active epic; tracks #96, #100, #28, #103–#106 | no direct implementation PR by design | V1 dev-50 is available through children | `TRACKER` |
@@ -148,6 +155,8 @@ therefore `BLOCKED` here.
   comparison, forward environment fingerprint, and conditional CI (#100).
 - `IMPLEMENTED` — project-agnostic public surface, README/brand, changelog, and
   PR governance contracts (#62–#66).
+- `VALIDATED` — deterministic-core vs optional-LLM responsibility boundary
+  accepted in ADR 0001 (#74). Runtime migration remains follow-up work.
 
 ## Benchmark capabilities: keep the two baselines separate
 
@@ -167,8 +176,7 @@ answer-quality result.
 
 ```text
 M0  READY #92 + READY #93 + READY #95 + READY #16 containment
-      └─ #74 is IN_PROGRESS in PR #107
-      └─ completed foundations: #68 + #94 + #96 + #100
+      └─ completed foundations: #68 + #74 + #94 + #96 + #100
       ↓
     #67 Quality Gate v2
       ↓
