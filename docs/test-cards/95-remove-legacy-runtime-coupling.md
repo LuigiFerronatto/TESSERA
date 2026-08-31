@@ -5,8 +5,8 @@
 | Issue | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Candidate branch pending publication |
-| Head commit | Pending final candidate commit |
+| Pull request | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) |
+| Head commit | [`d8221dc`](https://github.com/LuigiFerronatto/TESSERA/commit/d8221dcf10a78f6e00a431909785b43f7bd9bed3) implementation candidate; final PR head recorded in Issue evidence |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -99,7 +99,7 @@ for #67 and #115. #67 remains blocked on #93 and regression-gate integration;
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) |
-| Pull request | Candidate pending publication |
+| Pull request | [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending final Issue #95 comment |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity output in PR evidence |

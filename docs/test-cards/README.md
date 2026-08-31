@@ -47,7 +47,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #109 Plain-language stage-record system | `IMPLEMENTED` | This index and [TEMPLATE.md](TEMPLATE.md) | [Issue #109](https://github.com/LuigiFerronatto/TESSERA/issues/109), [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110) |
 | #112 TESSERA ASCII banner | `VALIDATED` | [112-tessera-ascii-banner.md](112-tessera-ascii-banner.md) | [Issue #112](https://github.com/LuigiFerronatto/TESSERA/issues/112), [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
 | #114 Evolution-auditable templates | `VALIDATED` | [114-evolution-auditable-templates.md](114-evolution-auditable-templates.md) | [Issue #114](https://github.com/LuigiFerronatto/TESSERA/issues/114), [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
-| #95 Generic runtime / explicit legacy compatibility | `IN_PROGRESS` | [95-remove-legacy-runtime-coupling.md](95-remove-legacy-runtime-coupling.md) | [Issue #95](https://github.com/LuigiFerronatto/TESSERA/issues/95), [PR Evolution Audit](../PR_EVOLUTION_95.md), candidate branch `test-card/95-remove-legacy-runtime-coupling` |
+| #95 Generic runtime / explicit legacy compatibility | `IN_PROGRESS` | [95-remove-legacy-runtime-coupling.md](95-remove-legacy-runtime-coupling.md) | [Issue #95](https://github.com/LuigiFerronatto/TESSERA/issues/95), [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126), [PR Evolution Audit](../PR_EVOLUTION_95.md) |
 
 ## Stage map
 

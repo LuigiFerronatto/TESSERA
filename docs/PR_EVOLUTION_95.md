@@ -3,7 +3,8 @@
 Audited starting main: `270bc29a0b0bb93ab1885947303caa6887a8b809` (includes
 runtime merge `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` and lifecycle
 merge `270bc29a0b0bb93ab1885947303caa6887a8b809`). Candidate branch:
-`test-card/95-remove-legacy-runtime-coupling`. Status: `IN_PROGRESS` until the
+`test-card/95-remove-legacy-runtime-coupling`; [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126).
+Status: `IN_PROGRESS` until the
 candidate is independently audited and merged.
 
 ## Previous capability state
@@ -56,7 +57,7 @@ Candidate, head and squash commits are counted once per canonical PR delivery.
 | [#123](https://github.com/LuigiFerronatto/TESSERA/pull/123) | GOVERNANCE | MERGED | `a79b5ae` | issue/PR templates, roadmap, tests | mandatory evolution audits | canonical delivery deduplication and lifecycle sync | Issue #114 evidence | incomplete audits |
 | [#125](https://github.com/LuigiFerronatto/TESSERA/pull/125) | DOCUMENTATION_CORRECTION | MERGED | `270bc29` | #92 audit/roadmap/stage/tests | synchronized lifecycle state | #92 becomes `VALIDATED`; #95 remains separate | green CI and merge | stale #92 state |
 | #57, #59 and earlier superseded documentation candidates | SUPERSEDED_OPERATIONAL_PR | CLOSED_UNMERGED | — | architecture/source-audit candidate branches | no canonical delivery | none; later merged PRs are authoritative | GitHub closed-PR audit | — |
-| current #95 candidate | RUNTIME_IMPLEMENTATION | OPEN / IN_PROGRESS | not merged | config, CLI, diagnostics, compatibility bridge, hooks, docs, generic fixtures/tests | generic defaults plus explicit deprecated compatibility | removes implicit project behavior without changing retrieval/write semantics | this audit, focused/full tests, sanity CI | remaining initial-runtime coupling |
+| [#126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | RUNTIME_IMPLEMENTATION | OPEN / IN_PROGRESS | not merged | config, CLI, diagnostics, compatibility bridge, hooks, docs, generic fixtures/tests | generic defaults plus explicit deprecated compatibility | removes implicit project behavior without changing retrieval/write semantics | head `d8221dc`, this audit, focused/full tests, sanity CI | remaining initial-runtime coupling |
 
 ## Exact current-main reference inventory
 
