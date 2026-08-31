@@ -45,6 +45,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #100 Benchmark ledger and CI | `VALIDATED` | [100-benchmark-ledger-and-ci.md](100-benchmark-ledger-and-ci.md) | [Issue #100](https://github.com/LuigiFerronatto/TESSERA/issues/100), [PR #102](https://github.com/LuigiFerronatto/TESSERA/pull/102) |
 | #92 Truthful write gate | `PLANNED` | [92-write-gate-integrity.md](92-write-gate-integrity.md) | [Issue #92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
 | #109 Plain-language stage-record system | `IMPLEMENTED` | This index and [TEMPLATE.md](TEMPLATE.md) | [Issue #109](https://github.com/LuigiFerronatto/TESSERA/issues/109), [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110) |
+| #112 TESSERA ASCII banner | `IN_PROGRESS` | [112-tessera-ascii-banner.md](112-tessera-ascii-banner.md) | [Issue #112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
 
 ## Stage map
 
