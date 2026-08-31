@@ -37,12 +37,45 @@ def _subprocess_env(values: dict[str, str]) -> dict[str, str]:
 def _run_mcp_probe(cwd: Path, environ: dict[str, str], query: str | None = None):
     code = """
 import json
+import sys
+import types
 from pathlib import Path
+
+try:
+    from mcp.server.fastmcp import FastMCP
+    transport = "installed-mcp"
+except ImportError:
+    # CI's core test environment intentionally omits the optional MCP
+    # transport. Replace only decorator registration; server bootstrap,
+    # storage resolution, Engine construction and tool calls stay real.
+    class FastMCP:
+        def __init__(self, _name):
+            pass
+        @staticmethod
+        def tool():
+            return lambda function: function
+        @staticmethod
+        def resource(_uri):
+            return lambda function: function
+    fastmcp_module = types.ModuleType("mcp.server.fastmcp")
+    fastmcp_module.FastMCP = FastMCP
+    server_module = types.ModuleType("mcp.server")
+    server_module.fastmcp = fastmcp_module
+    mcp_module = types.ModuleType("mcp")
+    mcp_module.server = server_module
+    sys.modules.update({
+        "mcp": mcp_module,
+        "mcp.server": server_module,
+        "mcp.server.fastmcp": fastmcp_module,
+    })
+    transport = "decorator-stand-in"
+
 import tessera.mcp_server as server
 query = %r
 payload = {
     "storage_dir": str(Path(server._engine.storage_dir).resolve()),
     "provider_initialized": server._hook._orchestrator is not None,
+    "transport": transport,
 }
 if query is not None:
     payload["results"] = server.query_memories(query, top_n=3)
