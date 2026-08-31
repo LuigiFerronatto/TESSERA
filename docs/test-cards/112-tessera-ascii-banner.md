@@ -5,8 +5,8 @@
 | Issue | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime branding contract` |
-| Pull request | Pending publication from `fix/112-tessera-ascii-banner` |
-| Head commit | Updated when the PR is published |
+| Pull request | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
+| Head commit | See current head on PR #113 |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -70,7 +70,7 @@ After merge, the exact ASCII regression is closed. #95 remains a broader indepen
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
-| Pull request | Pending |
+| Pull request | [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending |
 | Benchmark record | LongMemEval not applicable; smoke/sanity required |
