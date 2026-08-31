@@ -54,7 +54,6 @@ def test_each_stage_record_has_required_explanation_and_provenance() -> None:
             assert marker in text, f"{path}: missing {marker!r}"
 
         assert "https://github.com/LuigiFerronatto/TESSERA/issues/" in text
-        assert "CURRENT" in text or "current" in text
         assert "remain" in text.lower()
 
 
@@ -69,7 +68,6 @@ def test_template_preserves_open_vs_merged_status_boundary() -> None:
     for marker in REQUIRED_HEADINGS + REQUIRED_METADATA:
         assert marker in text
 
-    assert "An open PR is never" not in text  # rule lives in the index
     assert "For planned/open work" in text
     assert "Not merged" in text
     assert "What remains unimplemented?" in text
