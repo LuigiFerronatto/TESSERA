@@ -8,7 +8,10 @@ before the branch was created. It includes canonical #95 runtime merge
 
 Candidate branch: `test-card/115-repository-layout-audit`;
 [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128). Audited content
-candidate: `874fea2a1f06efbac43ea4a8c7414509306cbe1c`. This audit counts a
+candidate: `874fea2a1f06efbac43ea4a8c7414509306cbe1c`; evidence-bearing candidate
+before final link synchronization: `1db5698658878a1eef5b46f7f7e574ec1b8a51df`.
+[Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483088072).
+This audit counts a
 candidate head and its later canonical merge as one delivery. It does not treat
 lifecycle-only PRs as new runtime capability.
 

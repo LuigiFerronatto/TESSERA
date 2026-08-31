@@ -141,7 +141,7 @@ remain `BLOCKED` until #115 is merged and its canonical merge is recorded.
 | Issue/Test Card | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) |
 | Pull request | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) |
 | Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending superseding Issue #115 comment |
+| Evidence/Learnings/Decision | [Issue comment](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483088072) |
 | Benchmark record | Deterministic sanity; LongMemEval skipped under `SMOKE_ONLY` |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_115.md`](../PR_EVOLUTION_115.md) |
 
