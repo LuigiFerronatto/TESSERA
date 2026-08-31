@@ -28,6 +28,16 @@ assignees: ''
 ## Em linguagem simples
 <!-- Explain the problem as if you were telling another engineer why we are trying this. -->
 
+## Plain-language stage record
+- **Path:** `docs/test-cards/<issue>-<slug>.md`
+- **Record status:** `PLANNED | IN_PROGRESS | IMPLEMENTED | VALIDATED | BLOCKED | SUPERSEDED`
+
+<!--
+Create the record from docs/test-cards/TEMPLATE.md. Keep current behavior,
+target behavior, evidence and limitations separate. An open PR is never
+IMPLEMENTED or VALIDATED.
+-->
+
 ## Objetivo
 <!-- One concrete task. One Issue = one decisionable unit of work. -->
 
