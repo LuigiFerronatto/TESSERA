@@ -67,11 +67,13 @@ warning to stderr, leaving JSON stdout valid.
 ## How was it validated?
 
 Focused #95 tests cover the behavior matrix, warning channel, no discovery or
-provider probing, explicit compatibility, typed failure and foreign schema.
-The full Engine/CLI/MCP, #92 write/path, docs and benchmark reporting suites,
-Python 3.9/3.12 CI, smoke and deterministic sanity evaluation are required.
-Exact final counts and CI links will be recorded on the PR and Issue #95 before
-the candidate is handed to the maintainer.
+provider probing, explicit compatibility, typed failure and foreign schema:
+16 focused tests passed. The full local suite passed 257 tests; #92 write/path
+passed 67, persistence 15, retrieval parity 3, documentation contracts 13 and
+benchmark reporting 51. Compileall and diff checks passed. Sanity remained
+Hit@1 0.75, Hit@3/5 1.00, MRR 0.875, evidence hit rate 1.00 and missing-evidence
+check passed. Python 3.9/3.12, smoke, sanity and reporting CI links are recorded
+on PR #126 and in the final Issue #95 evidence.
 
 ## What improved?
 
