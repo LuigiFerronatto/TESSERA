@@ -13,9 +13,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Issue and pull-request templates now require canonical PR Evolution Audits, capability-state reconciliation, duplicate-delivery protection and explicit post-merge lifecycle synchronization. ([#114](https://github.com/LuigiFerronatto/TESSERA/issues/114))
+- Test Cards now have versioned plain-language stage records that preserve current-vs-target status, understandable before/after behavior, technical provenance, evidence, limitations and next dependencies. ([#109](https://github.com/LuigiFerronatto/TESSERA/issues/109))
 - The experimental roadmap now derives status from GitHub state, merged
   implementation/evidence, declared dependencies, and benchmark records. It
-  records completed #68/#74/#94/#96/#100 work, the
+  records completed #68/#94/#96/#100 work, accepted ADR #74 in progress, the
   #103–#106 evaluation chain, and the current M0–M5 critical path without stale
   emoji markers. ([#74](https://github.com/LuigiFerronatto/TESSERA/issues/74))
 - Root README is now the progressive product entrypoint: executive first, plain-language explanation next, technical details and experimental roadmap deeper down. ([#82](https://github.com/LuigiFerronatto/TESSERA/pull/82))
@@ -23,10 +25,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
-- Write-gate metadata now separates detection, real transformation, admission,
-  and persistence. Safe text is no longer falsely marked sanitized; review and
-  reject are mutation-free; accepted transformations are hash-proven and
-  shared across Python, CLI, MCP, and Markdown metadata. ([#92](https://github.com/LuigiFerronatto/TESSERA/issues/92))
+- Write-gate decisions now separate detection, admission and persistence,
+  reject unsafe or non-portable memory IDs before mutation, and conservatively
+  reject direct hostile instruction blocks instead of claiming partial
+  sanitization. Python, CLI, MCP and Markdown metadata share the same audited
+  result contract. ([#92](https://github.com/LuigiFerronatto/TESSERA/issues/92))
+- The active terminal banner now renders the TESSERA wordmark instead of the legacy AMem glyphs, with regression coverage that preserves legitimate A-MEM research citations. ([#112](https://github.com/LuigiFerronatto/TESSERA/issues/112))
 - Memory writes now accept only canonical Markdown persistence and reject unsupported formats before mutation, preventing acknowledged-but-unindexable JSON files. ([#94](https://github.com/LuigiFerronatto/TESSERA/issues/94))
 - Public package metadata no longer points to an external development repository or publishes an external project identity as the package author. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 

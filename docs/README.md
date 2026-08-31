@@ -33,6 +33,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
+| [test-cards/README.md](test-cards/README.md) | Plain-language stage records: what changed, how it works, evidence, limitations and next work. |
 | [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
 | [BENCHMARK_CI.md](BENCHMARK_CI.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
 | [adr/README.md](adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
@@ -51,6 +52,7 @@ TESSERA keeps product history, architecture rationale and experimental evidence 
 | [CHANGE_POLICY.md](CHANGE_POLICY.md) | **When and how** should a PR update the changelog? |
 | [research/DECISION_TRACE.md](research/DECISION_TRACE.md) | **Why** did a research/architecture signal influence a decision? |
 | [ROADMAP.md](ROADMAP.md) + linked Issues/Test Cards | **What are we trying to prove next?** |
+| [test-cards/](test-cards/) | **What does each stage mean in plain language, and what remains unfinished?** |
 | Pull request + CI/benchmark artifacts | **How was it implemented and what evidence passed?** |
 
 Canonical separation:
@@ -67,6 +69,9 @@ TEST CARD
 
 PR
 → how it was implemented
+
+PLAIN-LANGUAGE STAGE RECORD
+→ understandable before/after, proof and limitations
 
 CI / BENCHMARK
 → objective evidence
@@ -193,6 +198,8 @@ implementation PR
 update CHANGELOG or explicitly mark N/A
   ↓
 update its Test Card with evidence/learnings
+  ↓
+create/update its plain-language stage record
   ↓
 update FEATURES/ARCHITECTURE/OUTPUT_CONTRACT if public semantics changed
   ↓
