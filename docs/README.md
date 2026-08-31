@@ -35,6 +35,9 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
 | [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
 | [BENCHMARK_CI.md](BENCHMARK_CI.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
+| [adr/README.md](adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
+
+Current binding decision: [ADR 0001 — Core vs Optional LLM Orchestrator Boundary](adr/0001-core-vs-optional-llm-boundary.md).
 
 ---
 
@@ -114,7 +117,8 @@ Use [ROADMAP.md](ROADMAP.md) for sequencing, but use the linked Issue as the liv
 Current examples include:
 
 ```text
-#68 Engine / CLI / MCP Contract Parity
+#68 Engine / CLI / MCP Contract Parity (closed)
+#74 Core vs Optional LLM Boundary (accepted ADR 0001)
 #12 Incremental & Idempotent Indexing
 #69 Text Ingestion Coverage
 #70 Structural Segmentation

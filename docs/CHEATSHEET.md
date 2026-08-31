@@ -54,16 +54,23 @@ tessera banner                                                    # só o logo
 # ativa o venv que tem o `tessera` instalado (modo editável -e .)
 source .venv-browser-agent/bin/activate
 
-# se for usar --use-llm, carregue as credenciais do Azure Gateway antes:
+# somente para os comandos assistidos legados (`start` / `decompose`),
+# carregue as credenciais do Azure Gateway antes:
 set -a && source .env && set +a
 ```
 
+> Limite arquitetural: `query` é o caminho determinístico e não precisa de
+> LLM. `start`, `decompose` e as tools MCP assistidas atuais exigem um backend
+> real resolvível; não existe hoje flag `--use-llm` nem simulação offline nesses
+> comandos. Consulte o contrato vinculante em
+> [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
+
 > ⚠️ **Pegadinha comum**: `tessera list`/`tessera query` sem argumento de diretório
-> sempre resolvem para `./memories` a menos que a env var `LAO_MEM_DIR`
+> sempre resolvem para `./memories` a menos que a env var `TESSERA_STORAGE_DIR`
 > esteja exportada na sua sessão de shell (não basta estar no `.mcp.json` —
 > isso só vale pro processo MCP). Fixe permanentemente com:
 > ```bash
-> echo 'export LAO_MEM_DIR="$HOME/Desktop/Workspace/lab-autonomous-officer/.claude/memory"' >> ~/.bashrc
+> echo 'export TESSERA_STORAGE_DIR="/caminho/absoluto/para/memories"' >> ~/.bashrc
 > ```
 > ou sempre passe o caminho explícito como primeiro argumento posicional.
 
@@ -191,28 +198,24 @@ só se quiser forçar um rebuild do zero.
 
 ---
 
-### `tessera start <dir> "<tarefa>" [flags]` — pipeline completo (3 agentes)
+### `tessera start <dir> "<tarefa>" [flags]` — pipeline assistido legado
 
 O comando mais avançado: roda o orquestrador Need → Planner → Inference.
 
 | Flag | Descrição |
 |---|---|
 | `--top-n N` | Quantas memórias brutas alimentar no pipeline (default: 3) |
-| `--use-llm` | Faz os 3 passos chamarem um LLM real, em vez da simulação offline por template |
-| `--llm-backend {azure,engine_router,none}` | Ordem de prioridade de backend (default: `azure`) |
-| `--llm-engine <engine>` | Fixa um engine específico do `engine_router.py` (`claude`\|`copilot`\|`gemini`\|`opencode`) se cair no fallback |
-| `--llm-timeout SEGUNDOS` | Timeout por passo (default: 120) |
 
 ```bash
-# modo offline (simulado, instantâneo, sem custo)
-tessera start .claude/memory "Qual backend de LLM devo usar para o pipeline do Tessera?"
-
-# modo real, com LLM de verdade (Azure Gateway - carregue o .env antes!)
+# requer um backend real: Azure Gateway ou engine_router externo
 set -a && source .env && set +a
-tessera start .claude/memory "Qual backend de LLM devo usar para o pipeline do Tessera?" --use-llm
+tessera start .claude/memory "Qual backend de LLM devo usar para o pipeline do Tessera?"
 ```
 ⚠️ `task` é **posicional**, não tem flag — sempre vem depois do `storage_dir`.
-Leva ~6-8s com `--use-llm` (3 chamadas reais ao Azure Gateway gpt-5.2).
+O comando faz três chamadas reais (Need → Planner → Inference) e falha se
+nenhum backend puder ser resolvido. A busca interna continua sendo o retrieval
+determinístico do Engine; o contexto consolidado é texto derivado e
+`raw_memories` preserva os resultados de retrieval.
 
 ---
 
@@ -231,33 +234,22 @@ procedural_anchor) e grava todas de uma vez em `{prefix}/{tipo}-{n}.md`.
 | `--middle` | ✅ | Texto do meio do episódio (o grosso do conteúdo) |
 | `--end` | ✅ | Texto do fim/resultado do episódio |
 | `--tags` | ❌ | Lista separada por vírgula aplicada a todas as memórias extraídas |
-| `--use-llm` | ❌ | Chama um LLM real para classificar/extrair (em vez da heurística offline por palavra-chave) |
-| `--llm-backend {azure,engine_router,none}` | ❌ | Mesma semântica do `tessera start` (default: `azure`) |
-| `--llm-engine <engine>` | ❌ | Fixa engine específico se cair no fallback `engine_router` |
-| `--llm-timeout SEGUNDOS` | ❌ | Timeout por chamada (default: 120) |
 
 ```bash
-# offline (heurística por palavra-chave, instantâneo, sem custo)
+# requer backend LLM real configurado
+set -a && source .env && set +a
 tessera decompose .claude/memory \
   --mem-id-prefix "research/meu-topico" \
   --beginning "Investigando timeout intermitente no serviço de pagamentos." \
   --middle "Encontramos que o pool de conexões do Postgres esgota sob carga; prefiro usar pgbouncer a aumentar o pool bruto." \
   --end "Corrigido configurando pgbouncer com pool_mode=transaction; taxa de erro caiu a zero." \
   --tags "postgres,performance"
-
-# real, com LLM (Azure Gateway — carregue o .env antes!)
-set -a && source .env && set +a
-tessera decompose .claude/memory \
-  --mem-id-prefix "research/meu-topico" \
-  --beginning "..." --middle "..." --end "..." \
-  --use-llm
 ```
 
-Testado ao vivo com Azure Gateway real: **8 memórias corretas** extraídas de
-um episódio de esgotamento de connection-pool em 4.6s (6 facts, 1
-preference, 1 insight); **5 memórias** em outro episódio de índice
-composto. Cada memória extraída ainda passa pelo `WriteGatingEngine`
-normal — decomposição não contorna a auditoria/sanitização de escrita.
+Não há hoje fallback heurístico alcançável nesse comando. Falha de chamada ou
+de parsing produz uma lista vazia. Cada memória extraída passa pelo
+`WriteGatingEngine`; decomposição não contorna a auditoria/sanitização de
+escrita.
 Após rodar, **reindexe** (`tessera index <dir>`) para as novas notas entrarem
 na busca — a não ser que a próxima chamada de `query`/`list` já dispare
 isso sozinha via fingerprint cache.
@@ -366,49 +358,39 @@ Contagem de nós/arestas do índice atual.
 Reconstrói o grafo em memória do processo MCP (não recarrega o código
 Python — ver nota de troubleshooting abaixo).
 
-### `query_memories_pipeline(task_instruction, top_n=3, use_llm=False, llm_backend="azure", llm_engine=None)` — **(renomeado de `run_task_hook` em 2026-08-25)**
+### `query_memories_pipeline(task_instruction, top_n=7)` — pipeline assistido legado
 Pipeline completo Need→Planner→Retrieval→Inference via MCP (equivalente ao
 `tessera start`, sem sair do agente/CLI hospedeiro).
 
-Por padrão roda em **modo simulado/offline** (templates determinísticos,
-zero chamada de LLM). Para acionar uma **chamada real de LLM** em cada
-etapa — o que antes só existia via CLI (`tessera start --use-llm`) — passe
-`use_llm=True`:
+O backend real é resolvido automaticamente entre Azure Gateway e o
+`engine_router.py` externo. A assinatura atual não aceita `use_llm`,
+`llm_backend` nem `llm_engine`, e não oferece simulação offline:
 
 ```jsonc
-{ "task_instruction": "...", "use_llm": true, "llm_backend": "azure" }
+{ "task_instruction": "...", "top_n": 7 }
 ```
 
-- `llm_backend="azure"` (padrão): Azure AI Gateway interno da Blip via
-  HTTPS direto, ~2s/chamada. Requer `TESSERA_AZURE_GATEWAY_API_KEY` no
+- Azure Gateway requer `TESSERA_AZURE_GATEWAY_API_KEY` no
   **ambiente do processo `tessera-mcp`** (não no shell de quem chama a tool).
-- `llm_backend="engine_router"`: delega pro `lao_core/engine_router.py
-  invoke` (claude/copilot/gemini/opencode, com failover). Mais lento
-  (~9-13s/chamada) mas não precisa de credencial Azure. `llm_engine`
-  escolhe uma CLI específica (ex: `"opencode"`); `None` deixa o
-  engine_router escolher por prioridade/saúde.
-- Se `use_llm=true` mas nenhum backend estiver disponível, cai pra
-  simulação automaticamente — confira o campo `llm_backend_used` no
-  retorno (`"azure"` / `"engine_router"` / `"simulated"`) pra saber qual
-  caminho foi de fato usado.
+- O fallback de disponibilidade é o `engine_router.py` externo. Se nenhum
+  backend estiver disponível, a tool falha claramente antes de executar.
+- O retorno informa `llm_backend_used` e mantém `raw_memories`. Falhas depois
+  da seleção do backend atualmente podem degradar para eco do prompt; esse
+  comportamento é legado/depreciado pelo ADR 0001.
 
 > ⚠️ Mesma pegadinha de env var da CLI: o processo MCP lê
 > `TESSERA_AZURE_GATEWAY_API_KEY` **uma vez**, no boot. Exportar a chave
 > depois que o MCP já está conectado não tem efeito até reiniciar a
 > conexão (ver nota de troubleshooting no fim desta seção).
 
-### `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id="start", tags=None, use_llm=False, llm_backend="azure", llm_engine=None)` — **(novo 2026-08-26)**
+### `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id="start", tags=None)`
 Equivalente MCP de `tessera decompose`: extrai N memórias tipadas de um
 episódio bruto e grava todas em `{mem_id_prefix}/{tipo}-{n}.md`, sem sair
-do agente hospedeiro. Mesma semântica de `use_llm`/`llm_backend`/
-`llm_engine` de `query_memories_pipeline` — omitir `use_llm` roda a
-heurística offline por palavra-chave; `use_llm=True` chama um LLM real
-(confirme o backend efetivamente usado no campo de retorno). Testado ao
-vivo: **5 memórias** gravadas corretamente via chamada MCP direta com
-`use_llm=True`, backend `azure` confirmado.
+do agente hospedeiro. Exige um backend LLM real resolvível e não aceita flags
+de seleção ou simulação na assinatura atual.
 
 ```jsonc
-{ "mem_id_prefix": "research/meu-topico", "beginning": "...", "middle": "...", "end": "...", "use_llm": true }
+{ "mem_id_prefix": "research/meu-topico", "beginning": "...", "middle": "...", "end": "..." }
 ```
 
 ### `get_index_composition()` — **(novo 2026-08-25)**
@@ -486,7 +468,9 @@ efeitos colaterais, e ingestão arbitrária de JSON não é suportada.
 ```python
 from tessera.llm_bridge import resolve_llm_fn
 
-llm_fn = resolve_llm_fn(prefer="azure")  # ou None para heurística offline
+llm_fn = resolve_llm_fn(prefer="azure")
+if llm_fn is None:
+    raise RuntimeError("backend LLM assistido indisponível")
 
 paths = engine.decompose_and_write_episode(
     mem_id_prefix="research/meu-topico",
@@ -495,7 +479,7 @@ paths = engine.decompose_and_write_episode(
     end="Corrigido com pgbouncer...",
     episode_id="start",
     tags=["postgres", "performance"],
-    llm_fn=llm_fn,  # None = heurística por palavra-chave
+    llm_fn=llm_fn,
 )
 engine.build_index()  # reindexar após escrever
 print(paths)  # lista de caminhos gravados: research/meu-topico/factual-1.md, ...
@@ -589,13 +573,13 @@ metadata:
 | Contar quantas notas existem | `tessera list <dir> \| grep "notas indexadas"` |
 | Gravar uma nota simples | `tessera write <dir> --id ... --type ... --episode start --content ...` |
 | Gravar com conexões explícitas | `tessera write <dir> ... --related-to "id1" --related-to "id2:relation"` |
-| Rodar o pipeline completo (rápido, offline) | `tessera start <dir> "<tarefa>"` |
-| Rodar o pipeline completo com LLM real | `tessera start <dir> "<tarefa>" --use-llm` (requer `.env` carregado) |
+| Rodar retrieval determinístico/offline | `tessera query <dir> "<pergunta>"` |
+| Rodar pipeline assistido legado | `tessera start <dir> "<tarefa>"` (requer backend real) |
 | Forçar reconstrução do índice | `tessera index <dir>` |
 | Instalar skills padrão num novo repo | `tessera skills install <dir>` |
 | Ver composição do índice (notas vs. nós internos) | `tessera stats <dir>` |
 | Extrair N memórias tipadas de um episódio bruto de uma vez | `tessera decompose <dir> --mem-id-prefix ... --beginning ... --middle ... --end ...` |
-| Mesmo, com LLM real (Azure Gateway) | `tessera decompose <dir> ... --use-llm` |
+| Decompor com backend real configurado | `tessera decompose <dir> ...` |
 | Fechar episódios automaticamente por timeout/deriva de tópico (só biblioteca) | `EpisodeBoundaryTracker` (`tessera.episode_boundary`), sem CLI/MCP |
 | Fazer um agente (Copilot/Gemini/Claude) usar isso sem shell | Tool calls MCP: `query_memories`, `write_memory`, `query_memories_pipeline` |
 
@@ -603,7 +587,8 @@ metadata:
 
 ## Ver também
 
-- `Tessera/README.md` — visão geral, instalação, pegadinha do `LAO_MEM_DIR`
+- `README.md` — visão geral e instalação
+- `docs/adr/0001-core-vs-optional-llm-boundary.md` — limite entre core determinístico, adapters opcionais e agente consumidor
 - `Tessera/docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md` — arquitetura completa (3 pilares, grafo DW-PR, roadmap plug-and-play)
 - `Tessera/docs/ROTEIRO-DEMO-VIDEO.md` — roteiro de gravação testado ao vivo
 - `.agents/skills/lao-memory-query/SKILL.md` — como o LAO usa isso (taxonomia de domínios `.claude/memory/`)

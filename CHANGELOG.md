@@ -31,6 +31,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Legacy external-project identity from package metadata and MCP-facing examples/configuration. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 
 ### Architecture Decisions
+- Accepted ADR 0001: deterministic TESSERA memory infrastructure ends at
+  structured evidence with provenance; optional planner/reader adapters consume
+  that contract, consuming agents own final cognition, and LLM judges remain
+  benchmark-only infrastructure. This records current legacy deviations without
+  changing runtime behavior. ([#74](https://github.com/LuigiFerronatto/TESSERA/issues/74))
 - TESSERA's public product boundary is project-agnostic: public docs, examples, fixtures, benchmarks and runtime-facing configuration must describe TESSERA itself rather than a development environment. ([#62](https://github.com/LuigiFerronatto/TESSERA/issues/62))
 - Brand assets are repository-owned and current-vs-target architecture must remain visually distinguishable. ([#64](https://github.com/LuigiFerronatto/TESSERA/issues/64))
 - The root README describes **implemented capabilities separately from hypotheses/Test Cards**. ([#63](https://github.com/LuigiFerronatto/TESSERA/issues/63))
