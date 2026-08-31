@@ -24,6 +24,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- The active terminal banner now renders the TESSERA wordmark instead of the legacy AMem glyphs, with regression coverage that preserves legitimate A-MEM research citations. ([#112](https://github.com/LuigiFerronatto/TESSERA/issues/112))
 - Memory writes now accept only canonical Markdown persistence and reject unsupported formats before mutation, preventing acknowledged-but-unindexable JSON files. ([#94](https://github.com/LuigiFerronatto/TESSERA/issues/94))
 - Public package metadata no longer points to an external development repository or publishes an external project identity as the package author. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 
