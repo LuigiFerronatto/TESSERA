@@ -6,7 +6,9 @@ before the branch was created. It includes canonical #95 runtime merge
 `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` and canonical #95 lifecycle merge
 `5d43a2d4cdda0c17be6516f47920121070339d0f`.
 
-Candidate branch: `test-card/115-repository-layout-audit`. This audit counts a
+Candidate branch: `test-card/115-repository-layout-audit`;
+[PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128). Audited content
+candidate: `874fea2a1f06efbac43ea4a8c7414509306cbe1c`. This audit counts a
 candidate head and its later canonical merge as one delivery. It does not treat
 lifecycle-only PRs as new runtime capability.
 
@@ -307,6 +309,7 @@ A closed-unmerged attempt is a `SUPERSEDED_OPERATIONAL_PR`, not a capability.
 | `git diff --check` | passed |
 | `git diff --exit-code origin/main -- tessera/` | empty |
 | `git diff --exit-code origin/main -- benchmarks/` | empty |
+| clean candidate `python -m build` | wheel 46 files; sdist 69 files; exact inventories match audited main |
 
 The deterministic sanity fixture was run in both the clean audited-main
 worktree and the candidate worktree:

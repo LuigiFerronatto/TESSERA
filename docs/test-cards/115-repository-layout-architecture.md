@@ -5,8 +5,8 @@
 | Issue | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `architecture decision` |
-| Pull request | Not merged |
-| Head commit | Pending final candidate |
+| Pull request | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) |
+| Head commit | [`874fea2`](https://github.com/LuigiFerronatto/TESSERA/commit/874fea2a1f06efbac43ea4a8c7414509306cbe1c) (audited content candidate) |
 | Merge commit | Not merged |
 | Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -139,7 +139,7 @@ remain `BLOCKED` until #115 is merged and its canonical merge is recorded.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) |
-| Pull request | Pending |
+| Pull request | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending superseding Issue #115 comment |
 | Benchmark record | Deterministic sanity; LongMemEval skipped under `SMOKE_ONLY` |
