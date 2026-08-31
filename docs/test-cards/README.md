@@ -46,7 +46,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #92 Truthful write gate | `PLANNED` | [92-write-gate-integrity.md](92-write-gate-integrity.md) | [Issue #92](https://github.com/LuigiFerronatto/TESSERA/issues/92) |
 | #109 Plain-language stage-record system | `IMPLEMENTED` | This index and [TEMPLATE.md](TEMPLATE.md) | [Issue #109](https://github.com/LuigiFerronatto/TESSERA/issues/109), [PR #110](https://github.com/LuigiFerronatto/TESSERA/pull/110) |
 | #112 TESSERA ASCII banner | `VALIDATED` | [112-tessera-ascii-banner.md](112-tessera-ascii-banner.md) | [Issue #112](https://github.com/LuigiFerronatto/TESSERA/issues/112), [PR #113](https://github.com/LuigiFerronatto/TESSERA/pull/113) |
-| #114 Evolution-auditable templates | `IN_PROGRESS` | [114-evolution-auditable-templates.md](114-evolution-auditable-templates.md) | [Issue #114](https://github.com/LuigiFerronatto/TESSERA/issues/114) |
+| #114 Evolution-auditable templates | `IN_PROGRESS` | [114-evolution-auditable-templates.md](114-evolution-auditable-templates.md) | [Issue #114](https://github.com/LuigiFerronatto/TESSERA/issues/114), [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123) |
 
 ## Stage map
 
