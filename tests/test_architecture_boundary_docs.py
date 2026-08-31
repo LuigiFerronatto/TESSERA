@@ -116,3 +116,26 @@ def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
     assert "merge `0c0b638`" in roadmap
     assert "PR #107 / #74" in roadmap
     assert "PR #108 / #92" in roadmap
+    assert "PR_EVOLUTION_92.md" in roadmap
+    assert "existing deterministic write gate" in roadmap
+    assert "#19, still BLOCKED" in roadmap
+
+
+def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
+    audit = (ROOT / "docs" / "PR_EVOLUTION_92.md").read_text(encoding="utf-8")
+
+    for classification in (
+        "RUNTIME_IMPLEMENTATION",
+        "BENCHMARK_INFRASTRUCTURE",
+        "DOCUMENTATION_CORRECTION",
+        "GOVERNANCE",
+        "ARCHITECTURE_DECISION",
+        "SUPERSEDED_OPERATIONAL_PR",
+    ):
+        assert classification in audit
+    for pr in ("#6", "#53", "#61", "#79", "#83", "#98", "#99", "#101", "#102", "#107", "#108"):
+        assert pr in audit
+    assert "20 distinct merged deliveries" in audit
+    assert "CLOSED_UNMERGED" in audit
+    assert "NOT_RERUN" in audit
+    assert "LongMemEval V1 dev-50" in audit

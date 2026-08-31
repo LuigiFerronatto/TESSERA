@@ -100,7 +100,7 @@ therefore `BLOCKED` here.
 | [#66](https://github.com/LuigiFerronatto/TESSERA/issues/66) | stale planned marker | closed | completed governance card | [PR #85](https://github.com/LuigiFerronatto/TESSERA/pull/85), [merge `864a38e`](https://github.com/LuigiFerronatto/TESSERA/commit/864a38e12277498b56eb9245b31a75dfc71b3b5e), PR evidence/decision | PR-contract tests | `VALIDATED` |
 | [#68](https://github.com/LuigiFerronatto/TESSERA/issues/68) | planned | closed | stale “running” | [PR #98](https://github.com/LuigiFerronatto/TESSERA/pull/98), [merge `fb23012`](https://github.com/LuigiFerronatto/TESSERA/commit/fb23012ba4b2fddc3912d7cb593391a04fe45ae7), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/68#issuecomment-5471122707) | parity fixture + CI | `VALIDATED` |
 | [#75](https://github.com/LuigiFerronatto/TESSERA/issues/75) | stale in-progress marker | closed | previous roadmap sync | [PR #76](https://github.com/LuigiFerronatto/TESSERA/pull/76), [merge `32a2aa6`](https://github.com/LuigiFerronatto/TESSERA/commit/32a2aa63db0024497cdee4cf16911cc3634770ca), PR evidence | not applicable | `SUPERSEDED` |
-| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | M0 ready | open | active [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108); no dependencies | truthful write-gate contract candidate; not merged | `SMOKE_ONLY`; contract/sanity gates | `IN_PROGRESS` |
+| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | M0 ready | open | active [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108); no dependencies | [PR-evolution audit](PR_EVOLUTION_92.md) at audited candidate head [`8169da3`](https://github.com/LuigiFerronatto/TESSERA/commit/8169da3d5b6c0cfbc1bab9cd6372a86aa251c64d); not merged | `SMOKE_ONLY`; contract/persistence/sanity gates | `IN_PROGRESS` |
 | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) | M0 planned | open | ready; no dependencies | partial naming/config cleanup exists, but no closing PR or golden integration proof | smoke-only when executed | `READY` |
 | [#94](https://github.com/LuigiFerronatto/TESSERA/issues/94) | planned | closed | completed bug card | [PR #101](https://github.com/LuigiFerronatto/TESSERA/pull/101), [merge `467ba64`](https://github.com/LuigiFerronatto/TESSERA/commit/467ba649f53312cedcecf40caf548af5f766c67b), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/94#issuecomment-5471509112) | smoke-only contract validation | `VALIDATED` |
 | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | M0 planned | open | ready; no dependencies | project-agnostic work is partial; runtime inventory and closing PR are absent | smoke-only when executed | `READY` |
@@ -226,6 +226,21 @@ truthful write-gate state contract
 → detection/transformation/admission separated
 → State Contamination evaluation remains separate
 ```
+
+Capability evolution for the active safety card:
+
+```text
+existing deterministic write gate
+→ Markdown-only persistence integrity (#94 / PR #101)
+→ deterministic-core boundary (#74 / PR #107)
+→ truthful detection/transformation/admission contract (#92 / PR #108)
+→ future State Contamination evaluation (#19, still BLOCKED)
+```
+
+#92 contributes one required contract to #67 and only its own prerequisite to
+#19. While PR #108 is open, neither dependency is complete: #67 also remains
+blocked on #93 and #95 plus their regression checks, while #19 remains blocked
+on #13, #16 and #73. No downstream card becomes `READY` from an open PR.
 
 ---
 
