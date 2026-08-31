@@ -53,6 +53,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Legacy external-project identity from package metadata and MCP-facing examples/configuration. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 
 ### Architecture Decisions
+- Accepted ADR 0002: retain the root `tessera/` package, treat benchmarks,
+  tests, docs and history as repository-owned rather than library runtime,
+  preserve provenance, and execute packaging, adapter, Skills and documentation
+  changes through staged owner cards. This records a user-relevant distribution
+  direction without performing the migrations. ([#115](https://github.com/LuigiFerronatto/TESSERA/issues/115))
 - Accepted ADR 0001: deterministic TESSERA memory infrastructure ends at
   structured evidence with provenance; optional planner/reader adapters consume
   that contract, consuming agents own final cognition, and LLM judges remain
