@@ -6,6 +6,14 @@ created. This includes canonical #115 architecture delivery
 `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` and lifecycle synchronization
 `055a35f4a7e8298013bcb816b30f67d9706b9516`.
 
+The first merge-ready #116 candidate, `cb23a2537b662ceda9ccd67b44900e3f399e59bc`,
+had already been reconciled onto #93's runtime merge
+`c6124548f32b6dc5e1b7acf5127632bc6c75fccc`. While PR #131 remained open,
+parallel [PR #132](https://github.com/LuigiFerronatto/TESSERA/pull/132) advanced
+`main` to `65f42d76a7bfbd88f4d2b35f977f91848810e23a`. PR #131 was rebased onto that
+actual latest main. The reconciliation preserves #93 as `VALIDATED`, #67 as
+`BLOCKED` only on regression-gate integration, and #116 as `IN_PROGRESS`.
+
 ## Audit method
 
 The audit inspected actual merge commits and file lists, the full
@@ -35,6 +43,7 @@ that `benchmarks` is unavailable to artifact consumers.
 | [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126) | `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`, merged | `RUNTIME_IMPLEMENTATION` | made generic runtime/default storage and optional compatibility boundaries explicit | one runtime delivery |
 | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`, merged | `ARCHITECTURE_DECISION` | accepted ADR 0002: keep root package, exclude benchmarks/tests from artifacts through #116 | audited candidate and squash merge count once |
 | [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | `055a35f4a7e8298013bcb816b30f67d9706b9516`, merged | `DOCUMENTATION_CORRECTION` | synchronized #115 to `VALIDATED` and #116 to `READY` | no architecture/runtime count |
+| [PR #132](https://github.com/LuigiFerronatto/TESSERA/pull/132) | `65f42d76a7bfbd88f4d2b35f977f91848810e23a`, merged in parallel | `DOCUMENTATION_CORRECTION` | synchronized #93 to `VALIDATED` and left #67 blocked on regression-gate integration | independent #93 lifecycle delivery; no #116 capability count |
 | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) | open | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | one candidate packaging delivery; not counted as merged |
 
 No `SUPERSEDED_OPERATIONAL_PR` materially established the current packaging

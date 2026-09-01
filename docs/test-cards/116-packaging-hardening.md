@@ -53,6 +53,11 @@ ambiguity warning for `tessera.skills_library`; the current-main reproduction
 did not emit that warning, but the directory still depended on an implicit
 data-only convention.
 
+The packaging branch later incorporated #93's runtime merge at `c6124548` and
+its independent lifecycle correction at canonical merge `65f42d76`. That
+parallel documentation delivery leaves the artifact contract unchanged while
+preserving #93 `VALIDATED` and #67 `BLOCKED` on regression-gate integration.
+
 ## What changed or is being tested?
 
 The explicit setuptools package list now contains only `tessera`. Package data
@@ -158,6 +163,7 @@ dependency chains and no downstream implementation has started.
 working checkout and accidental mixed artifacts
 → explicit TESSERA-only package and sdist ownership
 → clean installed-wheel proof on Python 3.9/3.12
+→ #93 runtime/lifecycle current-main truth reconciled additively
 → current candidate remains IN_PROGRESS until merge
 → #117 becomes eligible only after lifecycle synchronization
 ```

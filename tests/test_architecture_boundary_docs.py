@@ -348,6 +348,8 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
         "DEV_ONLY",
         "#87 owns the standalone license",
         "No misleading benchmark extra",
+        "65f42d76a7bfbd88f4d2b35f977f91848810e23a",
+        "PR #132",
     ):
         assert marker in audit
 
