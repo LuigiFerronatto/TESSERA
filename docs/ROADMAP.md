@@ -1,6 +1,6 @@
 # TESSERA Roadmap
 
-> Authoritative portfolio audit: 2026-09-01 on canonical `main` `fc0ed763ad47f5eba88775f3517cbee99d00a8b9` (PR #152, #117 post-merge lifecycle). This document describes **validated current capability**, **live dependency routing**, and **planned experiments**. An Issue/Test Card existing is not evidence that a capability is implemented.
+> Authoritative portfolio audit: 2026-09-01 on canonical `main` `a13abbbba2138e48e237f14a182dd6746e3ec7d4` (PR #149, QUMem/product-release roadmap reconciliation). This document describes **validated current capability**, **live dependency routing**, and **planned experiments**. An Issue/Test Card existing is not evidence that a capability is implemented.
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown source records remain authoritative; indexes, caches and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
@@ -242,7 +242,7 @@ The first matching row for an Issue is the authoritative roadmap state used by s
 | [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | P2 public assisted-surface parity only after upstream semantic cards are validated; coordinate with #120. |
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | QUMem portfolio epic; no direct implementation PR. Coordinates #135–#146 plus #15/#16/#17/#20/#27. |
 | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`; broader docs audit remains separate from this roadmap-only sync. |
-| [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | open | `IN_PROGRESS` | Roadmap-only governance correction on `docs/147-qumem-roadmap-sync`; no runtime/benchmark capability. |
+| [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | closed | `VALIDATED` | `KEEP`; roadmap/governance PR #149 canonical `a13abbbba2138e48e237f14a182dd6746e3ec7d4`; final candidate `e8b52dbf882a15b1f15b935f30e41b1e0190d446`; documentation-only `NOT_APPLICABLE` delivery with final CI/Benchmark Ledger green. |
 
 ---
 
@@ -498,7 +498,7 @@ External work changes the next experiment; it does not become implemented produc
 | QUMem | #145 tracker; #135–#144 children | Which episode/decomposition/planning/state mechanisms improve TESSERA while preserving provenance and core independence? |
 | Personalized-memory benchmarks | #143 | Do QUMem-inspired additions improve preference evolution/current-state tasks, not only factual recall? |
 
-#146 owns broader paper-fidelity documentation truth. This roadmap only owns portfolio/routing truth.
+#146 owns broader paper-fidelity documentation truth. This roadmap only owns portfolio/routing truth. #147 canonically synchronized that routing in PR #149.
 
 ---
 
@@ -545,7 +545,7 @@ paper behavior
 != validated benchmark result
 ```
 
-#146 owns the QUMem-wide paper-fidelity audit. #78 owns project-specific legacy/deep-dive cleanup. #147 only synchronizes roadmap routing.
+#146 owns the QUMem-wide paper-fidelity audit. #78 owns project-specific legacy/deep-dive cleanup. #147 canonically synchronized roadmap routing in PR #149.
 
 For publication:
 

@@ -16,6 +16,7 @@ def _markdown_table_row(text: str, issue: str) -> str:
 def test_roadmap_tracks_current_product_release_routing() -> None:
     text = ROADMAP.read_text(encoding="utf-8")
 
+    assert "a13abbbba2138e48e237f14a182dd6746e3ec7d4" in text
     assert "fc0ed763ad47f5eba88775f3517cbee99d00a8b9" in text
     assert "`VALIDATED`" in _markdown_table_row(text, "#117")
     assert "`READY`" in _markdown_table_row(text, "#118")
@@ -43,7 +44,6 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
         "#144": "`BLOCKED`",
         "#145": "`TRACKER`",
         "#146": "`READY`",
-        "#147": "`IN_PROGRESS`",
     }
 
     for issue, status in expected.items():
@@ -51,6 +51,11 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
         assert status in row
         assert "`VALIDATED`" not in row
         assert "`IMPLEMENTED`" not in row
+
+    issue_147 = _markdown_table_row(text, "#147")
+    assert "closed" in issue_147
+    assert "`VALIDATED`" in issue_147
+    assert "a13abbbba2138e48e237f14a182dd6746e3ec7d4" in issue_147
 
     assert "Principal QUMem gap" in _markdown_table_row(text, "#141")
     assert "fixture design may start early" in _markdown_table_row(text, "#142")
