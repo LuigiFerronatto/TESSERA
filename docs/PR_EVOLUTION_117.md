@@ -4,7 +4,9 @@ Audited starting `main`: `b3be96f4aa842a81c135b6ac87d3311ed292d339`,
 the actual fetched `origin/main` when branch
 `test-card/117-config-init-discovery` was created. This is PR #133's canonical
 #116 lifecycle merge. Issue #117 dependencies #94, #115 and #116 are
-`VALIDATED`; implementation moves #117 from `READY` to `IN_PROGRESS` only.
+`VALIDATED`; implementation moved #117 from `READY` to `IN_PROGRESS` before
+the canonical merge and this lifecycle synchronization moves it to
+`VALIDATED`.
 
 ## Audit method and baseline reproduction
 
@@ -81,6 +83,32 @@ onboarding (#118), visual CLI redesign (#119), MCP lifecycle (#120), official
 Skills (#121), PyPI publication (#134), legal ownership (#87), Quality Gate
 #67, corpus Metadata Doctor #13, or conflict containment #16.
 
-While its implementation PR is open, #117 remains `IN_PROGRESS`; #118–#121
-and #134 remain `BLOCKED` and unstarted. Canonical merge and a separate
-lifecycle sync are required before `VALIDATED`.
+## Canonical implementation and lifecycle reconciliation
+
+PR #150 was squash-merged as
+`61cf76fbd6ed61972f0f5abae515ba9bffca4b55` from final candidate
+`f636e39f4d48726a10a3dce15fa42de88b029a23`. The candidate and canonical
+merge have the same tree and count once as one `CONFIGURATION_DISCOVERY`
+delivery. The final decision is `KEEP`.
+
+The implementation evidence is `SMOKE_ONLY`: TESSERA CI run `33459718574`
+passed the Python 3.9/3.12 tests and distributions, smoke and sanity jobs;
+Benchmark Ledger run `33459718572` passed reporting and correctly skipped
+LongMemEval. The implementation full suite passed with 301 tests and 14
+expected warnings.
+
+This post-merge lifecycle PR is a `DOCUMENTATION_CORRECTION`, not another
+configuration delivery. Its benchmark applicability is `NOT_APPLICABLE`
+because it synchronizes documentation, governance and executable documentation
+assertions only. It introduces no runtime, package, benchmark or schema change.
+
+After this lifecycle is canonically merged, #117 is `VALIDATED`; #118, #119
+and #120 are `READY`; #121 remains `BLOCKED` on #120; and #134 remains
+`BLOCKED` until #118 is validated and #87 resolves owner-approved legal and
+contribution entrypoints. #67 remains `BLOCKED` on regression-gate integration
+with its #93 dependency satisfied. No downstream implementation, PyPI or
+TestPyPI publication, release workflow, tag or GitHub Release was started.
+
+PR #149 remains separate roadmap/documentation work. This lifecycle preserves
+current-`main` truth only and does not absorb, recreate, close or reconcile the
+QUMem portfolio owned by #149/#147.

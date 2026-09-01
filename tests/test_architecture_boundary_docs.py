@@ -260,9 +260,7 @@ def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
     assert "`VALIDATED`" in issue_116
     assert "0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4" in issue_116
 
-    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#117")
-    for issue in ("#118", "#119", "#120", "#121"):
-        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+    assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
 
 
 def test_issue_115_canonical_delivery_is_deduplicated() -> None:
@@ -335,9 +333,10 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
     )
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#116")
-    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#117")
-    for issue in ("#118", "#119", "#120", "#121"):
-        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+    assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
+    for issue in ("#118", "#119", "#120"):
+        assert "`READY`" in _markdown_table_row(roadmap, issue)
+    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#121")
 
     for marker in (
         "055a35f4a7e8298013bcb816b30f67d9706b9516",
@@ -362,3 +361,44 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
     assert "| Record status | `VALIDATED` |" in record
     assert "VALIDATED ON `main`" in record
     assert "LongMemEval remains skipped" in record
+
+
+def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = (ROOT / "docs/PR_EVOLUTION_117.md").read_text(encoding="utf-8")
+    record = (
+        ROOT / "docs/test-cards/117-configuration-init-discovery.md"
+    ).read_text(encoding="utf-8")
+
+    assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
+    for issue in ("#118", "#119", "#120"):
+        assert "`READY`" in _markdown_table_row(roadmap, issue)
+    for issue in ("#121", "#134", "#67"):
+        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+
+    for marker in (
+        "b3be96f4aa842a81c135b6ac87d3311ed292d339",
+        "f636e39f4d48726a10a3dce15fa42de88b029a23",
+        "61cf76fbd6ed61972f0f5abae515ba9bffca4b55",
+        "PR #150",
+        "`CONFIGURATION_DISCOVERY`",
+        "count once",
+        "`DOCUMENTATION_CORRECTION`",
+        "`SMOKE_ONLY`",
+        "`NOT_APPLICABLE`",
+        "PR #149 remains separate",
+        "No downstream implementation",
+    ):
+        assert marker in audit
+
+    for marker in (
+        "| Record status | `VALIDATED` |",
+        "| Decision | `KEEP` |",
+        "f636e39f4d48726a10a3dce15fa42de88b029a23",
+        "61cf76fbd6ed61972f0f5abae515ba9bffca4b55",
+        "301 passed",
+        "Configuration/discovery validated",
+        "clean onboarding validated",
+        "PyPI release complete",
+    ):
+        assert marker in record
