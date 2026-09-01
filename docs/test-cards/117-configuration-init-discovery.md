@@ -5,7 +5,7 @@
 | Issue | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime configuration` |
-| Pull request | Implementation PR pending/open |
+| Pull request | [PR #150](https://github.com/LuigiFerronatto/TESSERA/pull/150) |
 | Head commit | Final candidate recorded after CI |
 | Merge commit | Not merged |
 | Decision | Candidate `KEEP` after green CI |
@@ -124,7 +124,7 @@ and #118 are validated and #87 is complete.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #117](https://github.com/LuigiFerronatto/TESSERA/issues/117) |
-| Pull request | Implementation PR pending/open |
+| Pull request | [PR #150](https://github.com/LuigiFerronatto/TESSERA/pull/150) |
 | Merge commit | Not merged |
 | Architecture decision | [ADR 0003](../adr/0003-configuration-and-store-discovery.md) |
 | PR Evolution Audit | [PR_EVOLUTION_117.md](../PR_EVOLUTION_117.md) |
