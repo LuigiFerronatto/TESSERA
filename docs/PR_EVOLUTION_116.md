@@ -46,7 +46,7 @@ that `benchmarks` is unavailable to artifact consumers.
 | [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | `055a35f4a7e8298013bcb816b30f67d9706b9516`, merged | `DOCUMENTATION_CORRECTION` | synchronized #115 to `VALIDATED` and #116 to `READY` | no architecture/runtime count |
 | [PR #132](https://github.com/LuigiFerronatto/TESSERA/pull/132) | `65f42d76a7bfbd88f4d2b35f977f91848810e23a`, merged in parallel | `DOCUMENTATION_CORRECTION` | synchronized #93 to `VALIDATED` and left #67 blocked on regression-gate integration | independent #93 lifecycle delivery; no #116 capability count |
 | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) | `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`, merged by squash | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | audited final candidate `0adb147075c25e1c442c1e310763eb66ca04c567` and canonical merge count as one packaging delivery |
-| #116 lifecycle synchronization PR | candidate | `DOCUMENTATION_CORRECTION` | records #116 `VALIDATED`, #117 `READY`, and preserves all downstream routing | no packaging or runtime capability count |
+| [PR #133](https://github.com/LuigiFerronatto/TESSERA/pull/133) | open lifecycle candidate | `DOCUMENTATION_CORRECTION` | records #116 `VALIDATED`, #117 `READY`, and preserves all downstream routing | no packaging or runtime capability count |
 
 No `SUPERSEDED_OPERATIONAL_PR` materially established the current packaging
 boundary. Candidate heads and later squash merges represent one delivery, not
