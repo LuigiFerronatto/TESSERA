@@ -1,6 +1,7 @@
 from pathlib import Path
 
 
+# Portfolio routing is intentionally frozen by this governance-only, NOT_APPLICABLE card.
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 
