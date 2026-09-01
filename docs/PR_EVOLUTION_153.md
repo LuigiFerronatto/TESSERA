@@ -89,7 +89,7 @@ new `memories/project/fact.md` identity.
 
 ## Evaluation record
 
-Benchmark applicability: `SMOKE_ONLY`.
+Benchmark applicability: `SMOKE_ONLY`, evaluated under Test Card #153.
 
 Benchmark rationale: the configuration contract can explicitly select a wider
 corpus, but ranking, graph expansion, conflict resolution, evidence projection,
