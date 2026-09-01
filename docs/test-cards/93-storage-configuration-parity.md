@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime` |
 | Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
-| Head commit | Pre-reconciliation candidate [`8f3827b`](https://github.com/LuigiFerronatto/TESSERA/commit/8f3827b39b6ceaf0a4b77a2a3ca8f63089032f5c); final rebased candidate recorded in Issue evidence and PR |
-| Merge commit | Not merged |
-| Decision | `KEEP` candidate |
+| Head commit | Audited final candidate [`c460e2f`](https://github.com/LuigiFerronatto/TESSERA/commit/c460e2f1c7d477a40f046e5e54da8d71aee45bac) |
+| Merge commit | Canonical squash merge [`c612454`](https://github.com/LuigiFerronatto/TESSERA/commit/c6124548f32b6dc5e1b7acf5127632bc6c75fccc) |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-08-31 |
 
@@ -57,7 +57,7 @@ index bootstrap.
 
 ## How does it work now?
 
-**CANDIDATE — NOT YET ON MAIN.** Resolution remains:
+**VALIDATED ON `main`.** Resolution remains:
 
 ```text
 explicit command/API path
@@ -96,6 +96,13 @@ Required regression suites, compile checks, the full suite, sanity before/after
 and GitHub Actions are recorded in
 [`docs/PR_EVOLUTION_93.md`](../PR_EVOLUTION_93.md) and the Issue evidence.
 
+Final-candidate [TESSERA CI run 33432658674](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33432658674)
+passed Python 3.9, Python 3.12, smoke and sanity-eval. [Benchmark Ledger run
+33432658639](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33432658639)
+passed reporting/applicability and correctly skipped LongMemEval. The
+[post-merge maintainer audit](https://github.com/LuigiFerronatto/TESSERA/issues/93#issuecomment-5484518285)
+is recorded on Issue #93.
+
 Deterministic sanity remains Hit@1 `0.75`, Hit@3 `1.00`, Hit@5 `1.00`, MRR
 `0.875`, evidence hit rate `1.00`, missing-evidence check `passed`.
 
@@ -120,10 +127,10 @@ benchmark changes. Those issues remain separate.
 
 ## What is unlocked next?
 
-Nothing is promoted while this pull request is open. #67 remains `BLOCKED` on
-the merge and lifecycle synchronization of #93 and on its own regression-gate
-integration. The merged #115 architecture is not counted as #93 work; #116 is
-not started or absorbed here, and #117 and #120 remain blocked and unabsorbed.
+#93's dependency edge for #67 is satisfied. #67 remains `BLOCKED` solely on its
+separate regression-gate integration; this lifecycle update does not start it.
+The merged #115 architecture is not counted as #93 work; #116 remains `READY`
+and is not started or absorbed here, while #117–#121 remain `BLOCKED`.
 
 ## Technical provenance
 
@@ -131,7 +138,7 @@ not started or absorbed here, and #117 and #120 remain blocked and unabsorbed.
 |---|---|
 | Issue/Test Card | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) |
 | Pull request | [#129](https://github.com/LuigiFerronatto/TESSERA/pull/129) |
-| Merge commit | Not merged |
+| Merge commit | [`c6124548f32b6dc5e1b7acf5127632bc6c75fccc`](https://github.com/LuigiFerronatto/TESSERA/commit/c6124548f32b6dc5e1b7acf5127632bc6c75fccc) |
 | Evidence/Learnings/Decision | [Superseding KEEP evidence](https://github.com/LuigiFerronatto/TESSERA/issues/93#issuecomment-5483152212) |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity only; LongMemEval not rerun |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_93.md`](../PR_EVOLUTION_93.md) |
@@ -148,5 +155,6 @@ not started or absorbed here, and #117 and #120 remain blocked and unabsorbed.
 → parallel #128 / `b475f1c` delivers #115 architecture
 → #130 / `055a35f` finalizes #115 lifecycle routing
 → #93 reconciled onto the latest main with both contracts preserved
-→ after merge/lifecycle sync, #67 loses only its #93 dependency
+→ #129 candidate `c460e2f` becomes canonical squash merge `c612454`
+→ #93 VALIDATED; #67 loses only its #93 dependency and remains blocked on regression-gate integration
 ```
