@@ -1,6 +1,7 @@
 from pathlib import Path
 
 
+# Post-#117 lifecycle routing is intentionally frozen by this governance test.
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 
