@@ -119,10 +119,10 @@ therefore `BLOCKED` here.
 | [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | absent | closed | completed governance contract | [PR #123](https://github.com/LuigiFerronatto/TESSERA/pull/123), [merge `a79b5ae`](https://github.com/LuigiFerronatto/TESSERA/commit/a79b5aec661f0d401b00c2985eff3a5a24363943), [Evidence/Learnings/Decision](https://github.com/LuigiFerronatto/TESSERA/issues/114#issuecomment-5473270634) | contract tests + Python 3.9/3.12 + smoke + sanity + reporting | `VALIDATED` |
 | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | absent | closed | completed by [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128); [ADR 0002](adr/0002-repository-layout-and-distribution-boundary.md) accepted with `KEEP` | [canonical squash merge `b475f1c`](https://github.com/LuigiFerronatto/TESSERA/commit/b475f1cd805f86cc8ad9526e563e3c6fb8409ff1), [post-merge audit](https://github.com/LuigiFerronatto/TESSERA/issues/115#issuecomment-5483321070), [plain-language record](test-cards/115-repository-layout-architecture.md), [PR Evolution Audit](PR_EVOLUTION_115.md); architecture accepted, migrations unimplemented | implementation `SMOKE_ONLY`; lifecycle synchronization `NOT_APPLICABLE` | `VALIDATED` |
 | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | absent | closed | completed by [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131); `KEEP` | [canonical squash merge `0dd6e5c`](https://github.com/LuigiFerronatto/TESSERA/commit/0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4), audited candidate `0adb147`, [plain-language record](test-cards/116-packaging-hardening.md), [PR Evolution Audit](PR_EVOLUTION_116.md); ownership-correct wheel/sdist and Python 3.9/3.12 clean-artifact proof | implementation `SMOKE_ONLY`; lifecycle synchronization `NOT_APPLICABLE`; LongMemEval skipped | `VALIDATED` |
-| [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | absent | open | #94, #115 and #116 dependencies are satisfied; [PR #150](https://github.com/LuigiFerronatto/TESSERA/pull/150) open | project/global schema, init and inspection candidate under review; canonical merge pending | `SMOKE_ONLY`; focused matrix, full suite, sanity and CI required | `IN_PROGRESS` |
-| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | absent | open | depends on #116 and #117 | checkout CI exists; clean wheel install/bootstrap gate absent | smoke-only when executed | `BLOCKED` |
-| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | absent | open | depends on #112, #116 and #117 | banner corrected; complete CLI UX/output audit absent | smoke-only when executed | `BLOCKED` |
-| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | absent | open | depends on #68, #74, #92, #116 and #117 | direct-query parity exists; eager optional initialization and protocol gaps remain | smoke-only unless retrieval changes | `BLOCKED` |
+| [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | absent | closed | completed by [PR #150](https://github.com/LuigiFerronatto/TESSERA/pull/150); #94, #115 and #116 dependencies satisfied; `KEEP` | [canonical squash merge `61cf76f`](https://github.com/LuigiFerronatto/TESSERA/commit/61cf76fbd6ed61972f0f5abae515ba9bffca4b55), audited candidate `f636e39`, [plain-language record](test-cards/117-configuration-init-discovery.md), [PR Evolution Audit](PR_EVOLUTION_117.md); candidate and merge are one `CONFIGURATION_DISCOVERY` delivery | implementation `SMOKE_ONLY`; lifecycle synchronization `NOT_APPLICABLE`; final-candidate CI and Benchmark Ledger passed; LongMemEval skipped | `VALIDATED` |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | absent | open | #116 and #117 are `VALIDATED`; ready after #117 lifecycle merge | clean wheel install/bootstrap gate absent; no implementation started | smoke-only when executed | `READY` |
+| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | absent | open | #112, #116 and #117 are `VALIDATED`; ready after #117 lifecycle merge | banner corrected; complete CLI UX/output audit absent; no implementation started | smoke-only when executed | `READY` |
+| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | absent | open | #68, #74, #92, #116 and #117 are `VALIDATED`; ready after #117 lifecycle merge | direct-query parity exists; eager optional initialization and protocol gaps remain; no implementation started | smoke-only unless retrieval changes | `READY` |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | absent | open | depends on #68, #92, #116, #117 and #120 | bundled Markdown library exists; official versioned integration Skills absent | smoke-only when executed | `BLOCKED` |
 | [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | absent | open | depends on #117, #118 and #87 | validated package artifacts exist; no public release was started | smoke-only when executed | `BLOCKED` |
 | [#16 containment](https://github.com/LuigiFerronatto/TESSERA/issues/16) | one undifferentiated planned card | open | containment has no dependencies | current silent heuristic is documented; containment PR absent | regression fixture required | `READY` |
@@ -187,8 +187,8 @@ answer-quality result.
 ## Current critical path, M0 through M5
 
 ```text
-M0  IN_PROGRESS #93 + READY #16 containment
-      └─ validated foundations: #68 + #74 + #92 + #94 + #95 + #96 + #100
+M0  READY #16 containment
+      └─ validated foundations: #68 + #74 + #92 + #93 + #94 + #95 + #96 + #100
       ↓
     #67 Quality Gate v2
       ↓
@@ -244,8 +244,8 @@ existing deterministic write gate
 → future State Contamination evaluation (#19, still BLOCKED)
 ```
 
-#92 and #95 now satisfy their required dependency edges for #67; #92 also
-satisfies only its own prerequisite for #19. #67 remains `BLOCKED` on #93 and
+#92, #93 and #95 satisfy their required dependency edges for #67; #92 also
+satisfies only its own prerequisite for #19. #67 remains `BLOCKED` solely on
 regression-gate integration; #19 remains blocked on #13, #16 and #73. No
 unrelated readiness state changes.
 
@@ -264,10 +264,10 @@ claim new retrieval intelligence.
   ↓
 #116 clean Python distribution (VALIDATED)
   ↓
-#117 project/global configuration and tessera init (IN_PROGRESS)
-  ├─ #118 clean install + CI onboarding (BLOCKED)
-  ├─ #119 CLI experience (BLOCKED)
-  └─ #120 MCP robustness (BLOCKED)
+#117 project/global configuration and tessera init (VALIDATED)
+  ├─ #118 clean install + CI onboarding (READY)
+  ├─ #119 CLI experience (READY)
+  └─ #120 MCP robustness (READY)
        ↓
      #121 official TESSERA Skills (BLOCKED)
 
