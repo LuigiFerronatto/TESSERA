@@ -1,8 +1,8 @@
 # TESSERA Roadmap
 
-> Authoritative portfolio audit: 2026-09-01 on canonical `main` `a13abbbba2138e48e237f14a182dd6746e3ec7d4` (PR #149, QUMem/product-release roadmap reconciliation). This document describes **validated current capability**, **live dependency routing**, and **planned experiments**. An Issue/Test Card existing is not evidence that a capability is implemented.
+> Authoritative portfolio audit: 2026-09-01 against canonical `main` `2508676d472088733702b6ed920fc829df9a7681` (PR #173, Configuration v2). Issue #172 owns this portfolio reconciliation. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
 
-TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown source records remain authoritative; indexes, caches and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
+TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
@@ -10,21 +10,51 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
 - `VALIDATED` — canonical delivery is merged and its required validation/lifecycle evidence is complete.
-- `READY` — dependencies and Definition of Ready are satisfied; work may start when selected under WIP limits.
-- `IN_PROGRESS` — an active unmerged implementation/documentation PR owns the current work.
-- `BLOCKED` — a dependency, decision, fixture or gate is unresolved.
-- `DEFERRED` — intentionally postponed.
+- `READY` — Definition of Ready and hard dependencies are satisfied; the card may be selected under WIP limits.
+- `IN_PROGRESS` — active unmerged work owns the current delivery.
+- `BLOCKED` — one or more explicit prerequisites, decisions, fixtures or gates are unresolved.
+- `DEFERRED` — valid work intentionally parked even if no hard dependency prevents design/execution.
 - `TRACKER` — coordination epic only; child Test Cards own implementation and decisions.
-- `DROPPED` — experiment rejected.
+- `DROPPED` — experiment explicitly rejected.
 - `SUPERSEDED` — replaced by a later canonical delivery/record.
 
 Candidate commits and their canonical merge commits represent one delivery when they contain the same capability. Lifecycle-only corrections are `DOCUMENTATION_CORRECTION`, not a second runtime capability.
+
+## Portfolio/WIP contract
+
+```text
+OPEN
+!= READY
+!= NOW
+```
+
+Technical executable WIP is bounded:
+
+```text
+NOW executable cards       <= 2
+READY executable backlog   <= 8
+```
+
+A card may be technically executable but intentionally `DEFERRED` to keep architecture exploration from becoming simultaneous implementation. Trackers never consume executable WIP.
+
+Current reconciliation-matrix counts:
+
+```text
+NOW executable                 0
+READY                          7 total / 4 executable
+BLOCKED                        40 full cards + #16 full phase
+TRACKER                        5 non-executable epics
+```
 
 ## Non-negotiable product invariants
 
 ```text
 Markdown/source truth
 != derived index/cache/ledger state
+!= semantic vector state
+!= query-conditioned state
+!= working context
+!= final answer
 
 relevance
 != confidence
@@ -40,8 +70,11 @@ relation exists
 conflict detected
 != conflict resolved
 
-query-conditioned state
-!= persistent source truth
+persistent memory
+!= working context
+
+more context
+!= better context
 ```
 
 Exactly three semantic drawers remain:
@@ -52,7 +85,142 @@ preferences
 insights
 ```
 
-QUMem-inspired work must not add a fourth semantic drawer. TESSERA-specific `procedural_anchor` semantics continue to map to the `insights` drawer where current code/contracts require it.
+QUMem-inspired work, intelligence/model work and Cognitive Continuity must not add a fourth semantic drawer. Additional concepts are facets, derived views or execution layers.
+
+---
+
+# Canonical execution board
+
+This board is selection guidance, not permission to bypass the owning Test Card.
+
+## NOW
+
+No executable feature is selected or in progress. This governance delivery
+closes #172 without starting its recommended successor.
+
+Recommended next executable selection after this governance card:
+
+```text
+Primary:
+#154 Safe project source discovery + .tessera-ignore
+
+Optional parallel integrity card, choose at most one:
+#135 deterministic decomposer fallback
+or
+#16 P0 conflict-containment
+```
+
+## NEXT / READY
+
+Highest-value unblocked work, ranked rather than treated equally:
+
+```text
+#154 Safe source discovery + .tessera-ignore  release-critical
+#135 Decomposer fallback integrity           P0 contract integrity
+#16  Conflict resolver containment           P0 state safety
+#120 MCP transport/runtime robustness        agent integration substrate
+#146 QUMem documentation truth               docs-only
+#168 Long-Term Memory architecture contract  cognitive-continuity architecture
+```
+
+Cards intentionally parked despite earlier/live `READY` wording are listed under `DEFERRED` below.
+
+## BLOCKED — principal chains
+
+```text
+FIRST PUBLIC RELEASE
+#153 VALIDATED
+  -> #154 source discovery READY
+      -> #155 init UX BLOCKED
+          -> #118 clean onboarding BLOCKED
+              -> #134 PyPI release BLOCKED
+
+#87 owner-approved LICENSE/contribution decision
+  -------------------------------------> #134
+
+
+INTELLIGENCE
+#153 VALIDATED -> #157 typed model profiles DEFERRED by WIP
+          ├-> #163 local model lifecycle
+          ├-> #160 capability pipeline
+          └-> #158 semantic embeddings
+                 -> #159 reranking
+
+#157 + #160 + #155 + validated retrieval capabilities
+  -> #161 presets
+#157 + #160 -> #162 diagnostics
+#157 + #160 + #163 -> #165 local generation
+
+
+QUMEM / QUERY STATE
+#135 -> #136 typed F/P/I decomposition
+     -> #137 lineage
+
+#139 -> #140 retrieval planning
+
+#73 -> #15 temporal/state semantics
+          -> #16 full supersession
+
+#140 + #137 + #15 + #16
+  -> #141 Fq/Tq/Iq state
+      -> #20 evidence status
+      -> #142/#143 evaluation
+
+
+AGENT COGNITIVE CONTINUITY
+#168 Long-Term Memory
+        +
+#139 -> #140 -> #141 -> #20
+        ↓
+#169 Context Compiler
+        ↓
+#167 Working Context
+        ↓
+#171 Agent-facing semantic API
+        ↓
+consuming agent
+
+#120 remains the separate MCP transport/runtime dependency for #171.
+```
+
+## DEFERRED
+
+Valid work intentionally parked to control WIP or avoid rework:
+
+```text
+#17  adaptive HOW-to-retrieve strategy
+#19  evidence-aware memory admission
+#21  utility / experience learning
+#25  query-aware graph expansion
+#28  structured-evidence rendering ablation
+#119 broad CLI redesign umbrella
+#139 QUMem information-needs implementation
+#166 unified CLI presentation system
+#80  architecture/roadmap visual assets
+#157 typed model profiles
+```
+
+`#25`, `#28`, `#139`, `#157` and `#166` have technically executable or previously `READY` definitions, but this portfolio intentionally parks them until the active release/safety foundations reduce WIP or their surrounding semantics stabilize.
+
+## TRACKERS
+
+```text
+#14  Graph experiments
+#18  Measurement / LongMemEval
+#145 QUMem
+#164 Intelligence
+#170 Agent Cognitive Continuity
+```
+
+Trackers do not receive direct feature implementation PRs.
+
+## OWNER DECISIONS / ADMIN
+
+```text
+#87 LICENSE / copyright ownership / CONTRIBUTING
+```
+
+#87 is a direct release blocker and must not be solved by an agent inventing legal ownership.
 
 ---
 
@@ -61,8 +229,6 @@ QUMem-inspired work must not add a fourth semantic drawer. TESSERA-specific `pro
 ## FASE 0 — FAZER FUNCIONAR
 
 Status: `VALIDATED FOUNDATION`.
-
-The engine already provides:
 
 ```text
 source / memory
@@ -74,96 +240,200 @@ source / memory
     -> structured evidence
 ```
 
-Implemented foundation includes memory persistence, retrieval, basic graph relations, stable identity and source-backed evidence. Advanced graph/state/admission capabilities remain later experiments; their existence must not be inferred from the foundation modules.
+Implemented foundation includes persistence, stable identity, source-backed evidence, basic relations/graph and deterministic retrieval. Advanced temporal/state/admission/intelligence/context capabilities remain experiments.
 
 ## FASE 1 — FAZER SER VERDADE
 
-Status: `MOSTLY VALIDATED`; the remaining high-risk work is containment/governance rather than rebuilding the foundation.
+Status: `MOSTLY VALIDATED`.
 
 Already validated:
 
 ```text
 #68  retrieval contract parity
+#74  deterministic-core / optional-LLM architecture
 #92  truthful write safety/path containment
 #93  cross-surface storage parity
 #94  Markdown persistence integrity
 #95  runtime independence
 #96  LongMemEval V1 reproducible retrieval baseline
 #100 benchmark governance
-#74  deterministic-core / optional-LLM architecture
 #112 public identity
 #114 lifecycle/evolution governance
 ```
-
-Supporting governance already on `main` includes #109 plain-language stage records. It is a documentation/lifecycle capability, not a memory-runtime feature.
 
 Still open:
 
 ```text
 #16 P0 containment
-    stop silent destructive newest-only conflict filtering
-
-#67 Quality Gate v2
-    still blocked on regression-gate integration
+#67 Quality Gate v2 / regression-gate integration
 ```
 
-#16 became more urgent after the QUMem audit because preference trajectories require earlier and later evidence to remain available. The P0 containment is independent from the later full supersession experiment.
+The P0 containment of #16 is independent from the later full temporal supersession experiment.
 
 ## FASE 2 — FAZER VIRAR PRODUTO
 
-Status: repository architecture, packaging and configuration/discovery are validated; clean onboarding is the next release-critical productization step.
+Status: architecture, packaging and Configuration v1 are validated. Productization v2 now owns the route to a trustworthy first public release.
 
 ```text
 #115 repository architecture        VALIDATED
   -> #116 package/distribution       VALIDATED
-       -> #117 init/config/discovery VALIDATED
-            -> #118 clean onboarding READY
-                 -> #134 first PyPI release BLOCKED
+       -> #117 config/discovery v1   VALIDATED
+            -> #153 config v2        VALIDATED
+                 -> #154 sources     READY
+                      -> #155 init UX BLOCKED
+                           -> #118 clean onboarding BLOCKED
+                                -> #134 first PyPI release BLOCKED
 
-#87 legal/repository entrypoint -----------------> #134
+#87 legal/repository entrypoint -------------------------------> #134
 
-Parallel product work now unblocked:
-  #119 CLI UX       READY
-  #120 MCP runtime  READY
-       -> #121 official Skills BLOCKED on #120
+Parallel product surfaces:
+#120 MCP runtime             READY
+  -> #121 official Skills    BLOCKED
 
-Configuration v2 refinement now active:
-  #153 store / sources / index separation IN_PROGRESS
-       -> #154 safe source discovery       BLOCKED pending #153 canonical reconciliation
-       -> #155 source-picker init UX       BLOCKED pending #153 canonical reconciliation
+#119 broad CLI umbrella      DEFERRED
+#166 presentation child      DEFERRED
 ```
 
-#153 is an unmerged candidate and must not be described as implemented or
-validated. This branch does not begin #154, #155, #157, or alter their
-deliveries; downstream readiness may change only after #153 is canonically
-merged and its post-merge lifecycle is synchronized.
+The previous `READY` state for #118 is superseded by its newer live prerequisites. #153 is satisfied; #154 and #155 remain active blockers, so #118 stays `BLOCKED`.
 
-The first PyPI release does **not** require #119/#120/#121 unless those cards discover a release-contract blocker before publication. #134 owns TestPyPI/PyPI publication, release workflow, distribution-name freeze and post-publication smoke. `tessera-agent-memory` is only a current candidate distribution name until #134 freezes it.
+The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 
-## FASE 3 — FAZER A MEMÓRIA MELHOR
+## FASE 3 — FAZER A MEMÓRIA E O RETRIEVAL MELHORES
 
-Status: foundation primitives exist; advanced memory construction, graph, temporal/state, arbitration, admission and utility learning are experimental.
+Status: multiple experimental families exist, but they are dependency-routed and WIP-limited.
 
-This phase now has two coordinated research families:
+### Durable-memory lifecycle
 
 ```text
-Graph / evidence intelligence
-#25 -> #26 -> #27 / #20
+#67
+ -> #12 incremental/idempotent indexing
+     -> #73 revision history
+         -> #15 temporal/state semantics
+             -> #16 full supersession
 
-QUMem-derived construction/state
-#145 tracker
-  -> #135/#136/#137/#138
-  -> #139/#140
-  -> #15/#16
-  -> #141
-  -> #20/#142/#143
+#69 broader text ingestion
+ -> #70 structural segmentation
+     -> #13 corpus doctor
+
+#19 admission and #21 utility remain later layers.
 ```
 
-Neither family replaces the deterministic core. Experimental assisted cognition remains optional under ADR #74.
+### Graph/evidence intelligence
 
-## FASE 4 — PROVAR QUE É MELHOR
+```text
+#14 TRACKER
+#25 query-aware expansion
+ -> #26 relation confidence
+     -> #27 arbitration / #20 evidence status
+```
 
-Status: measurement infrastructure exists; broader answer-quality and personalized-memory evidence remain future work.
+### QUMem-derived construction/state
+
+```text
+#145 TRACKER
+
+#135 fallback integrity
+ -> #136 typed F/P/I
+ -> #137 source episode/supporting-turn lineage
+
+#138 role-aware episode construction
+
+#139 information needs
+ -> #140 multi-query/multi-store plan
+
+#15/#16 temporal semantics
+        +
+#137/#140
+ -> #141 structured Fq/Tq/Iq
+     -> #20 evidence status
+     -> #142/#143 evaluation
+
+#144 public assisted parity only after semantics are validated.
+```
+
+Neither QUMem nor graph work replaces the deterministic core.
+
+## FASE 4 — ADICIONAR INTELIGÊNCIA SEM PERDER O CORE
+
+Parent tracker: #164.
+
+```text
+#153 configuration v2 VALIDATED
+  -> #157 typed model profiles DEFERRED by portfolio WIP
+       ├-> #163 local-model artifact lifecycle
+       ├-> #158 semantic embeddings/index
+       │    -> #159 reranking
+       └-> #160 pipeline capability/fallback configuration
+             ├-> #162 diagnostics
+             └-> #165 local generative experiments
+
+#155 + #157/#158/#160
+  -> #161 Local / Private Hybrid / Cloud presets
+
+validated retrieval capabilities
+  -> #17 adaptive HOW-to-retrieve experiments
+```
+
+Provider/model identity is configuration, not product architecture:
+
+```text
+capability
+-> typed profile
+-> provider/model
+```
+
+The deterministic core must continue to operate with zero provider/model configuration.
+
+## FASE 5 — CONTINUIDADE COGNITIVA DO AGENTE
+
+Parent tracker: #170.
+
+The architectural objective is not merely “the agent can search memory”; it is “the agent starts a bounded task with the right evidence-backed state and writes only durable learning afterward”.
+
+```text
+#168 LONG-TERM MEMORY
+        ↓
+#139 Information Needs
+        ↓
+#140 Retrieval Plan
+        ↓
+deterministic evidence retrieval
+        ↓
+#141 Query-Conditioned State
+        ↓
+#20 Evidence Status
+        ↓
+#169 Context Compiler
+        ↓
+#167 Working Context
+        ↓
+#171 Agent-facing Memory API
+        ↓
+CONSUMING AGENT
+```
+
+Ownership boundaries:
+
+```text
+#168 = durable memory boundary
+#169 = selection + synthesis + context budgeting
+#167 = packet identity + bootstrap + reuse + freshness/invalidation
+#171 = semantic intents: search / context / evidence / remember / inspect
+#120 = MCP server/transport/config/errors/timeouts/concurrency
+```
+
+Critical rule:
+
+```text
+READ BEFORE REASONING
+WRITE AFTER LEARNING
+```
+
+but neither read nor write is blind: compilation is bounded/evidence-backed, and durable write remains admission/write-gated.
+
+## FASE 6 — PROVAR QUE É MELHOR
+
+Status: measurement infrastructure exists; broader answer-quality, personalized-memory and cognitive-continuity evidence remain future work.
 
 Already available:
 
@@ -174,244 +444,171 @@ Benchmark Ledger / applicability (#100)
 conditional benchmark CI
 ```
 
-Open evaluation tracks include:
+Open measurement tracks:
 
 ```text
 #28  rendering ablation
-#103 frozen-evidence reader baseline
-#104 calibrated LLM-as-a-judge
+#103 frozen-evidence reader
+#104 calibrated judge
 #105 LongMemEval V1 full-500
 #106 LongMemEval-V2
-#142 QUMem fidelity regression suite
-#143 personalized-memory / preference-evolution benchmark
-```
 
-#143 complements LongMemEval; it does not replace it or make QUMem fidelity synonymous with benchmark quality.
+#142 QUMem fidelity regression
+#143 personalized-memory / preference-evolution
+
+future Cognitive Continuity metrics:
+time-to-first-reasoning
+memory tool calls/run
+context tokens
+critical-context recall
+cross-agent context drift
+stale-context failures
+```
 
 ---
 
 ## Reconciliation matrix
 
-The first matching row for an Issue is the authoritative roadmap state used by static governance tests.
+The first matching row for an Issue is the authoritative roadmap classification. `Class` distinguishes executable WIP from trackers, docs, architecture, evaluation and owner decisions.
 
-| Issue | GitHub state | Lifecycle status | Dependency / routing decision |
-|---|---|---|---|
-| [#68](https://github.com/LuigiFerronatto/TESSERA/issues/68) | closed | `VALIDATED` | Engine / CLI / MCP retrieval semantics aligned in PR #98. |
-| [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | closed | `VALIDATED` | ADR 0001 accepted in [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [merge `0c0b638`](https://github.com/LuigiFerronatto/TESSERA/commit/0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2). Core deterministic; assisted cognition optional. |
-| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | closed | `VALIDATED` | Write safety implementation [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108), canonical `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`; lifecycle evidence in `docs/PR_EVOLUTION_92.md`. |
-| [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) | closed | `VALIDATED` | `KEEP`; canonical implementation `c6124548f32b6dc5e1b7acf5127632bc6c75fccc`; lifecycle #132 complete; see `docs/PR_EVOLUTION_93.md`. |
-| [#94](https://github.com/LuigiFerronatto/TESSERA/issues/94) | closed | `VALIDATED` | Canonical Markdown persistence integrity. |
-| [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | closed | `VALIDATED` | `KEEP`; canonical runtime `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`; lifecycle complete. |
-| [#96](https://github.com/LuigiFerronatto/TESSERA/issues/96) | closed | `VALIDATED` | Reproducible LongMemEval V1 dev-50 retrieval baseline. |
-| [#100](https://github.com/LuigiFerronatto/TESSERA/issues/100) | closed | `VALIDATED` | Benchmark applicability/ledger: `REQUIRED / SMOKE_ONLY / NOT_APPLICABLE`. |
-| [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | closed | `VALIDATED` | Public TESSERA identity/banner. |
-| [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | closed | `VALIDATED` | Evolution-auditable lifecycle governance. |
-| [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | closed | `VALIDATED` | ADR 0002 accepted in PR #128, canonical `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`; lifecycle #130; `KEEP`. |
-| [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | closed | `VALIDATED` | Packaging PR #131 canonical `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`; lifecycle #133 canonical `b3be96f4aa842a81c135b6ac87d3311ed292d339`; `KEEP`. |
-| [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | closed | `VALIDATED` | `KEEP`; implementation PR #150 canonical `61cf76fbd6ed61972f0f5abae515ba9bffca4b55`; lifecycle PR #152 canonical `fc0ed763ad47f5eba88775f3517cbee99d00a8b9`; candidate and merge count once as `CONFIGURATION_DISCOVERY`. |
-| [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | open | `IN_PROGRESS` | Dedicated `test-card/153-config-v2` candidate separates write store, explicit read sources, and derived index. #154/#155 remain blocked until canonical merge and lifecycle reconciliation; no downstream work started. |
-| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
-| [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `READY` containment / `BLOCKED` full | P0 containment has no dependency; full supersession waits on #15/#73/#96. Preserve preference history for #141. |
-| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `READY` | #116/#117 validated. Clean-room onboarding may start; it is the remaining technical release gate for #134. |
-| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `READY` | #112/#116/#117 validated. CLI UX may start independently; not a mandatory blocker for first PyPI release. |
-| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | #68/#74/#92/#116/#117 validated. MCP lifecycle/robustness may start and should reuse #117 configuration primitives. |
-| [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | #117 is satisfied; remaining blocker is #120. Official Skills only after MCP/public-contract readiness. |
-| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | Owner legal decision required for standalone LICENSE/CONTRIBUTING; direct blocker for #134. |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | #117 is satisfied; remaining blockers are #118 validation + #87. #119–#121 are follow-ups unless they surface a release blocker. |
-| [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | open | `BLOCKED` | Depends on #67/#94; incremental/idempotent indexing. |
-| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `BLOCKED` | Depends on #12/#94; text ingestion beyond Markdown. |
-| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `BLOCKED` | Depends on #12/#69; structural document segmentation, not conversational episodes. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | Depends on #12/#69/#70; corpus doctor, distinct from product/config doctor. |
-| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `BLOCKED` | Depends on #12/#94; revision history foundation for temporal/supersession. |
-| [#14](https://github.com/LuigiFerronatto/TESSERA/issues/14) | open | `TRACKER` | Graph experiment epic coordinating #25/#26. |
-| [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) | open | `READY` | #96 baseline complete. The previous "#25 graph-expansion card DoR completion" gate is superseded by live routing; this card may start when selected under WIP limits. |
-| [#26](https://github.com/LuigiFerronatto/TESSERA/issues/26) | open | `BLOCKED` | Requires a frozen #25 baseline; tests relation origin/confidence separately from query relevance. |
-| [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
-| [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) | open | `BLOCKED` | Depends on #69/#70; harness adapter registry. |
-| [#32](https://github.com/LuigiFerronatto/TESSERA/issues/32) | open | `BLOCKED` | Depends on #71; authority/scope/precedence policy. |
-| [#72](https://github.com/LuigiFerronatto/TESSERA/issues/72) | open | `BLOCKED` | Depends on #71/#32; deterministic instruction resolver. |
-| [#27](https://github.com/LuigiFerronatto/TESSERA/issues/27) | open | `BLOCKED` | Depends on #15/#16/#32/#72/#96; cross-source Evidence Arbitration. |
-| [#20](https://github.com/LuigiFerronatto/TESSERA/issues/20) | open | `BLOCKED` | Owns only `sufficient / insufficient / conflicting / ambiguous` evidence status and abstention. Query-conditioned state moved to #141. |
-| [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | Evidence-aware admission; `worth remembering?` remains distinct from #92 `safe to persist?`. |
-| [#17](https://github.com/LuigiFerronatto/TESSERA/issues/17) | open | `DEFERRED` | Depends on #140/#20/#74/#96. Owns HOW a frozen retrieval operation executes, not WHAT to retrieve. |
-| [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | open | `DEFERRED` | Utility/experience learning after admission/state become trustworthy. |
-| [#18](https://github.com/LuigiFerronatto/TESSERA/issues/18) | open | `TRACKER` | Measurement spine: #96/#100 complete; #28/#103–#106 open. |
-| [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) | open | `READY` | #68/#96 complete; freeze evidence and vary renderer only. #28 rendering ablation is independent from retrieval changes. |
-| [#103](https://github.com/LuigiFerronatto/TESSERA/issues/103) | open | `BLOCKED` | Depends on #28/#74/#96/#100; frozen-evidence reader baseline. |
-| [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | Depends on #74/#100/#103; calibrated judge contract. |
-| [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | Depends on #96/#100/#103/#104; full-500 preregistered V1 evaluation. |
-| [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | Depends on #74/#100/#103/#104/#105; LongMemEval-V2 adapter/small tier. |
-| [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | open | `READY` | P0 decomposition fallback integrity; no dependencies; `SMOKE_ONLY`. Fix contract mismatch before deeper decomposition experiments. |
-| [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `BLOCKED` | Depends on #135/#74; F/P/I semantic fidelity plus one-pass vs three-pass ablation; `REQUIRED`. |
-| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `BLOCKED` | Hard dependency #135; coordinate sequencing with #136/#138/#15; source episode/supporting turns/temporal position; `REQUIRED`. |
-| [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) | open | `BLOCKED` | #74 satisfied, but DoR still requires a frozen reviewed episode-boundary fixture. Role-aware adjacent-user continuity experiment; `REQUIRED`. |
-| [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) | open | `READY` | #74 satisfied; bounded structured information needs before retrieval; `REQUIRED`. |
-| [#140](https://github.com/LuigiFerronatto/TESSERA/issues/140) | open | `BLOCKED` | Depends on #139/#74/#96; owns WHAT sub-queries/stores retrieve evidence; `REQUIRED`. |
-| [#141](https://github.com/LuigiFerronatto/TESSERA/issues/141) | open | `BLOCKED` | Principal QUMem gap. Depends on #140/#15/#16/#137/#74/#96; structured evidence-linked `Fq/Tq/Iq`; `REQUIRED`. |
-| [#142](https://github.com/LuigiFerronatto/TESSERA/issues/142) | open | `BLOCKED` | Full suite depends on #135–#141; fixture design may start early, but acceptance waits for child decisions; `REQUIRED`. |
-| [#143](https://github.com/LuigiFerronatto/TESSERA/issues/143) | open | `BLOCKED` | Personalized-memory/preference-evolution benchmark; depends on #136/#137/#138/#140/#141/#142/#96; `REQUIRED`. |
-| [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | P2 public assisted-surface parity only after upstream semantic cards are validated; coordinate with #120. |
-| [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | QUMem portfolio epic; no direct implementation PR. Coordinates #135–#146 plus #15/#16/#17/#20/#27. |
-| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`; broader docs audit remains separate from this roadmap-only sync. |
-| [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | closed | `VALIDATED` | `KEEP`; roadmap/governance PR #149 canonical `a13abbbba2138e48e237f14a182dd6746e3ec7d4`; final candidate `e8b52dbf882a15b1f15b935f30e41b1e0190d446`; documentation-only `NOT_APPLICABLE` delivery with final CI/Benchmark Ledger green. |
+| Issue | GitHub state | Lifecycle status | Class | Lane | Dependency / routing decision |
+|---|---|---|---|---|---|
+| [#68](https://github.com/LuigiFerronatto/TESSERA/issues/68) | closed | `VALIDATED` | FOUNDATION | Contract | Engine / CLI / MCP retrieval semantics aligned in PR #98. |
+| [#74](https://github.com/LuigiFerronatto/TESSERA/issues/74) | closed | `VALIDATED` | FOUNDATION | Contract | ADR 0001 accepted in [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), merge `0c0b638`, canonical `0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2`. |
+| [#92](https://github.com/LuigiFerronatto/TESSERA/issues/92) | closed | `VALIDATED` | FOUNDATION | Contract | [PR #108](https://github.com/LuigiFerronatto/TESSERA/pull/108), canonical `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05`; see `PR_EVOLUTION_92.md`. |
+| [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) | closed | `VALIDATED` | FOUNDATION | Contract | `KEEP`; canonical `c6124548f32b6dc5e1b7acf5127632bc6c75fccc`; see `PR_EVOLUTION_93.md`. |
+| [#94](https://github.com/LuigiFerronatto/TESSERA/issues/94) | closed | `VALIDATED` | FOUNDATION | Contract | Canonical Markdown persistence integrity. |
+| [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) | closed | `VALIDATED` | FOUNDATION | Contract | `KEEP`; canonical `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599`. |
+| [#96](https://github.com/LuigiFerronatto/TESSERA/issues/96) | closed | `VALIDATED` | FOUNDATION | Measurement | Reproducible LongMemEval V1 dev-50 historical retrieval baseline. |
+| [#100](https://github.com/LuigiFerronatto/TESSERA/issues/100) | closed | `VALIDATED` | FOUNDATION | Measurement | Benchmark Ledger and `REQUIRED / SMOKE_ONLY / NOT_APPLICABLE`. |
+| [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) | closed | `VALIDATED` | FOUNDATION | Product | Public identity/banner. |
+| [#114](https://github.com/LuigiFerronatto/TESSERA/issues/114) | closed | `VALIDATED` | FOUNDATION | Governance | Evolution-auditable lifecycle governance. |
+| [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | closed | `VALIDATED` | FOUNDATION | Product | ADR 0002 / PR #128; canonical `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`; `KEEP`. |
+| [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | closed | `VALIDATED` | FOUNDATION | Product | Packaging PR #131 canonical `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`; lifecycle `b3be96f4aa842a81c135b6ac87d3311ed292d339`. |
+| [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | closed | `VALIDATED` | FOUNDATION | Product | `KEEP`; implementation `61cf76fbd6ed61972f0f5abae515ba9bffca4b55`; lifecycle `fc0ed763ad47f5eba88775f3517cbee99d00a8b9`. |
+| [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | closed | `VALIDATED` | GOVERNANCE | Docs | Roadmap/QUMem reconciliation #149 canonical `a13abbbba2138e48e237f14a182dd6746e3ec7d4`; lifecycle #156 canonical `0880ef3ec417735c105898039cc202450407af2b`. |
+| [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `READY` containment / `BLOCKED` full | EXECUTABLE | Safety | P0 containment can be selected; full supersession waits on #15/#73/#96. |
+| [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | EXECUTABLE | Safety | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
+| [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | open | `BLOCKED` | EXECUTABLE | Storage | Depends on #67/#94; incremental/idempotent indexing. |
+| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#94; text ingestion beyond Markdown. |
+| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69; structural segmentation. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69/#70; corpus doctor, distinct from config/model doctor. |
+| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `BLOCKED` | EXECUTABLE | Storage | Depends on #12/#94; source/memory revision history. |
+| [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
+| [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
+| [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Utility/experience learning after admission/state become trustworthy. |
+| [#14](https://github.com/LuigiFerronatto/TESSERA/issues/14) | open | `TRACKER` | TRACKER | Graph | Graph experiment epic; child execution in #25/#26. |
+| [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) | open | `DEFERRED` | EXECUTABLE | Graph | #96 baseline complete. The previous "#25 graph-expansion card DoR completion" gate is superseded by live routing; technically executable but parked by WIP. |
+| [#26](https://github.com/LuigiFerronatto/TESSERA/issues/26) | open | `BLOCKED` | EXECUTABLE | Graph | Requires a frozen #25 baseline; relation confidence separate from relevance. |
+| [#32](https://github.com/LuigiFerronatto/TESSERA/issues/32) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #71; source authority/scope/precedence. |
+| [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #69/#70; harness adapter registry. |
+| [#72](https://github.com/LuigiFerronatto/TESSERA/issues/72) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #71/#32; deterministic instruction resolver. |
+| [#27](https://github.com/LuigiFerronatto/TESSERA/issues/27) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #15/#16/#32/#72/#96; cross-source Evidence Arbitration. |
+| [#20](https://github.com/LuigiFerronatto/TESSERA/issues/20) | open | `BLOCKED` | EXECUTABLE | Trust | Owns `sufficient / insufficient / conflicting / ambiguous`; state reconstruction belongs #141. |
+| [#17](https://github.com/LuigiFerronatto/TESSERA/issues/17) | open | `DEFERRED` | EXECUTABLE | Retrieval | Owns HOW validated retrieval capabilities are selected/combined; depends on #140/#20/#74/#96 and relevant capability baselines. |
+| [#18](https://github.com/LuigiFerronatto/TESSERA/issues/18) | open | `TRACKER` | TRACKER | Measurement | Measurement spine; #96/#100 complete, #28/#103–#106 open. |
+| [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) | open | `DEFERRED` | EVALUATION | Measurement | #68/#96 complete; freeze evidence and vary renderer only. |
+| [#103](https://github.com/LuigiFerronatto/TESSERA/issues/103) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #28/#74/#96/#100; frozen-evidence reader. |
+| [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #74/#100/#103; calibrated judge. |
+| [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #96/#100/#103/#104; LongMemEval V1 full-500. |
+| [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #74/#100/#103/#104/#105; LongMemEval-V2. |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `BLOCKED` | EXECUTABLE | Productization | #116/#117/#153 are satisfied; remaining blockers are #154 safe source discovery and #155 Init UX. |
+| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #153–#155 semantics stabilize; #166 owns presentation architecture. |
+| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | EXECUTABLE | Agent Integration | MCP startup/transport/config/schema/errors/timeouts/concurrency. Semantic memory intents belong #171. |
+| [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
+| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153 is satisfied; #154/#155 remain transitive blockers through #118. |
+| [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | open | `READY` | EXECUTABLE | QUMem | P0 deterministic decomposition fallback; no hard dependency. |
+| [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135/#74; F/P/I fidelity + 1-pass vs 3-pass. |
+| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135; source episode/supporting turns/temporal position. |
+| [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) | open | `BLOCKED` | EXECUTABLE | QUMem | #74 satisfied; DoR still requires frozen reviewed episode-boundary fixture. |
+| [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) | open | `DEFERRED` | EXECUTABLE | QUMem | Hard dependency #74 is satisfied; intentionally parked while release/safety lane is selected. |
+| [#140](https://github.com/LuigiFerronatto/TESSERA/issues/140) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #139/#74/#96; owns WHAT subqueries/stores retrieve evidence. |
+| [#141](https://github.com/LuigiFerronatto/TESSERA/issues/141) | open | `BLOCKED` | EXECUTABLE | QUMem | Principal QUMem gap; depends on #140/#15/#16/#137/#74/#96; structured evidence-linked Fq/Tq/Iq. |
+| [#142](https://github.com/LuigiFerronatto/TESSERA/issues/142) | open | `BLOCKED` | EVALUATION | QUMem | Full suite depends #135–#141; fixture design may start early, final acceptance waits for children. |
+| [#143](https://github.com/LuigiFerronatto/TESSERA/issues/143) | open | `BLOCKED` | BENCHMARK | QUMem | Personalized-memory/preference-evolution benchmark after #136/#137/#138/#140/#141/#142/#96. |
+| [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Expose only validated assisted contracts across Python/CLI/MCP; coordinate #120/#171. |
+| [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
+| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
+| [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
+| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `READY` | EXECUTABLE | Productization | #153 is validated; no remaining hard blocker. Owns safe project source discovery, clustering/classification, `.tessera-ignore`, and sensitive/forbidden-source policy. |
+| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `BLOCKED` | EXECUTABLE | Productization | #117/#153 are satisfied; remaining active blocker is #154 validation. Owns interactive/non-interactive Init UX. |
+| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #154 lane is primary. |
+| [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
+| [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
+| [#160](https://github.com/LuigiFerronatto/TESSERA/issues/160) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#74; capability-level pipeline modes/fallbacks. |
+| [#161](https://github.com/LuigiFerronatto/TESSERA/issues/161) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#158/#160/#155; Local/Private Hybrid/Cloud presets. |
+| [#162](https://github.com/LuigiFerronatto/TESSERA/issues/162) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#160; model/pipeline diagnostics. |
+| [#163](https://github.com/LuigiFerronatto/TESSERA/issues/163) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157; explicit local model artifact/cache/device/offline lifecycle. |
+| [#164](https://github.com/LuigiFerronatto/TESSERA/issues/164) | open | `TRACKER` | TRACKER | Intelligence | Provider-agnostic Intelligence epic; child cards #157–#163/#165 own decisions. |
+| [#165](https://github.com/LuigiFerronatto/TESSERA/issues/165) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#160/#163; local generative memory organization/reasoning. |
+| [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `DEFERRED` | EXECUTABLE | CLI | Technically executable from validated #112/#116/#117, but parked until #153–#155 semantics stabilize. |
+| [#167](https://github.com/LuigiFerronatto/TESSERA/issues/167) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Working Context packet identity/bootstrap/reuse/freshness; depends on #169 and #20 as applicable; consumes #168. |
+| [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) | open | `READY` | ARCHITECTURE | Cognitive Continuity | Long-Term Memory durable boundary; validated foundation satisfied; implementation behavior remains dependency-routed to child cards. |
+| [#169](https://github.com/LuigiFerronatto/TESSERA/issues/169) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Context Compiler; depends on #139/#140/#141/#20 and consumes #168. |
+| [#170](https://github.com/LuigiFerronatto/TESSERA/issues/170) | open | `TRACKER` | TRACKER | Cognitive Continuity | Agent Cognitive Continuity epic; no direct feature PR. |
+| [#171](https://github.com/LuigiFerronatto/TESSERA/issues/171) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Semantic `search/context/evidence/remember/inspect`; depends on #120 + #167/#169, with #19/#92 governing durable remember. |
+| [#78](https://github.com/LuigiFerronatto/TESSERA/issues/78) | open | `READY` | DOCUMENTATION | Docs | Project-agnostic legacy/deep-dive cleanup; coordinate #146, not technical WIP. |
+| [#80](https://github.com/LuigiFerronatto/TESSERA/issues/80) | open | `DEFERRED` | DOCUMENTATION | Docs | Visual/architecture documentation after target contracts stabilize. |
+| [#172](https://github.com/LuigiFerronatto/TESSERA/issues/172) | closed | `VALIDATED` | GOVERNANCE | Portfolio | `KEEP`; canonical execution funnel and WIP taxonomy reconciled by PR #174 after the #173 merge. |
 
 ---
 
-# Execution lanes
+# Ownership boundaries that must not collapse
 
-The roadmap is not one serial queue. Independent lanes may advance in parallel, subject to the repository WIP limit and shared-file conflict avoidance.
-
-## Lane A — Contract & Safety
-
-```text
-#16 containment READY
-
-#67 regression-gate integration BLOCKED
-  -> #12 incremental indexing
-```
-
-Containment should preserve candidates rather than silently treating newest as truth. Full deterministic supersession remains later and requires temporal/revision foundations.
-
-## Lane B — Productization and first public release
-
-```text
-#117 init/config/discovery VALIDATED
-  -> #118 clean onboarding READY
-       -> #134 first PyPI release BLOCKED
-
-#87 LICENSE / contribution ownership
-       -> #134
-
-#119 CLI UX READY
-#120 MCP robustness READY
-  -> #121 official Skills BLOCKED
-```
-
-#134 is the release gate, not a packaging refactor. #116 already proved wheel/sdist ownership and clean installed-artifact behavior. #118 must prove the final onboarding flow against the #117 contract before publication. The remaining #134 blockers are #118 validation and #87.
-
-## Lane C — QUMem-derived memory construction and state
-
-Parent tracker: #145.
-
-### Immediate integrity / truth work
-
-```text
-#135 decomposer fallback              READY
-#16 P0 conflict containment           READY
-#146 paper/runtime docs truth         READY
-```
-
-These are independent Test Cards. Selection still obeys WIP limits.
-
-### Memory construction
-
-```text
-#138 role-aware episode continuity
-     BLOCKED until frozen reviewed boundary fixture
-
-#135
-  -> #136 F/P/I semantics + 1-pass vs 3-pass
-
-#135
-  -> #137 source episode / supporting turns / temporal position
-       recommended to consume decisions from #136/#138 when available
-```
-
-Important distinction:
-
-```text
-semantic episode membership (#138)
-!= Beginning/Middle/End TESSERA representation
-
-interaction temporal_position (#137)
-!= temporal validity/state semantics (#15)
-```
-
-### Query-conditioned retrieval
-
-```text
-#139 information needs READY
-  -> #140 bounded multi-query + multi-store plan
-```
-
-Ownership boundary:
+## QUMem / retrieval
 
 ```text
 #139 = what historical facets must be established?
 #140 = WHAT sub-queries/stores should retrieve them?
 #17  = HOW each frozen retrieval operation should execute efficiently?
-```
 
-#17 stays later; it must not absorb query planning.
-
-### Temporal/state foundation
-
-```text
-#73 revision history
-  -> #15 temporal/state keys
-       -> #16 full deterministic supersession
-```
-
-Historical preferences remain evidence even when superseded for current applicability.
-
-### Principal QUMem gap
-
-```text
-#140 retrieval plan
-#137 lineage
-#15 temporal/state semantics
-#16 conflict containment/full semantics
-#74 optional-LLM boundary
-#96 benchmark baseline
-        -> #141 structured query-conditioned state Fq / Tq / Iq
-```
-
-#141 is an optional assisted state view over structured evidence. It is not a new source-of-truth store and must never overwrite persistent memories.
-
-### Control flow and evaluation
-
-```text
-#27 cross-source arbitration
-#15/#16 temporal conflict semantics
-        -> #20 evidence status / abstention
-
-#135–#141
-        -> #142 frozen QUMem fidelity suite
-        -> #143 personalized-memory benchmark
-
-validated semantic contracts
-        -> #144 Python / CLI / MCP assisted-surface parity
-```
-
-Ownership boundary:
-
-```text
 #141 = what state does evidence imply for this query?
 #20  = is the evidence/state sufficient, insufficient, conflicting or ambiguous?
+
+interaction temporal_position (#137)
+!= temporal validity/state semantics (#15)
+
+semantic episode membership (#138)
+!= Beginning/Middle/End TESSERA representation
 ```
 
-## Lane D — Graph and retrieval experiments
+## Intelligence
 
 ```text
-#25 query-aware expansion READY
-  -> frozen baseline
-      -> #26 relation confidence
-          -> later graph/arbitration integration
+#157 = typed capability/model profiles
+#158 = semantic candidate generation/index
+#159 = reranking a frozen candidate set
+#160 = execution mode/profile/fallback per pipeline capability
+#163 = local model artifact lifecycle
+#165 = local generative behavior experiments
+#17  = adaptive runtime choice among validated retrieval capabilities
 ```
 
-No relation-confidence value enters the default final relevance score merely because an edge exists.
-
-## Lane E — Measurement spine
+## Cognitive Continuity
 
 ```text
-#28 rendering READY
-  -> #103 reader baseline
-      -> #104 judge calibration
-          -> #105 LongMemEval V1 full-500
-              -> #106 LongMemEval-V2
+#168 Long-Term Memory
+!=
+#169 Context Compiler
+!=
+#167 Working Context
+!=
+#171 Agent-facing semantic API
+!=
+#120 MCP transport/runtime
 ```
 
-The QUMem #142/#143 track runs alongside this spine and must keep construction/retrieval/state/reader effects separable.
+The intended direction is:
+
+```text
+Long-Term Memory
+-> Context Compiler
+-> Working Context
+-> Agent
+```
+
+Raw search/evidence remain available for drill-down; working context does not become durable truth.
 
 ---
 
@@ -423,12 +620,13 @@ The QUMem #142/#143 track runs alongside this spine and must keep construction/r
 QUERY
   |
   v
-Configuration / Store Selection (#117)
+Configuration / Source Selection
   |
   v
 Deterministic Candidate Retrieval
   |
-  +--> lexical / basic relation signals today
+  +--> lexical/basic relation signals today
+  +--> semantic lane later (#158)
   +--> query-aware graph expansion later (#25/#26)
   +--> temporal/state-aware retrieval later (#15/#16)
   +--> adaptive HOW-to-retrieve later (#17)
@@ -460,15 +658,18 @@ Typed F/P/I Decomposition (#136)
 Source Episode + Supporting-Turn Lineage (#137)
   |
   v
+Admission (#19, when validated)
+  |
+  v
 Canonical Write Gate (#92)
   |
   v
-MARKDOWN SOURCE MEMORIES
+LONG-TERM MEMORY (#168 boundary)
 ```
 
-#135 first restores deterministic fallback integrity for the existing decomposer. It does not by itself validate QUMem fidelity.
+#135 first restores deterministic fallback integrity. It does not by itself validate QUMem fidelity.
 
-## Optional assisted query-conditioned path
+## Optional query-conditioned/context path
 
 ```text
 QUERY / TASK
@@ -480,7 +681,7 @@ Information Needs (#139)
 Retrieval Plan: WHAT to retrieve (#140)
   |
   v
-Deterministic TESSERA Retrieval
+TESSERA Evidence Retrieval
   |
   v
 Structured Fq / Tq / Iq State (#141)
@@ -489,16 +690,25 @@ Structured Fq / Tq / Iq State (#141)
 Evidence Status / Abstention (#20)
   |
   v
+Context Compiler (#169)
+  |
+  v
+Working Context Packet (#167)
+  |
+  v
+Agent-facing API (#171)
+  |
+  v
 CONSUMING AGENT
 ```
 
-The consuming agent remains responsible for final reasoning/action. TESSERA returns evidence and optional structured derived state; it does not silently promote model output to persistent truth.
+TESSERA returns evidence and optional structured derived state/context; it does not take final-answer authority from the consuming agent.
 
 ---
 
 # Research-derived experiment map
 
-External work changes the next experiment; it does not become implemented product capability merely because it is cited.
+External work changes the next experiment; citation does not equal implementation.
 
 | Research signal | TESSERA experiment | Decision question |
 |---|---|---|
@@ -506,10 +716,10 @@ External work changes the next experiment; it does not become implemented produc
 | CaSKG | #26 relation confidence | Is an edge trustworthy independently of query relevance? |
 | MemToC | #27 + #20 | How do we preserve disagreement and signal sufficiency/conflict/ambiguity? |
 | RENDER | #28 rendering ablation | Does structured evidence presentation help when retrieval is frozen? |
-| QUMem | #145 tracker; #135–#144 children | Which episode/decomposition/planning/state mechanisms improve TESSERA while preserving provenance and core independence? |
-| Personalized-memory benchmarks | #143 | Do QUMem-inspired additions improve preference evolution/current-state tasks, not only factual recall? |
+| QUMem | #145 / #135–#144 | Which construction/planning/state mechanisms improve TESSERA while preserving provenance/core independence? |
+| Personalized-memory benchmarks | #143 | Do additions improve preference evolution/current-state tasks, not only factual recall? |
 
-#146 owns broader paper-fidelity documentation truth. This roadmap only owns portfolio/routing truth. #147 canonically synchronized that routing in PR #149.
+#146 owns broader QUMem paper-fidelity documentation truth.
 
 ---
 
@@ -519,7 +729,7 @@ Benchmark applicability follows #100:
 
 ```text
 REQUIRED
-  semantic retrieval / memory-state experiment requires its declared benchmark evidence
+  semantic retrieval / memory-state experiment requires declared benchmark evidence
 
 SMOKE_ONLY
   config/runtime/release/integrity work that should preserve retrieval semantics
@@ -528,9 +738,9 @@ NOT_APPLICABLE
   documentation/governance-only work
 ```
 
-LongMemEval is not run automatically for `SMOKE_ONLY` or `NOT_APPLICABLE` work. The deterministic sanity fixture remains the low-cost regression guard where required.
+LongMemEval is not run automatically for `SMOKE_ONLY` or `NOT_APPLICABLE`.
 
-Historical deterministic sanity reference used by recent non-semantic changes:
+Historical deterministic sanity reference:
 
 ```text
 Hit@1             = 0.75
@@ -556,51 +766,53 @@ paper behavior
 != validated benchmark result
 ```
 
-#146 owns the QUMem-wide paper-fidelity audit. #78 owns project-specific legacy/deep-dive cleanup. #147 canonically synchronized roadmap routing in PR #149.
+#146 owns QUMem research-fidelity truth. #78 owns project-agnostic legacy/deep-dive cleanup. #80 is deferred visual documentation.
 
-For publication:
+For the first public release:
 
 ```text
-#117 VALIDATED
-+
-#118 VALIDATED
-+
+#153 VALIDATED
+-> #154 VALIDATED
+-> #155 VALIDATED
+-> #118 VALIDATED
+
+AND
+
 #87 owner-approved legal entrypoint
-        -> #134 TestPyPI/PyPI release gate
+
+=> #134 TestPyPI/PyPI release gate
 ```
 
-No roadmap entry may imply that `tessera` is already the published PyPI distribution name. Distribution naming/version policy is frozen only inside #134.
+No roadmap entry may imply that `tessera` is already the published PyPI distribution name.
 
 ---
 
 # Immediate selection guidance
 
-The repository uses bounded WIP rather than starting every `READY` card at once.
+The repository uses bounded WIP rather than starting every technically executable card at once.
 
-Current candidates with no unresolved hard dependency include:
+Recommended after the #153/#172 lifecycle reconciliation:
 
 ```text
-Productization:
-#118 clean onboarding
-#120 MCP robustness
-#119 CLI UX
+Primary:
+#154 Safe project source discovery + .tessera-ignore
 
-P0 safety/integrity:
+Parallel, choose one:
 #135 decomposer fallback
+or
 #16 containment
-
-Documentation truth:
-#146 QUMem fidelity correction
-
-Independent research:
-#139 structured information needs
-#25 query-aware graph expansion
-#28 rendering ablation
 ```
 
-Prioritize by risk and the active product goal. A reasonable split is one productization card plus one safety/research card in separate worktrees, but the WIP policy remains authoritative over this example.
+Why #154 first:
+- #153 has already validated the store/source/index boundary;
+- #154 directly unlocks #155, then #118 and #134;
+- it owns discovery/ignore safety before onboarding broadens the corpus.
 
-Do not start downstream cards simply because they are visible in this roadmap.
+Why one integrity card in parallel:
+- #135 fixes a concrete P0 contract mismatch and unlocks #136/#137;
+- #16 containment prevents destructive preference/history loss needed by later state work.
+
+Do not start #166 before #154/#155 semantics stabilize. Keep #157 deliberately deferred while the release-critical product lane is selected. Do not start #167/#169/#171 before their state/context prerequisites.
 
 ---
 
@@ -610,31 +822,44 @@ Do not start downstream cards simply because they are visible in this roadmap.
 FOUNDATION / TRUTH
 #68/#74/#92/#93/#94/#95/#96/#100/#112/#114  VALIDATED
 #16 containment                                  READY
-#67 quality gate                                 BLOCKED
+#67 Quality Gate                                 BLOCKED
 
 PRODUCTIZATION / RELEASE
 #115 VALIDATED
-  -> #116 VALIDATED
-       -> #117 VALIDATED
-            -> #118 READY
-                 -> #134 BLOCKED
-#87 ----------------------------------------------^
-#119 READY
+ -> #116 VALIDATED
+     -> #117 VALIDATED
+         -> #153 VALIDATED
+             -> #154 READY
+                 -> #155 BLOCKED
+                     -> #118 BLOCKED
+                         -> #134 BLOCKED
+#87 ADMIN ------------------------------------------^
+
 #120 READY -> #121 BLOCKED
+#119/#166 DEFERRED
 
-QUMEM EPIC #145                                   TRACKER
-P0: #135 READY + #16 containment READY
-Docs truth: #146 READY
-Construction: #138 DoR-blocked; #136 blocked; #137 blocked
-Planning: #139 READY -> #140 BLOCKED
-Temporal: #73 -> #15 -> #16 full
-Principal gap: #141 BLOCKED
-Evaluation: #142/#143 BLOCKED
-Public assisted parity: #144 BLOCKED
+INTELLIGENCE EPIC #164                             TRACKER
+#153 VALIDATED -> #157 DEFERRED -> #158/#160/#163 -> #159/#162/#165
+#155 + validated intelligence -> #161
+later #17 adaptive retrieval
 
-GRAPH / EVALUATION
-#25 READY -> #26 BLOCKED
-#28 READY -> #103 -> #104 -> #105 -> #106
+QUMEM EPIC #145                                    TRACKER
+#135 READY
+#136/#137 BLOCKED
+#138 BLOCKED
+#139 DEFERRED -> #140 BLOCKED
+#73 -> #15 -> #16 full
+#141/#142/#143/#144 BLOCKED
+#146 READY docs
+
+COGNITIVE CONTINUITY EPIC #170                     TRACKER
+#168 READY architecture
+#139 -> #140 -> #141 -> #20 -> #169 -> #167 -> #171
+#120 provides MCP transport, not context semantics
+
+GRAPH / MEASUREMENT
+#25 DEFERRED -> #26 BLOCKED
+#28 DEFERRED -> #103 -> #104 -> #105 -> #106
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.

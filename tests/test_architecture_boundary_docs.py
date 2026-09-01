@@ -335,8 +335,9 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#116")
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
-    for issue in ("#118", "#119", "#120"):
-        assert "`READY`" in _markdown_table_row(roadmap, issue)
+    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`DEFERRED`" in _markdown_table_row(roadmap, "#119")
+    assert "`READY`" in _markdown_table_row(roadmap, "#120")
     assert "`BLOCKED`" in _markdown_table_row(roadmap, "#121")
 
     for marker in (
@@ -372,8 +373,9 @@ def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
     ).read_text(encoding="utf-8")
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
-    for issue in ("#118", "#119", "#120"):
-        assert "`READY`" in _markdown_table_row(roadmap, issue)
+    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`DEFERRED`" in _markdown_table_row(roadmap, "#119")
+    assert "`READY`" in _markdown_table_row(roadmap, "#120")
     for issue in ("#121", "#134", "#67"):
         assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
 
@@ -405,16 +407,22 @@ def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
         assert marker in record
 
 
-def test_issue_153_candidate_records_boundaries_without_downstream_claims() -> None:
+def test_issue_153_validated_records_preserve_delivery_and_downstream_boundaries() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_153_AUDIT.read_text(encoding="utf-8")
     record = (
         ROOT / "docs/test-cards/153-configuration-v2-store-sources-index.md"
     ).read_text(encoding="utf-8")
 
-    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#153")
+    issue_153 = _markdown_table_row(roadmap, "#153")
+    assert "`VALIDATED`" in issue_153
+    assert "`READY`" not in issue_153
+    assert "`IN_PROGRESS`" not in issue_153
     for marker in (
         "0880ef3ec417735c105898039cc202450407af2b",
+        "72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4",
+        "53f772cdd0fae369a2ed3954751667d5e4ea52c4",
+        "2508676d472088733702b6ed920fc829df9a7681",
         "ResolvedConfiguration",
         "store.path",
         "sources.roots",
@@ -423,6 +431,9 @@ def test_issue_153_candidate_records_boundaries_without_downstream_claims() -> N
         "#154, #155, #157",
     ):
         assert marker in audit
-    assert "| Record status | `IN_PROGRESS` |" in record
+    assert "| Record status | `VALIDATED` |" in record
+    assert "| Decision | `KEEP` |" in record
+    assert "2508676d472088733702b6ed920fc829df9a7681" in record
     assert "## What changed or is being tested?" in record
-    assert "#154 and #155 remain blocked" in record
+    assert "#154 is now `READY`" in record
+    assert "#155 remains\n`BLOCKED` on #154" in record

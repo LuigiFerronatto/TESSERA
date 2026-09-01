@@ -23,7 +23,7 @@ ancestor and sibling leakage. #117 added safe selection and stable store
 identity without changing that Engine boundary. Those protections are retained;
 #153 adds explicit source breadth only when schema v2 says so.
 
-## Candidate architecture
+## Final architecture contract
 
 ```text
 configuration inputs
@@ -110,9 +110,81 @@ Local candidate evidence:
 | Deterministic sanity before | Hit@1 `0.75`; Hit@3 `1.00`; Hit@5 `1.00`; MRR `0.875`; evidence `1.00`; missing evidence passed |
 | Deterministic sanity candidate | Hit@1 `0.75`; Hit@3 `1.00`; Hit@5 `1.00`; MRR `0.875`; evidence `1.00`; missing evidence passed |
 
-The implementation candidate was published as
-[`53f772c`](https://github.com/LuigiFerronatto/TESSERA/commit/53f772cdd0fae369a2ed3954751667d5e4ea52c4)
-in [PR #173](https://github.com/LuigiFerronatto/TESSERA/pull/173). CI run links
-and the final PR head are recorded in PR evidence. Until canonical merge and
-post-merge lifecycle sync, #153 remains `IN_PROGRESS`, and #154/#155 remain
-blocked.
+## Canonical delivery and lifecycle result
+
+| Field | Canonical evidence |
+|---|---|
+| Implementation starting main | `0880ef3ec417735c105898039cc202450407af2b` |
+| Runtime implementation commit | [`53f772cdd0fae369a2ed3954751667d5e4ea52c4`](https://github.com/LuigiFerronatto/TESSERA/commit/53f772cdd0fae369a2ed3954751667d5e4ea52c4) |
+| Final candidate | [`72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`](https://github.com/LuigiFerronatto/TESSERA/commit/72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4) |
+| Implementation PR | [#173](https://github.com/LuigiFerronatto/TESSERA/pull/173) |
+| Canonical squash merge | [`2508676d472088733702b6ed920fc829df9a7681`](https://github.com/LuigiFerronatto/TESSERA/commit/2508676d472088733702b6ed920fc829df9a7681) |
+| Lifecycle status | `VALIDATED` |
+| Decision | `KEEP` |
+| Implementation benchmark applicability | `SMOKE_ONLY` |
+
+The final candidate and canonical squash merge are two Git identities for one
+delivery, not two features. The runtime commit is preserved separately because
+the final candidate also contains its evidence and documentation corrections.
+
+Exact PR #173 surfaces changed:
+
+```text
+CHANGELOG.md
+README.md
+docs/ARCHITECTURE.md
+docs/OVERVIEW.md
+docs/PR_EVOLUTION_153.md
+docs/ROADMAP.md
+docs/test-cards/153-configuration-v2-store-sources-index.md
+docs/test-cards/README.md
+tessera/cli.py
+tessera/config.py
+tessera/engine.py
+tessera/engine_core.py
+tessera/mcp_server.py
+tests/test_architecture_boundary_docs.py
+tests/test_issue_117_config_init_discovery.py
+tests/test_issue_153_configuration_v2.py
+tests/test_issue_95_runtime_boundary.py
+tests/test_project_agnostic_runtime.py
+```
+
+Final-head CI was green at `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`:
+[TESSERA CI 33545813964](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33545813964)
+passed Python 3.9, Python 3.12, distribution, smoke, and sanity; [Benchmark
+Ledger 33545813991](https://github.com/LuigiFerronatto/TESSERA/actions/runs/33545813991)
+passed offline reporting and skipped LongMemEval under `SMOKE_ONLY`.
+
+## Validated outcome and downstream routing
+
+```text
+store.path -> generated-memory write destination
+sources    -> explicit read/index corpus
+index.path -> derived, disposable, rebuildable state
+```
+
+Engine, CLI, and MCP consume the same resolved boundary. The path, symlink,
+source-read-only, store-write-containment, identity, cache, and rebuild evidence
+listed above remained green through the final candidate. Held-constant direct,
+schema-v1, and conservatively migrated schema-v2 retrieval projections remained
+exact, with sanity unchanged at Hit@1 `0.75`, Hit@3/5 `1.00`, MRR `0.875`,
+evidence `1.00`, and missing-evidence passed.
+
+Conservative migration remains:
+
+```text
+schema v1
+-> previous store remains store.path
+-> previous store remains the only source
+-> no repository-wide discovery is activated
+```
+
+Known limitations and non-goals remain automatic source discovery,
+`.tessera-ignore`, source clustering/picker UX, init UX, embeddings/models, and
+incremental indexing. They were not implemented by #153.
+
+Post-merge routing is therefore: #154 `READY` with no remaining hard blocker;
+#155 `BLOCKED` on #154; #118 `BLOCKED` on #154/#155; and #157's #153 prerequisite
+is satisfied, but #157 is deliberately `DEFERRED` under portfolio WIP. No
+downstream implementation was started.
