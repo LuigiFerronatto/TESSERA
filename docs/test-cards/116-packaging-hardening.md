@@ -154,6 +154,7 @@ completed onboarding: #118 still owns that work.
 |---|---|
 | Issue/Test Card | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) |
 | Pull request | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) |
+| Lifecycle pull request | [PR #133](https://github.com/LuigiFerronatto/TESSERA/pull/133) (`DOCUMENTATION_CORRECTION`) |
 | Merge commit | `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4` |
 | Evidence/Learnings/Decision | Published before merge on Issue #116 |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, LongMemEval skipped |
