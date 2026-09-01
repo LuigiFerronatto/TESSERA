@@ -115,9 +115,15 @@ mandatory-LLM behavior remain fixed. Deterministic sanity must remain Hit@1
 `0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence `1.00`, and missing-evidence
 passed. LongMemEval is not required unless held-constant retrieval changes.
 
-Final focused/full-suite, packaging, sanity, candidate SHA, CI, Benchmark
-Ledger, and Issue Evidence/Learnings/Decision links are recorded after
-publication. Until merge and a separate lifecycle reconciliation, #154 remains
+Local candidate validation recorded for PR #175: the required focused set
+passed `165` tests; the clean-worktree full suite passed `359` tests with 14
+expected warnings; compileall and diff checks passed. Wheel and sdist builds
+include `tessera/source_discovery.py`, exclude test/benchmark trees from the
+wheel, and the installed-wheel discovery smoke passed. Sanity remained Hit@1
+`0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence `1.00`, and missing-evidence
+passed. Final candidate SHA, CI, Benchmark Ledger, and Issue
+Evidence/Learnings/Decision links are recorded after final-head publication.
+Until merge and a separate lifecycle reconciliation, #154 remains
 `IN_PROGRESS`; #155/#118/#134 remain blocked and unstarted.
 
 ## Known limitations and non-goals

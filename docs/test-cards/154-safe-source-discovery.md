@@ -5,7 +5,7 @@
 | Issue | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `SOURCE_DISCOVERY` |
-| Pull request | Pending publication from `test-card/154-safe-source-discovery` |
+| Pull request | [#175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
 | Head commit | Pending final candidate |
 | Merge commit | Not merged |
 | Decision | candidate `KEEP`, subject to final CI |
@@ -134,7 +134,7 @@ and release chains. No downstream implementation starts in this candidate.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #154](https://github.com/LuigiFerronatto/TESSERA/issues/154) |
-| Pull request | Pending publication |
+| Pull request | [PR #175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending final Issue comment |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity required, LongMemEval skipped |
