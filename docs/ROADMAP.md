@@ -1,6 +1,6 @@
 # TESSERA Roadmap
 
-> Authoritative portfolio audit: 2026-09-01 against canonical `main` `0880ef3ec417735c105898039cc202450407af2b` (PR #156, #147 post-merge lifecycle). Issue #172 owns this portfolio reconciliation. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
+> Authoritative portfolio audit: 2026-09-01 against canonical `main` `2508676d472088733702b6ed920fc829df9a7681` (PR #173, Configuration v2). Issue #172 owns this portfolio reconciliation. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
@@ -36,6 +36,15 @@ READY executable backlog   <= 8
 ```
 
 A card may be technically executable but intentionally `DEFERRED` to keep architecture exploration from becoming simultaneous implementation. Trackers never consume executable WIP.
+
+Current reconciliation-matrix counts:
+
+```text
+NOW executable                 0
+READY                          7 total / 4 executable
+BLOCKED                        40 full cards + #16 full phase
+TRACKER                        5 non-executable epics
+```
 
 ## Non-negotiable product invariants
 
@@ -86,19 +95,14 @@ This board is selection guidance, not permission to bypass the owning Test Card.
 
 ## NOW
 
-Current governance delivery:
-
-```text
-#172 portfolio / roadmap reconciliation      IN_PROGRESS
-```
-
-No technical feature implementation is started by #172.
+No executable feature is selected or in progress. This governance delivery
+closes #172 without starting its recommended successor.
 
 Recommended next executable selection after this governance card:
 
 ```text
 Primary:
-#153 Configuration v2
+#154 Safe project source discovery + .tessera-ignore
 
 Optional parallel integrity card, choose at most one:
 #135 deterministic decomposer fallback
@@ -111,7 +115,7 @@ or
 Highest-value unblocked work, ranked rather than treated equally:
 
 ```text
-#153 Configuration v2                        release-critical
+#154 Safe source discovery + .tessera-ignore  release-critical
 #135 Decomposer fallback integrity           P0 contract integrity
 #16  Conflict resolver containment           P0 state safety
 #120 MCP transport/runtime robustness        agent integration substrate
@@ -125,18 +129,18 @@ Cards intentionally parked despite earlier/live `READY` wording are listed under
 
 ```text
 FIRST PUBLIC RELEASE
-#153
-  -> #154 source discovery
-      -> #155 init UX
-          -> #118 clean onboarding
-              -> #134 PyPI release
+#153 VALIDATED
+  -> #154 source discovery READY
+      -> #155 init UX BLOCKED
+          -> #118 clean onboarding BLOCKED
+              -> #134 PyPI release BLOCKED
 
 #87 owner-approved LICENSE/contribution decision
   -------------------------------------> #134
 
 
 INTELLIGENCE
-#153 -> #157 typed model profiles
+#153 VALIDATED -> #157 typed model profiles DEFERRED by WIP
           ├-> #163 local model lifecycle
           ├-> #160 capability pipeline
           └-> #158 semantic embeddings
@@ -193,9 +197,10 @@ Valid work intentionally parked to control WIP or avoid rework:
 #139 QUMem information-needs implementation
 #166 unified CLI presentation system
 #80  architecture/roadmap visual assets
+#157 typed model profiles
 ```
 
-`#25`, `#28`, `#139` and `#166` have technically executable or previously `READY` definitions, but this portfolio intentionally parks them until the active release/safety foundations reduce WIP or their surrounding semantics stabilize.
+`#25`, `#28`, `#139`, `#157` and `#166` have technically executable or previously `READY` definitions, but this portfolio intentionally parks them until the active release/safety foundations reduce WIP or their surrounding semantics stabilize.
 
 ## TRACKERS
 
@@ -273,8 +278,8 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
 #115 repository architecture        VALIDATED
   -> #116 package/distribution       VALIDATED
        -> #117 config/discovery v1   VALIDATED
-            -> #153 config v2        READY
-                 -> #154 sources     BLOCKED
+            -> #153 config v2        VALIDATED
+                 -> #154 sources     READY
                       -> #155 init UX BLOCKED
                            -> #118 clean onboarding BLOCKED
                                 -> #134 first PyPI release BLOCKED
@@ -289,7 +294,7 @@ Parallel product surfaces:
 #166 presentation child      DEFERRED
 ```
 
-The previous `READY` state for #118 is superseded by its newer live prerequisites #153/#154/#155; current portfolio status is `BLOCKED`.
+The previous `READY` state for #118 is superseded by its newer live prerequisites. #153 is satisfied; #154 and #155 remain active blockers, so #118 stays `BLOCKED`.
 
 The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 
@@ -353,8 +358,8 @@ Neither QUMem nor graph work replaces the deterministic core.
 Parent tracker: #164.
 
 ```text
-#153 configuration v2
-  -> #157 typed model profiles
+#153 configuration v2 VALIDATED
+  -> #157 typed model profiles DEFERRED by portfolio WIP
        ├-> #163 local-model artifact lifecycle
        ├-> #158 semantic embeddings/index
        │    -> #159 reranking
@@ -507,12 +512,12 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #74/#100/#103; calibrated judge. |
 | [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #96/#100/#103/#104; LongMemEval V1 full-500. |
 | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #74/#100/#103/#104/#105; LongMemEval-V2. |
-| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `BLOCKED` | EXECUTABLE | Productization | Previous `READY` state superseded by #153/#154/#155; depends on #116/#117 plus validated Configuration v2, safe source discovery and Init UX. |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `BLOCKED` | EXECUTABLE | Productization | #116/#117/#153 are satisfied; remaining blockers are #154 safe source discovery and #155 Init UX. |
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #153–#155 semantics stabilize; #166 owns presentation architecture. |
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | EXECUTABLE | Agent Integration | MCP startup/transport/config/schema/errors/timeouts/concurrency. Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | #117 satisfied; requires #118 VALIDATED + #87. #153–#155 are transitive blockers through #118. |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153 is satisfied; #154/#155 remain transitive blockers through #118. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | open | `READY` | EXECUTABLE | QUMem | P0 deterministic decomposition fallback; no hard dependency. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135/#74; F/P/I fidelity + 1-pass vs 3-pass. |
 | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135; source episode/supporting turns/temporal position. |
@@ -525,10 +530,10 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Expose only validated assisted contracts across Python/CLI/MCP; coordinate #120/#171. |
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
 | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
-| [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | open | `READY` | EXECUTABLE | Productization | P0 Configuration v2; depends on validated #117/#93; unlocks #154/#155/#118 and Intelligence configuration. |
-| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `BLOCKED` | EXECUTABLE | Productization | Depends on #153; safe source discovery + `.tessera-ignore`. |
-| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `BLOCKED` | EXECUTABLE | Productization | Depends on #153/#154/#117; interactive/non-interactive Init UX. |
-| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `BLOCKED` | EXECUTABLE | Intelligence | Starts after #153 schema is stable; typed model profiles. |
+| [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
+| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `READY` | EXECUTABLE | Productization | #153 is validated; no remaining hard blocker. Owns safe project source discovery, clustering/classification, `.tessera-ignore`, and sensitive/forbidden-source policy. |
+| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `BLOCKED` | EXECUTABLE | Productization | #117/#153 are satisfied; remaining active blocker is #154 validation. Owns interactive/non-interactive Init UX. |
+| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #154 lane is primary. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
 | [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
 | [#160](https://github.com/LuigiFerronatto/TESSERA/issues/160) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#74; capability-level pipeline modes/fallbacks. |
@@ -545,7 +550,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#171](https://github.com/LuigiFerronatto/TESSERA/issues/171) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Semantic `search/context/evidence/remember/inspect`; depends on #120 + #167/#169, with #19/#92 governing durable remember. |
 | [#78](https://github.com/LuigiFerronatto/TESSERA/issues/78) | open | `READY` | DOCUMENTATION | Docs | Project-agnostic legacy/deep-dive cleanup; coordinate #146, not technical WIP. |
 | [#80](https://github.com/LuigiFerronatto/TESSERA/issues/80) | open | `DEFERRED` | DOCUMENTATION | Docs | Visual/architecture documentation after target contracts stabilize. |
-| [#172](https://github.com/LuigiFerronatto/TESSERA/issues/172) | open | `IN_PROGRESS` | GOVERNANCE | Portfolio | Full open-issue triage and canonical execution funnel; this PR only. |
+| [#172](https://github.com/LuigiFerronatto/TESSERA/issues/172) | closed | `VALIDATED` | GOVERNANCE | Portfolio | `KEEP`; canonical execution funnel and WIP taxonomy reconciled by PR #174 after the #173 merge. |
 
 ---
 
@@ -786,11 +791,11 @@ No roadmap entry may imply that `tessera` is already the published PyPI distribu
 
 The repository uses bounded WIP rather than starting every technically executable card at once.
 
-Recommended after #172:
+Recommended after the #153/#172 lifecycle reconciliation:
 
 ```text
 Primary:
-#153 Configuration v2
+#154 Safe project source discovery + .tessera-ignore
 
 Parallel, choose one:
 #135 decomposer fallback
@@ -798,16 +803,16 @@ or
 #16 containment
 ```
 
-Why #153 first:
-- directly unlocks #154/#155/#118/#134;
-- also unlocks #157 and therefore the Intelligence stack;
-- resolves the store/source/index boundary before onboarding and model/index work.
+Why #154 first:
+- #153 has already validated the store/source/index boundary;
+- #154 directly unlocks #155, then #118 and #134;
+- it owns discovery/ignore safety before onboarding broadens the corpus.
 
 Why one integrity card in parallel:
 - #135 fixes a concrete P0 contract mismatch and unlocks #136/#137;
 - #16 containment prevents destructive preference/history loss needed by later state work.
 
-Do not start #166 before #153–#155 semantics stabilize. Do not let #157+ outrun #153. Do not start #167/#169/#171 before their state/context prerequisites.
+Do not start #166 before #154/#155 semantics stabilize. Keep #157 deliberately deferred while the release-critical product lane is selected. Do not start #167/#169/#171 before their state/context prerequisites.
 
 ---
 
@@ -823,8 +828,8 @@ PRODUCTIZATION / RELEASE
 #115 VALIDATED
  -> #116 VALIDATED
      -> #117 VALIDATED
-         -> #153 READY
-             -> #154 BLOCKED
+         -> #153 VALIDATED
+             -> #154 READY
                  -> #155 BLOCKED
                      -> #118 BLOCKED
                          -> #134 BLOCKED
@@ -834,7 +839,7 @@ PRODUCTIZATION / RELEASE
 #119/#166 DEFERRED
 
 INTELLIGENCE EPIC #164                             TRACKER
-#153 -> #157 -> #158/#160/#163 -> #159/#162/#165
+#153 VALIDATED -> #157 DEFERRED -> #158/#160/#163 -> #159/#162/#165
 #155 + validated intelligence -> #161
 later #17 adaptive retrieval
 

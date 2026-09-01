@@ -8,7 +8,9 @@ subgraph retrieval, and temporal conflict resolution.
 
 import datetime
 import os
+import sys
 import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import networkx as nx
@@ -32,6 +34,17 @@ from .models import (
     WriteGatingViolationError,
 )
 from .security import WriteAdmission, WriteGatingEngine, WriteResult, validate_memory_path
+
+
+_BUILTIN_EXCLUDED_SOURCE_DIRS = {
+    ".tessera_index",
+    ".git",
+    "node_modules",
+    "venv",
+    ".venv-browser-agent",
+    ".browser-harness",
+    "Tessera",
+}
 
 # Relation types that receive a retrieval boost — they anchor procedural
 # stability (skills that stabilize a service/deployment/generalization).
@@ -75,8 +88,20 @@ class TesseraEngine:
     construction, DW-PR-weighted subgraph search, and write-side management.
     """
 
-    def __init__(self, storage_dir: str, weights: Optional[Dict[str, float]] = None):
-        self.storage_dir = storage_dir
+    def __init__(
+        self,
+        storage_dir: str,
+        weights: Optional[Dict[str, float]] = None,
+        *,
+        source_roots: Optional[Tuple[Any, ...]] = None,
+        index_dir: Optional[str] = None,
+        identity_root: Optional[str] = None,
+    ):
+        self.storage_dir = str(Path(storage_dir).expanduser().resolve(strict=False))
+        self.source_roots = tuple(source_roots or ())
+        self.identity_root = str(
+            Path(identity_root or self.storage_dir).expanduser().resolve(strict=False)
+        )
         self.graph = nx.DiGraph()
         self.file_registry: Dict[str, str] = {}
         self.node_corpus: Dict[str, str] = {}
@@ -99,15 +124,17 @@ class TesseraEngine:
             
         self._today_provider = None
 
-        if not os.path.exists(storage_dir):
-            os.makedirs(storage_dir)
+        if not os.path.exists(self.storage_dir):
+            os.makedirs(self.storage_dir)
 
-        # On-disk index cache: lives *inside* storage_dir so the graph
-        # persists across CLI invocations instead of being rebuilt (and
-        # discarded) in-memory every single time. Never mixed in with the
-        # user's own memory notes (kept in a dedicated subfolder that
-        # `_iter_markdown_files` explicitly skips).
-        self.index_cache_dir = os.path.join(storage_dir, ".tessera_index")
+        # On-disk derived index: legacy direct callers keep the historical
+        # store-local location; resolved project configurations provide the
+        # explicit disposable path. It is always excluded from source scans.
+        self.index_cache_dir = str(
+            Path(index_dir or (Path(self.storage_dir) / ".tessera_index"))
+            .expanduser()
+            .resolve(strict=False)
+        )
         self.index_cache_pkl = os.path.join(self.index_cache_dir, "graph.pkl")
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
         self.manifest_path = os.path.join(self.index_cache_dir, "identity_manifest.json")
@@ -148,7 +175,7 @@ class TesseraEngine:
         """Resolves or generates both persistent memory ID and stable document ID."""
         import posixpath
         import re
-        rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
+        rel_path = self._relative_identity_path(filepath)
         
         # 1. First, check if there is an explicit ID in the frontmatter
         from .canonical import _split_markdown, compute_sha256
@@ -170,8 +197,12 @@ class TesseraEngine:
         candidates = []
         for path, entry in self.identity_manifest.items():
             if entry["content_hash"] == content_hash:
-                full_old_path = os.path.join(self.storage_dir, path.replace("/", os.sep))
-                if not os.path.exists(full_old_path):
+                relative = path.replace("/", os.sep)
+                possible_old_paths = {
+                    os.path.join(self.storage_dir, relative),
+                    os.path.join(self.identity_root, relative),
+                }
+                if not any(os.path.exists(item) for item in possible_old_paths):
                     candidates.append((path, entry))
                     
         if len(candidates) == 1:
@@ -195,7 +226,7 @@ class TesseraEngine:
 
     def _update_identity_manifest(self, filepath: str, canonical_meta: Any) -> None:
         """Updates the stable identity manifest with a parsed document's metadata."""
-        rel_path = os.path.relpath(filepath, self.storage_dir).replace(os.sep, "/")
+        rel_path = self._relative_identity_path(filepath)
         stable_id = canonical_meta.identity.id
         doc_id = canonical_meta.source.document_id
         
@@ -602,7 +633,7 @@ class TesseraEngine:
         explicit_ids_indexed = {}
 
         for filepath in self._iter_markdown_files(recursive=recursive):
-            filename = os.path.relpath(filepath, self.storage_dir)
+            filename = self._relative_identity_path(filepath)
             try:
                 with open(filepath, "r", encoding="utf-8") as f:
                     raw_text = f.read()
@@ -612,7 +643,7 @@ class TesseraEngine:
                 persistent_id, persistent_doc_id = self._resolve_persistent_id(filepath, raw_text)
                 
                 canonical_meta = parse_and_normalize(
-                    raw_text, filepath, self.storage_dir,
+                    raw_text, filepath, self._identity_base_for(filepath),
                     persistent_id=persistent_id, persistent_doc_id=persistent_doc_id
                 )
                 self._update_identity_manifest(filepath, canonical_meta)
@@ -717,7 +748,10 @@ class TesseraEngine:
                 # Re-raise explicit collisions to fail build_index properly
                 if isinstance(e, ValueError) and "Collision de IDs Explícitos" in str(e):
                     raise e
-                print(f"[Aviso] Falha ao processar a nota física {filename}: {e}")
+                print(
+                    f"[Aviso] Falha ao processar a nota física {filename}: {e}",
+                    file=sys.stderr,
+                )
                 continue
 
         for src, dest, rel in pending_connections:
@@ -772,6 +806,7 @@ class TesseraEngine:
         fingerprint = self._source_fingerprint()
         snapshot = {
             "storage_dir": os.path.abspath(self.storage_dir),
+            "source_spec": self._source_spec(),
             "fingerprint": fingerprint,
             "graph": self.graph,
             "file_registry": self.file_registry,
@@ -820,6 +855,8 @@ class TesseraEngine:
 
         if snapshot.get("fingerprint") != self._source_fingerprint():
             return False
+        if snapshot.get("source_spec") != self._source_spec():
+            return False
 
         self.graph = snapshot["graph"]
         self.file_registry = snapshot["file_registry"]
@@ -830,13 +867,49 @@ class TesseraEngine:
         return True
 
     def _iter_markdown_files(self, recursive: bool):
-        """Yield Markdown sources contained by the configured storage directory.
+        """Yield Markdown from explicit sources or the legacy store-only corpus.
 
-        ``storage_dir`` is the complete corpus boundary. Project-wide discovery
-        belongs to an explicit adapter/registry contract, not index bootstrap;
-        silently adding sibling ``docs`` folders or ancestor Markdown files can
-        make two identically configured processes observe unrelated memories.
+        No implicit project-wide discovery occurs. Multiple read roots are
+        active only when the resolved v2 configuration names them.
         """
+        if self.source_roots:
+            index_root = Path(self.index_cache_dir).resolve(strict=False)
+            seen = set()
+            selected = []
+            for source in self.source_roots:
+                root = Path(source.path).expanduser().resolve(strict=False)
+                if not root.exists():
+                    continue
+                patterns = tuple(source.include) if recursive else ("*.md",)
+                for pattern in patterns:
+                    for candidate in root.glob(pattern):
+                        if not candidate.is_file() or candidate.suffix.lower() != ".md":
+                            continue
+                        resolved = candidate.resolve(strict=False)
+                        try:
+                            resolved.relative_to(root)
+                        except ValueError as exc:
+                            raise ValueError(
+                                f"configured source escapes its root through a symlink: {candidate}"
+                            ) from exc
+                        relative_parts = resolved.relative_to(root).parts[:-1]
+                        if any(
+                            part in _BUILTIN_EXCLUDED_SOURCE_DIRS
+                            for part in relative_parts
+                        ):
+                            continue
+                        try:
+                            resolved.relative_to(index_root)
+                            continue
+                        except ValueError:
+                            pass
+                        key = os.path.normcase(str(resolved))
+                        if key not in seen:
+                            seen.add(key)
+                            selected.append(str(resolved))
+            yield from sorted(selected)
+            return
+
         if recursive:
             for root, dirs, files in os.walk(self.storage_dir):
                 # Derived indexes and common dependency/build directories are
@@ -844,16 +917,7 @@ class TesseraEngine:
                 dirs[:] = [
                     directory
                     for directory in dirs
-                    if directory
-                    not in (
-                        ".tessera_index",
-                        ".git",
-                        "node_modules",
-                        "venv",
-                        ".venv-browser-agent",
-                        ".browser-harness",
-                        "Tessera",
-                    )
+                    if directory not in _BUILTIN_EXCLUDED_SOURCE_DIRS
                 ]
                 for filename in files:
                     if filename.endswith(".md"):
@@ -866,6 +930,36 @@ class TesseraEngine:
                     yield os.path.join(self.storage_dir, filename)
         except OSError:
             return
+
+    def _source_spec(self) -> Tuple[Any, ...]:
+        """Stable cache key for the selected read/index boundary."""
+        if self.source_roots:
+            roots = tuple(
+                (str(Path(item.path).resolve(strict=False)), tuple(item.include))
+                for item in self.source_roots
+            )
+        else:
+            roots = ((self.storage_dir, ("**/*.md",)),)
+        return (
+            roots,
+            self.index_cache_dir,
+            self.identity_root,
+        )
+
+    def _identity_base_for(self, filepath: str) -> str:
+        """Keep legacy memory identities stable while namespacing project sources."""
+        candidate = Path(filepath).resolve(strict=False)
+        store = Path(self.storage_dir).resolve(strict=False)
+        try:
+            candidate.relative_to(store)
+            return str(store)
+        except ValueError:
+            return self.identity_root
+
+    def _relative_identity_path(self, filepath: str) -> str:
+        return os.path.relpath(
+            filepath, self._identity_base_for(filepath)
+        ).replace(os.sep, "/")
 
     def _normalize_frontmatter(self, frontmatter: Dict[str, Any], filepath: str) -> Dict[str, Any]:
         """

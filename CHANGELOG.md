@@ -17,6 +17,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Project configuration schema v2 separates the generated-memory write store,
+  explicit read/index source roots, and disposable index location. Schema-v1,
+  direct-path, environment, and named-global corpora migrate conservatively to
+  their prior store only; broader project sources require explicit v2 config.
+  ([#153](https://github.com/LuigiFerronatto/TESSERA/issues/153))
 - Configuration-aware CLI operations now select one explainable store using
   explicit path, environment, nearest project config, or an explicitly named
   registry entry; missing configuration fails instead of silently creating a

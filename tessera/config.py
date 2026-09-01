@@ -14,12 +14,15 @@ import uuid
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Mapping, Optional
+from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
 import yaml
 
 
+# JSON command envelopes and the global registry remain on their established
+# v1 contracts.  Project configuration is the boundary changed by Issue #153.
 SCHEMA_VERSION = 1
+PROJECT_SCHEMA_VERSION = 2
 PROJECT_CONFIG_RELATIVE = Path(".tessera") / "config.yaml"
 REGISTRY_FILENAME = "registry.yaml"
 CANONICAL_STORAGE_ENV = "TESSERA_STORAGE_DIR"
@@ -74,11 +77,13 @@ def _closed_keys(value: Mapping[str, Any], allowed: set[str], context: str) -> N
         )
 
 
-def _validate_version(value: Mapping[str, Any], context: str) -> None:
-    if value.get("schema_version") != SCHEMA_VERSION:
+def _validate_version(
+    value: Mapping[str, Any], context: str, *, expected: int = SCHEMA_VERSION
+) -> None:
+    if value.get("schema_version") != expected:
         raise ConfigurationError(
             f"unsupported schema_version in {context}: {value.get('schema_version')!r}; "
-            f"expected {SCHEMA_VERSION}"
+            f"expected {expected}"
         )
 
 
@@ -103,6 +108,24 @@ def _validate_store_id(value: Any) -> str:
     except (ValueError, AttributeError) as exc:
         raise ConfigurationError("store.id must be a UUID") from exc
     return str(parsed)
+
+
+def _is_relative_to(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def _validate_include_pattern(value: Any) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ConfigurationError("source include patterns must be non-empty strings")
+    pattern = value.strip().replace("\\", "/")
+    candidate = Path(pattern)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        raise ConfigurationError("source include patterns must be relative and may not contain '..'")
+    return pattern
 
 
 @dataclass(frozen=True)
@@ -135,10 +158,103 @@ class StoreRecord:
 
 
 @dataclass(frozen=True)
+class SourceRootRecord:
+    """One explicit read-only source root and its allow-list patterns."""
+
+    path: str
+    include: Tuple[str, ...] = ("**/*.md",)
+
+    @classmethod
+    def from_mapping(
+        cls,
+        value: Any,
+        *,
+        project_root: Path,
+        context: str,
+        allowed_external: Sequence[Path] = (),
+    ) -> "SourceRootRecord":
+        if not isinstance(value, dict):
+            raise ConfigurationError(f"{context} must be a mapping")
+        _closed_keys(value, {"path", "include"}, context)
+        if "path" not in value or "include" not in value:
+            raise ConfigurationError(f"{context} requires path and include")
+        raw_path = value["path"]
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            raise ConfigurationError(f"{context}.path must be a non-empty path")
+        lexical = Path(raw_path).expanduser()
+        if ".." in lexical.parts:
+            raise ConfigurationError(
+                f"{context}.path must be project-relative and may not contain '..'"
+            )
+        root = (
+            lexical.resolve(strict=False)
+            if lexical.is_absolute()
+            else (project_root / lexical).resolve(strict=False)
+        )
+        allowed = {item.resolve(strict=False) for item in allowed_external}
+        if not _is_relative_to(root, project_root) and root not in allowed:
+            raise ConfigurationError(f"{context}.path escapes the project root")
+        includes = value["include"]
+        if not isinstance(includes, list) or not includes:
+            raise ConfigurationError(f"{context}.include must be a non-empty list")
+        return cls(str(root), tuple(_validate_include_pattern(item) for item in includes))
+
+    def to_mapping(
+        self, *, project_root: Path, allowed_external: Sequence[Path] = ()
+    ) -> Dict[str, Any]:
+        root = Path(self.path).resolve(strict=False)
+        allowed = {item.resolve(strict=False) for item in allowed_external}
+        if not _is_relative_to(root, project_root) and root not in allowed:
+            raise ConfigurationError(f"source root escapes the project root: {root}")
+        serialized = (
+            str(root.relative_to(project_root)) or "."
+            if _is_relative_to(root, project_root)
+            else str(root)
+        )
+        return {"path": serialized, "include": list(self.include)}
+
+
+@dataclass(frozen=True)
+class IndexRecord:
+    path: str
+
+    @classmethod
+    def from_mapping(
+        cls, value: Any, *, project_root: Path, context: str
+    ) -> "IndexRecord":
+        if not isinstance(value, dict):
+            raise ConfigurationError(f"{context} must be a mapping")
+        _closed_keys(value, {"path"}, context)
+        if "path" not in value:
+            raise ConfigurationError(f"{context} requires path")
+        raw_path = value["path"]
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            raise ConfigurationError(f"{context}.path must be a non-empty path")
+        lexical = Path(raw_path).expanduser()
+        if lexical.is_absolute() or ".." in lexical.parts:
+            raise ConfigurationError(
+                f"{context}.path must be project-relative and may not contain '..'"
+            )
+        path = (project_root / lexical).resolve(strict=False)
+        if not _is_relative_to(path, project_root):
+            raise ConfigurationError(f"{context}.path escapes the project root")
+        return cls(str(path))
+
+    def to_mapping(self, *, project_root: Path) -> Dict[str, str]:
+        path = Path(self.path).resolve(strict=False)
+        if not _is_relative_to(path, project_root):
+            raise ConfigurationError(f"index path escapes the project root: {path}")
+        return {"path": str(path.relative_to(project_root)) or "."}
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     project_root: Path
     config_path: Path
     store: StoreRecord
+    sources: Tuple[SourceRootRecord, ...] = ()
+    index: Optional[IndexRecord] = None
+    loaded_schema_version: int = PROJECT_SCHEMA_VERSION
 
     @classmethod
     def load(cls, config_path: Path) -> "ProjectConfig":
@@ -147,17 +263,95 @@ class ProjectConfig:
         config_path = config_path.resolve(strict=False)
         project_root = config_path.parent.parent.resolve(strict=False)
         raw = _load_yaml(config_path)
-        _closed_keys(raw, {"schema_version", "store"}, str(config_path))
-        _validate_version(raw, str(config_path))
+        version = raw.get("schema_version")
+        if version not in {1, PROJECT_SCHEMA_VERSION}:
+            raise ConfigurationError(
+                f"unsupported schema_version in {config_path}: {version!r}; "
+                f"expected 1 or {PROJECT_SCHEMA_VERSION}"
+            )
+        allowed = {"schema_version", "store"} if version == 1 else {
+            "schema_version", "store", "sources", "index"
+        }
+        _closed_keys(raw, allowed, str(config_path))
         store = StoreRecord.from_mapping(
             raw.get("store"), base=project_root, context=f"store in {config_path}"
         )
-        return cls(project_root=project_root, config_path=config_path, store=store)
+        if version == 1:
+            # Migration compatibility is deliberately conservative: the old
+            # store remains the complete readable corpus.
+            sources = (SourceRootRecord(store.path, ("**/*.md",)),)
+            index = IndexRecord(str((project_root / ".tessera" / "index").resolve(strict=False)))
+        else:
+            sources_raw = raw.get("sources")
+            if not isinstance(sources_raw, dict):
+                raise ConfigurationError(f"sources in {config_path} must be a mapping")
+            _closed_keys(sources_raw, {"roots"}, f"sources in {config_path}")
+            roots_raw = sources_raw.get("roots")
+            if not isinstance(roots_raw, list) or not roots_raw:
+                raise ConfigurationError(f"sources.roots in {config_path} must be a non-empty list")
+            sources = tuple(
+                SourceRootRecord.from_mapping(
+                    item, project_root=project_root,
+                    context=f"sources.roots[{index}] in {config_path}",
+                    allowed_external=(Path(store.path),),
+                )
+                for index, item in enumerate(roots_raw)
+            )
+            external_sources = [
+                source for source in sources
+                if not _is_relative_to(
+                    Path(source.path).resolve(strict=False), project_root
+                )
+            ]
+            if external_sources and not (
+                len(sources) == 1
+                and Path(sources[0].path).resolve(strict=False)
+                == Path(store.path).resolve(strict=False)
+                and sources[0].include == ("**/*.md",)
+            ):
+                raise ConfigurationError(
+                    "external source roots are allowed only for a conservative "
+                    "store-only v1 migration"
+                )
+            index = IndexRecord.from_mapping(
+                raw.get("index"), project_root=project_root,
+                context=f"index in {config_path}",
+            )
+        index_path = Path(index.path).resolve(strict=False)
+        store_path = Path(store.path).resolve(strict=False)
+        if _is_relative_to(index_path, store_path):
+            raise ConfigurationError("index.path must be outside store.path")
+        return cls(
+            project_root=project_root,
+            config_path=config_path,
+            store=store,
+            sources=sources,
+            index=index,
+            loaded_schema_version=int(version),
+        )
+
+    def resolved_sources(self) -> Tuple[SourceRootRecord, ...]:
+        return self.sources or (SourceRootRecord(self.store.path, ("**/*.md",)),)
+
+    def resolved_index(self) -> IndexRecord:
+        return self.index or IndexRecord(
+            str((self.project_root / ".tessera" / "index").resolve(strict=False))
+        )
 
     def to_mapping(self) -> Dict[str, Any]:
         return {
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": PROJECT_SCHEMA_VERSION,
             "store": self.store.to_mapping(relative_to=self.project_root),
+            "sources": {
+                "roots": [
+                    source.to_mapping(
+                        project_root=self.project_root,
+                        allowed_external=(Path(self.store.path),),
+                    )
+                    for source in self.resolved_sources()
+                ]
+            },
+            "index": self.resolved_index().to_mapping(project_root=self.project_root),
         }
 
 
@@ -219,7 +413,9 @@ class GlobalRegistry:
 
 
 @dataclass(frozen=True)
-class StorageSelection:
+class ResolvedConfiguration:
+    """The sole runtime source of truth for write, read, and derived paths."""
+
     store_id: Optional[str]
     storage_dir: str
     source: str
@@ -227,6 +423,20 @@ class StorageSelection:
     config_path: Optional[str] = None
     registry_name: Optional[str] = None
     registry_path: Optional[str] = None
+    source_roots: Tuple[SourceRootRecord, ...] = ()
+    index_dir: Optional[str] = None
+    identity_root: Optional[str] = None
+    config_schema_version: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        store = str(Path(self.storage_dir).expanduser().resolve(strict=False))
+        roots = self.source_roots or (SourceRootRecord(store, ("**/*.md",)),)
+        index = self.index_dir or str((Path(store) / ".tessera_index").resolve(strict=False))
+        identity = self.identity_root or store
+        object.__setattr__(self, "storage_dir", store)
+        object.__setattr__(self, "source_roots", tuple(roots))
+        object.__setattr__(self, "index_dir", str(Path(index).resolve(strict=False)))
+        object.__setattr__(self, "identity_root", str(Path(identity).resolve(strict=False)))
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -237,7 +447,40 @@ class StorageSelection:
             "config_path": self.config_path,
             "registry_name": self.registry_name,
             "registry_path": self.registry_path,
+            "sources": [
+                {"path": item.path, "include": list(item.include)}
+                for item in self.source_roots
+            ],
+            "index_dir": self.index_dir,
+            "identity_root": self.identity_root,
+            "config_schema_version": self.config_schema_version,
         }
+
+
+# Public compatibility name retained for callers introduced by Issue #117.
+StorageSelection = ResolvedConfiguration
+
+
+def _legacy_configuration(
+    storage_dir: str,
+    source: str,
+    *,
+    store_id: Optional[str] = None,
+    registry_name: Optional[str] = None,
+    registry_path: Optional[str] = None,
+) -> ResolvedConfiguration:
+    store = str(Path(storage_dir).expanduser().resolve(strict=False))
+    return ResolvedConfiguration(
+        store_id,
+        store,
+        source,
+        registry_name=registry_name,
+        registry_path=registry_path,
+        source_roots=(SourceRootRecord(store, ("**/*.md",)),),
+        index_dir=str((Path(store) / ".tessera_index").resolve(strict=False)),
+        identity_root=store,
+        config_schema_version=1,
+    )
 
 
 def global_registry_path(
@@ -307,12 +550,12 @@ class ConfigurationResolver:
         project: Optional[str | os.PathLike[str]] = None,
         global_name: Optional[str] = None,
         warn_legacy: bool = True,
-    ) -> StorageSelection:
+    ) -> ResolvedConfiguration:
         if explicit:
-            return StorageSelection(None, str(_canonical_path(explicit)), "explicit")
+            return _legacy_configuration(str(_canonical_path(explicit)), "explicit")
         canonical = self.environ.get(CANONICAL_STORAGE_ENV)
         if canonical:
-            return StorageSelection(None, str(_canonical_path(canonical)), "environment")
+            return _legacy_configuration(str(_canonical_path(canonical)), "environment")
         legacy = self.environ.get(LEGACY_STORAGE_ENV)
         if legacy:
             if warn_legacy:
@@ -322,18 +565,26 @@ class ConfigurationResolver:
                     LegacyStorageConfigurationWarning,
                     stacklevel=2,
                 )
-            return StorageSelection(None, str(_canonical_path(legacy)), "environment")
+            return _legacy_configuration(str(_canonical_path(legacy)), "environment")
 
         project_start = self.cwd if project is None else Path(project).expanduser().resolve(strict=False)
         config_path = discover_project_config(project_start, home=self.home)
         if config_path is not None:
             config = ProjectConfig.load(config_path)
-            return StorageSelection(
+            return ResolvedConfiguration(
                 config.store.id,
                 config.store.path,
                 "project_config",
                 project_root=str(config.project_root),
                 config_path=str(config.config_path),
+                source_roots=config.resolved_sources(),
+                index_dir=config.resolved_index().path,
+                identity_root=(
+                    str(config.project_root)
+                    if config.loaded_schema_version == PROJECT_SCHEMA_VERSION
+                    else config.store.path
+                ),
+                config_schema_version=config.loaded_schema_version,
             )
 
         if global_name:
@@ -344,10 +595,10 @@ class ConfigurationResolver:
                     f"global store {global_name!r} is not registered; available: {available}"
                 )
             record = registry.stores[global_name]
-            return StorageSelection(
-                record.id,
+            return _legacy_configuration(
                 record.path,
                 "global_registry",
+                store_id=record.id,
                 registry_name=global_name,
                 registry_path=str(registry.path),
             )
@@ -429,6 +680,9 @@ class InitPlan:
     registry_name: Optional[str]
     creates: tuple[str, ...]
     updates: tuple[str, ...]
+    source_roots: Tuple[SourceRootRecord, ...] = ()
+    index_dir: Optional[str] = None
+    identity_root: Optional[str] = None
     deletes: tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
@@ -442,6 +696,11 @@ class InitPlan:
             "creates": list(self.creates),
             "updates": list(self.updates),
             "deletes": list(self.deletes),
+            "sources": [
+                {"path": item.path, "include": list(item.include)}
+                for item in self.source_roots
+            ],
+            "index_dir": self.index_dir,
         }
 
 
@@ -462,6 +721,22 @@ def build_init_plan(
         storage = _canonical_path(store_path or "memories", base=root)
         existing = ProjectConfig.load(config_path) if config_path.exists() else None
         store_id = existing.store.id if existing else str(id_factory())
+        if existing:
+            source_roots = (
+                (SourceRootRecord(str(storage), ("**/*.md",)),)
+                if existing.loaded_schema_version == 1
+                else existing.resolved_sources()
+            )
+            index_dir = existing.resolved_index().path
+            identity_root = (
+                str(root)
+                if existing.loaded_schema_version == PROJECT_SCHEMA_VERSION
+                else str(storage)
+            )
+        else:
+            source_roots = (SourceRootRecord(str(storage), ("**/*.md",)),)
+            index_dir = str((root / ".tessera" / "index").resolve(strict=False))
+            identity_root = str(storage)
     else:
         if not registry_name:
             raise ConfigurationError("global init requires --global NAME")
@@ -472,6 +747,9 @@ def build_init_plan(
         existing = registry.stores.get(registry_name)
         store_id = existing.id if existing else str(id_factory())
         storage = _canonical_path(store_path)
+        source_roots = (SourceRootRecord(str(storage), ("**/*.md",)),)
+        index_dir = str((storage / ".tessera_index").resolve(strict=False))
+        identity_root = str(storage)
     store_id = _validate_store_id(store_id)
     creates = []
     updates = []
@@ -485,19 +763,38 @@ def build_init_plan(
         registry_name=registry_name if mode == "global" else None,
         creates=tuple(creates),
         updates=tuple(updates),
+        source_roots=source_roots,
+        index_dir=index_dir,
+        identity_root=identity_root,
     )
 
 
-def apply_init_plan(plan: InitPlan) -> StorageSelection:
+def apply_init_plan(plan: InitPlan) -> ResolvedConfiguration:
     storage = Path(plan.storage_dir)
     record = StoreRecord(plan.store_id, str(storage.resolve(strict=False)))
     config_path = Path(plan.config_path)
     if plan.mode == "project":
         project_root = config_path.parent.parent.resolve(strict=False)
         storage.mkdir(parents=True, exist_ok=True)
-        write_project_config(ProjectConfig(project_root, config_path, record))
-        return StorageSelection(
-            record.id, record.path, "project_config", str(project_root), str(config_path)
+        project_config = ProjectConfig(
+            project_root,
+            config_path,
+            record,
+            plan.source_roots or (SourceRootRecord(record.path, ("**/*.md",)),),
+            IndexRecord(plan.index_dir or str(project_root / ".tessera" / "index")),
+            PROJECT_SCHEMA_VERSION,
+        )
+        write_project_config(project_config)
+        return ResolvedConfiguration(
+            record.id,
+            record.path,
+            "project_config",
+            str(project_root),
+            str(config_path),
+            source_roots=project_config.resolved_sources(),
+            index_dir=project_config.resolved_index().path,
+            identity_root=plan.identity_root or record.path,
+            config_schema_version=PROJECT_SCHEMA_VERSION,
         )
     registry = GlobalRegistry.load(config_path)
     stores = dict(registry.stores)
@@ -511,9 +808,12 @@ def apply_init_plan(plan: InitPlan) -> StorageSelection:
     storage.mkdir(parents=True, exist_ok=True)
     stores[plan.registry_name or ""] = record
     write_global_registry(GlobalRegistry(config_path, stores))
-    return StorageSelection(
-        record.id, record.path, "global_registry",
-        registry_name=plan.registry_name, registry_path=str(config_path),
+    return _legacy_configuration(
+        record.path,
+        "global_registry",
+        store_id=record.id,
+        registry_name=plan.registry_name,
+        registry_path=str(config_path),
     )
 
 
@@ -552,3 +852,29 @@ def resolve_storage_dir(
             )
         return legacy
     return DEFAULT_STORAGE_DIR
+
+
+def resolve_runtime_configuration(
+    *,
+    environ: Optional[Mapping[str, str]] = None,
+    cwd: Optional[str | os.PathLike[str]] = None,
+) -> ResolvedConfiguration:
+    """Resolve v2 project boundaries with a legacy fallback for direct/MCP use.
+
+    This keeps the pre-#120 ``./memories`` behavior when no product
+    configuration exists while allowing Engine, CLI, and MCP to consume the
+    same project configuration object when one is present.
+    """
+    active_environment = os.environ if environ is None else environ
+    resolver = ConfigurationResolver(environ=active_environment, cwd=cwd)
+    has_environment_selection = bool(
+        active_environment.get(CANONICAL_STORAGE_ENV)
+        or active_environment.get(LEGACY_STORAGE_ENV)
+    )
+    has_project_selection = discover_project_config(
+        resolver.cwd, home=resolver.home
+    ) is not None
+    if has_environment_selection or has_project_selection:
+        return resolver.resolve()
+    legacy = resolve_storage_dir(environ=active_environment)
+    return _legacy_configuration(legacy, "legacy_default")

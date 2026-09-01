@@ -16,16 +16,16 @@ def _markdown_table_row(text: str, issue: str) -> str:
 def test_roadmap_tracks_productization_v2_and_release_routing() -> None:
     text = ROADMAP.read_text(encoding="utf-8")
 
-    assert "0880ef3ec417735c105898039cc202450407af2b" in text
+    assert "2508676d472088733702b6ed920fc829df9a7681" in text
     assert "`VALIDATED`" in _markdown_table_row(text, "#117")
-    assert "`READY`" in _markdown_table_row(text, "#153")
-    assert "`BLOCKED`" in _markdown_table_row(text, "#154")
+    assert "`VALIDATED`" in _markdown_table_row(text, "#153")
+    assert "`READY`" in _markdown_table_row(text, "#154")
     assert "`BLOCKED`" in _markdown_table_row(text, "#155")
     assert "`BLOCKED`" in _markdown_table_row(text, "#118")
     assert "`READY`" in _markdown_table_row(text, "#120")
     assert "`BLOCKED`" in _markdown_table_row(text, "#121")
     assert "`BLOCKED`" in _markdown_table_row(text, "#134")
-    assert "#153–#155 are transitive blockers through #118" in _markdown_table_row(text, "#134")
+    assert "#153 is satisfied; #154/#155 remain transitive blockers through #118" in _markdown_table_row(text, "#134")
     assert "`BLOCKED`" in _markdown_table_row(text, "#87")
 
 

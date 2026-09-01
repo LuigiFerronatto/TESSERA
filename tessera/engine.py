@@ -10,6 +10,8 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
+from .config import ResolvedConfiguration
+
 # Preserve the engine module's existing public constants/types/functions for
 # callers that import them from ``tessera.engine``.
 from .engine_core import *  # noqa: F401,F403
@@ -30,8 +32,34 @@ class TesseraEngine(_CoreTesseraEngine):
     retrieval results as structured provenance.
     """
 
-    def __init__(self, storage_dir: str, weights: Optional[Dict[str, float]] = None):
-        super().__init__(storage_dir=storage_dir, weights=weights)
+    def __init__(
+        self,
+        storage_dir: Optional[str] = None,
+        weights: Optional[Dict[str, float]] = None,
+        *,
+        configuration: Optional[ResolvedConfiguration] = None,
+    ):
+        if configuration is None and isinstance(storage_dir, ResolvedConfiguration):
+            configuration = storage_dir
+            storage_dir = None
+        if configuration is not None:
+            if storage_dir is not None and str(storage_dir) != configuration.storage_dir:
+                raise ValueError("pass either storage_dir or configuration, not divergent paths")
+            super().__init__(
+                storage_dir=configuration.storage_dir,
+                weights=weights,
+                source_roots=configuration.source_roots,
+                index_dir=configuration.index_dir,
+                identity_root=configuration.identity_root,
+            )
+            self.configuration = configuration
+        else:
+            if storage_dir is None:
+                raise TypeError("storage_dir or configuration is required")
+            super().__init__(storage_dir=storage_dir, weights=weights)
+            self.configuration = ResolvedConfiguration(
+                None, str(storage_dir), "legacy_storage_dir"
+            )
         self.evidence_ledger = EvidenceLedger()
         self.evidence_cache_json = os.path.join(self.index_cache_dir, "evidence.json")
 
