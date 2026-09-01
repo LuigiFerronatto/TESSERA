@@ -110,6 +110,9 @@ Local candidate evidence:
 | Deterministic sanity before | Hit@1 `0.75`; Hit@3 `1.00`; Hit@5 `1.00`; MRR `0.875`; evidence `1.00`; missing evidence passed |
 | Deterministic sanity candidate | Hit@1 `0.75`; Hit@3 `1.00`; Hit@5 `1.00`; MRR `0.875`; evidence `1.00`; missing evidence passed |
 
-Candidate/PR identifiers and CI runs are added to the PR evidence after the
-candidate is published. Until canonical merge and post-merge lifecycle sync,
-#153 remains `IN_PROGRESS`, and #154/#155 remain blocked.
+The implementation candidate was published as
+[`53f772c`](https://github.com/LuigiFerronatto/TESSERA/commit/53f772cdd0fae369a2ed3954751667d5e4ea52c4)
+in [PR #173](https://github.com/LuigiFerronatto/TESSERA/pull/173). CI run links
+and the final PR head are recorded in PR evidence. Until canonical merge and
+post-merge lifecycle sync, #153 remains `IN_PROGRESS`, and #154/#155 remain
+blocked.

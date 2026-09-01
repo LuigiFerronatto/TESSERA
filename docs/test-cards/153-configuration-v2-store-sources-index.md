@@ -5,7 +5,7 @@
 | Issue | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `CONFIGURATION_V2` |
-| Pull request | pending publication from `test-card/153-config-v2` |
+| Pull request | [#173](https://github.com/LuigiFerronatto/TESSERA/pull/173) |
 | Merge commit | Not merged; candidate branch only |
 | Audited main | `0880ef3ec417735c105898039cc202450407af2b` |
 | Decision | candidate `KEEP`, subject to final CI |
@@ -131,6 +131,7 @@ record is synchronized. The expanded #118 onboarding proof remains downstream.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #153](https://github.com/LuigiFerronatto/TESSERA/issues/153) |
+| Pull request | [PR #173](https://github.com/LuigiFerronatto/TESSERA/pull/173) |
 | Branch | `test-card/153-config-v2` |
 | Audited main | `0880ef3ec417735c105898039cc202450407af2b` |
 | PR Evolution Audit | [PR_EVOLUTION_153.md](../PR_EVOLUTION_153.md) |
