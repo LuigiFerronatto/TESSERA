@@ -149,6 +149,7 @@ Optional generative components may exist for higher-level workflows, but the bas
 | Explicit/local relation parsing | Implemented foundation | Issue #9 / PR #3 |
 | CI + deterministic sanity evaluation | Implemented | Issue #10 / PR #4 |
 | Evidence Ledger + provenance | Implemented | Issue #11 / PR #6 |
+| Project/global store configuration and explainable discovery | In-progress candidate | Issue #117 / ADR 0003 |
 | Engine/CLI/MCP contract parity | Planned Foundation hardening | Issue #68 |
 | Incremental/idempotent indexing | Planned Foundation experiment | Issue #12 |
 | Plain-text ingestion beyond Markdown | Planned experiment | Issue #69 |
@@ -164,6 +165,26 @@ Optional generative components may exist for higher-level workflows, but the bas
 | Rendering ablations | Planned benchmark experiment | Issue #28 |
 
 The project roadmap is maintained in [`ROADMAP.md`](ROADMAP.md) and the corresponding GitHub Test Cards.
+
+## Configuration boundary
+
+Issue #117's candidate places explicit configuration before the existing
+memory pipeline:
+
+```text
+--store / environment / nearest project config / named registry
+                              ↓
+                    StorageSelection
+                              ↓
+                   one absolute store
+                              ↓
+                         Engine
+```
+
+Project config lives at `.tessera/config.yaml`; global configuration is an
+OS-appropriate registry of explicitly named stores. Neither layer contains
+memory, credentials or executable instructions, and neither scans or combines
+projects. See [ADR 0003](adr/0003-configuration-and-store-discovery.md).
 
 ---
 

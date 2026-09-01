@@ -9,10 +9,19 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ## Unreleased
 
 ### Added
+- Versioned project configuration, an OS-appropriate named global-store
+  registry, stable store IDs, bounded discovery, atomic `tessera init`, and
+  read-only `tessera config show/list/doctor` plus metadata-only unregister.
+  ([#117](https://github.com/LuigiFerronatto/TESSERA/issues/117))
 - A versioned LongMemEval V1 dev-50 benchmark ledger with immediate-parent regression gating, a separate historical #96 comparison, validated Test Card attribution, pinned forward-environment fingerprints, and checksum-pinned conditional benchmark CI. ([#100](https://github.com/LuigiFerronatto/TESSERA/issues/100))
 - Versioned TESSERA brand assets and a canonical 1280×640 repository/social card. ([#81](https://github.com/LuigiFerronatto/TESSERA/pull/81))
 
 ### Changed
+- Configuration-aware CLI operations now select one explainable store using
+  explicit path, environment, nearest project config, or an explicitly named
+  registry entry; missing configuration fails instead of silently creating a
+  product store. Direct-library and pre-#120 MCP `./memories` compatibility is
+  retained explicitly. ([#117](https://github.com/LuigiFerronatto/TESSERA/issues/117))
 - Built distributions now contain the TESSERA runtime and its five required
   Markdown resources without repository-only benchmark packages or partial
   tests; clean wheel installs are continuously exercised on Python 3.9 and
@@ -57,6 +66,9 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Legacy external-project identity from package metadata and MCP-facing examples/configuration. ([#83](https://github.com/LuigiFerronatto/TESSERA/pull/83))
 
 ### Architecture Decisions
+- Accepted ADR 0003: project configuration and named global discovery are
+  separate metadata layers above Engine, use closed versioned schemas and
+  atomic mutation, and never scan or merge project memories. ([#117](https://github.com/LuigiFerronatto/TESSERA/issues/117))
 - Accepted ADR 0002: retain the root `tessera/` package, treat benchmarks,
   tests, docs and history as repository-owned rather than library runtime,
   preserve provenance, and execute packaging, adapter, Skills and documentation

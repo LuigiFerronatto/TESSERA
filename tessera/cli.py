@@ -14,9 +14,21 @@ import os
 import sys
 import json
 import warnings
+from pathlib import Path
 from typing import Dict
 
-from .config import resolve_storage_dir
+from .config import (
+    SCHEMA_VERSION,
+    ConfigurationError,
+    ConfigurationResolver,
+    GlobalRegistry,
+    apply_init_plan,
+    build_init_plan,
+    discover_project_config,
+    global_registry_path,
+    resolve_storage_dir,
+    unregister_global_store,
+)
 from .engine import TesseraEngine
 from .models import Connection, Entity
 from .orchestrator import TesseraOrchestrator
@@ -55,16 +67,77 @@ def _parse_connections(raw_connections):
 
 
 def cmd_init(args):
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    if args.project is not None and args.global_name:
+        raise ConfigurationError("--project and --global are mutually exclusive")
+    mode = "global" if args.global_name else ("project" if args.project is not None else None)
+    compatibility_positional = args.storage_dir
+    store_path = args.store or compatibility_positional
+    prompted = False
+    if mode is None and compatibility_positional:
+        mode = "project"  # documented compatibility for `tessera init PATH`
+    if mode is None:
+        if args.non_interactive or not sys.stdin.isatty():
+            raise ConfigurationError(
+                "init needs --project [PATH] or --global NAME in non-interactive mode"
+            )
+        prompted = True
+        print("Where should TESSERA configure this store?\n1. This project\n2. User-global registry")
+        choice = input("Selection [1/2]: ").strip()
+        if choice == "1":
+            mode = "project"
+            args.project = "."
+        elif choice == "2":
+            mode = "global"
+            args.global_name = input("Registry name: ").strip()
+            if not store_path:
+                store_path = input("Store path: ").strip()
+        else:
+            raise ConfigurationError("init selection must be 1 or 2")
+    if args.store and compatibility_positional:
+        raise ConfigurationError("pass either positional storage_dir or --store, not both")
+    registry_path = global_registry_path()
+    plan = build_init_plan(
+        mode=mode,
+        store_path=store_path,
+        project_root=args.project if mode == "project" else None,
+        registry_name=args.global_name,
+        registry_path=registry_path,
+    )
+    if args.json:
+        if args.dry_run:
+            print(json.dumps({"schema_version": SCHEMA_VERSION, "plan": plan.to_dict(), "applied": False}, sort_keys=True))
+            return 0
+    else:
+        print("Initialization plan:")
+        print(f"  Mode: {plan.mode}")
+        print(f"  Project root: {Path(plan.config_path).parent.parent if plan.mode == 'project' else '-'}")
+        print(f"  Store path: {plan.storage_dir}")
+        print(f"  Configuration file: {plan.config_path}")
+        print(f"  Store id: {plan.store_id}")
+        print(f"  Registry entry: {plan.registry_name or '-'}")
+        print(f"  Creates: {', '.join(plan.creates) or '-'}")
+        print(f"  Updates: {', '.join(plan.updates) or '-'}")
+        print("  Deletes: none")
+        if args.dry_run:
+            return 0
+    if prompted and input("Apply this plan? [y/N]: ").strip().lower() not in {"y", "yes"}:
+        print("Initialization cancelled; no files were changed.")
+        return 1
+    selection = apply_init_plan(plan)
+    engine = TesseraEngine(storage_dir=selection.storage_dir)
     engine.build_index()
-    from .display import get_console, render_init_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_init_result(console, os.path.abspath(args.storage_dir), engine.graph.number_of_nodes())
-        return
-    print(f"✔ Diretório de memórias inicializado em: {os.path.abspath(args.storage_dir)}")
-    print(f"  ({engine.graph.number_of_nodes()} nós já encontrados/indexados)")
+    if args.json:
+        print(json.dumps({
+            "schema_version": SCHEMA_VERSION,
+            "plan": plan.to_dict(),
+            "applied": True,
+            "storage_selection": selection.to_dict(),
+            "indexed_nodes": engine.graph.number_of_nodes(),
+        }, sort_keys=True))
+    else:
+        print(f"✔ TESSERA configured {selection.storage_dir}")
+        print(f"  ({engine.graph.number_of_nodes()} nodes indexed)")
+    return 0
 
 
 def cmd_write(args):
@@ -422,7 +495,135 @@ def cmd_doctor(args):
     else:
         print_doctor_report_plain(report)
 
-    sys.exit(0 if report.all_ok else 1)
+    return 0 if report.all_ok else 1
+
+
+def _selection_from_args(args):
+    if getattr(args, "store", None) and getattr(args, "storage_dir", None):
+        raise ConfigurationError("pass either positional storage_dir or --store, not both")
+    resolver = ConfigurationResolver()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        selection = resolver.resolve(
+            explicit=getattr(args, "store", None) or getattr(args, "storage_dir", None),
+            project=getattr(args, "project", None),
+            global_name=getattr(args, "global_name", None),
+        )
+    for warning in caught:
+        print(f"[tessera] warning: {warning.message}", file=sys.stderr)
+    return selection
+
+
+def cmd_config_show(args):
+    selection = _selection_from_args(args)
+    payload = {"schema_version": SCHEMA_VERSION, "storage_selection": selection.to_dict()}
+    if args.json:
+        print(json.dumps(payload, sort_keys=True))
+    else:
+        for key, value in selection.to_dict().items():
+            print(f"{key}: {value if value is not None else '-'}")
+    return 0
+
+
+def cmd_config_list(args):
+    path = global_registry_path()
+    registry = GlobalRegistry.load(path)
+    stores = [
+        {"name": name, "store_id": record.id, "storage_dir": record.path}
+        for name, record in sorted(registry.stores.items())
+    ]
+    payload = {"schema_version": SCHEMA_VERSION, "registry_path": str(path), "stores": stores}
+    if args.json:
+        print(json.dumps(payload, sort_keys=True))
+    elif stores:
+        for store in stores:
+            print(f"{store['name']}\t{store['store_id']}\t{store['storage_dir']}")
+    else:
+        print("No global stores are registered.")
+    return 0
+
+
+def cmd_config_doctor(args):
+    checks = []
+    project_path = discover_project_config(args.project or os.getcwd())
+    if project_path:
+        try:
+            from .config import ProjectConfig
+            project_config = ProjectConfig.load(project_path)
+            checks.append({"name": "project_config", "ok": True, "detail": str(project_path)})
+            if Path(project_config.store.path).is_symlink():
+                checks.append({"name": "project_store_symlink", "ok": False, "detail": project_config.store.path})
+        except ConfigurationError as exc:
+            checks.append({"name": "project_config", "ok": False, "detail": str(exc)})
+    else:
+        checks.append({"name": "project_config", "ok": True, "detail": "not found", "required": False})
+    registry_path = global_registry_path()
+    try:
+        registry = GlobalRegistry.load(registry_path)
+        checks.append({"name": "global_registry", "ok": True, "detail": str(registry_path)})
+        if args.global_name:
+            checks.append({
+                "name": f"requested_global:{args.global_name}",
+                "ok": args.global_name in registry.stores,
+                "detail": "registered" if args.global_name in registry.stores else "missing explicitly requested global store",
+            })
+        for name, record in sorted(registry.stores.items()):
+            exists = Path(record.path).is_dir()
+            checks.append({
+                "name": f"registry_store:{name}",
+                "ok": exists,
+                "detail": record.path if exists else f"stale or missing path: {record.path}",
+            })
+    except ConfigurationError as exc:
+        checks.append({"name": "global_registry", "ok": False, "detail": str(exc)})
+    selection = None
+    try:
+        selection = _selection_from_args(args)
+        selected_path = Path(selection.storage_dir)
+        exists = selected_path.is_dir()
+        writable = exists and os.access(selected_path, os.W_OK)
+        symlink = selected_path.is_symlink()
+        checks.extend([
+            {"name": "selected_store_exists", "ok": exists, "detail": str(selected_path)},
+            {"name": "selected_store_writable", "ok": writable, "detail": str(selected_path)},
+            {"name": "selected_store_symlink", "ok": not symlink, "detail": "physical canonical path" if not symlink else str(selected_path), "required": False},
+        ])
+    except ConfigurationError as exc:
+        checks.append({"name": "storage_selection", "ok": False, "detail": str(exc)})
+    healthy = all(check["ok"] for check in checks if check.get("required", True))
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "healthy": healthy,
+        "project_config_path": str(project_path) if project_path else None,
+        "registry_path": str(registry_path),
+        "storage_selection": selection.to_dict() if selection else None,
+        "checks": checks,
+    }
+    if args.json:
+        print(json.dumps(payload, sort_keys=True))
+    else:
+        for check in checks:
+            print(f"{'OK' if check['ok'] else 'PROBLEM'} {check['name']}: {check['detail']}")
+    return 0 if healthy else 1
+
+
+def cmd_config_unregister(args):
+    path = global_registry_path()
+    removed = unregister_global_store(args.name, path)
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "removed_registry_name": args.name,
+        "store_id": removed.id,
+        "storage_dir": removed.path,
+        "store_deleted": False,
+        "registry_path": str(path),
+    }
+    if args.json:
+        print(json.dumps(payload, sort_keys=True))
+    else:
+        print(f"Unregistered {args.name!r}; only registry metadata was removed.")
+        print(f"Store retained: {removed.path}")
+    return 0
 
 
 def cmd_quickstart(args):
@@ -465,6 +666,12 @@ def _add_optional_backend_arguments(parser):
     parser.add_argument("--compat-router-path", default=None, help=argparse.SUPPRESS)
 
 
+def _add_store_selection_arguments(parser):
+    parser.add_argument("--store", default=None, help="Explicit canonical store path")
+    parser.add_argument("--project", default=None, metavar="PATH", help="Start project-config discovery at PATH")
+    parser.add_argument("--global", dest="global_name", default=None, metavar="NAME", help="Select this exact global registry entry")
+
+
 def build_parser():
     parser = argparse.ArgumentParser(prog="tessera", description="Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -477,12 +684,19 @@ def build_parser():
     plain_parent.add_argument("--plain", action="store_true",
                                help="Force plain-text output (no colors/tables), even on a TTY.")
 
-    p_init = sub.add_parser("init", help="Initialize a memory storage directory", parents=[plain_parent])
+    p_init = sub.add_parser("init", help="Configure and initialize an explicit TESSERA store", parents=[plain_parent])
     p_init.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    p_init.add_argument("--project", nargs="?", const=".", default=None, metavar="PATH", help="Write project config (default PATH: current directory)")
+    p_init.add_argument("--global", dest="global_name", default=None, metavar="NAME", help="Write/update this named global registry entry")
+    p_init.add_argument("--store", default=None, metavar="PATH", help="Store path (positional path remains a compatibility alias)")
+    p_init.add_argument("--non-interactive", action="store_true", help="Never prompt; fail when choices are missing")
+    p_init.add_argument("--dry-run", action="store_true", help="Show the complete mutation plan without writing")
+    p_init.add_argument("--json", action="store_true", help="Emit stable machine-readable output")
     p_init.set_defaults(func=cmd_init)
 
     p_write = sub.add_parser("write", help="Write a new memory note", parents=[plain_parent])
     p_write.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_write)
     p_write.add_argument("--id", required=True)
     p_write.add_argument("--type", required=True, choices=["factual", "preference", "procedural_anchor"])
     p_write.add_argument("--episode", required=True)
@@ -498,10 +712,12 @@ def build_parser():
 
     p_index = sub.add_parser("index", help="Rebuild the in-memory knowledge graph index", parents=[plain_parent])
     p_index.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_index)
     p_index.set_defaults(func=cmd_index)
 
     p_query = sub.add_parser("query", help="Retrieve relevant memories for a query", parents=[plain_parent])
     p_query.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_query)
     p_query.add_argument("query", nargs="?", help="Query text (storage path may be omitted)")
     p_query.add_argument("--top-n", type=int, default=7)
     p_query.add_argument("--no-resolve-conflicts", action="store_true")
@@ -519,6 +735,7 @@ def build_parser():
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])
     p_list.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_list)
     p_list.add_argument("--type", choices=["factual", "preference", "procedural_anchor"], default=None)
     p_list.add_argument("--paths-only", action="store_true",
                          help="Print only the filepath of each note (one per line)")
@@ -532,6 +749,7 @@ def build_parser():
     p_skills_install = skills_sub.add_parser("install", help="Install the 5 bundled default skills into a storage dir",
                                               parents=[plain_parent])
     p_skills_install.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_skills_install)
     p_skills_install.set_defaults(func=cmd_skills_install)
 
     p_skills_list = skills_sub.add_parser("list", help="List the bundled default skill IDs", parents=[plain_parent])
@@ -542,6 +760,7 @@ def build_parser():
         parents=[plain_parent],
     )
     p_start.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_start)
     p_start.add_argument("task", nargs="?", help="Task text (storage path may be omitted)")
     p_start.add_argument("--top-n", type=int, default=7)
     _add_optional_backend_arguments(p_start)
@@ -553,6 +772,7 @@ def build_parser():
         parents=[plain_parent],
     )
     p_decompose.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_decompose)
     p_decompose.add_argument("--mem-id-prefix", required=True,
                               help='Domain-prefixed prefix, e.g. "research/some-topic" or "project/some-run" - '
                                    'each extracted memory is written as "{prefix}/{type}-{n}".')
@@ -573,6 +793,7 @@ def build_parser():
         parents=[plain_parent],
     )
     p_stats.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_stats)
     p_stats.set_defaults(func=cmd_stats)
 
     p_doctor = sub.add_parser(
@@ -594,6 +815,28 @@ def build_parser():
                                help="Actually create storage_dir and run the first index build (default: dry-run plan only)")
     p_quickstart.set_defaults(func=cmd_quickstart)
 
+    p_config = sub.add_parser("config", help="Inspect TESSERA project/global store configuration")
+    config_sub = p_config.add_subparsers(dest="config_command", required=True)
+
+    p_config_show = config_sub.add_parser("show", help="Show the one resolved storage selection")
+    _add_store_selection_arguments(p_config_show)
+    p_config_show.add_argument("--json", action="store_true")
+    p_config_show.set_defaults(func=cmd_config_show)
+
+    p_config_list = config_sub.add_parser("list", help="List explicit global registry entries (no filesystem scan)")
+    p_config_list.add_argument("--json", action="store_true")
+    p_config_list.set_defaults(func=cmd_config_list)
+
+    p_config_doctor = config_sub.add_parser("doctor", help="Read-only configuration/discovery diagnostics")
+    _add_store_selection_arguments(p_config_doctor)
+    p_config_doctor.add_argument("--json", action="store_true")
+    p_config_doctor.set_defaults(func=cmd_config_doctor)
+
+    p_config_unregister = config_sub.add_parser("unregister", help="Remove only one named registry entry")
+    p_config_unregister.add_argument("name")
+    p_config_unregister.add_argument("--json", action="store_true")
+    p_config_unregister.set_defaults(func=cmd_config_unregister)
+
     return parser
 
 
@@ -607,14 +850,22 @@ def main(argv=None):
             args.storage_dir = None
         if getattr(args, text_field) is None:
             parser.error(f"{args.command} requires {text_field} text")
-    if hasattr(args, "storage_dir") and args.command != "quickstart":
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            args.storage_dir = resolve_storage_dir(args.storage_dir)
-        for warning in caught:
-            print(f"[tessera] warning: {warning.message}", file=sys.stderr)
     try:
+        if hasattr(args, "storage_dir") and args.command not in {"init", "quickstart"}:
+            if args.command == "doctor":
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter("always")
+                    args.storage_dir = resolve_storage_dir(args.storage_dir)
+                for warning in caught:
+                    print(f"[tessera] warning: {warning.message}", file=sys.stderr)
+            else:
+                selection = _selection_from_args(args)
+                args.storage_selection = selection
+                args.storage_dir = selection.storage_dir
         return args.func(args) or 0
+    except ConfigurationError as exc:
+        print(f"tessera: configuration error: {exc}", file=sys.stderr)
+        return 2
     except BrokenPipeError:
         # Harmless: happens when output is piped into `head`/`grep -m` and the
         # reader closes early. Exit quietly instead of printing a traceback.
