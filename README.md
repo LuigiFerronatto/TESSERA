@@ -35,6 +35,22 @@ cd TESSERA
 python -m pip install -e ".[dev]"
 ```
 
+For a locally built release artifact, use a clean wheel rather than an editable
+checkout:
+
+```bash
+python -m build
+python -m pip install ./dist/tessera-3.4.0-py3-none-any.whl
+python -m pip install "./dist/tessera-3.4.0-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera-3.4.0-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera-3.4.0-py3-none-any.whl
+python -m pip uninstall tessera
+```
+
+The project version is currently `3.4.0`; `pyproject.toml`, `tessera.__version__`
+and installed distribution metadata must agree. Version changes are release
+decisions, not automatic consequences of individual Test Cards.
+
 TESSERA is not documented here as a PyPI package or release binary until those distribution channels are actually published.
 
 ## Quickstart
