@@ -174,7 +174,7 @@ def test_p13_moved_store_preserves_id_and_p14_missing_is_not_recreated(tmp_path)
 @pytest.mark.parametrize(
     "text,match",
     [
-        ("schema_version: 2\nstore: {}\n", "schema_version"),
+        ("schema_version: 2\nstore: {}\n", "requires id and path"),
         ("- not\n- a\n- mapping\n", "root"),
         (f"schema_version: 1\nstore:\n  id: {STORE_A}\n", "requires id and path"),
         (f"schema_version: 1\nstore:\n  id: {STORE_A}\n  path: memories\n  api_key: secret\n", "unsupported key"),
@@ -245,7 +245,11 @@ def test_p20_os_paths_json_no_home_scan_and_two_stores_remain_independent(tmp_pa
     assert cli.main(["config", "show", "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["schema_version"] == 1
-    assert set(payload["storage_selection"]) == {"store_id", "storage_dir", "source", "project_root", "config_path", "registry_name", "registry_path"}
+    assert set(payload["storage_selection"]) == {
+        "store_id", "storage_dir", "source", "project_root", "config_path",
+        "registry_name", "registry_path", "sources", "index_dir",
+        "identity_root", "config_schema_version",
+    }
 
     # Discovery performs exact ancestor marker checks only; an unrelated home
     # config is beyond the explicit home boundary and cannot win.

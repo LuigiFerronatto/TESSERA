@@ -41,7 +41,7 @@ Claude Desktop / Cursor config example:
 import os
 from typing import Any, Dict, List, Literal, Optional
 
-from .config import resolve_storage_dir
+from .config import resolve_runtime_configuration
 from .engine import TesseraEngine
 from .hooks import TesseraTaskHook
 from .models import Connection, Entity
@@ -54,10 +54,11 @@ except ImportError as exc:  # pragma: no cover - only hit when 'mcp' extra isn't
         "The MCP server requires the 'mcp' extra. Install it with: pip install 'tessera[mcp]'"
     ) from exc
 
-DEFAULT_STORAGE_DIR = resolve_storage_dir()
+DEFAULT_CONFIGURATION = resolve_runtime_configuration()
+DEFAULT_STORAGE_DIR = DEFAULT_CONFIGURATION.storage_dir
 
 mcp = FastMCP("tessera")
-_engine = TesseraEngine(storage_dir=DEFAULT_STORAGE_DIR)
+_engine = TesseraEngine(configuration=DEFAULT_CONFIGURATION)
 _engine.build_index()
 _hook = TesseraTaskHook(_engine)
 

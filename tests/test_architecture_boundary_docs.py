@@ -9,6 +9,7 @@ ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
 ISSUE_116_AUDIT = ROOT / "docs" / "PR_EVOLUTION_116.md"
 LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
 ISSUE_93_AUDIT = ROOT / "docs" / "PR_EVOLUTION_93.md"
+ISSUE_153_AUDIT = ROOT / "docs" / "PR_EVOLUTION_153.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
 ISSUE_115_CANDIDATE_SHA = "25afd31b910dec97cffea34a25092c6e7f8b4f2e"
 CANONICAL_115_MERGE_SHA = "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1"
@@ -402,3 +403,26 @@ def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
         "PyPI release complete",
     ):
         assert marker in record
+
+
+def test_issue_153_candidate_records_boundaries_without_downstream_claims() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = ISSUE_153_AUDIT.read_text(encoding="utf-8")
+    record = (
+        ROOT / "docs/test-cards/153-configuration-v2-store-sources-index.md"
+    ).read_text(encoding="utf-8")
+
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#153")
+    for marker in (
+        "0880ef3ec417735c105898039cc202450407af2b",
+        "ResolvedConfiguration",
+        "store.path",
+        "sources.roots",
+        "index.path",
+        "`SMOKE_ONLY`",
+        "#154, #155, #157",
+    ):
+        assert marker in audit
+    assert "| Record status | `IN_PROGRESS` |" in record
+    assert "## What changed or is being tested?" in record
+    assert "#154 and #155 remain blocked" in record

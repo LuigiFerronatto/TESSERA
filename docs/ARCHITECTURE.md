@@ -41,11 +41,14 @@ AGENT
 - No generative LLM is mandatory for the basic Foundation path.
 - User source files are not silently rewritten during indexing.
 - Public examples/fixtures are project-agnostic.
-- Configuration discovery selects one store; it never discovers or merges memory corpora.
+- Configuration discovery selects one store; configured v2 sources are an
+  explicit per-project allow list, never an implicit corpus merge.
 
 ## Configuration and Engine boundary
 
-The Issue #117 candidate implements [ADR 0003](adr/0003-configuration-and-store-discovery.md):
+Issue #117 implements [ADR 0003](adr/0003-configuration-and-store-discovery.md).
+The Issue #153 candidate evolves the Engine handoff without changing selection
+precedence:
 
 ```text
 explicit path
@@ -54,17 +57,29 @@ explicit path
   → explicitly named global registry entry
   → actionable failure
                     ↓
-             StorageSelection
+          ResolvedConfiguration
+        ┌───────────┼────────────┐
+        ↓           ↓            ↓
+   store.path    sources      index.path
+   write only    read only    derived only
+        └───────────┼────────────┘
                     ↓
-           TesseraEngine(path)
+             TesseraEngine
 ```
 
 The resolver alone checks exact project configuration markers and registry
-metadata. Engine does not walk repositories, prompt, read global configuration,
-or select among projects. Project config is source configuration outside the
-store's rebuildable `.tessera_index/`; deleting an index cannot delete config.
-The global registry points to independent stores and never aggregates them.
-MCP lifecycle adoption remains Issue #120.
+metadata. Engine does not discover repositories, prompt, read global
+configuration, or select among projects. It iterates only the resolved source
+roots and include patterns. Generated writes remain strictly contained by
+`store.path`; source files are never copied or rewritten; `.tessera/index` is
+excluded from source iteration and can be deleted/rebuilt independently.
+
+Schema-v1 project configuration, direct `storage_dir`, environment selection,
+and named-global stores conservatively use their prior store as the sole source.
+They do not gain project README/docs/research files on upgrade. Explicit v2
+project roots must remain physically contained by the project, and symlink
+escapes fail safely. A named global store never absorbs current-project sources.
+Broader safe discovery and source-picker UX remain #154/#155.
 
 ## Current read / retrieval pipeline
 
@@ -417,7 +432,7 @@ Sanity metrics are regression indicators, not competitive benchmark claims.
 | `tessera/security.py` | Basic deterministic write-side hostile-pattern audit/sanitization |
 | `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
 | `tessera/models.py` | Domain models for memory/write paths |
-| `tessera/config.py` | Closed project/global schemas, bounded discovery, stable store selection and atomic config mutation |
+| `tessera/config.py` | Closed v1/v2 project and global schemas, bounded discovery, and one resolved store/source/index boundary |
 | `tessera/cli.py` | Human CLI surface |
 | `tessera/mcp_server.py` | MCP transport; direct `query_memories()` has #68 parity, while legacy assisted-hook startup is an ADR 0001 deviation |
 | `tessera/orchestrator.py` | Legacy optional assisted planning/synthesis path governed by ADR 0001 |

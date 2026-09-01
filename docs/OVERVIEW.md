@@ -149,8 +149,9 @@ Optional generative components may exist for higher-level workflows, but the bas
 | Explicit/local relation parsing | Implemented foundation | Issue #9 / PR #3 |
 | CI + deterministic sanity evaluation | Implemented | Issue #10 / PR #4 |
 | Evidence Ledger + provenance | Implemented | Issue #11 / PR #6 |
-| Project/global store configuration and explainable discovery | In-progress candidate | Issue #117 / ADR 0003 |
-| Engine/CLI/MCP contract parity | Planned Foundation hardening | Issue #68 |
+| Project/global store configuration and explainable discovery | Validated | Issue #117 / ADR 0003 |
+| Store/source/index boundary separation | In-progress candidate | Issue #153 |
+| Engine/CLI/MCP contract parity | Validated direct-query contract | Issue #68 |
 | Incremental/idempotent indexing | Planned Foundation experiment | Issue #12 |
 | Plain-text ingestion beyond Markdown | Planned experiment | Issue #69 |
 | Structural segmentation | Planned experiment | Issue #70 |
@@ -168,23 +169,29 @@ The project roadmap is maintained in [`ROADMAP.md`](ROADMAP.md) and the correspo
 
 ## Configuration boundary
 
-Issue #117's candidate places explicit configuration before the existing
-memory pipeline:
+Issue #117 places explicit selection before the memory pipeline. Issue #153's
+candidate makes the resolved Engine boundary explicit:
 
 ```text
 --store / environment / nearest project config / named registry
                               ↓
-                    StorageSelection
-                              ↓
-                   one absolute store
-                              ↓
-                         Engine
+                 ResolvedConfiguration
+              ┌───────────┼───────────┐
+              ↓           ↓           ↓
+         store.path    sources    index.path
+         write only    read only  derived only
+              └───────────┼───────────┘
+                          ↓
+                        Engine
 ```
 
 Project config lives at `.tessera/config.yaml`; global configuration is an
 OS-appropriate registry of explicitly named stores. Neither layer contains
-memory, credentials or executable instructions, and neither scans or combines
-projects. See [ADR 0003](adr/0003-configuration-and-store-discovery.md).
+memory, credentials or executable instructions. Schema-v1 and named-global
+stores remain store-only corpora; explicit schema-v2 roots never trigger an
+implicit project/home scan or cross-project merge. See
+[ADR 0003](adr/0003-configuration-and-store-discovery.md) and the
+[#153 evolution audit](PR_EVOLUTION_153.md).
 
 ---
 
