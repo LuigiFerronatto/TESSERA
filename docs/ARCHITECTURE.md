@@ -41,6 +41,30 @@ AGENT
 - No generative LLM is mandatory for the basic Foundation path.
 - User source files are not silently rewritten during indexing.
 - Public examples/fixtures are project-agnostic.
+- Configuration discovery selects one store; it never discovers or merges memory corpora.
+
+## Configuration and Engine boundary
+
+The Issue #117 candidate implements [ADR 0003](adr/0003-configuration-and-store-discovery.md):
+
+```text
+explicit path
+  → canonical/deprecated environment
+  → nearest exact project config
+  → explicitly named global registry entry
+  → actionable failure
+                    ↓
+             StorageSelection
+                    ↓
+           TesseraEngine(path)
+```
+
+The resolver alone checks exact project configuration markers and registry
+metadata. Engine does not walk repositories, prompt, read global configuration,
+or select among projects. Project config is source configuration outside the
+store's rebuildable `.tessera_index/`; deleting an index cannot delete config.
+The global registry points to independent stores and never aggregates them.
+MCP lifecycle adoption remains Issue #120.
 
 ## Current read / retrieval pipeline
 
@@ -393,6 +417,7 @@ Sanity metrics are regression indicators, not competitive benchmark claims.
 | `tessera/security.py` | Basic deterministic write-side hostile-pattern audit/sanitization |
 | `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
 | `tessera/models.py` | Domain models for memory/write paths |
+| `tessera/config.py` | Closed project/global schemas, bounded discovery, stable store selection and atomic config mutation |
 | `tessera/cli.py` | Human CLI surface |
 | `tessera/mcp_server.py` | MCP transport; direct `query_memories()` has #68 parity, while legacy assisted-hook startup is an ADR 0001 deviation |
 | `tessera/orchestrator.py` | Legacy optional assisted planning/synthesis path governed by ADR 0001 |

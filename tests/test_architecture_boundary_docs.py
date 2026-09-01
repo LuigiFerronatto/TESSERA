@@ -260,7 +260,7 @@ def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
     assert "`VALIDATED`" in issue_116
     assert "0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4" in issue_116
 
-    assert "`READY`" in _markdown_table_row(roadmap, "#117")
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#117")
     for issue in ("#118", "#119", "#120", "#121"):
         assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
 
@@ -335,7 +335,7 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
     )
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#116")
-    assert "`READY`" in _markdown_table_row(roadmap, "#117")
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#117")
     for issue in ("#118", "#119", "#120", "#121"):
         assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
 

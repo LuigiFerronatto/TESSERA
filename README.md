@@ -55,22 +55,47 @@ TESSERA is not documented here as a PyPI package or release binary until those d
 
 ## Quickstart
 
-Create a memory store, write one fact, index it, and query it:
+Configure this project, write one fact, index it, and query it. The config is
+human-readable and contains no credential:
 
 ```bash
-tessera init ./memories
+tessera init --project . --store memories --non-interactive
 
-tessera write ./memories \
+tessera write \
   --id project/database \
   --type factual \
   --episode setup \
   --content "The project uses PostgreSQL as its primary database." \
   --tags database,postgresql
 
-tessera index ./memories
+tessera index
 
-tessera query ./memories "what database does the project use?"
+tessera query "what database does the project use?"
 ```
+
+From a nested directory TESSERA checks only the exact
+`.tessera/config.yaml` marker on each physical ancestor; the nearest config
+wins. Inspect the decision with `tessera config show` or
+`tessera config show --json`.
+
+A user-global registry remembers named stores without copying or merging their
+memory:
+
+```bash
+tessera init --global research --store /absolute/path/to/research --non-interactive
+tessera config show --global research --json
+tessera config list
+tessera config doctor
+tessera config unregister research  # metadata only; never deletes the store
+```
+
+Selection precedence is explicit `--store`/positional path,
+`TESSERA_STORAGE_DIR`, deprecated warning-emitting `LAO_MEM_DIR`, nearest
+project config, then an explicitly named global entry. Otherwise product CLI
+operations fail with an actionable configuration error. The direct Python
+compatibility resolver and pre-#120 MCP bootstrap retain historical
+`./memories` fallback; existing callers do not migrate automatically. See
+[ADR 0003](docs/adr/0003-configuration-and-store-discovery.md).
 
 Source files remain the source of truth. Derived index data is rebuildable under `.tessera_index/`.
 
