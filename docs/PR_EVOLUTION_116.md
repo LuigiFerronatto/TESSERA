@@ -12,7 +12,8 @@ had already been reconciled onto #93's runtime merge
 parallel [PR #132](https://github.com/LuigiFerronatto/TESSERA/pull/132) advanced
 `main` to `65f42d76a7bfbd88f4d2b35f977f91848810e23a`. PR #131 was rebased onto that
 actual latest main. The reconciliation preserves #93 as `VALIDATED`, #67 as
-`BLOCKED` only on regression-gate integration, and #116 as `IN_PROGRESS`.
+`BLOCKED` only on regression-gate integration, and kept #116 `IN_PROGRESS`
+until its canonical merge.
 
 ## Audit method
 
@@ -44,7 +45,8 @@ that `benchmarks` is unavailable to artifact consumers.
 | [PR #128](https://github.com/LuigiFerronatto/TESSERA/pull/128) | `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`, merged | `ARCHITECTURE_DECISION` | accepted ADR 0002: keep root package, exclude benchmarks/tests from artifacts through #116 | audited candidate and squash merge count once |
 | [PR #130](https://github.com/LuigiFerronatto/TESSERA/pull/130) | `055a35f4a7e8298013bcb816b30f67d9706b9516`, merged | `DOCUMENTATION_CORRECTION` | synchronized #115 to `VALIDATED` and #116 to `READY` | no architecture/runtime count |
 | [PR #132](https://github.com/LuigiFerronatto/TESSERA/pull/132) | `65f42d76a7bfbd88f4d2b35f977f91848810e23a`, merged in parallel | `DOCUMENTATION_CORRECTION` | synchronized #93 to `VALIDATED` and left #67 blocked on regression-gate integration | independent #93 lifecycle delivery; no #116 capability count |
-| [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) | open | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | one candidate packaging delivery; not counted as merged |
+| [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) | `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`, merged by squash | `PACKAGING` | removes accidental benchmark/test artifact ownership, modernizes equivalent MIT metadata, adds artifact tests/CI | audited final candidate `0adb147075c25e1c442c1e310763eb66ca04c567` and canonical merge count as one packaging delivery |
+| #116 lifecycle synchronization PR | candidate | `DOCUMENTATION_CORRECTION` | records #116 `VALIDATED`, #117 `READY`, and preserves all downstream routing | no packaging or runtime capability count |
 
 No `SUPERSEDED_OPERATIONAL_PR` materially established the current packaging
 boundary. Candidate heads and later squash merges represent one delivery, not
@@ -148,3 +150,20 @@ point without starting an uncontrolled server.
 
 No runtime/retrieval semantics, benchmark implementation, migration, PyPI
 release or tag is part of #116.
+
+## Canonical outcome and lifecycle routing
+
+PR #131 is `MERGED`. Its original audited main was
+`055a35f4a7e8298013bcb816b30f67d9706b9516`; it incorporated the independent #93
+runtime merge `c6124548f32b6dc5e1b7acf5127632bc6c75fccc` and lifecycle merge
+`65f42d76a7bfbd88f4d2b35f977f91848810e23a`. The previous #116 candidate was
+`cb23a2537b662ceda9ccd67b44900e3f399e59bc`; the audited final candidate was
+`0adb147075c25e1c442c1e310763eb66ca04c567`; and the canonical squash merge is
+`0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`. The final candidate and canonical
+merge are exactly one `PACKAGING` delivery, not two.
+
+The decision is `KEEP`. Implementation applicability remains `SMOKE_ONLY`;
+this lifecycle-only `DOCUMENTATION_CORRECTION` is `NOT_APPLICABLE`. Issue #116
+is `VALIDATED`, and #117 becomes `READY` because #94, #115 and #116 are
+satisfied. Issues #118–#121 remain `BLOCKED` and unstarted. Issue #87 retains
+standalone license/legal ownership. No PyPI publication or tag occurred.

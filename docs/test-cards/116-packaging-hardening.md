@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `packaging` |
 | Pull request | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) |
-| Head commit | Current PR head; canonical delivery is recorded after merge |
-| Merge commit | Not merged |
-| Decision | `KEEP` candidate |
+| Head commit | Audited candidate `0adb147075c25e1c442c1e310763eb66ca04c567` |
+| Merge commit | Canonical squash merge `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4` |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-08-31 |
 
@@ -77,10 +77,10 @@ resources, and separately loads the optional MCP surface.
 
 ## How does it work now?
 
-**CANDIDATE — NOT YET ON `main`.**
+**VALIDATED ON `main`.**
 
-The candidate wheel has 30 files: the same 20 TESSERA modules, five required
-Markdown resources and five metadata files. The candidate sdist has 40 entries:
+The validated wheel has 30 files: the same 20 TESSERA modules, five required
+Markdown resources and five metadata files. The validated sdist has 40 entries:
 its root, README, `pyproject.toml`, `MANIFEST.in`, generated build metadata,
 the same runtime/data sources and egg metadata. Neither artifact includes
 benchmark or test Python files.
@@ -142,9 +142,11 @@ Skills #121. The root MCP compatibility shim is unchanged.
 
 ## What is unlocked next?
 
-Nothing is promoted while this PR is open. After canonical merge and lifecycle
-synchronization, #117 may become `READY`. Issues #118–#121 retain their full
-dependency chains and no downstream implementation has started.
+After this lifecycle synchronization, #117 is `READY` because #94, #115 and
+#116 are satisfied. This readiness does not start configuration work. Issues
+#118–#121 retain their full dependency chains and remain `BLOCKED`; no downstream
+implementation has started. A validated packaging artifact is not the same as
+completed onboarding: #118 still owns that work.
 
 ## Technical provenance
 
@@ -152,7 +154,7 @@ dependency chains and no downstream implementation has started.
 |---|---|
 | Issue/Test Card | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) |
 | Pull request | [PR #131](https://github.com/LuigiFerronatto/TESSERA/pull/131) |
-| Merge commit | Not merged |
+| Merge commit | `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4` |
 | Evidence/Learnings/Decision | Published before merge on Issue #116 |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, LongMemEval skipped |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_116.md`](../PR_EVOLUTION_116.md) |
@@ -164,6 +166,14 @@ working checkout and accidental mixed artifacts
 → explicit TESSERA-only package and sdist ownership
 → clean installed-wheel proof on Python 3.9/3.12
 → #93 runtime/lifecycle current-main truth reconciled additively
-→ current candidate remains IN_PROGRESS until merge
-→ #117 becomes eligible only after lifecycle synchronization
+→ audited candidate `0adb147` and canonical squash merge `0dd6e5c` count once
+→ #116 VALIDATED; #117 READY after lifecycle synchronization
 ```
+
+Clean installed-wheel proof passed on Python 3.9 and Python 3.12 from temporary
+`site-packages`, including the public API, `TesseraEngine`, version metadata,
+`tessera --help`, deterministic temporary-corpus write/query and all five
+Markdown resources. Python 3.12 also installed the MCP extra and loaded packaged
+`tessera.mcp_server:main` without starting a server or provider. Historical
+implementation applicability remains `SMOKE_ONLY`; this lifecycle correction is
+`NOT_APPLICABLE`. No PyPI release or tag was created.
