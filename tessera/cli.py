@@ -40,6 +40,13 @@ STORAGE_HELP = (
 )
 
 
+def _engine_for_args(args):
+    configuration = getattr(args, "storage_selection", None)
+    if configuration is not None:
+        return TesseraEngine(configuration=configuration)
+    return TesseraEngine(storage_dir=args.storage_dir)
+
+
 def _parse_entities(raw_entities):
     entities = []
     for raw in raw_entities or []:
@@ -124,7 +131,7 @@ def cmd_init(args):
         print("Initialization cancelled; no files were changed.")
         return 1
     selection = apply_init_plan(plan)
-    engine = TesseraEngine(storage_dir=selection.storage_dir)
+    engine = TesseraEngine(configuration=selection)
     engine.build_index()
     if args.json:
         print(json.dumps({
@@ -141,7 +148,7 @@ def cmd_init(args):
 
 
 def cmd_write(args):
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     tags = args.tags.split(",") if args.tags else []
     entities = _parse_entities(args.entity)
     active_connections = _parse_connections(args.related_to)
@@ -190,7 +197,7 @@ def cmd_write(args):
 
 def cmd_index(args):
     print(f"[tessera] Indexando: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     # `tessera index` means "rebuild now" — always force a fresh scan, ignoring
     # any existing cache, then persist the new result to .tessera_index/.
     engine.build_index(use_cache=False)
@@ -216,7 +223,7 @@ def cmd_index(args):
 
 def cmd_query(args):
     print(f"[tessera] storage_dir: {args.storage_dir}  |  query: {args.query!r}", file=sys.stderr)
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     engine.build_index()
     if engine.graph.number_of_nodes() == 0:
         print(
@@ -266,7 +273,7 @@ def cmd_query(args):
 
 def cmd_list(args):
     print(f"[tessera] Usando storage_dir: {args.storage_dir}", file=sys.stderr)
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     engine.build_index()
     rows = []
     for node_id, data in sorted(engine.graph.nodes(data=True)):
@@ -304,7 +311,7 @@ def cmd_list(args):
 
 
 def cmd_skills_install(args):
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     paths = install_default_skills(engine)
 
     from .display import get_console, render_skills_install_result
@@ -334,7 +341,7 @@ def cmd_skills_list(args):
 def cmd_start(args):
     """Runs the full Need -> Planner -> Retrieval -> Inference pipeline (TesseraOrchestrator)."""
     print(f"[tessera] storage_dir: {args.storage_dir}  |  task: {args.task!r}", file=sys.stderr)
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     engine.build_index()
 
     from .llm_bridge import resolve_llm_fn
@@ -410,7 +417,7 @@ def cmd_decompose(args):
     from .models import Episode
 
     print(f"[tessera] storage_dir: {args.storage_dir}  |  mem_id_prefix: {args.mem_id_prefix!r}", file=sys.stderr)
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     engine.build_index()
 
     from .llm_bridge import resolve_llm_fn
@@ -465,7 +472,7 @@ def cmd_decompose(args):
 
 
 def cmd_stats(args):
-    engine = TesseraEngine(storage_dir=args.storage_dir)
+    engine = _engine_for_args(args)
     engine.build_index()
 
     type_counts: Dict[str, int] = {}
@@ -588,6 +595,19 @@ def cmd_config_doctor(args):
             {"name": "selected_store_writable", "ok": writable, "detail": str(selected_path)},
             {"name": "selected_store_symlink", "ok": not symlink, "detail": "physical canonical path" if not symlink else str(selected_path), "required": False},
         ])
+        index_path = Path(selection.index_dir)
+        checks.append({
+            "name": "derived_index_separate",
+            "ok": index_path != selected_path,
+            "detail": str(index_path),
+        })
+        for position, source_root in enumerate(selection.source_roots):
+            source_path = Path(source_root.path)
+            checks.append({
+                "name": f"source_root:{position}",
+                "ok": source_path.is_dir(),
+                "detail": str(source_path),
+            })
     except ConfigurationError as exc:
         checks.append({"name": "storage_selection", "ok": False, "detail": str(exc)})
     healthy = all(check["ok"] for check in checks if check.get("required", True))

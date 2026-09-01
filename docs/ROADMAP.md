@@ -126,7 +126,17 @@ Parallel product work now unblocked:
   #119 CLI UX       READY
   #120 MCP runtime  READY
        -> #121 official Skills BLOCKED on #120
+
+Configuration v2 refinement now active:
+  #153 store / sources / index separation IN_PROGRESS
+       -> #154 safe source discovery       BLOCKED pending #153 canonical reconciliation
+       -> #155 source-picker init UX       BLOCKED pending #153 canonical reconciliation
 ```
+
+#153 is an unmerged candidate and must not be described as implemented or
+validated. This branch does not begin #154, #155, #157, or alter their
+deliveries; downstream readiness may change only after #153 is canonically
+merged and its post-merge lifecycle is synchronized.
 
 The first PyPI release does **not** require #119/#120/#121 unless those cards discover a release-contract blocker before publication. #134 owns TestPyPI/PyPI publication, release workflow, distribution-name freeze and post-publication smoke. `tessera-agent-memory` is only a current candidate distribution name until #134 freezes it.
 
@@ -199,6 +209,7 @@ The first matching row for an Issue is the authoritative roadmap state used by s
 | [#115](https://github.com/LuigiFerronatto/TESSERA/issues/115) | closed | `VALIDATED` | ADR 0002 accepted in PR #128, canonical `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1`; lifecycle #130; `KEEP`. |
 | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | closed | `VALIDATED` | Packaging PR #131 canonical `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`; lifecycle #133 canonical `b3be96f4aa842a81c135b6ac87d3311ed292d339`; `KEEP`. |
 | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | closed | `VALIDATED` | `KEEP`; implementation PR #150 canonical `61cf76fbd6ed61972f0f5abae515ba9bffca4b55`; lifecycle PR #152 canonical `fc0ed763ad47f5eba88775f3517cbee99d00a8b9`; candidate and merge count once as `CONFIGURATION_DISCOVERY`. |
+| [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | open | `IN_PROGRESS` | Dedicated `test-card/153-config-v2` candidate separates write store, explicit read sources, and derived index. #154/#155 remain blocked until canonical merge and lifecycle reconciliation; no downstream work started. |
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
 | [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `READY` containment / `BLOCKED` full | P0 containment has no dependency; full supersession waits on #15/#73/#96. Preserve preference history for #141. |
 | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `READY` | #116/#117 validated. Clean-room onboarding may start; it is the remaining technical release gate for #134. |
