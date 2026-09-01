@@ -552,6 +552,7 @@ def cmd_config_list(args):
 
 def cmd_config_doctor(args):
     checks = []
+    source_discovery = None
     project_path = discover_project_config(args.project or os.getcwd())
     if project_path:
         try:
@@ -608,6 +609,32 @@ def cmd_config_doctor(args):
                 "ok": source_path.is_dir(),
                 "detail": str(source_path),
             })
+        if selection.project_root:
+            from .source_discovery import discover_sources_for_configuration
+
+            source_discovery = discover_sources_for_configuration(selection)
+            invalid_codes = {
+                "invalid_ignore_pattern",
+                "unreadable_ignore_file",
+                "unsafe_ignore_file",
+                "configured_source_forbidden",
+            }
+            blocking_warnings = [
+                warning for warning in source_discovery.warnings
+                if warning.code in invalid_codes
+            ]
+            checks.append({
+                "name": "source_discovery_policy",
+                "ok": not blocking_warnings,
+                "detail": (
+                    "structured discovery plan available"
+                    if not blocking_warnings
+                    else "; ".join(
+                        f"{warning.code}:{warning.path}:{warning.detail}"
+                        for warning in blocking_warnings
+                    )
+                ),
+            })
     except ConfigurationError as exc:
         checks.append({"name": "storage_selection", "ok": False, "detail": str(exc)})
     healthy = all(check["ok"] for check in checks if check.get("required", True))
@@ -617,6 +644,7 @@ def cmd_config_doctor(args):
         "project_config_path": str(project_path) if project_path else None,
         "registry_path": str(registry_path),
         "storage_selection": selection.to_dict() if selection else None,
+        "source_discovery": source_discovery.to_dict() if source_discovery else None,
         "checks": checks,
     }
     if args.json:

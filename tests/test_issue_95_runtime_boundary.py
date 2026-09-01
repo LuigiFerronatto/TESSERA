@@ -224,6 +224,7 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         "tests/test_issue_93_storage_config_parity.py",
         "tests/test_issue_117_config_init_discovery.py",
         "tests/test_issue_153_configuration_v2.py",
+        "tests/test_issue_154_source_discovery.py",
     }
     unexpected = []
     for path in ROOT.rglob("*"):

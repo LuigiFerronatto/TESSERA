@@ -9,6 +9,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ## Unreleased
 
 ### Added
+- Root-bounded, read-only project source discovery now returns deterministic
+  `RECOMMENDED / SUPPORTED / IGNORED / FORBIDDEN` candidates and location
+  clusters, applies the documented `.tessera-ignore` subset, blocks derived
+  indexes, unsafe symlinks, special files and high-confidence credential/key
+  artifacts, and exposes the plan through `tessera config doctor --json`.
+  ([#154](https://github.com/LuigiFerronatto/TESSERA/issues/154))
 - Versioned project configuration, an OS-appropriate named global-store
   registry, stable store IDs, bounded discovery, atomic `tessera init`, and
   read-only `tessera config show/list/doctor` plus metadata-only unregister.

@@ -10,6 +10,8 @@ ISSUE_116_AUDIT = ROOT / "docs" / "PR_EVOLUTION_116.md"
 LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
 ISSUE_93_AUDIT = ROOT / "docs" / "PR_EVOLUTION_93.md"
 ISSUE_153_AUDIT = ROOT / "docs" / "PR_EVOLUTION_153.md"
+ISSUE_154_AUDIT = ROOT / "docs" / "PR_EVOLUTION_154.md"
+SOURCE_DISCOVERY_ADR = ROOT / "docs" / "adr" / "0004-safe-project-source-discovery.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
 ISSUE_115_CANDIDATE_SHA = "25afd31b910dec97cffea34a25092c6e7f8b4f2e"
 CANONICAL_115_MERGE_SHA = "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1"
@@ -437,3 +439,42 @@ def test_issue_153_validated_records_preserve_delivery_and_downstream_boundaries
     assert "## What changed or is being tested?" in record
     assert "#154 is now `READY`" in record
     assert "#155 remains\n`BLOCKED` on #154" in record
+
+
+def test_issue_154_candidate_freezes_discovery_without_selection_or_mutation() -> None:
+    roadmap = ROADMAP.read_text(encoding="utf-8")
+    audit = ISSUE_154_AUDIT.read_text(encoding="utf-8")
+    record = (ROOT / "docs/test-cards/154-safe-source-discovery.md").read_text(
+        encoding="utf-8"
+    )
+    adr = SOURCE_DISCOVERY_ADR.read_text(encoding="utf-8")
+
+    issue_154 = _markdown_table_row(roadmap, "#154")
+    assert "`IN_PROGRESS`" in issue_154
+    for issue in ("#155", "#118", "#134"):
+        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+
+    for marker in (
+        "8f1c0c19a04ec4bde686b124389eb17a61856de0",
+        "2508676d472088733702b6ed920fc829df9a7681",
+        "#153 = WHAT paths can be configured",
+        "#154 = HOW project source candidates",
+        "#155 = HOW a user selects",
+        "RECOMMENDED",
+        "SUPPORTED",
+        "IGNORED",
+        "FORBIDDEN",
+        "2 MiB",
+        "SMOKE_ONLY",
+    ):
+        assert marker in audit
+
+    assert "| Record status | `IN_PROGRESS` |" in record
+    assert "candidate `KEEP`" in record
+    for marker in (
+        "never enumerates an\nancestor, sibling, `$HOME`",
+        "All symlinks are skipped",
+        "documented subset",
+        "#155 owns display/select/confirm/persist/index",
+    ):
+        assert marker in adr

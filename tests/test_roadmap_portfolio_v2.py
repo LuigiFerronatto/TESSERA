@@ -27,7 +27,7 @@ def test_productization_v2_critical_path_is_explicit() -> None:
         assert marker in text
 
     assert "`VALIDATED`" in _row(text, "#153")
-    assert "`READY`" in _row(text, "#154")
+    assert "`IN_PROGRESS`" in _row(text, "#154")
     for issue in ("#155", "#118", "#134"):
         assert "`BLOCKED`" in _row(text, issue)
 
@@ -117,8 +117,8 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 4, ready_executable
-    assert any("[#154]" in line for line in ready_executable)
+    assert len(ready_executable) == 3, ready_executable
+    assert not any("[#154]" in line for line in ready_executable)
     assert any("[#135]" in line for line in ready_executable)
 
 
@@ -132,8 +132,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "2508676d472088733702b6ed920fc829df9a7681" in issue_153
 
     issue_154 = _row(text, "#154")
-    assert "`READY`" in issue_154
-    assert "no remaining hard blocker" in issue_154
+    assert "`IN_PROGRESS`" in issue_154
+    assert "test-card/154-safe-source-discovery" in issue_154
 
     assert "remaining active blocker is #154" in _row(text, "#155")
     assert "remaining blockers are #154" in _row(text, "#118")
@@ -141,18 +141,21 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
     now_section = text.split("## NOW", 1)[1].split("## NEXT / READY", 1)[0]
-    assert "No executable feature is selected or in progress" in now_section
+    assert "#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS" in now_section
+    assert "#135/#16 integrity lane remains unselected" in now_section
 
     rows = [line for line in text.splitlines() if line.startswith("| [#")]
     now_executable = [
         line
         for line in rows
-        if "`NOW`" in line.split("|")[3]
+        if any(status in line.split("|")[3] for status in ("`NOW`", "`IN_PROGRESS`"))
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 0
+    assert len(now_executable) == 1
+    assert "[#154]" in now_executable[0]
 
-    assert "READY                          7 total / 4 executable" in text
+    assert "NOW executable                 1" in text
+    assert "READY                          6 total / 3 executable" in text
     assert "BLOCKED                        40 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text
