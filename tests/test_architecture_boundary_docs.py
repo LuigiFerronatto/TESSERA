@@ -188,8 +188,8 @@ def test_issue_95_lifecycle_and_dependency_routing_are_reconciled() -> None:
     assert "still depends on #93, #95" not in issue_67
     assert "`VALIDATED`" in issue_115
     assert CANONICAL_115_MERGE_SHA in issue_115
-    assert "`IN_PROGRESS`" in issue_116
-    assert "#74, #95 and canonical #115 are satisfied" in issue_116
+    assert "`VALIDATED`" in issue_116
+    assert "0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4" in issue_116
 
 
 def test_repository_layout_adr_defines_distribution_ownership_without_migration() -> None:
@@ -257,10 +257,11 @@ def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
     assert "PR #128" in issue_115
     assert CANONICAL_115_MERGE_SHA in issue_115
     assert "`KEEP`" in issue_115
-    assert "`IN_PROGRESS`" in issue_116
-    assert "#74, #95 and canonical #115 are satisfied" in issue_116
+    assert "`VALIDATED`" in issue_116
+    assert "0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4" in issue_116
 
-    for issue in ("#117", "#118", "#119", "#120", "#121"):
+    assert "`READY`" in _markdown_table_row(roadmap, "#117")
+    for issue in ("#118", "#119", "#120", "#121"):
         assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
 
 
@@ -333,8 +334,9 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
         encoding="utf-8"
     )
 
-    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#116")
-    for issue in ("#117", "#118", "#119", "#120", "#121"):
+    assert "`VALIDATED`" in _markdown_table_row(roadmap, "#116")
+    assert "`READY`" in _markdown_table_row(roadmap, "#117")
+    for issue in ("#118", "#119", "#120", "#121"):
         assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
 
     for marker in (
@@ -350,9 +352,13 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
         "No misleading benchmark extra",
         "65f42d76a7bfbd88f4d2b35f977f91848810e23a",
         "PR #132",
+        "0adb147075c25e1c442c1e310763eb66ca04c567",
+        "0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4",
+        "one `PACKAGING` delivery",
+        "`DOCUMENTATION_CORRECTION`",
     ):
         assert marker in audit
 
-    assert "| Record status | `IN_PROGRESS` |" in record
-    assert "CANDIDATE — NOT YET ON `main`" in record
+    assert "| Record status | `VALIDATED` |" in record
+    assert "VALIDATED ON `main`" in record
     assert "LongMemEval remains skipped" in record
