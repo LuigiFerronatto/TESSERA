@@ -7,7 +7,7 @@
 | Capability type | `SOURCE_DISCOVERY` |
 | Pull request | [#175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
 | Final candidate | `06521763b4c3cf033c4d1e6a771ae105aad98e37` |
-| Canonical merge | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
+| Merge commit | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
 | Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Final CI | `33633838687` — success |
@@ -40,7 +40,7 @@ project inspection / candidate plan
 The conservative behavior was intentional: schema v1 and newly initialized v2
 projects retained the store as their only source.
 
-## What changed?
+## What changed or is being tested?
 
 The validated delivery adds a pure Python discovery layer:
 
@@ -149,7 +149,7 @@ record.
 | Issue/Test Card | [Issue #154](https://github.com/LuigiFerronatto/TESSERA/issues/154) |
 | Pull request | [PR #175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
 | Final candidate | `06521763b4c3cf033c4d1e6a771ae105aad98e37` |
-| Canonical merge | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
+| Merge commit | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
 | Evidence/Learnings/Decision | [Issue #154 evidence](https://github.com/LuigiFerronatto/TESSERA/issues/154#issuecomment-5510041443) |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity preserved, LongMemEval skipped |
 | PR Evolution Audit | [PR_EVOLUTION_154.md](../PR_EVOLUTION_154.md) |
