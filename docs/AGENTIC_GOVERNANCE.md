@@ -321,14 +321,17 @@ No secrets are committed by this change. A maintainer must configure:
   Identity Federation if the installed gh-aw version's Gemini engine
   supports it in this environment.
 - **Codex** (`tessera-pr-maintainer-audit.md`, `tessera-post-merge-lifecycle.md`):
-  configured with `engine.model: copilot/auto`, routing Codex's BYOK
-  provider through GitHub Copilot inference instead of OpenAI directly.
-  This requires either `copilot-requests: write` in `permissions:` (both
-  workflows have it, for org-billed AIC) or a `COPILOT_GITHUB_TOKEN`
-  secret (PAT-based, seat-billed) if the org does not support the former.
-  Confirmed as an officially documented gh-aw feature at compile time
-  (`gh aw compile` succeeds and the `.lock.yml` embeds
-  `"agent_model":"copilot/auto"`).
+  `CODEX_API_KEY`/`OPENAI_API_KEY` per the installed gh-aw Codex engine
+  configuration. Routing Codex inference through GitHub Copilot billing
+  (`engine.model: copilot/auto` + `copilot-requests: write`) was attempted
+  and reverted after a live failure: at the pinned engine version
+  (`0.150.1`), the Copilot API proxy rejected the literal model name `auto`
+  with `model_not_supported`, even though `copilot/auto` is gh-aw's
+  documented, tested pattern for this exact use case. This is tracked as a
+  known limitation (see below) rather than re-attempted blindly; a future
+  change should either pin an explicit non-`auto` Copilot model id (for
+  example `copilot/gpt-5.4`) or bump the engine version once compatibility
+  is confirmed in a low-stakes workflow first.
 - **Copilot** (`tessera-pr-fixer.md`): prefer organization-billed Copilot
   requests (`copilot-requests: write`) if your GitHub plan/organization
   supports it; otherwise configure the documented Copilot CLI authentication
@@ -478,23 +481,34 @@ require a non-empty, non-`"none"` `inputs.operation` to run.
   wiring the exact GraphQL query is called out explicitly in the workflow
   and should be completed before treating its check run as a sole required
   gate.
-- The merge governor publishes a check run but does not (yet) enforce it via
-  branch protection; a maintainer must add `tessera-merge-governor` to the
-  repository's required status checks to make it binding.
-- Because the check is not (yet) required, GitHub's `mergeStateStatus` can
-  read `UNSTABLE` purely because the governor's own check is red, even once
-  every gate the governor itself checks (CI, benchmark, audit `KEEP` on the
-  exact head, no requested changes) is green — a self-referential loop that
-  only resolves once `mergeable_state == clean` on a later governor re-run.
-  This is cosmetic while the check is non-required: a human can still merge
-  regardless of it. Making `tessera-merge-governor` a required check (Stage
-  B+) needs this loop resolved first, e.g. by excluding the governor's own
-  check from whatever `mergeable_state` computation gates it, or by having
-  branch protection require only the underlying CI/benchmark/audit signals
-  and treating the governor check as informational.
+- Branch protection on `main` now requires `tessera-merge-governor` and
+  `TESSERA Maintainer Audit` as individual status checks (in addition to
+  CI/benchmark), with `strict: true` (anti-stale-head) and 1 required
+  approval. The earlier self-referential `mergeStateStatus` loop (the
+  governor's own aggregate merge state depended on its own required check)
+  was fixed by gating on `mergeable` (raw git-conflict-only) instead — see
+  "Engine-failure resilience" and the `mergeable_state` docstring in
+  `governance/merge_governor.py`.
+- Attempting to route Codex inference billing through GitHub Copilot
+  (`engine.model: copilot/auto`) failed live on PR #182 at the pinned
+  engine version (`0.150.1`): the Copilot API proxy returned
+  `model_not_supported` for the literal model name `auto`, even though
+  `copilot/auto` is gh-aw's own documented and unit-tested pattern for this
+  exact use case (verified against `github/gh-aw`'s
+  `pkg/workflow/codex_engine_test.go` and `pkg/workflow/data/model_aliases.json`
+  upstream). This was reverted rather than worked around blindly; both
+  Codex workflows currently authenticate via `CODEX_API_KEY`/`OPENAI_API_KEY`
+  as before. Retrying this requires either an explicit non-`auto` Copilot
+  model id (e.g. `copilot/gpt-5.4`) or a newer pinned engine version,
+  validated in a low-stakes workflow before reapplying to the
+  fail-closed-required Maintainer Audit.
 - This PR itself exercised `tessera-pr-maintainer-audit` and
   `tessera-merge-governor` live (Codex engine, real GitHub Actions runs) and
-  both worked as designed, including correctly BLOCKing two earlier heads.
+  both worked as designed, including correctly BLOCKing/ITERATEing on
+  several earlier heads (an OR-logic CI gate bug, a blank benchmark-issue
+  placeholder, non-reproducible engine-version pinning, a lock-file
+  compiler-version mismatch, an `agentics-maintenance.yml` scope leak, and
+  the `mergeStateStatus`/`workflow_dispatch` bugs above).
   `tessera-issue-triage`, `tessera-pr-fixer`, and
   `tessera-post-merge-lifecycle` have not yet executed against a live event
   in this delivery; compilation and static governance tests are the
