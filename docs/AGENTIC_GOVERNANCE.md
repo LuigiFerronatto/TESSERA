@@ -305,11 +305,20 @@ job — never by the agent directly:
 | Workflow | Safe outputs allowed | Explicitly forbidden |
 |---|---|---|
 | `tessera-issue-triage.md` | `add-comment` (max 1), `add-labels` (max 4) | issue close/delete, code changes, PR creation/merge |
-| `tessera-pr-maintainer-audit.md` | `add-comment`, `add-labels`, `create-pull-request-review-comment`, `submit-pull-request-review` | `push-to-pull-request-branch`, `create-pull-request`, `merge-pull-request`, direct file edits |
+| `tessera-pr-maintainer-audit.md` | `add-comment`, `add-labels`, `create-pull-request-review-comment` | `push-to-pull-request-branch`, `create-pull-request`, `merge-pull-request`, `submit-pull-request-review`, direct file edits |
 | `tessera-pr-fixer.md` | `push-to-pull-request-branch` (to the existing PR branch only), `add-comment` | merge, approve/submit-review, push to `main`, create new PRs |
 | `tessera-post-merge-lifecycle.md` | `create-pull-request` (**draft: true**), `add-comment` | push to `main`, `push-to-pull-request-branch` |
 | `tessera-documentation-drift.md` | `create-issue` (max 1, `close-older-issues`) | PR creation, file edits |
 | `tessera-merge-governor.yml` | (not a safe-output workflow; plain `checks: write`) | any merge/auto-merge API call in Stage A |
+
+`tessera-pr-maintainer-audit.md` deliberately never uses
+`submit-pull-request-review`: GitHub's default `GITHUB_TOKEN` cannot submit
+an "approve" review (a hard, non-configurable platform restriction that
+prevents a workflow from self-approving its own pull request), so this
+would permanently fail for every `KEEP` decision. The `## Maintainer audit
+— KEEP | ITERATE | BLOCK` PR comment (parsed by `find_latest_audit`) is the
+sole authoritative decision record; no formal GitHub review object is ever
+required or relied upon by the merge governor.
 
 No workflow requests `write-all`. `tessera-pr-maintainer-audit.md` disables
 `tools.bash` entirely (`bash: false`, `cli-proxy: false`) so the reviewer can

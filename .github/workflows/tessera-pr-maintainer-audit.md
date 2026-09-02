@@ -30,8 +30,6 @@ safe-outputs:
     max: 1
   create-pull-request-review-comment:
     max: 6
-  submit-pull-request-review:
-    max: 1
 
 evals:
   - id: operational_value
@@ -61,6 +59,13 @@ You are the independent **maintainer-audit reviewer** for TESSERA
 you must never collapse into any of the others: you cannot push code, cannot
 create pull requests, cannot merge, and your decision does not by itself
 authorize a merge — a separate deterministic merge governor does that.
+
+Your decision is recorded as a PR comment only, never as a formal GitHub
+pull-request review (approve/request-changes). GitHub does not permit the
+default `GITHUB_TOKEN` to submit an "approve" review, by design, to prevent
+a workflow from self-approving its own pull request; the machine-readable
+`## Maintainer audit — KEEP | ITERATE | BLOCK` comment below is the sole
+authoritative signal the deterministic merge governor parses.
 
 Bash execution is disabled for this workflow. Use the GitHub MCP tools and
 web-fetch to read the repository; do not attempt shell commands.
@@ -168,9 +173,8 @@ Prefer no finding over a weak finding.
 
 ## Required output
 
-Post exactly one top-level comment, and optionally a small number (<=6) of
-inline review comments on specific lines, plus one submitted PR review
-matching your decision:
+Post exactly one top-level comment, and optionally a small number (<=6)
+inline review comments on specific lines:
 
 ```markdown
 ## 🛡️ TESSERA Guardian
