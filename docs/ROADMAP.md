@@ -201,7 +201,7 @@ THEN — Agent integration
 42 #191 Historical conversation import
 43 #121 Official TESSERA Skills
 44 #193 Skills/plugin/MCP distribution
--> Claude, Codex, Gemini, Copilot and LAO all share the same TESSERA memory.
+-> Every integrated agent runtime shares the same TESSERA memory.
 
 FINALLY — Autonomous learning
 45 #19  Evidence-aware memory admission
