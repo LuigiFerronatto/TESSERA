@@ -291,7 +291,21 @@ workflow (no `engine:`), reviewed like any other CI change.
 - The merge governor publishes a check run but does not (yet) enforce it via
   branch protection; a maintainer must add `tessera-merge-governor` to the
   repository's required status checks to make it binding.
-- None of these workflows have executed against live GitHub Actions yet in
-  this delivery (no engine secrets are configured); compilation, static
-  governance tests, and repository test suite are the available
-  pre-merge evidence.
+- Because the check is not (yet) required, GitHub's `mergeStateStatus` can
+  read `UNSTABLE` purely because the governor's own check is red, even once
+  every gate the governor itself checks (CI, benchmark, audit `KEEP` on the
+  exact head, no requested changes) is green — a self-referential loop that
+  only resolves once `mergeable_state == clean` on a later governor re-run.
+  This is cosmetic while the check is non-required: a human can still merge
+  regardless of it. Making `tessera-merge-governor` a required check (Stage
+  B+) needs this loop resolved first, e.g. by excluding the governor's own
+  check from whatever `mergeable_state` computation gates it, or by having
+  branch protection require only the underlying CI/benchmark/audit signals
+  and treating the governor check as informational.
+- This PR itself exercised `tessera-pr-maintainer-audit` and
+  `tessera-merge-governor` live (Codex engine, real GitHub Actions runs) and
+  both worked as designed, including correctly BLOCKing two earlier heads.
+  `tessera-issue-triage`, `tessera-pr-fixer`, and
+  `tessera-post-merge-lifecycle` have not yet executed against a live event
+  in this delivery; compilation and static governance tests are the
+  available pre-merge evidence for those three.
