@@ -13,7 +13,8 @@ was created. No open pull request overlapped #154. Live routing was #154
 - **Final candidate:** `06521763b4c3cf033c4d1e6a771ae105aad98e37`
 - **Canonical squash merge:** `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`
 - **Lifecycle status:** `VALIDATED`
-- **Benchmark applicability:** `SMOKE_ONLY`
+- **Implementation benchmark applicability:** `SMOKE_ONLY`
+- **Lifecycle correction benchmark applicability:** `NOT_APPLICABLE`
 - **Final CI:** TESSERA CI `33633838687` — success
 - **Final Benchmark Ledger:** `33633838753` — success
 
@@ -122,7 +123,7 @@ diagnostic output.
 
 ## Evaluation record
 
-Benchmark applicability: `SMOKE_ONLY`.
+Implementation benchmark applicability: `SMOKE_ONLY`.
 
 Final candidate validation for PR #175:
 
@@ -136,7 +137,9 @@ Final candidate validation for PR #175:
 - Benchmark Ledger run `33633838753`: success; LongMemEval correctly skipped under `SMOKE_ONLY`.
 
 The held-constant retrieval contract was not changed by discovery. Source
-selection remains explicit and separate from candidate proposal.
+selection remains explicit and separate from candidate proposal. This post-merge
+lifecycle correction is `NOT_APPLICABLE` for LongMemEval because it only changes
+documentation, roadmap routing and static governance assertions.
 
 ## Post-merge routing
 
