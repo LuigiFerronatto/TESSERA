@@ -441,7 +441,7 @@ def test_issue_153_validated_records_preserve_delivery_and_downstream_boundaries
     assert "#155 remains\n`BLOCKED` on #154" in record
 
 
-def test_issue_154_candidate_freezes_discovery_without_selection_or_mutation() -> None:
+def test_issue_154_validated_lifecycle_preserves_discovery_boundaries() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_154_AUDIT.read_text(encoding="utf-8")
     record = (ROOT / "docs/test-cards/154-safe-source-discovery.md").read_text(
@@ -450,13 +450,19 @@ def test_issue_154_candidate_freezes_discovery_without_selection_or_mutation() -
     adr = SOURCE_DISCOVERY_ADR.read_text(encoding="utf-8")
 
     issue_154 = _markdown_table_row(roadmap, "#154")
-    assert "`IN_PROGRESS`" in issue_154
-    for issue in ("#155", "#118", "#134"):
-        assert "`BLOCKED`" in _markdown_table_row(roadmap, issue)
+    issue_155 = _markdown_table_row(roadmap, "#155")
+    assert "closed" in issue_154
+    assert "`VALIDATED`" in issue_154
+    assert "`IN_PROGRESS`" not in issue_154
+    assert "`READY`" in issue_155
+    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#134")
 
     for marker in (
         "8f1c0c19a04ec4bde686b124389eb17a61856de0",
         "2508676d472088733702b6ed920fc829df9a7681",
+        "06521763b4c3cf033c4d1e6a771ae105aad98e37",
+        "05ce0dd234a7756d4a5ba315b77e4a6ec33c9429",
         "#153 = WHAT paths can be configured",
         "#154 = HOW project source candidates",
         "#155 = HOW a user selects",
@@ -465,12 +471,16 @@ def test_issue_154_candidate_freezes_discovery_without_selection_or_mutation() -
         "IGNORED",
         "FORBIDDEN",
         "2 MiB",
-        "SMOKE_ONLY",
+        "Implementation benchmark applicability: `SMOKE_ONLY`",
+        "Lifecycle correction benchmark applicability: `NOT_APPLICABLE`",
     ):
         assert marker in audit
 
-    assert "| Record status | `IN_PROGRESS` |" in record
-    assert "candidate `KEEP`" in record
+    assert "| Record status | `VALIDATED` |" in record
+    assert "| Decision | `KEEP` |" in record
+    assert "06521763b4c3cf033c4d1e6a771ae105aad98e37" in record
+    assert "05ce0dd234a7756d4a5ba315b77e4a6ec33c9429" in record
+    assert "#155 is now `READY`" in record
     for marker in (
         "never enumerates an\nancestor, sibling, `$HOME`",
         "All symlinks are skipped",

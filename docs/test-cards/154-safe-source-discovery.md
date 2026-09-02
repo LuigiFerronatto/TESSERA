@@ -3,14 +3,16 @@
 | Field | Value |
 |---|---|
 | Issue | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `SOURCE_DISCOVERY` |
 | Pull request | [#175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
-| Head commit | Pending final candidate |
-| Merge commit | Not merged |
-| Decision | candidate `KEEP`, subject to final CI |
+| Final candidate | `06521763b4c3cf033c4d1e6a771ae105aad98e37` |
+| Merge commit | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
-| Last audited | 2026-09-01 |
+| Final CI | `33633838687` — success |
+| Benchmark Ledger | `33633838753` — success |
+| Last audited | 2026-09-02 |
 
 ## In one sentence
 
@@ -40,7 +42,7 @@ projects retained the store as their only source.
 
 ## What changed or is being tested?
 
-The candidate adds a pure Python discovery layer:
+The validated delivery adds a pure Python discovery layer:
 
 ```text
 physical project root
@@ -57,8 +59,6 @@ diagnostics, supported formats, the size limit, and deterministic scan metrics.
 Machine-readable reason codes explain every classification.
 
 ## How does it work now?
-
-**IMPLEMENTATION CANDIDATE — not yet validated on `main`.**
 
 The scanner resolves the supplied project root once and calls `os.scandir`
 only inside that tree. It does not follow symlinks. Metadata checks happen
@@ -94,8 +94,8 @@ private.key               FORBIDDEN    sensitive_file
 .tessera/index/           FORBIDDEN    derived_index
 ```
 
-This is only a proposal. No candidate is added to `sources` until a separate
-#155 display/select/confirm/persist workflow exists.
+This is only a proposal. No candidate is added to `sources` until the separate
+#155 display/select/confirm/persist workflow executes.
 
 ## How was it validated?
 
@@ -108,8 +108,17 @@ ignore-file self exclusion, private keys/credentials, `.env` examples, symlink
 inside/outside/loop behavior, duplicate prevention, oversized/unreadable/special
 files, deterministic output/metrics, config doctor JSON, no mutation,
 root-bounded filesystem calls, schema-v2 stability, and conservative schema-v1
-behavior. Final counts, packaging, sanity, CI, and Benchmark Ledger evidence are
-recorded in the PR and Issue evidence comment.
+behavior.
+
+Final evidence on candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`:
+
+- focused tests: `66 passed`;
+- full clean suite: `363 passed`, 14 expected warnings;
+- packaging/install smoke: passed;
+- deterministic sanity: unchanged;
+- TESSERA CI `33633838687`: success;
+- Benchmark Ledger `33633838753`: success;
+- canonical squash merge: `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`.
 
 ## What improved?
 
@@ -128,9 +137,10 @@ sensitive policy is conservative and does not claim content secret detection.
 
 ## What is unlocked next?
 
-#155 remains blocked until #154 is canonically merged and post-merge lifecycle
-evidence is synchronized. #118 and #134 remain blocked through the onboarding
-and release chains. No downstream implementation starts in this candidate.
+#155 is now `READY`: #117, #153 and #154 are all validated. #118 remains
+blocked until #155 is validated; #134 remains blocked through #118 and the
+owner/legal #87 gate. No downstream implementation is started by this lifecycle
+record.
 
 ## Technical provenance
 
@@ -138,9 +148,10 @@ and release chains. No downstream implementation starts in this candidate.
 |---|---|
 | Issue/Test Card | [Issue #154](https://github.com/LuigiFerronatto/TESSERA/issues/154) |
 | Pull request | [PR #175](https://github.com/LuigiFerronatto/TESSERA/pull/175) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending final Issue comment |
-| Benchmark record | `SMOKE_ONLY`; deterministic sanity required, LongMemEval skipped |
+| Final candidate | `06521763b4c3cf033c4d1e6a771ae105aad98e37` |
+| Merge commit | `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` |
+| Evidence/Learnings/Decision | [Issue #154 evidence](https://github.com/LuigiFerronatto/TESSERA/issues/154#issuecomment-5510041443) |
+| Benchmark record | `SMOKE_ONLY`; deterministic sanity preserved, LongMemEval skipped |
 | PR Evolution Audit | [PR_EVOLUTION_154.md](../PR_EVOLUTION_154.md) |
 | Architecture decision | [ADR 0004](../adr/0004-safe-project-source-discovery.md) |
 

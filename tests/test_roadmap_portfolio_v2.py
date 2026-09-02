@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-# Portfolio routing is intentionally frozen by this governance-only, NOT_APPLICABLE card.
+# Portfolio routing is intentionally frozen by governance-only lifecycle cards.
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 
@@ -26,9 +26,10 @@ def test_productization_v2_critical_path_is_explicit() -> None:
     ):
         assert marker in text
 
-    assert "`VALIDATED`" in _row(text, "#153")
-    assert "`IN_PROGRESS`" in _row(text, "#154")
-    for issue in ("#155", "#118", "#134"):
+    for issue in ("#153", "#154"):
+        assert "`VALIDATED`" in _row(text, issue)
+    assert "`READY`" in _row(text, "#155")
+    for issue in ("#118", "#134"):
         assert "`BLOCKED`" in _row(text, issue)
 
 
@@ -77,14 +78,14 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
         "#118", "#119", "#120", "#121", "#134",
         "#135", "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
-        "#154", "#155", "#157", "#158", "#159", "#160", "#161",
+        "#155", "#157", "#158", "#159", "#160", "#161",
         "#162", "#163", "#164", "#165", "#166", "#167", "#168", "#169",
         "#170", "#171",
     )
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#153", "#172"):
+    for issue in ("#153", "#154", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -117,8 +118,9 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 3, ready_executable
+    assert len(ready_executable) == 4, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
+    assert any("[#155]" in line for line in ready_executable)
     assert any("[#135]" in line for line in ready_executable)
 
 
@@ -127,22 +129,28 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
 
     issue_153 = _row(text, "#153")
     assert "`VALIDATED`" in issue_153
-    assert "`READY`" not in issue_153
-    assert "`IN_PROGRESS`" not in issue_153
     assert "2508676d472088733702b6ed920fc829df9a7681" in issue_153
 
     issue_154 = _row(text, "#154")
-    assert "`IN_PROGRESS`" in issue_154
-    assert "test-card/154-safe-source-discovery" in issue_154
+    assert "closed" in issue_154
+    assert "`VALIDATED`" in issue_154
+    assert "06521763b4c3cf033c4d1e6a771ae105aad98e37" in issue_154
+    assert "05ce0dd234a7756d4a5ba315b77e4a6ec33c9429" in issue_154
+    assert "`READY`" not in issue_154
+    assert "`IN_PROGRESS`" not in issue_154
 
-    assert "remaining active blocker is #154" in _row(text, "#155")
-    assert "remaining blockers are #154" in _row(text, "#118")
-    assert "Requires #118 VALIDATED + #87" in _row(text, "#134")
+    issue_155 = _row(text, "#155")
+    assert "`READY`" in issue_155
+    assert "no active blocker remains" in issue_155
+
+    assert "remaining blocker is #155" in _row(text, "#118")
+    assert "#153/#154 are satisfied" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
     now_section = text.split("## NOW", 1)[1].split("## NEXT / READY", 1)[0]
-    assert "#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS" in now_section
-    assert "#135/#16 integrity lane remains unselected" in now_section
+    assert "No executable feature is selected" in now_section
+    assert "#154 Safe project source discovery + .tessera-ignore  VALIDATED" in now_section
+    assert "#155" in now_section
 
     rows = [line for line in text.splitlines() if line.startswith("| [#")]
     now_executable = [
@@ -152,10 +160,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 1
-    assert "[#154]" in now_executable[0]
+    assert len(now_executable) == 0
 
-    assert "NOW executable                 1" in text
-    assert "READY                          6 total / 3 executable" in text
-    assert "BLOCKED                        40 full cards + #16 full phase" in text
+    assert "NOW executable                 0" in text
+    assert "READY                          7 total / 4 executable" in text
+    assert "BLOCKED                        39 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

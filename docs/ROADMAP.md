@@ -1,6 +1,6 @@
 # TESSERA Roadmap
 
-> Authoritative portfolio audit: 2026-09-01 against canonical `main` `2508676d472088733702b6ed920fc829df9a7681` (PR #173, Configuration v2). Issue #172 owns this portfolio reconciliation. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
+> Authoritative portfolio audit: 2026-09-02 against canonical `main` `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` (PR #175, safe project source discovery). Issue #172 owns the portfolio taxonomy; this lifecycle correction reconciles #154/#155 against the new canonical main. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
@@ -40,9 +40,9 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 1
-READY                          6 total / 3 executable
-BLOCKED                        40 full cards + #16 full phase
+NOW executable                 0
+READY                          7 total / 4 executable
+BLOCKED                        39 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
 
@@ -95,18 +95,22 @@ This board is selection guidance, not permission to bypass the owning Test Card.
 
 ## NOW
 
+No executable feature is selected by this lifecycle-only branch.
+
 ```text
-#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS
+#154 Safe project source discovery + .tessera-ignore  VALIDATED
 ```
 
-No second feature implementation is started by this branch. The optional
-#135/#16 integrity lane remains unselected.
+The implementation lane is clear; the next release-critical executable card is
+#155, but it is not started by this lifecycle correction. The optional #135/#16
+integrity lane remains unselected.
 
 ## NEXT / READY
 
 Highest-value unblocked work, ranked rather than treated equally:
 
 ```text
+#155 Init UX / source selection              P0 release-critical
 #135 Decomposer fallback integrity           P0 contract integrity
 #16  Conflict resolver containment           P0 state safety
 #120 MCP transport/runtime robustness        agent integration substrate
@@ -121,8 +125,8 @@ Cards intentionally parked despite earlier/live `READY` wording are listed under
 ```text
 FIRST PUBLIC RELEASE
 #153 VALIDATED
-  -> #154 source discovery IN_PROGRESS
-      -> #155 init UX BLOCKED
+  -> #154 source discovery VALIDATED
+      -> #155 init UX READY
           -> #118 clean onboarding BLOCKED
               -> #134 PyPI release BLOCKED
 
@@ -270,8 +274,8 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
   -> #116 package/distribution       VALIDATED
        -> #117 config/discovery v1   VALIDATED
             -> #153 config v2        VALIDATED
-                 -> #154 sources     IN_PROGRESS
-                      -> #155 init UX BLOCKED
+                 -> #154 sources     VALIDATED
+                      -> #155 init UX READY
                            -> #118 clean onboarding BLOCKED
                                 -> #134 first PyPI release BLOCKED
 
@@ -285,7 +289,9 @@ Parallel product surfaces:
 #166 presentation child      DEFERRED
 ```
 
-The previous `READY` state for #118 is superseded by its newer live prerequisites. #153 is satisfied; #154 and #155 remain active blockers, so #118 stays `BLOCKED`.
+#153 and #154 are satisfied. #155 is now the only remaining productization
+implementation blocker before #118; #118 therefore stays `BLOCKED` until #155
+is canonically validated.
 
 The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 
@@ -503,12 +509,12 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #74/#100/#103; calibrated judge. |
 | [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #96/#100/#103/#104; LongMemEval V1 full-500. |
 | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #74/#100/#103/#104/#105; LongMemEval-V2. |
-| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `BLOCKED` | EXECUTABLE | Productization | #116/#117/#153 are satisfied; remaining blockers are #154 safe source discovery and #155 Init UX. |
-| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #153–#155 semantics stabilize; #166 owns presentation architecture. |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `BLOCKED` | EXECUTABLE | Productization | #116/#117/#153/#154 are satisfied; remaining blocker is #155 Init UX. |
+| [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #155 semantics stabilize; #166 owns presentation architecture. |
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | EXECUTABLE | Agent Integration | MCP startup/transport/config/schema/errors/timeouts/concurrency. Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153 is satisfied; #154/#155 remain transitive blockers through #118. |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153/#154 are satisfied; #155 remains the transitive productization blocker through #118. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | open | `READY` | EXECUTABLE | QUMem | P0 deterministic decomposition fallback; no hard dependency. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135/#74; F/P/I fidelity + 1-pass vs 3-pass. |
 | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135; source episode/supporting turns/temporal position. |
@@ -522,9 +528,9 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
 | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
-| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `IN_PROGRESS` | EXECUTABLE | Productization | Branch `test-card/154-safe-source-discovery` implements root-bounded discovery, clustering/classification, `.tessera-ignore`, and sensitive/forbidden-source policy. #155 remains separate and blocked. |
-| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `BLOCKED` | EXECUTABLE | Productization | #117/#153 are satisfied; remaining active blocker is #154 validation. Owns interactive/non-interactive Init UX. |
-| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #154 lane is primary. |
+| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
+| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `READY` | EXECUTABLE | Productization | #117/#153/#154 are satisfied; no active blocker remains. Owns interactive/non-interactive Init UX and is the next release-critical implementation candidate. |
+| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #155 lane is primary. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
 | [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
 | [#160](https://github.com/LuigiFerronatto/TESSERA/issues/160) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#74; capability-level pipeline modes/fallbacks. |
@@ -533,7 +539,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#163](https://github.com/LuigiFerronatto/TESSERA/issues/163) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157; explicit local model artifact/cache/device/offline lifecycle. |
 | [#164](https://github.com/LuigiFerronatto/TESSERA/issues/164) | open | `TRACKER` | TRACKER | Intelligence | Provider-agnostic Intelligence epic; child cards #157–#163/#165 own decisions. |
 | [#165](https://github.com/LuigiFerronatto/TESSERA/issues/165) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#160/#163; local generative memory organization/reasoning. |
-| [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `DEFERRED` | EXECUTABLE | CLI | Technically executable from validated #112/#116/#117, but parked until #153–#155 semantics stabilize. |
+| [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `DEFERRED` | EXECUTABLE | CLI | Technically executable from validated #112/#116/#117, but parked until #155 semantics stabilize. |
 | [#167](https://github.com/LuigiFerronatto/TESSERA/issues/167) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Working Context packet identity/bootstrap/reuse/freshness; depends on #169 and #20 as applicable; consumes #168. |
 | [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) | open | `READY` | ARCHITECTURE | Cognitive Continuity | Long-Term Memory durable boundary; validated foundation satisfied; implementation behavior remains dependency-routed to child cards. |
 | [#169](https://github.com/LuigiFerronatto/TESSERA/issues/169) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Context Compiler; depends on #139/#140/#141/#20 and consumes #168. |
@@ -782,23 +788,25 @@ No roadmap entry may imply that `tessera` is already the published PyPI distribu
 
 The repository uses bounded WIP rather than starting every technically executable card at once.
 
-Selected after the #153/#172 lifecycle reconciliation:
+After the #154 canonical merge and lifecycle reconciliation:
 
 ```text
-#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS
-#135/#16 optional parallel integrity lane             not selected
+#154 Safe project source discovery + .tessera-ignore  VALIDATED
+#155 Init UX / source selection                          READY — next primary
+#135/#16 optional parallel integrity lane              not selected
 ```
 
-Why #154 is selected:
-- #153 has already validated the store/source/index boundary;
-- #154 directly unlocks #155, then #118 and #134;
-- it owns discovery/ignore safety before onboarding broadens the corpus.
+Why #155 is next:
+- #153 validated the store/source/index boundary;
+- #154 now validates safe discovery, classification, clustering and ignore policy;
+- #155 is the remaining onboarding implementation needed before the clean-room #118 gate;
+- #155 directly unlocks #118, which gates #134.
 
-Why one integrity card in parallel:
+Why one integrity card may still run later in parallel:
 - #135 fixes a concrete P0 contract mismatch and unlocks #136/#137;
 - #16 containment prevents destructive preference/history loss needed by later state work.
 
-Do not start #166 before #154/#155 semantics stabilize. Keep #157 deliberately deferred while the release-critical product lane is selected. Do not start #167/#169/#171 before their state/context prerequisites.
+Do not start #166 before #155 semantics stabilize. Keep #157 deliberately deferred while the release-critical product lane is selected. Do not start #167/#169/#171 before their state/context prerequisites.
 
 ---
 
@@ -815,8 +823,8 @@ PRODUCTIZATION / RELEASE
  -> #116 VALIDATED
      -> #117 VALIDATED
          -> #153 VALIDATED
-             -> #154 IN_PROGRESS
-                 -> #155 BLOCKED
+             -> #154 VALIDATED
+                 -> #155 READY
                      -> #118 BLOCKED
                          -> #134 BLOCKED
 #87 ADMIN ------------------------------------------^
