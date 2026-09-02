@@ -80,6 +80,7 @@ class SourceCluster:
     recommended_count: int
     ignored_count: int
     forbidden_count: int
+    selectable: bool
     recommended: bool
     classification: str
     reason: str
@@ -224,12 +225,31 @@ class IgnoreRuleSet:
         return ignored, re_included, matched
 
     def may_reinclude_under(self, directory: str) -> bool:
-        prefix = directory.rstrip("/") + "/"
+        normalized = directory.rstrip("/")
+        prefix = normalized + "/"
+        directory_parts = PurePosixPath(normalized).parts
         for rule in self.rules:
             if not rule.negated:
                 continue
-            pattern = rule.pattern.lstrip("/")
-            if "/" not in pattern or pattern.startswith(prefix):
+            pattern = rule.pattern.lstrip("/").rstrip("/")
+            if "/" not in pattern:
+                return True
+            if rule.directory_only and rule.matches(normalized, is_dir=True):
+                return True
+            pattern_parts = PurePosixPath(pattern).parts
+            wildcard_index = next(
+                (
+                    index
+                    for index, part in enumerate(pattern_parts)
+                    if any(character in part for character in "*?")
+                ),
+                len(pattern_parts),
+            )
+            literal_prefix = pattern_parts[:wildcard_index]
+            shared = min(len(directory_parts), len(literal_prefix))
+            if directory_parts[:shared] != literal_prefix[:shared]:
+                continue
+            if wildcard_index < len(pattern_parts) or pattern.startswith(prefix):
                 return True
         return False
 
@@ -371,12 +391,12 @@ def _build_clusters(files: Sequence[SourceCandidate]) -> Tuple[SourceCluster, ..
         counts = {classification.value: 0 for classification in SourceClassification}
         for child in children:
             counts[child.classification] += 1
-        if counts[SourceClassification.FORBIDDEN.value]:
-            classification = SourceClassification.FORBIDDEN
-        elif counts[SourceClassification.RECOMMENDED.value]:
+        if counts[SourceClassification.RECOMMENDED.value]:
             classification = SourceClassification.RECOMMENDED
         elif counts[SourceClassification.SUPPORTED.value]:
             classification = SourceClassification.SUPPORTED
+        elif counts[SourceClassification.FORBIDDEN.value]:
+            classification = SourceClassification.FORBIDDEN
         else:
             classification = SourceClassification.IGNORED
         reasons = {child.reason for child in children}
@@ -396,6 +416,10 @@ def _build_clusters(files: Sequence[SourceCandidate]) -> Tuple[SourceCluster, ..
             recommended_count=counts[SourceClassification.RECOMMENDED.value],
             ignored_count=counts[SourceClassification.IGNORED.value],
             forbidden_count=counts[SourceClassification.FORBIDDEN.value],
+            selectable=classification in {
+                SourceClassification.RECOMMENDED,
+                SourceClassification.SUPPORTED,
+            },
             recommended=classification is SourceClassification.RECOMMENDED,
             classification=classification.value,
             reason=reason.value,

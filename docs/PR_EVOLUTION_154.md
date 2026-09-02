@@ -67,10 +67,12 @@ or security exclusions and cannot be negated.
 
 Root entrypoints remain file entries. Nested paths cluster by their real
 top-level directory. Each cluster retains supported/recommended/ignored/
-forbidden counts; a forbidden child makes the security state visible rather
-than hiding it behind a recommended label. Candidate and cluster ordering is
-classification priority (`RECOMMENDED`, `SUPPORTED`, `IGNORED`, `FORBIDDEN`)
-then normalized relative path.
+forbidden counts. Classification and selectability are derived from safe
+selectable children: a mixed cluster remains recommended or supported while
+its forbidden count exposes excluded children, and a forbidden-only cluster
+remains forbidden. Candidate and cluster ordering is classification priority
+(`RECOMMENDED`, `SUPPORTED`, `IGNORED`, `FORBIDDEN`) then normalized relative
+path.
 
 ## Safety and policy
 
@@ -94,7 +96,8 @@ The optional UTF-8 root file supports comments, blanks, ordered `*`, `?`,
 `**`, directory suffix `/`, and `!` re-inclusion. Empty negations, parent
 traversal, and bracket classes are diagnosed. This is deliberately a familiar
 subset, not full `.gitignore` compatibility. A negation can recover a safe
-convenience-excluded file but never a mandatory exclusion.
+convenience-excluded file, including through `**` below an ignored parent, but
+never a mandatory exclusion.
 
 ## Configuration compatibility
 

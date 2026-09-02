@@ -119,6 +119,31 @@ def test_convenience_exclusions_are_ignored_and_safe_reinclude_works(tmp_path):
     assert files["archive/decisions.md"].matched_rule == "!archive/decisions.md"
 
 
+def test_recursive_negation_reincludes_file_under_ignored_parent(tmp_path):
+    _write(tmp_path / "archive" / "old.md")
+    _write(tmp_path / "archive" / "decisions.md")
+    _write(tmp_path / ".tessera-ignore", "archive/\n!**/decisions.md\n")
+
+    files = _by_path(discover_sources(tmp_path))
+
+    assert files["archive/old.md"].classification == "IGNORED"
+    assert files["archive/decisions.md"].classification == "SUPPORTED"
+    assert files["archive/decisions.md"].matched_rule == "!**/decisions.md"
+
+
+def test_scoped_recursive_negation_descends_through_nested_ignored_directories(tmp_path):
+    _write(tmp_path / "archive" / "old" / "discard.md")
+    _write(tmp_path / "archive" / "nested" / "deeper" / "keep.md")
+    _write(tmp_path / ".tessera-ignore", "archive/\n!archive/**/keep.md\n")
+
+    files = _by_path(discover_sources(tmp_path))
+
+    assert files["archive/old/"].classification == "IGNORED"
+    assert files["archive/old/discard.md"].classification == "IGNORED"
+    assert files["archive/nested/deeper/keep.md"].classification == "SUPPORTED"
+    assert files["archive/nested/deeper/keep.md"].matched_rule == "!archive/**/keep.md"
+
+
 def test_ignore_subset_supports_comments_blanks_globs_question_and_double_star(tmp_path):
     for relative in ("docs/a.md", "docs/ab.md", "docs/deep/private.md", "root.log", "keep.md"):
         _write(tmp_path / relative)
@@ -238,13 +263,40 @@ def test_special_files_are_forbidden(tmp_path):
     assert item.reason == "special_file"
 
 
-def test_forbidden_child_is_visible_in_cluster_summary(tmp_path):
+def test_recommended_cluster_remains_selectable_with_forbidden_child(tmp_path):
     _write(tmp_path / "docs" / "guide.md")
     _write(tmp_path / "docs" / "private.key", "secret")
-    cluster = {item.path: item for item in discover_sources(tmp_path).clusters}["docs/"]
+    plan = discover_sources(tmp_path)
+    files = _by_path(plan)
+    cluster = {item.path: item for item in plan.clusters}["docs/"]
     assert cluster.recommended_count == 1
     assert cluster.forbidden_count == 1
+    assert cluster.classification == "RECOMMENDED"
+    assert cluster.selectable is True
+    assert cluster.recommended is True
+    assert files["docs/guide.md"].selectable is True
+    assert files["docs/private.key"].selectable is False
+
+
+def test_supported_cluster_remains_selectable_with_forbidden_child(tmp_path):
+    _write(tmp_path / "examples" / "guide.md")
+    _write(tmp_path / "examples" / "private.key", "secret")
+    cluster = {item.path: item for item in discover_sources(tmp_path).clusters}["examples/"]
+    assert cluster.supported_count == 1
+    assert cluster.forbidden_count == 1
+    assert cluster.classification == "SUPPORTED"
+    assert cluster.selectable is True
+    assert cluster.recommended is False
+
+
+def test_forbidden_only_cluster_remains_forbidden_and_not_selectable(tmp_path):
+    _write(tmp_path / "private" / "first.key", "secret")
+    _write(tmp_path / "private" / "second.pem", "secret")
+    cluster = {item.path: item for item in discover_sources(tmp_path).clusters}["private/"]
+    assert cluster.forbidden_count == 2
     assert cluster.classification == "FORBIDDEN"
+    assert cluster.selectable is False
+    assert cluster.recommended is False
 
 
 def test_repeated_scan_has_identical_semantic_output_and_metrics(tmp_path):

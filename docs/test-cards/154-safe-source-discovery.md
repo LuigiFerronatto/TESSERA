@@ -70,7 +70,7 @@ Mandatory exclusions precede ignore matching and cannot be negated: `.git`,
 the resolved v2 index, legacy `.tessera_index`, special files, unsafe symlinks,
 and high-confidence credential/private-key names. Common dependency/build/cache
 trees are safe convenience ignores and may be re-included by a supported `!`
-rule.
+rule, including recursive `**` negations below an ignored parent.
 
 The ignore subset supports comments, blanks, ordered `*`, `?`, `**`, directory
 suffix `/`, and `!` re-inclusion. It explicitly does not claim complete
@@ -79,7 +79,9 @@ classes produce deterministic diagnostics.
 
 Important root files remain standalone. Nested entries are grouped by their
 actual top-level directory. A cluster reports counts for every classification,
-so a forbidden child cannot disappear behind an otherwise recommended group.
+so a forbidden child cannot disappear inside an otherwise recommended group.
+Mixed clusters retain the classification and selectability of their safe
+children while forbidden-only clusters remain forbidden.
 
 ## Concrete example
 
@@ -100,8 +102,9 @@ This is only a proposal. No candidate is added to `sources` until a separate
 `tests/test_issue_154_source_discovery.py` freezes basic discovery, standalone
 root files, clustering/counts, configured-source recommendation, Markdown-only
 truthfulness, mandatory/default exclusions, ignore patterns and safe
-re-inclusion, mandatory re-inclusion rejection, invalid syntax, ignore-file
-self exclusion, private keys/credentials, `.env` examples, symlink
+re-inclusion (including recursive `**` descent), mixed and forbidden-only
+cluster selectability, mandatory re-inclusion rejection, invalid syntax,
+ignore-file self exclusion, private keys/credentials, `.env` examples, symlink
 inside/outside/loop behavior, duplicate prevention, oversized/unreadable/special
 files, deterministic output/metrics, config doctor JSON, no mutation,
 root-bounded filesystem calls, schema-v2 stability, and conservative schema-v1

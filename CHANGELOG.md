@@ -56,6 +56,9 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- Recursive `.tessera-ignore` negations now reopen ignored ancestor paths for
+  `**` matches, and mixed source clusters remain selectable from their safe
+  children while retaining explicit forbidden-child counts. ([#154](https://github.com/LuigiFerronatto/TESSERA/issues/154))
 - Write-gate decisions now separate detection, admission and persistence,
   reject unsafe or non-portable memory IDs before mutation, and conservatively
   reject direct hostile instruction blocks instead of claiming partial

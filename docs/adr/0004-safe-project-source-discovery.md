@@ -48,12 +48,15 @@ ordered patterns using `*`, `?`, `**`, directory suffix `/`, and `!`
 re-inclusion. Absolute/parent-traversal patterns, empty negations, and bracket
 classes are diagnosed as unsupported. This is a documented subset, not full
 `.gitignore` compatibility. Re-inclusion may override safe convenience ignores
-such as `archive/`, but never mandatory exclusions.
+such as `archive/`, including recursive forms such as `!**/decisions.md` and
+`!archive/**/keep.md`, but never mandatory exclusions.
 
 Important root files remain individual entries. Nested paths are clustered by
 their actual top-level directory; counts preserve supported, recommended,
-ignored, and forbidden children, and any forbidden child stays visible in the
-cluster classification. Ordering is recommendation class then normalized path.
+ignored, and forbidden children. Cluster classification and selectability come
+from safe selectable children, so a forbidden child remains visible through its
+count without poisoning safe siblings; forbidden-only clusters remain
+forbidden. Ordering is recommendation class then normalized path.
 
 ## Boundaries and consequences
 
