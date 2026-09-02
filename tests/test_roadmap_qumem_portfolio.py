@@ -17,15 +17,16 @@ def test_roadmap_tracks_productization_v2_and_release_routing() -> None:
     text = ROADMAP.read_text(encoding="utf-8")
 
     assert "2508676d472088733702b6ed920fc829df9a7681" in text
+    assert "05ce0dd234a7756d4a5ba315b77e4a6ec33c9429" in text
     assert "`VALIDATED`" in _markdown_table_row(text, "#117")
     assert "`VALIDATED`" in _markdown_table_row(text, "#153")
-    assert "`IN_PROGRESS`" in _markdown_table_row(text, "#154")
-    assert "`BLOCKED`" in _markdown_table_row(text, "#155")
+    assert "`VALIDATED`" in _markdown_table_row(text, "#154")
+    assert "`READY`" in _markdown_table_row(text, "#155")
     assert "`BLOCKED`" in _markdown_table_row(text, "#118")
     assert "`READY`" in _markdown_table_row(text, "#120")
     assert "`BLOCKED`" in _markdown_table_row(text, "#121")
     assert "`BLOCKED`" in _markdown_table_row(text, "#134")
-    assert "#153 is satisfied; #154/#155 remain transitive blockers through #118" in _markdown_table_row(text, "#134")
+    assert "#153/#154 are satisfied; #155 remains the transitive productization blocker through #118" in _markdown_table_row(text, "#134")
     assert "`BLOCKED`" in _markdown_table_row(text, "#87")
 
 
