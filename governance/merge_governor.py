@@ -226,9 +226,10 @@ def _main(argv: Optional[list[str]] = None) -> int:
     else:
         data = json.loads(sys.stdin.read())
 
+    current_head_sha = data["current_head_sha"]
     audit = find_latest_audit(data.get("comments", []))
     result = evaluate_runtime_pr_gates(
-        current_head_sha=data["current_head_sha"],
+        current_head_sha=current_head_sha,
         is_draft=data.get("is_draft", False),
         mergeable_state=data.get("mergeable_state"),
         audit=audit,
@@ -238,8 +239,46 @@ def _main(argv: Optional[list[str]] = None) -> int:
         has_unresolved_threads=data.get("has_unresolved_threads", False),
         required_checks_satisfied=data.get("required_checks_satisfied", True),
     )
-    print(json.dumps(result.to_dict()))
+    output = result.to_dict()
+    # Exposed so the calling workflow can publish a dedicated
+    # `TESSERA Maintainer Audit` check run (see audit_check_conclusion),
+    # independent from the aggregate merge-governor conclusion. This lets
+    # branch protection require the audit signal on its own, in addition to
+    # the aggregate gate, per "defense in depth" (individual gates AND the
+    # final aggregator are each independently required).
+    output["audit"] = (
+        None
+        if audit is None
+        else {
+            "decision": audit.decision,
+            "audited_head_sha": audit.audited_head_sha,
+            "stale": audit.audited_head_sha != current_head_sha,
+        }
+    )
+    print(json.dumps(output))
     return 0 if result.authorized else 1
+
+
+def audit_check_conclusion(audit: Optional[dict]) -> Optional[str]:
+    """Map a parsed audit record (as emitted in the CLI JSON output) to a
+    GitHub check-run conclusion for the dedicated `TESSERA Maintainer Audit`
+    check.
+
+    Returns ``None`` when no audit has been recorded yet for this PR at all,
+    signalling the caller should leave the check unpublished (pending)
+    rather than publish a false failure before the audit has had a chance to
+    run. Returns ``"failure"`` for a stale audit (bound to a superseded
+    head), for ``ITERATE``/``BLOCK`` decisions, and ``"success"`` only for a
+    non-stale ``KEEP``.
+    """
+
+    if audit is None:
+        return None
+    if audit.get("stale"):
+        return "failure"
+    if audit.get("decision") == "KEEP":
+        return "success"
+    return "failure"
 
 
 if __name__ == "__main__":

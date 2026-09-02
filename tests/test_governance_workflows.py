@@ -453,3 +453,100 @@ def test_merge_governor_cli_exits_nonzero_when_not_authorized(tmp_path):
     )
     assert result.returncode == 1
     assert json.loads(result.stdout)["authorized"] is False
+
+
+def test_merge_governor_cli_exposes_audit_record_for_dedicated_check(tmp_path):
+    """The CLI's JSON output must expose the parsed audit record so the
+    calling workflow can publish a dedicated `TESSERA Maintainer Audit`
+    check run, independent from the aggregate `tessera-merge-governor`
+    check (see `audit_check_conclusion`)."""
+    from governance import merge_governor as mg
+
+    payload = {
+        "current_head_sha": "def4567",
+        "is_draft": False,
+        "mergeable_state": "clean",
+        "ci_success": True,
+        "benchmark_success": True,
+        "has_requested_changes": False,
+        "has_unresolved_threads": False,
+        "comments": [
+            {
+                "id": 1,
+                "created_at": "2024-01-01T00:00:00Z",
+                "body": "## Maintainer audit — KEEP\n\nAudited head: `def4567`\n",
+            }
+        ],
+    }
+    payload_path = tmp_path / "payload.json"
+    payload_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = subprocess.run(
+        [sys.executable, "-m", "governance.merge_governor", "--payload-file", str(payload_path)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    output = json.loads(result.stdout)
+    assert output["audit"] == {
+        "decision": "KEEP",
+        "audited_head_sha": "def4567",
+        "stale": False,
+    }
+    assert mg.audit_check_conclusion(output["audit"]) == "success"
+
+
+def test_audit_check_conclusion_flags_stale_and_non_keep_decisions():
+    from governance import merge_governor as mg
+
+    assert mg.audit_check_conclusion(None) is None
+    assert (
+        mg.audit_check_conclusion(
+            {"decision": "KEEP", "audited_head_sha": "old", "stale": True}
+        )
+        == "failure"
+    )
+    assert (
+        mg.audit_check_conclusion(
+            {"decision": "ITERATE", "audited_head_sha": "cur", "stale": False}
+        )
+        == "failure"
+    )
+    assert (
+        mg.audit_check_conclusion(
+            {"decision": "KEEP", "audited_head_sha": "cur", "stale": False}
+        )
+        == "success"
+    )
+
+
+PERSONAS = {
+    "tessera-issue-triage": "🧭 TESSERA Router",
+    "tessera-pr-maintainer-audit": "🛡️ TESSERA Guardian",
+    "tessera-pr-fixer": "🔧 TESSERA Fixer",
+    "tessera-post-merge-lifecycle": "🔄 TESSERA Steward",
+    "tessera-documentation-drift": "🔎 TESSERA Sentinel",
+}
+
+
+@pytest.mark.parametrize("workflow_id,persona", sorted(PERSONAS.items()))
+def test_workflow_declares_its_content_level_persona(workflow_id, persona):
+    """Every gh-aw workflow must render a distinct persona header in its
+    reports (see docs/AGENTIC_GOVERNANCE.md#personas), so a maintainer can
+    tell which governance role produced a comment without reading the
+    workflow name. This is content-level branding only; it never changes
+    the actual GitHub comment author."""
+    source = _read_source(workflow_id)
+    assert persona in source, (
+        f"{workflow_id}.md must declare and render the persona {persona!r}"
+    )
+
+
+def test_merge_governor_publishes_dedicated_maintainer_audit_check():
+    """The deterministic merge-governor workflow must publish `TESSERA
+    Maintainer Audit` as its own check run, independent from the aggregate
+    `tessera-merge-governor` check, so branch protection can require the
+    semantic audit signal individually (defense in depth)."""
+    source = MERGE_GOVERNOR_PATH.read_text(encoding="utf-8")
+    assert 'name="TESSERA Maintainer Audit"' in source
+    assert "audit_check_conclusion" in source

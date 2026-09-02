@@ -47,6 +47,28 @@ change. The maintainer-audit reviewer cannot push to the branch it reviews;
 the opt-in fixer cannot approve or merge its own fix; the lifecycle
 reconciler cannot push to `main`.
 
+## Personas (content-level, not a separate GitHub identity)
+
+Every workflow renders a distinct visual persona at the start of its
+comment/report body, so a maintainer can tell at a glance which governance
+role produced a given comment without reading the workflow name:
+
+| Persona | Workflow | Role |
+|---|---|---|
+| 🧭 TESSERA Router | `tessera-issue-triage.md` | Issue triage |
+| 🛡️ TESSERA Guardian | `tessera-pr-maintainer-audit.md` | Maintainer audit (KEEP/ITERATE/BLOCK) |
+| 🔧 TESSERA Fixer | `tessera-pr-fixer.md` | Opt-in fix commits |
+| 🔄 TESSERA Steward | `tessera-post-merge-lifecycle.md` | Post-merge lifecycle reconciliation |
+| 🔎 TESSERA Sentinel | `tessera-documentation-drift.md` | Periodic documentation drift |
+
+This is a **content-level** persona only: the real GitHub comment/review
+author remains `github-actions[bot]` (or whichever token the workflow uses),
+because gh-aw safe outputs are always written by the workflow's own GitHub
+token. Giving each agent a truly distinct bot account/avatar
+(`tessera-guardian[bot]`, etc.) would require registering and installing a
+dedicated GitHub App per persona — legitimate, but deliberately deferred
+past Stage A as unnecessary infrastructure for the current trust level.
+
 ## The governance loop
 
 ```text
@@ -63,9 +85,14 @@ ITERATE
   → new head → tessera-pr-maintainer-audit.md re-runs automatically
 
 KEEP + exact head unchanged + CI/Benchmark green + no unresolved threads
-  → tessera-merge-governor.yml (deterministic GitHub Actions, no AI):
-    publishes a `tessera-merge-governor` check run a maintainer can require
-    for branch protection; never calls the merge API in Stage A
+  → tessera-merge-governor.yml (deterministic GitHub Actions, no AI), triggered
+    by `pull_request` and `pull_request_review` events (so it re-evaluates the
+    moment the audit submits its review, not on a fixed delay):
+    publishes two independently-requirable check runs bound to the exact
+    current head SHA — `TESSERA Maintainer Audit` (mirrors the latest
+    KEEP/ITERATE/BLOCK decision, `failure` if stale) and
+    `tessera-merge-governor` (the aggregate authorization gate). Never calls
+    the merge API in Stage A.
 
 human merges (branch protection enforced) → canonical merge on main
   → tessera-post-merge-lifecycle.md (Codex): reconciles ROADMAP / Test Card /
@@ -76,6 +103,65 @@ weekly (and workflow_dispatch)
   → tessera-documentation-drift.md (Gemini): one consolidated `[docs-drift]`
     issue when canonical main and repository documentation disagree
 ```
+
+## Branch protection: GitHub is the authority, not convention
+
+`main` is protected (`repos/.../branches/main/protection`) and requires, on
+every pull request, **all** of the following to be green on the exact
+current head before the Merge button unlocks — enforced by GitHub itself,
+not by a maintainer remembering a checklist:
+
+```text
+Required status checks (strict: branch must be up to date)
+  distribution (Python 3.9)
+  distribution (Python 3.12)
+  test (Python 3.9)
+  test (Python 3.12)
+  smoke
+  sanity-eval
+  benchmark-reporting (offline)
+  TESSERA Maintainer Audit
+  tessera-merge-governor
+
+Required reviews
+  >= 1 approving review (dismissed automatically on a new push)
+  required_conversation_resolution: true (zero unresolved review threads)
+```
+
+Each required check is enforced individually (defense in depth) *and* the
+aggregate `tessera-merge-governor` check is required on top — a bug in the
+aggregator alone cannot silently authorize a merge that a individual
+required check would have blocked, and vice versa. `strict: true` means any
+new commit resets every required check to pending for the new SHA, which is
+what actually enforces the anti-stale-head invariant at the GitHub UI level
+(a green check bound to an old SHA can never satisfy a required check for
+the new SHA). `enforce_admins` is intentionally left `false` in Stage A so a
+maintainer can still override in a genuine emergency; tightening this is a
+candidate for a later stage once the system has a track record.
+
+## Why pre-merge gates stay as separate workflows, not one mega-workflow
+
+CI (`tessera-ci.yml`) and Benchmark Ledger (`benchmark.yml`) are pre-existing
+workflows independent of this governance rollout; `tessera-pr-maintainer-audit.md`
+is a gh-aw-compiled agentic workflow. GitHub Actions `needs:` can only
+express dependencies between jobs **inside the same workflow run** — it
+cannot gate a job in one workflow file on a job defined in a different
+workflow file. Making all four literally one workflow would require either
+(a) converting `tessera-ci.yml`/`benchmark.yml` into `workflow_call`-based
+reusable workflows invoked as jobs from a new orchestrator, or (b) rewriting
+their logic inline — both are bigger, riskier changes to already-established
+CI infrastructure than this rollout's scope, and are tracked as a candidate
+follow-up rather than done speculatively here.
+
+What is already achieved without that rewrite: `tessera-merge-governor.yml`
+re-evaluates automatically the instant the audit submits its review (via the
+`pull_request_review` trigger, not polling), publishes both a `TESSERA
+Maintainer Audit` check and the aggregate `tessera-merge-governor` check
+bound to the exact head, and branch protection requires every individual
+gate plus the aggregate. The net effect at the PR UI is the same ordering
+the user asked for (`CI + Benchmark → Audit → Governor`) and the same
+all-green-or-blocked outcome, without needing job-level `needs:` across
+independently-versioned workflow files.
 
 ## Anti-stale-head mechanism
 
@@ -230,9 +316,10 @@ Optional fixer expansion beyond the current narrow bash allowlist.
 **Stage D (future, only after measured trust):**
 
 ```text
-Runtime PR auto-merge, gated on tessera-merge-governor's check run being a
-required branch-protection status check plus sustained human-override data
-from Stage A/B.
+Runtime PR auto-merge, now that tessera-merge-governor and TESSERA
+Maintainer Audit are both required branch-protection status checks (see
+"Branch protection" above), gated on sustained human-override data from
+Stage A/B before auto-merge itself is enabled.
 ```
 
 ## How a maintainer overrides a bad AI decision

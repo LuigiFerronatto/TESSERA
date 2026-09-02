@@ -198,3 +198,62 @@ jobs:
             echo "::warning::Deterministic merge gates are not satisfied yet:"
             echo "$reasons"
           fi
+
+      # Publish `TESSERA Maintainer Audit` as its own required status check,
+      # independent from `tessera-merge-governor`. This lets branch
+      # protection require the semantic audit signal on its own (not just
+      # the aggregate governor), per "defense in depth": CI, Benchmark,
+      # Maintainer Audit and Merge Governor are each independently required
+      # rather than trusting a single aggregator to never have a bug. Bound
+      # to the exact current head SHA: any new commit makes this check
+      # pending again (a stale audit publishes `failure`, never a stale
+      # `success`).
+      - name: Publish maintainer-audit check run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RESULT_JSON: ${{ steps.evaluate.outputs.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+
+          from governance.merge_governor import audit_check_conclusion
+
+          data = json.loads(os.environ["RESULT_JSON"])
+          audit = data.get("audit")
+          conclusion = audit_check_conclusion(audit)
+          if conclusion is None:
+              # No audit recorded yet for this PR at all: leave the check
+              # unpublished so branch protection shows it as pending, not a
+              # false failure raised before the audit has run.
+              out = {"skip": True}
+          else:
+              if audit.get("stale"):
+                  summary = (
+                      f"Stale: audited head `{audit['audited_head_sha']}` does not "
+                      "match the current head. A fresh audit is required."
+                  )
+              else:
+                  summary = f"Latest maintainer-audit decision: {audit['decision']}."
+              out = {"skip": False, "conclusion": conclusion, "summary": summary}
+          with open("audit_check.json", "w", encoding="utf-8") as fh:
+              json.dump(out, fh)
+          PY
+          if [[ "$(python -c 'import json;print(json.load(open("audit_check.json"))["skip"])')" == "True" ]]; then
+            echo "No maintainer-audit decision recorded yet for this head; leaving check pending."
+            exit 0
+          fi
+          conclusion="$(python -c 'import json;print(json.load(open("audit_check.json"))["conclusion"])')"
+          summary="$(python -c 'import json;print(json.load(open("audit_check.json"))["summary"])')"
+          gh api "repos/$REPO/check-runs" \
+            -f name="TESSERA Maintainer Audit" \
+            -f head_sha="$HEAD_SHA" \
+            -f status="completed" \
+            -f conclusion="$conclusion" \
+            -f "output[title]=TESSERA Maintainer Audit: $conclusion" \
+            -f "output[summary]=$summary" \
+            > /dev/null || echo "::warning::could not publish check-run (requires checks: write on this token/context)"
