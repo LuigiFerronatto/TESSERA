@@ -14,7 +14,7 @@ was created. No open pull request overlapped #154. Live routing was #154
 - **Canonical squash merge:** `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`
 - **Lifecycle status:** `VALIDATED`
 - **Implementation benchmark applicability:** `SMOKE_ONLY`
-- **Lifecycle correction benchmark applicability:** `NOT_APPLICABLE`
+- Lifecycle correction benchmark applicability: `NOT_APPLICABLE`
 - **Final CI:** TESSERA CI `33633838687` — success
 - **Final Benchmark Ledger:** `33633838753` — success
 
