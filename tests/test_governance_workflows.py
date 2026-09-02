@@ -204,6 +204,43 @@ def test_evals_present_with_operational_value_first():
         assert evals[0]["id"] == "operational_value"
 
 
+def _pinned_compiler_version(lock_path: Path) -> str | None:
+    """Read the `compiler_version` gh-aw pinned into a lock file's header.
+
+    Recompiling with a *different* `gh aw` CLI version than the one that
+    produced the committed lock file is expected to legitimately change
+    output (new compiler releases can change generated YAML). Comparing
+    reproducibility is only meaningful against the exact compiler version
+    the lock file itself records, regardless of whatever `gh aw` build
+    happens to already be on PATH in a given local machine or CI runner.
+    """
+    first_line = lock_path.read_text(encoding="utf-8").splitlines()[0]
+    match = re.search(r'"compiler_version":"([^"]+)"', first_line)
+    return match.group(1) if match else None
+
+
+def _ensure_gh_aw_pinned(version: str) -> bool:
+    """Best-effort pin of the `gh aw` extension to an exact release.
+
+    Returns True if the extension is (now) pinned to `version`, False if
+    pinning could not be verified (e.g. no network access), in which case
+    the caller should skip rather than risk a false-positive/negative
+    reproducibility result against an unrelated compiler build.
+    """
+    subprocess.run(
+        ["gh", "extension", "upgrade", "github/gh-aw", "--pin", version],
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["gh", "extension", "install", "github/gh-aw", "--pin", version, "--force"],
+        capture_output=True,
+        text=True,
+    )
+    check = subprocess.run(["gh", "extension", "list"], capture_output=True, text=True)
+    return f"github/gh-aw\t{version}" in check.stdout or f" {version}" in check.stdout
+
+
 @pytest.mark.parametrize("workflow_id", sorted(GH_AW_WORKFLOWS))
 def test_lock_file_is_reproducible_from_source(workflow_id, tmp_path):
     """Recompiling a workflow source must not change its committed lock file.
@@ -217,6 +254,14 @@ def test_lock_file_is_reproducible_from_source(workflow_id, tmp_path):
         pytest.skip("lock file not present; covered by test_gh_aw_workflow_source_and_lock_exist")
     if subprocess.run(["gh", "aw", "--help"], capture_output=True).returncode != 0:
         pytest.skip("gh-aw CLI extension not available in this environment")
+
+    pinned_version = _pinned_compiler_version(lock_path)
+    if pinned_version and not _ensure_gh_aw_pinned(pinned_version):
+        pytest.skip(
+            f"could not pin gh-aw CLI to compiler_version={pinned_version}; "
+            "recompiling with a different compiler build is not a meaningful "
+            "reproducibility check"
+        )
 
     before = lock_path.read_text(encoding="utf-8")
     result = subprocess.run(
