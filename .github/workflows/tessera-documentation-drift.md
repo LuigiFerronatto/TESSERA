@@ -12,7 +12,9 @@ permissions:
   issues: read
   pull-requests: read
 
-engine: gemini
+engine:
+  id: gemini
+  version: "0.55.1"
 
 network: defaults
 

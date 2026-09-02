@@ -88,13 +88,43 @@ jobs:
 
           rollup = pr.get("statusCheckRollup") or []
 
-          def conclusion_for(name_substring):
+          def conclusions_for(name_substring):
+              # Returns every matching check's pass/fail state (not just the
+              # first match). A single first-match `or` previously let a red
+              # required job (for example a failing `test (Python 3.9)`)
+              # hide behind an unrelated green job (for example
+              # `distribution (Python 3.9)`) that happened to match first.
+              matches = []
               for check in rollup:
                   name = (check.get("name") or check.get("context") or "")
                   if name_substring.lower() in name.lower():
                       state = check.get("conclusion") or check.get("state") or ""
-                      return str(state).upper() in ("SUCCESS", "NEUTRAL", "SKIPPED")
-              return False
+                      matches.append(str(state).upper() in ("SUCCESS", "NEUTRAL", "SKIPPED"))
+              return matches
+
+          def all_green(name_substring):
+              matches = conclusions_for(name_substring)
+              return bool(matches) and all(matches)
+
+          # TESSERA CI (.github/workflows/tessera-ci.yml) publishes these
+          # required job names; every one of them must be present and green
+          # on the current head for CI to count as green. Missing evidence
+          # (job not yet run/reported) must fail closed, not pass open.
+          required_ci_jobs = (
+              "distribution (Python 3.9)",
+              "distribution (Python 3.12)",
+              "test (Python 3.9)",
+              "test (Python 3.12)",
+              "smoke",
+              "sanity-eval",
+          )
+          ci_success = all(all_green(job_name) for job_name in required_ci_jobs)
+
+          # The Benchmark Ledger (.github/workflows/benchmark.yml) always
+          # runs `benchmark-reporting (offline)`; it must be green regardless
+          # of applicability level (it also validates the PR's own
+          # applicability declaration).
+          benchmark_success = all_green("benchmark-reporting")
 
           payload = {
               "current_head_sha": pr.get("headRefOid"),
@@ -102,8 +132,8 @@ jobs:
               "mergeable_state": (
                   "clean" if pr.get("mergeStateStatus") == "CLEAN" else pr.get("mergeStateStatus")
               ),
-              "ci_success": conclusion_for("distribution") or conclusion_for("test ("),
-              "benchmark_success": conclusion_for("benchmark"),
+              "ci_success": ci_success,
+              "benchmark_success": benchmark_success,
               "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
               # Unresolved-thread detection requires a GraphQL query beyond
               # `gh pr view --json`; conservatively treat as satisfied only

@@ -12,7 +12,9 @@ permissions:
   issues: read
   pull-requests: read
 
-engine: copilot
+engine:
+  id: copilot
+  version: "1.0.80"
 
 tools:
   bash:

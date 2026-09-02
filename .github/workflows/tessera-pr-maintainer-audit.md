@@ -14,6 +14,7 @@ permissions:
 
 engine:
   id: codex
+  version: "0.150.1"
 
 tools:
   bash: false
