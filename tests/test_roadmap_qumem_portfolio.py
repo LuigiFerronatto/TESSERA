@@ -19,7 +19,7 @@ def test_roadmap_tracks_productization_v2_and_release_routing() -> None:
     assert "2508676d472088733702b6ed920fc829df9a7681" in text
     assert "`VALIDATED`" in _markdown_table_row(text, "#117")
     assert "`VALIDATED`" in _markdown_table_row(text, "#153")
-    assert "`READY`" in _markdown_table_row(text, "#154")
+    assert "`IN_PROGRESS`" in _markdown_table_row(text, "#154")
     assert "`BLOCKED`" in _markdown_table_row(text, "#155")
     assert "`BLOCKED`" in _markdown_table_row(text, "#118")
     assert "`READY`" in _markdown_table_row(text, "#120")

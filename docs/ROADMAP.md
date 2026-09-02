@@ -40,8 +40,8 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 0
-READY                          7 total / 4 executable
+NOW executable                 1
+READY                          6 total / 3 executable
 BLOCKED                        40 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
@@ -95,27 +95,18 @@ This board is selection guidance, not permission to bypass the owning Test Card.
 
 ## NOW
 
-No executable feature is selected or in progress. This governance delivery
-closes #172 without starting its recommended successor.
-
-Recommended next executable selection after this governance card:
-
 ```text
-Primary:
-#154 Safe project source discovery + .tessera-ignore
-
-Optional parallel integrity card, choose at most one:
-#135 deterministic decomposer fallback
-or
-#16 P0 conflict-containment
+#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS
 ```
+
+No second feature implementation is started by this branch. The optional
+#135/#16 integrity lane remains unselected.
 
 ## NEXT / READY
 
 Highest-value unblocked work, ranked rather than treated equally:
 
 ```text
-#154 Safe source discovery + .tessera-ignore  release-critical
 #135 Decomposer fallback integrity           P0 contract integrity
 #16  Conflict resolver containment           P0 state safety
 #120 MCP transport/runtime robustness        agent integration substrate
@@ -130,7 +121,7 @@ Cards intentionally parked despite earlier/live `READY` wording are listed under
 ```text
 FIRST PUBLIC RELEASE
 #153 VALIDATED
-  -> #154 source discovery READY
+  -> #154 source discovery IN_PROGRESS
       -> #155 init UX BLOCKED
           -> #118 clean onboarding BLOCKED
               -> #134 PyPI release BLOCKED
@@ -279,7 +270,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
   -> #116 package/distribution       VALIDATED
        -> #117 config/discovery v1   VALIDATED
             -> #153 config v2        VALIDATED
-                 -> #154 sources     READY
+                 -> #154 sources     IN_PROGRESS
                       -> #155 init UX BLOCKED
                            -> #118 clean onboarding BLOCKED
                                 -> #134 first PyPI release BLOCKED
@@ -531,7 +522,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
 | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
-| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `READY` | EXECUTABLE | Productization | #153 is validated; no remaining hard blocker. Owns safe project source discovery, clustering/classification, `.tessera-ignore`, and sensitive/forbidden-source policy. |
+| [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | open | `IN_PROGRESS` | EXECUTABLE | Productization | Branch `test-card/154-safe-source-discovery` implements root-bounded discovery, clustering/classification, `.tessera-ignore`, and sensitive/forbidden-source policy. #155 remains separate and blocked. |
 | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `BLOCKED` | EXECUTABLE | Productization | #117/#153 are satisfied; remaining active blocker is #154 validation. Owns interactive/non-interactive Init UX. |
 | [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #154 lane is primary. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
@@ -791,19 +782,14 @@ No roadmap entry may imply that `tessera` is already the published PyPI distribu
 
 The repository uses bounded WIP rather than starting every technically executable card at once.
 
-Recommended after the #153/#172 lifecycle reconciliation:
+Selected after the #153/#172 lifecycle reconciliation:
 
 ```text
-Primary:
-#154 Safe project source discovery + .tessera-ignore
-
-Parallel, choose one:
-#135 decomposer fallback
-or
-#16 containment
+#154 Safe project source discovery + .tessera-ignore  IN_PROGRESS
+#135/#16 optional parallel integrity lane             not selected
 ```
 
-Why #154 first:
+Why #154 is selected:
 - #153 has already validated the store/source/index boundary;
 - #154 directly unlocks #155, then #118 and #134;
 - it owns discovery/ignore safety before onboarding broadens the corpus.
@@ -829,7 +815,7 @@ PRODUCTIZATION / RELEASE
  -> #116 VALIDATED
      -> #117 VALIDATED
          -> #153 VALIDATED
-             -> #154 READY
+             -> #154 IN_PROGRESS
                  -> #155 BLOCKED
                      -> #118 BLOCKED
                          -> #134 BLOCKED

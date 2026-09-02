@@ -79,7 +79,26 @@ and named-global stores conservatively use their prior store as the sole source.
 They do not gain project README/docs/research files on upgrade. Explicit v2
 project roots must remain physically contained by the project, and symlink
 escapes fail safely. A named global store never absorbs current-project sources.
-Broader safe discovery and source-picker UX remain #154/#155.
+
+Project source discovery is a separate read-only proposal layer:
+
+```text
+physical project root
+  -> mandatory safety exclusions
+  -> .tessera-ignore subset
+  -> Markdown-only classification
+  -> recommendation policy
+  -> top-level location clusters
+  -> SourceDiscoveryPlan
+```
+
+`tessera.source_discovery` scans only the supplied physical project root. It
+skips all symlinks, performs metadata-first size/format checks, never traverses
+ancestors/siblings/home, and returns explicit reason codes. Mandatory
+exclusions run before ignore negation, so derived indexes, `.git`, special
+files and high-confidence secret/key artifacts cannot become selectable.
+Discovery does not mutate configured `sources`; display/selection/confirmation,
+config persistence, and index construction remain #155.
 
 ## Current read / retrieval pipeline
 

@@ -125,8 +125,30 @@ index:
 ```
 
 Source roots are read/index only and must stay within the physical project;
-generated writes remain inside `store.path`. Automatic discovery,
-`.tessera-ignore`, and source-picker UX remain future #154/#155 work.
+generated writes remain inside `store.path`. TESSERA can now inspect the
+configured project without changing that allow list:
+
+```python
+from tessera.source_discovery import discover_sources_for_configuration
+
+plan = discover_sources_for_configuration(resolved_configuration)
+payload = plan.to_dict()  # stable, machine-readable candidates and clusters
+```
+
+Discovery is Markdown-only because Markdown is the current canonical ingestion
+format. It returns `RECOMMENDED`, `SUPPORTED`, `IGNORED`, and `FORBIDDEN`
+entries; standalone root files such as `README.md` remain visible while nested
+sources are grouped by top-level project location. It never writes config,
+`.tessera-ignore`, sources, or index state, and it never expands the configured
+corpus. `tessera config doctor --json` includes the same discovery plan.
+
+An optional root `.tessera-ignore` supports blank lines, `#` comments, `*`,
+`?`, `**`, directory suffix `/`, and ordered `!` re-inclusion. It is a
+documented subset, not a claim of perfect `.gitignore` compatibility. Mandatory
+exclusions—including `.git`, the resolved derived index, legacy
+`.tessera_index`, unsafe symlinks, special files, and private-key/credential
+artifacts—cannot be re-included. Interactive display, selection, confirmation,
+config persistence, and indexing remain #155 work.
 
 Markdown is the only canonical writable persistence format. Every successful
 Engine, CLI, or MCP write creates a `.md` source that the current indexer can

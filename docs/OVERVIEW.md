@@ -185,6 +185,14 @@ candidate makes the resolved Engine boundary explicit:
                         Engine
 ```
 
+Issue #154 adds a proposal layer beside—not inside—the Engine path. A bounded
+scanner can inspect one configured project, apply mandatory exclusions and the
+documented `.tessera-ignore` subset, classify Markdown candidates, and return
+deterministic root-file entries plus top-level directory clusters. The result
+is structured and read-only: it does not add configured sources, write config,
+touch source files, or build the index. The future #155 workflow owns how a
+person displays, selects, confirms, persists, and indexes that plan.
+
 Project config lives at `.tessera/config.yaml`; global configuration is an
 OS-appropriate registry of explicitly named stores. Neither layer contains
 memory, credentials or executable instructions. Schema-v1 and named-global
