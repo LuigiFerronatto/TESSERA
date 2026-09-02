@@ -134,6 +134,26 @@ A future release process may move those entries into a version/date section. Thi
 
 Do not invent semantic-version bumps merely to satisfy the changelog.
 
+## Agent-drafted changelog entries (narrow, evidence-gated exception)
+
+TESSERA's `tessera-post-merge-lifecycle` agentic workflow (see
+[`docs/AGENTIC_GOVERNANCE.md`](AGENTIC_GOVERNANCE.md)) may propose a
+`CHANGELOG.md` entry **only** inside a reviewable pull request, and **only**
+when every one of the following evidence sources grounds the entry:
+
+- the linked Issue/Test Card;
+- the actual canonical merged diff (not a PR title or commit message alone);
+- the specific public/contract surfaces affected;
+- the final recorded decision (`KEEP`/etc.);
+- the canonical merge commit SHA.
+
+This does not weaken the prohibition earlier in this policy: an AI agent must
+never fabricate authoritative product history purely from commit messages,
+PR titles, or `git log`. A proposed agent-drafted entry is always subject to
+the same human/CI review as any other PR change to `CHANGELOG.md`, and the
+lifecycle workflow must flag the required entry instead of writing one when
+it lacks sufficient grounded evidence.
+
 ## PR checklist contract
 
 Every meaningful PR should declare:

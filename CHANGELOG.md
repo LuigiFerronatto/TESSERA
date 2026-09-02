@@ -8,6 +8,16 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Architecture Decisions
+- Added an agentic repository-governance system (issue triage, independent
+  PR maintainer audit, opt-in fixer, deterministic merge governor, post-merge
+  lifecycle reconciliation, weekly documentation-drift audit) built on
+  GitHub Agentic Workflows. This is repository-process automation, not a
+  TESSERA product/runtime capability; see
+  [`docs/AGENTIC_GOVERNANCE.md`](docs/AGENTIC_GOVERNANCE.md). Benchmark
+  applicability: NOT_APPLICABLE (workflow/docs/governance-test only, no
+  runtime behavior changed).
+
 ### Added
 - Root-bounded, read-only project source discovery now returns deterministic
   `RECOMMENDED / SUPPORTED / IGNORED / FORBIDDEN` candidates and location

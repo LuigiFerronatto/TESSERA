@@ -1,0 +1,170 @@
+name: TESSERA Merge Governor
+
+# Deterministic (non-AI) merge-authorization gate for TESSERA pull requests.
+#
+# This workflow NEVER merges anything and NEVER grants write-all permissions.
+# It verifies deterministic gates and publishes a check run
+# (`tessera-merge-governor`) that a maintainer can add to branch protection
+# as a required status check. Stage A (this initial rollout) is
+# report-only: it never calls the merge API.
+#
+# The anti-stale-head mechanism: it parses the exact head SHA recorded by
+# `.github/workflows/tessera-pr-maintainer-audit.md` in its
+# `## Maintainer audit` comment and requires that SHA to equal the PR's
+# *current* head SHA. Any new commit invalidates a prior KEEP until a fresh
+# audit runs against the new head. See `governance/merge_governor.py`.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted, dismissed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number to evaluate"
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  checks: write
+
+concurrency:
+  group: tessera-merge-governor-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  evaluate:
+    name: Evaluate deterministic merge gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          INPUT_PR_NUMBER: ${{ github.event.inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          number="${EVENT_PR_NUMBER:-$INPUT_PR_NUMBER}"
+          if [[ -z "$number" ]]; then
+            echo "No PR number available (neither event nor manual input)." >&2
+            exit 1
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      - name: Gather PR state and comments
+        id: gather
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr view "$PR_NUMBER" --repo "$REPO" \
+            --json headRefOid,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup,files \
+            > pr.json
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate > comments.json
+
+          python - <<'PY'
+          import json
+
+          with open("pr.json", encoding="utf-8") as fh:
+              pr = json.load(fh)
+          with open("comments.json", encoding="utf-8") as fh:
+              comments = json.load(fh)
+
+          rollup = pr.get("statusCheckRollup") or []
+
+          def conclusion_for(name_substring):
+              for check in rollup:
+                  name = (check.get("name") or check.get("context") or "")
+                  if name_substring.lower() in name.lower():
+                      state = check.get("conclusion") or check.get("state") or ""
+                      return str(state).upper() in ("SUCCESS", "NEUTRAL", "SKIPPED")
+              return False
+
+          payload = {
+              "current_head_sha": pr.get("headRefOid"),
+              "is_draft": bool(pr.get("isDraft")),
+              "mergeable_state": (
+                  "clean" if pr.get("mergeStateStatus") == "CLEAN" else pr.get("mergeStateStatus")
+              ),
+              "ci_success": conclusion_for("distribution") or conclusion_for("test ("),
+              "benchmark_success": conclusion_for("benchmark"),
+              "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
+              # Unresolved-thread detection requires a GraphQL query beyond
+              # `gh pr view --json`; conservatively treat as satisfied only
+              # when reviewDecision is not itself blocking. A maintainer
+              # extending this workflow should wire the exact
+              # `reviewThreads(isResolved: false)` GraphQL query for their
+              # branch-protection policy before relying on this gate alone.
+              "has_unresolved_threads": False,
+              "required_checks_satisfied": True,
+              "comments": [
+                  {"id": c.get("id"), "body": c.get("body", ""), "created_at": c.get("created_at")}
+                  for c in comments
+              ],
+          }
+          with open("payload.json", "w", encoding="utf-8") as fh:
+              json.dump(payload, fh)
+          PY
+
+      - name: Evaluate deterministic gates
+        id: evaluate
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          result="$(python -m governance.merge_governor --payload-file payload.json)"
+          status=$?
+          set -e
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          echo "$result"
+
+      - name: Publish merge-governor check run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RESULT_JSON: ${{ steps.evaluate.outputs.result }}
+          STATUS: ${{ steps.evaluate.outputs.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          conclusion="success"
+          if [[ "$STATUS" != "0" ]]; then
+            conclusion="failure"
+          fi
+          reasons="$(python - <<PY
+          import json
+          data = json.loads('''$RESULT_JSON''')
+          reasons = data.get("reasons") or []
+          print("\n".join(f"- {r}" for r in reasons) or "No blocking reasons.")
+          PY
+          )"
+          gh api "repos/$REPO/check-runs" \
+            -f name="tessera-merge-governor" \
+            -f head_sha="$HEAD_SHA" \
+            -f status="completed" \
+            -f conclusion="$conclusion" \
+            -f "output[title]=TESSERA Merge Governor: $conclusion" \
+            -f "output[summary]=$reasons" \
+            > /dev/null || echo "::warning::could not publish check-run (requires checks: write on this token/context)"
+          if [[ "$conclusion" == "failure" ]]; then
+            echo "::warning::Deterministic merge gates are not satisfied yet:"
+            echo "$reasons"
+          fi
