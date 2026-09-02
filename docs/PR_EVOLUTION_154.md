@@ -6,6 +6,21 @@ was created. No open pull request overlapped #154. Live routing was #154
 `READY`, #155 `BLOCKED` on #154, #118 `BLOCKED` on #154/#155, and #134
 `BLOCKED` on #118 plus #87.
 
+## Canonical lifecycle
+
+- **Decision:** `KEEP`
+- **Implementation PR:** [#175](https://github.com/LuigiFerronatto/TESSERA/pull/175)
+- **Final candidate:** `06521763b4c3cf033c4d1e6a771ae105aad98e37`
+- **Canonical squash merge:** `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`
+- **Lifecycle status:** `VALIDATED`
+- **Benchmark applicability:** `SMOKE_ONLY`
+- **Final CI:** TESSERA CI `33633838687` — success
+- **Final Benchmark Ledger:** `33633838753` — success
+
+The final candidate and canonical squash merge are one source-discovery
+delivery, not two capabilities. The post-merge lifecycle sync is a
+documentation/governance correction only.
+
 ## Capability lineage
 
 | Issue | Canonical contribution retained by #154 |
@@ -16,18 +31,15 @@ was created. No open pull request overlapped #154. Live routing was #154
 | #117 | Physical project root and deterministic project/global configuration selection. |
 | #153 | `store.path` writes, explicit `sources` read/index, and `index.path` derived state; canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. |
 | #154 | Safely discover/classify additional project candidates without selecting them. |
-| #155 | Future display/select/confirm/persist/index workflow; not implemented here. |
+| #155 | Display/select/confirm/persist/index workflow; now unblocked by validated #154 but still a separate delivery. |
 
-#153 and #154 are separate deliveries:
+#153, #154 and #155 remain separate deliveries:
 
 ```text
 #153 = WHAT paths can be configured as store / sources / index
 #154 = HOW project source candidates are safely discovered / classified
 #155 = HOW a user selects and confirms those candidates
 ```
-
-The #153 candidate and canonical merge remain one `CONFIGURATION_V2` delivery;
-none of that capability is counted again as #154.
 
 ## Before architecture
 
@@ -40,7 +52,7 @@ ResolvedConfiguration
 safe project-wide candidate proposal -> absent
 ```
 
-## Candidate architecture
+## Validated architecture
 
 ```text
 project root
@@ -112,22 +124,33 @@ diagnostic output.
 
 Benchmark applicability: `SMOKE_ONLY`.
 
-Benchmark rationale: source discovery changes candidate proposal and safety
-only. Retrieval/ranking, selected corpus, Evidence Ledger, three drawers, and
-mandatory-LLM behavior remain fixed. Deterministic sanity must remain Hit@1
-`0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence `1.00`, and missing-evidence
-passed. LongMemEval is not required unless held-constant retrieval changes.
+Final candidate validation for PR #175:
 
-Local candidate validation recorded for PR #175: the required focused set
-passed `165` tests; the clean-worktree full suite passed `359` tests with 14
-expected warnings; compileall and diff checks passed. Wheel and sdist builds
-include `tessera/source_discovery.py`, exclude test/benchmark trees from the
-wheel, and the installed-wheel discovery smoke passed. Sanity remained Hit@1
-`0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence `1.00`, and missing-evidence
-passed. Final candidate SHA, CI, Benchmark Ledger, and Issue
-Evidence/Learnings/Decision links are recorded after final-head publication.
-Until merge and a separate lifecycle reconciliation, #154 remains
-`IN_PROGRESS`; #155/#118/#134 remain blocked and unstarted.
+- focused blocker/impacted set: `66 passed`;
+- full clean suite: `363 passed`, 14 expected warnings;
+- compileall and `git diff --check`: passed;
+- wheel + sdist: built successfully;
+- installed-wheel discovery smoke: passed;
+- deterministic sanity unchanged: Hit@1 `0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence `1.00`, missing-evidence passed;
+- TESSERA CI run `33633838687`: success;
+- Benchmark Ledger run `33633838753`: success; LongMemEval correctly skipped under `SMOKE_ONLY`.
+
+The held-constant retrieval contract was not changed by discovery. Source
+selection remains explicit and separate from candidate proposal.
+
+## Post-merge routing
+
+```text
+#153 VALIDATED
+  -> #154 VALIDATED
+      -> #155 READY
+          -> #118 BLOCKED on #155
+              -> #134 BLOCKED on #118 + #87
+```
+
+#154 no longer consumes executable WIP. #155 is the next release-critical
+productization implementation candidate, but is not started by this lifecycle
+correction.
 
 ## Known limitations and non-goals
 
