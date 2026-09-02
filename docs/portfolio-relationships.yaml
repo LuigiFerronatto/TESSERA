@@ -1,0 +1,507 @@
+schema_version: 1
+repository: LuigiFerronatto/TESSERA
+audited_against:
+  main: 05ce0dd234a7756d4a5ba315b77e4a6ec33c9429
+  date: 2026-09-02
+
+# This is the audited native projection of the sources named below, not a new
+# roadmap. `blocked_by` is canonical; GitHub derives `blocking`. Each
+# `relates_to` edge is declared once and the sync tool treats it as undirected.
+policy:
+  precedence:
+    - authoritative_portfolio_routing
+    - current_test_card
+    - docs_roadmap
+    - current_issue_body
+    - live_issue_state
+    - conservative_fallback
+  satisfied_dependencies: >-
+    Preserve closed prerequisites when they form a concrete delivery or safety
+    chain. Omit broadly repeated, already-universal foundation baselines such as
+    #74 and #96 unless the edge still adds unique navigation value.
+  active_blocker_override: >-
+    An explicit Active blocker or Remaining blocker narrows the native blocker
+    set and supersedes an older full prerequisite list.
+  split_scope: >-
+    A dependency that blocks only a future sub-scope is not projected as a
+    native blocker for the whole issue; keep it as an audited lateral edge.
+  textual_mentions: >-
+    Mentions without an explicit hierarchy, execution dependency, or material
+    architectural rationale are intentionally ignored.
+
+scope:
+  ignored_title_prefixes:
+    - "[aw]"
+    - "[lifecycle]"
+  issue_numbers:
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 25
+    - 26
+    - 27
+    - 28
+    - 32
+    - 38
+    - 67
+    - 68
+    - 69
+    - 70
+    - 71
+    - 72
+    - 73
+    - 74
+    - 78
+    - 80
+    - 87
+    - 92
+    - 93
+    - 94
+    - 95
+    - 96
+    - 100
+    - 103
+    - 104
+    - 105
+    - 106
+    - 109
+    - 112
+    - 114
+    - 115
+    - 116
+    - 117
+    - 118
+    - 119
+    - 120
+    - 121
+    - 134
+    - 135
+    - 136
+    - 137
+    - 138
+    - 139
+    - 140
+    - 141
+    - 142
+    - 143
+    - 144
+    - 145
+    - 146
+    - 153
+    - 154
+    - 155
+    - 157
+    - 158
+    - 159
+    - 160
+    - 161
+    - 162
+    - 163
+    - 164
+    - 165
+    - 166
+    - 167
+    - 168
+    - 169
+    - 170
+    - 171
+    - 176
+    - 177
+    - 178
+    - 179
+    - 190
+    - 191
+    - 192
+    - 193
+    - 196
+
+issues:
+  12:
+    blocked_by:
+      - {issue: 67, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#12:authoritative-routing"}
+      - {issue: 94, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#12:authoritative-routing"}
+  13:
+    blocked_by:
+      - {issue: 12, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#13:authoritative-routing"}
+      - {issue: 69, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#13:authoritative-routing"}
+      - {issue: 70, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#13:authoritative-routing"}
+  15:
+    blocked_by:
+      - {issue: 73, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#15:authoritative-routing"}
+    relates_to:
+      - {issue: 137, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#15:authoritative-routing"}
+      - {issue: 138, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#15:authoritative-routing"}
+  16:
+    relates_to:
+      - {issue: 15, reason_code: SPLIT_SCOPE_NOT_NATIVE_BLOCKER, source: "issue:#16:authoritative-routing"}
+      - {issue: 73, reason_code: SPLIT_SCOPE_NOT_NATIVE_BLOCKER, source: "issue:#16:authoritative-routing"}
+      - {issue: 137, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#16:authoritative-routing"}
+  17:
+    blocked_by:
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#17:authoritative-routing"}
+      - {issue: 20, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#17:authoritative-routing"}
+    relates_to:
+      - {issue: 139, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#17:authoritative-routing"}
+      - {issue: 158, reason_code: ARCHITECTURAL_RELATION, source: "issue:#17:qualified-capability-baseline"}
+      - {issue: 159, reason_code: ARCHITECTURAL_RELATION, source: "issue:#17:qualified-capability-baseline"}
+  19:
+    blocked_by:
+      - {issue: 92, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#19:authoritative-routing"}
+      - {issue: 13, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#19:authoritative-routing"}
+      - {issue: 16, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#19:authoritative-routing"}
+      - {issue: 73, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#19:authoritative-routing"}
+  20:
+    blocked_by:
+      - {issue: 15, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#20:authoritative-routing"}
+      - {issue: 16, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#20:authoritative-routing"}
+      - {issue: 27, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#20:authoritative-routing"}
+    relates_to:
+      - {issue: 141, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#20:authoritative-routing"}
+  21:
+    blocked_by:
+      - {issue: 19, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#21:authoritative-routing"}
+      - {issue: 20, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#21:authoritative-routing"}
+  25:
+    parent: {issue: 14, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#14:tracks-children"}
+    relates_to:
+      - {issue: 159, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#159:portfolio-routing"}
+  26:
+    parent: {issue: 14, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#14:tracks-children"}
+    blocked_by:
+      - {issue: 25, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#26:authoritative-routing"}
+    relates_to:
+      - {issue: 27, reason_code: ARCHITECTURAL_RELATION, source: "issue:#26:unlocks-edge-trust"}
+  27:
+    blocked_by:
+      - {issue: 15, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#27:authoritative-routing"}
+      - {issue: 16, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#27:authoritative-routing"}
+      - {issue: 32, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#27:authoritative-routing"}
+      - {issue: 72, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#27:authoritative-routing"}
+  28:
+    parent: {issue: 18, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#18:tracks-children"}
+    relates_to:
+      - {issue: 159, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#159:portfolio-routing"}
+  32:
+    blocked_by:
+      - {issue: 71, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#32:authoritative-routing"}
+  67:
+    blocked_by:
+      - {issue: 93, reason_code: ROADMAP_DEPENDENCY, source: "issue:#67:satisfied-dependency"}
+  69:
+    blocked_by:
+      - {issue: 12, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#69:authoritative-routing"}
+      - {issue: 94, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#69:authoritative-routing"}
+  70:
+    blocked_by:
+      - {issue: 12, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#70:authoritative-routing"}
+      - {issue: 69, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#70:authoritative-routing"}
+  71:
+    blocked_by:
+      - {issue: 69, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#71:authoritative-routing"}
+      - {issue: 70, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#71:authoritative-routing"}
+  72:
+    blocked_by:
+      - {issue: 71, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#72:authoritative-routing"}
+      - {issue: 32, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#72:authoritative-routing"}
+  73:
+    blocked_by:
+      - {issue: 12, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#73:authoritative-routing"}
+      - {issue: 94, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#73:authoritative-routing"}
+  78:
+    parent: {issue: 38, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#38:tracks-children"}
+    relates_to:
+      - {issue: 146, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#146:portfolio-routing"}
+  80:
+    parent: {issue: 38, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#38:tracks-children"}
+    blocked_by:
+      - {issue: 74, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#80:authoritative-routing"}
+  87:
+    parent: {issue: 38, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#38:tracks-children"}
+  96:
+    parent: {issue: 18, reason_code: EXPLICIT_PARENT, source: "issue:#96:portfolio-routing"}
+    blocked_by:
+      - {issue: 68, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#96:portfolio-routing"}
+  100:
+    parent: {issue: 18, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#18:tracks-children"}
+    blocked_by:
+      - {issue: 96, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#100:portfolio-routing"}
+  103:
+    parent: {issue: 18, reason_code: EXPLICIT_PARENT, source: "issue:#103:authoritative-routing"}
+    blocked_by:
+      - {issue: 28, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#103:authoritative-routing"}
+      - {issue: 100, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#103:authoritative-routing"}
+  104:
+    parent: {issue: 18, reason_code: EXPLICIT_PARENT, source: "issue:#104:authoritative-routing"}
+    blocked_by:
+      - {issue: 100, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#104:authoritative-routing"}
+      - {issue: 103, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#104:authoritative-routing"}
+  105:
+    parent: {issue: 18, reason_code: EXPLICIT_PARENT, source: "issue:#105:authoritative-routing"}
+    blocked_by:
+      - {issue: 100, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#105:authoritative-routing"}
+      - {issue: 103, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#105:authoritative-routing"}
+      - {issue: 104, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#105:authoritative-routing"}
+  106:
+    parent: {issue: 18, reason_code: EXPLICIT_PARENT, source: "issue:#106:authoritative-routing"}
+    blocked_by:
+      - {issue: 100, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#106:authoritative-routing"}
+      - {issue: 103, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#106:authoritative-routing"}
+      - {issue: 104, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#106:authoritative-routing"}
+      - {issue: 105, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#106:authoritative-routing"}
+  109:
+    parent: {issue: 38, reason_code: EXPLICIT_PARENT, source: "issue:#109:authoritative-routing"}
+  112:
+    parent: {issue: 38, reason_code: EXPLICIT_PARENT, source: "issue:#112:authoritative-routing"}
+    relates_to:
+      - {issue: 95, reason_code: ARCHITECTURAL_RELATION, source: "issue:#112:authoritative-routing"}
+  114:
+    parent: {issue: 38, reason_code: EXPLICIT_PARENT, source: "issue:#114:portfolio-routing"}
+    blocked_by:
+      - {issue: 109, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#114:portfolio-routing"}
+  115:
+    blocked_by:
+      - {issue: 74, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#115:portfolio-routing"}
+      - {issue: 95, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#115:portfolio-routing"}
+      - {issue: 112, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#115:portfolio-routing"}
+  116:
+    blocked_by:
+      - {issue: 115, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#116:portfolio-routing"}
+  117:
+    blocked_by:
+      - {issue: 115, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#117:portfolio-routing"}
+      - {issue: 116, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#117:portfolio-routing"}
+      - {issue: 94, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#117:portfolio-routing"}
+  118:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:ux-onboarding-ownership"}
+    blocked_by:
+      - {issue: 155, reason_code: ACTIVE_BLOCKER, source: "issue:#118:portfolio-routing"}
+    relates_to:
+      - {issue: 119, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#118:portfolio-routing"}
+  119:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:ux-epic"}
+    relates_to:
+      - {issue: 155, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#119:portfolio-routing"}
+      - {issue: 120, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#119:portfolio-routing"}
+  120:
+    relates_to:
+      - {issue: 144, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#120:portfolio-routing"}
+      - {issue: 167, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#120:portfolio-routing"}
+      - {issue: 169, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#120:portfolio-routing"}
+      - {issue: 177, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#177:portfolio-routing"}
+      - {issue: 190, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#190:portfolio-routing"}
+  121:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#178:ux-epic-coordination"}
+    blocked_by:
+      - {issue: 120, reason_code: REMAINING_BLOCKER, source: "issue:#121:portfolio-routing"}
+    relates_to:
+      - {issue: 193, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#193:portfolio-routing"}
+  134:
+    blocked_by:
+      - {issue: 118, reason_code: ACTIVE_BLOCKER, source: "roadmap:first-public-release"}
+      - {issue: 87, reason_code: ACTIVE_BLOCKER, source: "roadmap:first-public-release"}
+    relates_to:
+      - {issue: 193, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#193:portfolio-routing"}
+  135:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+  136:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 135, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#136:portfolio-routing"}
+    relates_to:
+      - {issue: 138, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#138:portfolio-routing"}
+      - {issue: 160, reason_code: ARCHITECTURAL_RELATION, source: "issue:#160:portfolio-routing"}
+      - {issue: 165, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#165:portfolio-routing"}
+  137:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 135, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#137:portfolio-routing"}
+    relates_to:
+      - {issue: 138, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#138:portfolio-routing"}
+      - {issue: 176, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#176:portfolio-routing"}
+  138:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    relates_to:
+      - {issue: 177, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#177:portfolio-routing"}
+      - {issue: 191, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#191:portfolio-routing"}
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:capture-pipeline"}
+  139:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    relates_to:
+      - {issue: 160, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#160:portfolio-routing"}
+  140:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 139, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#140:portfolio-routing"}
+  141:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#141:portfolio-routing"}
+      - {issue: 15, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#141:portfolio-routing"}
+      - {issue: 16, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#141:portfolio-routing"}
+      - {issue: 137, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#141:portfolio-routing"}
+  142:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 135, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 136, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 137, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 138, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 139, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+      - {issue: 141, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#142:portfolio-routing"}
+  143:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 136, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+      - {issue: 137, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+      - {issue: 138, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+      - {issue: 141, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+      - {issue: 142, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#143:portfolio-routing"}
+    relates_to:
+      - {issue: 18, reason_code: TRACKER_RELATION, source: "issue:#143:portfolio-routing"}
+  144:
+    parent: {issue: 145, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:qumem-child"}
+    blocked_by:
+      - {issue: 136, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+      - {issue: 137, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+      - {issue: 138, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+      - {issue: 141, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+      - {issue: 142, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#144:portfolio-routing"}
+  146:
+    parent: {issue: 145, reason_code: EXPLICIT_PARENT, source: "issue:#146:portfolio-routing"}
+  153:
+    blocked_by:
+      - {issue: 117, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#153:portfolio-routing"}
+      - {issue: 93, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#153:portfolio-routing"}
+  154:
+    blocked_by:
+      - {issue: 153, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#154:portfolio-routing"}
+  155:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:ux-onboarding-ownership"}
+    blocked_by:
+      - {issue: 117, reason_code: ROADMAP_DEPENDENCY, source: "roadmap:productization-chain"}
+      - {issue: 153, reason_code: ROADMAP_DEPENDENCY, source: "roadmap:productization-chain"}
+      - {issue: 154, reason_code: ROADMAP_DEPENDENCY, source: "roadmap:productization-chain"}
+    relates_to:
+      - {issue: 166, reason_code: ARCHITECTURAL_RELATION, source: "roadmap:cli-presentation-substrate"}
+  157:
+    parent: {issue: 164, reason_code: EXPLICIT_PARENT, source: "issue:#157:portfolio-routing"}
+    blocked_by:
+      - {issue: 153, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#157:portfolio-routing"}
+  158:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#158:portfolio-routing"}
+      - {issue: 153, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#158:portfolio-routing"}
+  159:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#159:portfolio-routing"}
+      - {issue: 158, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#159:portfolio-routing"}
+  160:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#160:portfolio-routing"}
+  161:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#161:portfolio-routing"}
+      - {issue: 158, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#161:portfolio-routing"}
+      - {issue: 160, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#161:portfolio-routing"}
+      - {issue: 155, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#161:portfolio-routing"}
+  162:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#162:portfolio-routing"}
+      - {issue: 160, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#162:portfolio-routing"}
+  163:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#163:portfolio-routing"}
+  165:
+    parent: {issue: 164, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:intelligence-child"}
+    blocked_by:
+      - {issue: 157, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#165:portfolio-routing"}
+      - {issue: 160, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#165:portfolio-routing"}
+      - {issue: 163, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#165:portfolio-routing"}
+  166:
+    parent: {issue: 119, reason_code: EXPLICIT_PARENT, source: "issue:#166:portfolio-routing"}
+    relates_to:
+      - {issue: 190, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#190:portfolio-routing"}
+  167:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-child"}
+    blocked_by:
+      - {issue: 169, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#167:portfolio-routing"}
+    relates_to:
+      - {issue: 168, reason_code: ARCHITECTURAL_RELATION, source: "issue:#167:consumes-long-term-memory"}
+  168:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-child"}
+    relates_to:
+      - {issue: 169, reason_code: ARCHITECTURAL_RELATION, source: "issue:#169:consumes-long-term-memory"}
+      - {issue: 171, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#171:portfolio-routing"}
+      - {issue: 176, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#176:portfolio-routing"}
+      - {issue: 177, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#177:portfolio-routing"}
+      - {issue: 179, reason_code: RESEARCH_RELATION, source: "issue:#179:portfolio-routing"}
+  169:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-child"}
+    blocked_by:
+      - {issue: 139, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#169:portfolio-routing"}
+      - {issue: 140, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#169:portfolio-routing"}
+      - {issue: 141, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#169:portfolio-routing"}
+      - {issue: 20, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#169:portfolio-routing"}
+    relates_to:
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:portfolio-routing"}
+  171:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-child"}
+    blocked_by:
+      - {issue: 120, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#171:portfolio-routing"}
+      - {issue: 167, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#171:portfolio-routing"}
+      - {issue: 169, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#171:portfolio-routing"}
+    relates_to:
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:portfolio-routing"}
+  176:
+    blocked_by:
+      - {issue: 154, reason_code: AUTHORITATIVE_DEPENDS_ON, source: "issue:#176:portfolio-routing"}
+    relates_to:
+      - {issue: 69, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#176:portfolio-routing"}
+      - {issue: 191, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#191:portfolio-routing"}
+  177:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-integration"}
+    blocked_by:
+      - {issue: 196, reason_code: ROADMAP_DEPENDENCY, source: "issue:#196:adapter-contract-boundary"}
+    relates_to:
+      - {issue: 179, reason_code: RESEARCH_RELATION, source: "issue:#179:portfolio-routing"}
+      - {issue: 190, reason_code: ARCHITECTURAL_RELATION, source: "issue:#190:portfolio-routing"}
+      - {issue: 191, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#191:portfolio-routing"}
+      - {issue: 193, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#193:portfolio-routing"}
+  190:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#190:portfolio-routing"}
+    relates_to:
+      - {issue: 193, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#193:portfolio-routing"}
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:portfolio-routing"}
+  191:
+    relates_to:
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:portfolio-routing"}
+  192:
+    parent: {issue: 176, reason_code: EXPLICIT_PARENT, source: "issue:#192:portfolio-routing"}
+    relates_to:
+      - {issue: 12, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#192:portfolio-routing"}
+      - {issue: 166, reason_code: AUTHORITATIVE_COORDINATES_WITH, source: "issue:#192:portfolio-routing"}
+  193:
+    parent: {issue: 178, reason_code: EXPLICIT_EPIC_CHILD, source: "issue:#178:ux-distribution-ownership"}
+    blocked_by:
+      - {issue: 120, reason_code: ACTIVE_BLOCKER, source: "issue:#193:portfolio-status"}
+      - {issue: 171, reason_code: ACTIVE_BLOCKER, source: "issue:#193:portfolio-status"}
+    relates_to:
+      - {issue: 196, reason_code: ARCHITECTURAL_RELATION, source: "issue:#196:portfolio-routing"}
+  196:
+    parent: {issue: 170, reason_code: EXPLICIT_EPIC_CHILD, source: "roadmap:cognitive-continuity-hook-core"}

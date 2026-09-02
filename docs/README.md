@@ -38,6 +38,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [BENCHMARK_CI.md](BENCHMARK_CI.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
 | [adr/README.md](adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
 | [AGENTIC_GOVERNANCE.md](AGENTIC_GOVERNANCE.md) | Repository-process automation: issue triage, independent PR audit, opt-in fixer, deterministic merge governor, post-merge lifecycle reconciliation, documentation drift audits. Not a TESSERA product/runtime feature. |
+| [portfolio-relationships.yaml](portfolio-relationships.yaml) | Audited machine-readable projection of roadmap and Issue routing into native GitHub relationships, including rationale for every edge. |
 
 Current binding decision: [ADR 0001 — Core vs Optional LLM Orchestrator Boundary](adr/0001-core-vs-optional-llm-boundary.md).
 

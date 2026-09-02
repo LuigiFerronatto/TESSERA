@@ -154,6 +154,28 @@ the same human/CI review as any other PR change to `CHANGELOG.md`, and the
 lifecycle workflow must flag the required entry instead of writing one when
 it lacks sufficient grounded evidence.
 
+## Native Issue relationship synchronization
+
+The audited projection in
+[`docs/portfolio-relationships.yaml`](portfolio-relationships.yaml) maps the
+roadmap and authoritative Issue routing blocks onto GitHub's native `Parent`,
+`Blocked by`/derived `Blocking`, and `Relates to` relationships. It is not a
+parallel roadmap and must follow this precedence:
+
+```text
+authoritative Issue routing
+→ current Test Card
+→ ROADMAP
+→ current Issue body
+→ live Issue state
+→ conservative fallback
+```
+
+Run `python scripts/sync_portfolio.py relationships` for a read-only audit.
+Mutation always requires the explicit `--apply` flag. `blocked_by` is the only
+stored direction for dependencies; the inverse `blocking` view is derived.
+Plain textual mentions are never promoted automatically.
+
 ## PR checklist contract
 
 Every meaningful PR should declare:
