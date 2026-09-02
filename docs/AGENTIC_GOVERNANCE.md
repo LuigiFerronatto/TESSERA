@@ -279,6 +279,37 @@ SHA bumps).
 `tessera-merge-governor.yml` is a plain, deterministic GitHub Actions
 workflow (no `engine:`), reviewed like any other CI change.
 
+## Generated maintenance workflow (`.github/workflows/agentics-maintenance.yml`)
+
+gh-aw automatically generates and maintains this file — do not hand-edit it,
+edit `.github/workflows/aw.json` (`{"maintenance": false}` disables
+generation entirely) and recompile instead. It exists because
+`tessera-documentation-drift.md` declares `close-older-issues: true`
+(an expiring safe output): gh-aw needs a companion scheduled job to actually
+close superseded `[docs-drift]` issues once a newer one is created.
+
+**Default (daily `schedule`, no `operation` input) behavior** — the only
+path that runs without a human explicitly choosing an operation — is
+narrowly scoped to closing gh-aw's own already-expired
+issues/discussions/PRs and pruning stale cache-memory entries
+(`close-expired-issues`, `close-expired-discussions`,
+`close-expired-pull-requests`, `cleanup-cache-memory`). Every job requires
+`!github.event.repository.fork` and none of them touch content this
+governance system did not itself create/label.
+
+**Every other operation** (`disable`, `enable`, `update`, `upgrade`,
+`safe_outputs` replay, `create_labels`, `activity_report`,
+`close_agentic_workflows_issues`, `clean_cache_memories`,
+`update_pull_request_branches`, `validate`, `forecast`) is gated behind
+`workflow_dispatch`/`workflow_call` **and** an explicit non-default
+`inputs.operation` selection — none of them ever run on the daily schedule.
+A maintainer must deliberately pick that operation from the Actions tab (or
+an explicit `workflow_call`); this is the same "explicit human action
+required" pattern as `tessera-pr-fixer`'s `ai-fix-approved` label.
+`tests/test_governance_workflows.py::test_generated_maintenance_workflow_write_operations_require_explicit_operation_input`
+freezes this: every job outside the four default-cleanup jobs above must
+require a non-empty, non-`"none"` `inputs.operation` to run.
+
 ## Known limitations
 
 - The merge governor's unresolved-review-thread check is currently a

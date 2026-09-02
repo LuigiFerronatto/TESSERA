@@ -31,6 +31,21 @@ GH_AW_WORKFLOWS = {
 
 MERGE_GOVERNOR_PATH = WORKFLOWS_DIR / "tessera-merge-governor.yml"
 
+MAINTENANCE_WORKFLOW_PATH = WORKFLOWS_DIR / "agentics-maintenance.yml"
+
+# Jobs that gh-aw generates to run on the plain daily schedule (no explicit
+# operation input) purely to close items this governance system's own
+# expiring safe outputs (e.g. tessera-documentation-drift's
+# close-older-issues) already marked as superseded, or to prune stale
+# cache-memory entries. Every other job in the file is an admin-only
+# operation that must require an explicit `inputs.operation` selection.
+MAINTENANCE_DEFAULT_CLEANUP_JOBS = {
+    "close-expired-discussions",
+    "close-expired-issues",
+    "close-expired-pull-requests",
+    "cleanup-cache-memory",
+}
+
 
 def _read_source(workflow_id: str) -> str:
     path = WORKFLOWS_DIR / f"{workflow_id}.md"
@@ -298,6 +313,45 @@ def test_merge_governor_is_deterministic_yaml_not_ai_workflow():
     # conservative Stage A rollout.
     assert "gh pr merge" not in text
     assert re.search(r"issues/\$PR_NUMBER/merge|/pulls/\d+/merge|--auto\b", text) is None
+
+
+def test_generated_maintenance_workflow_write_operations_require_explicit_operation_input():
+    """The gh-aw-generated maintenance workflow must not silently run
+    write-capable admin operations on its plain daily schedule.
+
+    Flagged by the TESSERA PR Maintainer Audit (see PR #182): shipping this
+    file expands repository automation authority beyond the five named
+    gh-aw workflows and the merge governor. Rather than removing it (it is
+    required for `tessera-documentation-drift`'s `close-older-issues`
+    expiring safe output to actually close superseded issues), it is
+    documented in `docs/AGENTIC_GOVERNANCE.md` and constrained here: every
+    job other than the default cleanup jobs must require a non-default,
+    non-empty `inputs.operation` value, so none of them can fire from the
+    unattended daily `schedule` trigger.
+    """
+    assert MAINTENANCE_WORKFLOW_PATH.exists()
+    doc = yaml.safe_load(MAINTENANCE_WORKFLOW_PATH.read_text(encoding="utf-8"))
+    doc = {("on" if key is True else key): value for key, value in doc.items()}
+
+    assert "schedule" in doc["on"], "expected the maintenance workflow to still run on a schedule"
+
+    jobs = doc.get("jobs", {})
+    assert MAINTENANCE_DEFAULT_CLEANUP_JOBS <= jobs.keys(), (
+        "expected gh-aw's default cleanup jobs to still be present"
+    )
+
+    admin_jobs = jobs.keys() - MAINTENANCE_DEFAULT_CLEANUP_JOBS
+    assert admin_jobs, "expected at least one admin/operation-gated job to exist"
+    for job_name in admin_jobs:
+        condition = jobs[job_name].get("if", "")
+        assert "inputs.operation" in condition, (
+            f"job {job_name!r} must gate on inputs.operation so it cannot run "
+            "unattended from the daily schedule"
+        )
+        assert "workflow_dispatch" in condition or "workflow_call" in condition, (
+            f"job {job_name!r} must only run from an explicit workflow_dispatch/"
+            "workflow_call, never the schedule trigger"
+        )
 
 
 def test_merge_governor_binds_decision_to_current_head(monkeypatch):
