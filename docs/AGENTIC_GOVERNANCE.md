@@ -543,3 +543,11 @@ require a non-empty, non-`"none"` `inputs.operation` to run.
   `tessera-post-merge-lifecycle` have not yet executed against a live event
   in this delivery; compilation and static governance tests are the
   available pre-merge evidence for those three.
+- **Canonical merge record (post-merge lifecycle reconciliation of #181/#182):**
+  final candidate head `30bfdfa02735c9d68ce546182e00a68c205a1b6b` was merged
+  to `main` as canonical merge commit `c349bac48c5fb1427f15615fc26e4fbc748ed320`.
+  Tracker issue #181 is closed as `IMPLEMENTED` (Stage A only); it is not
+  `VALIDATED`, since that label is reserved for capabilities with required
+  CI/benchmark evidence against the canonical merge SHA and this delivery is
+  process/governance tooling with `NOT_APPLICABLE` benchmark applicability.
+  See `docs/ROADMAP.md`'s reconciliation matrix for the authoritative row.

@@ -1,6 +1,6 @@
 # TESSERA Roadmap
 
-> Authoritative portfolio audit: 2026-09-02 against canonical `main` `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429` (PR #175, safe project source discovery). Issue #172 owns the portfolio taxonomy; this lifecycle correction reconciles #154/#155 against the new canonical main. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
+> Authoritative portfolio audit: 2026-09-02 against canonical `main` `c349bac48c5fb1427f15615fc26e4fbc748ed320` (PR #182, agentic repository-governance system). Issue #172 owns the portfolio taxonomy; this lifecycle correction reconciles #154/#155/#181 against the new canonical main. This document separates **validated capability**, **dependency readiness**, and **selected WIP**. An open Issue/Test Card is not evidence that a capability is implemented, validated, or currently selected.
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
@@ -548,6 +548,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#78](https://github.com/LuigiFerronatto/TESSERA/issues/78) | open | `READY` | DOCUMENTATION | Docs | Project-agnostic legacy/deep-dive cleanup; coordinate #146, not technical WIP. |
 | [#80](https://github.com/LuigiFerronatto/TESSERA/issues/80) | open | `DEFERRED` | DOCUMENTATION | Docs | Visual/architecture documentation after target contracts stabilize. |
 | [#172](https://github.com/LuigiFerronatto/TESSERA/issues/172) | closed | `VALIDATED` | GOVERNANCE | Portfolio | `KEEP`; canonical execution funnel and WIP taxonomy reconciled by PR #174 after the #173 merge. |
+| [#181](https://github.com/LuigiFerronatto/TESSERA/issues/181) | closed | `TRACKER` (`IMPLEMENTED`, Stage A) | TRACKER | Governance | Coordination epic for the agentic repository-governance system; not itself executable. `KEEP`; PR #182 final candidate `30bfdfa02735c9d68ce546182e00a68c205a1b6b`, canonical merge `c349bac48c5fb1427f15615fc26e4fbc748ed320`. Delivered Stage A (report-only/comment-only/draft-only) triage, PR maintainer audit, opt-in fixer, deterministic merge governor, post-merge lifecycle reconciler and documentation-drift auditor; no `tessera/` runtime behavior changed. Not `VALIDATED`: Stage B+ auto-merge wiring, the real GraphQL unresolved-thread check, and cross-engine review evaluation remain unimplemented follow-ups under this tracker. |
 
 ---
 
