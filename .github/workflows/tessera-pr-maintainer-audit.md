@@ -11,10 +11,11 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  copilot-requests: write
 
 engine:
-  id: codex
-  version: "0.150.1"
+  id: copilot
+  version: "1.0.80"
 
 tools:
   bash: false

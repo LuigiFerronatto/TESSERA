@@ -77,7 +77,7 @@ issue opened/reopened
 
 pull request opened/synchronize/ready_for_review
   → TESSERA CI + Benchmark Ledger (deterministic, unchanged)
-  → tessera-pr-maintainer-audit.md (Codex): KEEP | ITERATE | BLOCK bound to exact head SHA
+  → tessera-pr-maintainer-audit.md (Copilot): KEEP | ITERATE | BLOCK bound to exact head SHA
 
 ITERATE
   → maintainer applies `ai-fix-approved` label (opt-in, never automatic)
@@ -95,7 +95,7 @@ KEEP + exact head unchanged + CI/Benchmark green + no unresolved threads
     the merge API in Stage A.
 
 human merges (branch protection enforced) → canonical merge on main
-  → tessera-post-merge-lifecycle.md (Codex): reconciles ROADMAP / Test Card /
+  → tessera-post-merge-lifecycle.md (Copilot): reconciles ROADMAP / Test Card /
     PR Evolution / dependent-issue routing / CHANGELOG (per Change Policy);
     opens one minimal draft lifecycle PR only when actual drift is found
 
@@ -252,7 +252,7 @@ Constraints enforced by `governance/merge_governor.py`:
 | `tessera-issue-triage.md` | best-effort | Issue stays untriaged; re-run manually or on reopen. No merge-authorization impact. |
 | `tessera-pr-maintainer-audit.md` | **fail-closed** | No audit comment → no authorization. `ENGINE_UNAVAILABLE` on the dedicated check; only escape is a bound human override. |
 | `tessera-pr-fixer.md` | fails, manual fix | PR is unchanged; a maintainer fixes it by hand or re-applies `ai-fix-approved`. |
-| `tessera-post-merge-lifecycle.md` | retry/fallback (future) | Lifecycle PR is simply not opened yet; `workflow_dispatch` re-run recovers it. Cross-engine fallback (e.g. Gemini as a Codex fallback) is explicitly deferred to a future stage. |
+| `tessera-post-merge-lifecycle.md` | retry/fallback (future) | Lifecycle PR is simply not opened yet; `workflow_dispatch` re-run recovers it. Cross-engine fallback (e.g. Gemini as a fallback) is explicitly deferred to a future stage. |
 | `tessera-documentation-drift.md` | best-effort | Next scheduled run recovers it; this is a periodic safety net, not a gate. |
 | `tessera-merge-governor.yml` | deterministic, no AI engine | Not subject to engine failure; this is the workflow that *interprets* engine-unavailable state for the other agents. |
 
@@ -260,23 +260,34 @@ Constraints enforced by `governance/merge_governor.py`:
 
 ```text
 Gemini  → issue triage and weekly documentation-drift reconnaissance (broad read)
-Codex   → independent semantic PR audit and post-merge lifecycle reconciliation
-          (deep contract reasoning, shell disabled for the reviewer)
-Copilot → explicitly opt-in code fixing where branch mutation is authorized
+Copilot → independent semantic PR audit, post-merge lifecycle reconciliation,
+          and opt-in code fixing where branch mutation is authorized
 GitHub Actions (deterministic) → merge authorization only
 ```
 
+`tessera-pr-maintainer-audit.md` and `tessera-post-merge-lifecycle.md`
+originally ran on `engine: {id: codex}`. Both were switched to
+`engine: {id: copilot}` after a live, external OpenAI account/billing
+failure on the Codex engine's `CODEX_API_KEY`/`OPENAI_API_KEY` blocked the
+required Maintainer Audit check on PR #182 (`stream disconnected before
+completion: Your account is not active`). A prior attempt to route Codex
+inference through Copilot billing (`engine.model: copilot/auto`) also
+failed live with `model_not_supported` (see "Known limitations"). Standard
+Copilot engine (`copilot-requests: write`, no external API key dependency)
+avoids both failure modes and is the current assignment for all three
+Copilot-billed roles.
+
 This assignment is an initial engineering hypothesis based on each engine's
-documented strengths (Codex/Claude have native deep contract reasoning;
-Gemini supports broad low-cost reconnaissance; Copilot has the broadest
-engine-specific feature set for controlled code mutation). It is **not**
-evidence that one model is objectively superior at each role. A future Test
-Card should measure this directly by running, for a sample of PRs:
+documented strengths (Copilot has the broadest engine-specific feature set,
+native agent selection, and no external-provider billing dependency;
+Gemini supports broad low-cost reconnaissance). It is **not** evidence that
+one model is objectively superior at each role. A future Test Card should
+measure this directly by running, for a sample of PRs:
 
 ```text
-R0: Codex reviewer only (current)
+R0: Copilot reviewer only (current)
 R1: Gemini reviewer only
-R2: Codex + Gemini independent reviewers
+R2: Copilot + Gemini independent reviewers
 ```
 
 and comparing: valid blocking findings, false-positive rate, unique valid
@@ -320,22 +331,25 @@ No secrets are committed by this change. A maintainer must configure:
   `GEMINI_API_KEY` repository/organization secret, or Google Workload
   Identity Federation if the installed gh-aw version's Gemini engine
   supports it in this environment.
-- **Codex** (`tessera-pr-maintainer-audit.md`, `tessera-post-merge-lifecycle.md`):
-  `CODEX_API_KEY`/`OPENAI_API_KEY` per the installed gh-aw Codex engine
-  configuration. Routing Codex inference through GitHub Copilot billing
-  (`engine.model: copilot/auto` + `copilot-requests: write`) was attempted
-  and reverted after a live failure: at the pinned engine version
-  (`0.150.1`), the Copilot API proxy rejected the literal model name `auto`
-  with `model_not_supported`, even though `copilot/auto` is gh-aw's
-  documented, tested pattern for this exact use case. This is tracked as a
-  known limitation (see below) rather than re-attempted blindly; a future
-  change should either pin an explicit non-`auto` Copilot model id (for
-  example `copilot/gpt-5.4`) or bump the engine version once compatibility
-  is confirmed in a low-stakes workflow first.
-- **Copilot** (`tessera-pr-fixer.md`): prefer organization-billed Copilot
-  requests (`copilot-requests: write`) if your GitHub plan/organization
-  supports it; otherwise configure the documented Copilot CLI authentication
-  for gh-aw.
+- **Codex**: previously used by `tessera-pr-maintainer-audit.md` and
+  `tessera-post-merge-lifecycle.md` (`CODEX_API_KEY`/`OPENAI_API_KEY`).
+  Both were switched to the Copilot engine after two consecutive live
+  failures on PR #182: routing Codex inference through Copilot billing
+  (`engine.model: copilot/auto`) failed with `model_not_supported` at the
+  pinned engine version (`0.150.1`), and reverting to direct OpenAI
+  billing then failed with an inactive/unbilled OpenAI account error
+  (`stream disconnected before completion: Your account is not active`).
+  Neither is a code defect in this repository; both were external
+  provider/billing failures. Codex is no longer used by any TESSERA
+  workflow as of this delivery — this is a design decision, not merely a
+  temporary workaround, since standard Copilot engine has no external
+  API-key dependency at all. See "Known limitations" for the full history.
+- **Copilot** (`tessera-pr-maintainer-audit.md`, `tessera-pr-fixer.md`,
+  `tessera-post-merge-lifecycle.md`): prefer organization-billed Copilot
+  requests (`copilot-requests: write`, granted to all three workflows) if
+  your GitHub plan/organization supports it; otherwise configure a
+  `COPILOT_GITHUB_TOKEN` secret (fine-grained PAT with Copilot Requests
+  access) per gh-aw's documented Copilot CLI authentication.
 
 Compile-time secret detection (`gh aw compile`) will flag any new secret
 requirement the first time a workflow using it is compiled; each one listed
@@ -489,26 +503,33 @@ require a non-empty, non-`"none"` `inputs.operation` to run.
   was fixed by gating on `mergeable` (raw git-conflict-only) instead — see
   "Engine-failure resilience" and the `mergeable_state` docstring in
   `governance/merge_governor.py`.
-- Attempting to route Codex inference billing through GitHub Copilot
-  (`engine.model: copilot/auto`) failed live on PR #182 at the pinned
-  engine version (`0.150.1`): the Copilot API proxy returned
-  `model_not_supported` for the literal model name `auto`, even though
+- `tessera-pr-maintainer-audit.md` and `tessera-post-merge-lifecycle.md`
+  moved from `engine: {id: codex}` to `engine: {id: copilot}` after two
+  consecutive live failures on PR #182, both external to this repository's
+  code: (1) `engine.model: copilot/auto` (routing Codex inference through
+  Copilot billing) failed with `model_not_supported` for the literal model
+  name `auto` at the pinned Codex engine version (`0.150.1`), even though
   `copilot/auto` is gh-aw's own documented and unit-tested pattern for this
   exact use case (verified against `github/gh-aw`'s
   `pkg/workflow/codex_engine_test.go` and `pkg/workflow/data/model_aliases.json`
-  upstream). This was reverted rather than worked around blindly; both
-  Codex workflows currently authenticate via `CODEX_API_KEY`/`OPENAI_API_KEY`
-  as before. Retrying this requires either an explicit non-`auto` Copilot
-  model id (e.g. `copilot/gpt-5.4`) or a newer pinned engine version,
-  validated in a low-stakes workflow before reapplying to the
-  fail-closed-required Maintainer Audit.
+  upstream); (2) reverting to direct `CODEX_API_KEY`/`OPENAI_API_KEY` billing
+  then failed with `stream disconnected before completion: Your account is
+  not active, please check your billing details on our website` — an
+  inactive/unbilled OpenAI account, unrelated to any workflow configuration.
+  Standard Copilot engine (`copilot-requests: write`) has no external
+  API-key dependency and avoids both failure modes; this fail-closed
+  Maintainer Audit engine failure is exactly what the `ENGINE_UNAVAILABLE`
+  break-glass override contract above exists to handle when it recurs.
 - This PR itself exercised `tessera-pr-maintainer-audit` and
-  `tessera-merge-governor` live (Codex engine, real GitHub Actions runs) and
-  both worked as designed, including correctly BLOCKing/ITERATEing on
-  several earlier heads (an OR-logic CI gate bug, a blank benchmark-issue
-  placeholder, non-reproducible engine-version pinning, a lock-file
-  compiler-version mismatch, an `agentics-maintenance.yml` scope leak, and
-  the `mergeStateStatus`/`workflow_dispatch` bugs above).
+  `tessera-merge-governor` live (real GitHub Actions runs, first on Codex,
+  then on Copilot) and both worked as designed, including correctly
+  BLOCKing/ITERATEing on several earlier heads (an OR-logic CI gate bug, a
+  blank benchmark-issue placeholder, non-reproducible engine-version
+  pinning, a lock-file compiler-version mismatch, an
+  `agentics-maintenance.yml` scope leak, and the
+  `mergeStateStatus`/`workflow_dispatch` bugs above), and correctly staying
+  fail-closed (not silently authorizing merge) through two consecutive
+  live engine failures.
   `tessera-issue-triage`, `tessera-pr-fixer`, and
   `tessera-post-merge-lifecycle` have not yet executed against a live event
   in this delivery; compilation and static governance tests are the

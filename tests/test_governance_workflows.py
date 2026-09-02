@@ -23,9 +23,9 @@ WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 
 GH_AW_WORKFLOWS = {
     "tessera-issue-triage": "gemini",
-    "tessera-pr-maintainer-audit": "codex",
+    "tessera-pr-maintainer-audit": "copilot",
     "tessera-pr-fixer": "copilot",
-    "tessera-post-merge-lifecycle": "codex",
+    "tessera-post-merge-lifecycle": "copilot",
     "tessera-documentation-drift": "gemini",
 }
 
