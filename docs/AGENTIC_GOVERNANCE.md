@@ -190,6 +190,72 @@ treated as sufficient authorization by itself; it is a visual aid only. See
 for the frozen behavior (a stale-SHA KEEP is proven not to authorize a newer
 head).
 
+## Engine-failure resilience: `ENGINE_UNAVAILABLE` and human override
+
+An AI provider running out of credits/quota, timing out, or hitting an auth
+failure is a distinct state from a completed audit that found a problem:
+
+```text
+BLOCK               "I analyzed this and found a problem."
+ENGINE_UNAVAILABLE   "I could not analyze this at all."
+```
+
+These must never be conflated. If the maintainer-audit workflow simply
+fails to produce a comment (for any reason, including engine failure), the
+absence of a parseable `AuditRecord` **fails closed** by default: no audit
+comment means no authorization, full stop. `is_engine_unavailable()`
+classifies the maintainer-audit workflow's own GitHub Actions run
+conclusion (`failure`, `timed_out`, `cancelled`, `action_required`) so the
+calling workflow can render an honest, explicit `ENGINE_UNAVAILABLE` state
+on the dedicated `TESSERA Maintainer Audit` check (via
+`audit_check_status`) instead of leaving it ambiguously pending forever.
+
+The **only** escape hatch is an explicit, head-bound human break-glass
+override, posted as a PR comment by a genuine maintainer:
+
+```markdown
+## Maintainer override — KEEP
+
+Audited head: `<exact sha>`
+Reason: engine_unavailable (quota_exceeded)
+```
+
+Constraints enforced by `governance/merge_governor.py`:
+
+- An override can only ever assert `KEEP`. There is no "override BLOCK" —
+  a maintainer can always simply decline to merge through ordinary
+  repository permissions, so no machine-readable override contract is
+  needed for that direction.
+- An override only becomes non-blocking when `audit is None` **and**
+  `engine_unavailable` is true. It can never substitute for, or override,
+  an actual completed `ITERATE`/`BLOCK` decision (see
+  `test_override_never_substitutes_for_a_real_block_decision`).
+- An override is bound to the exact current head SHA the same way an
+  audit is: a stale override (bound to a superseded head) does not
+  authorize a newer commit.
+- The override only relaxes the *aggregate* `tessera-merge-governor`
+  check. The dedicated `TESSERA Maintainer Audit` check is never faked to
+  `success` by an override — it honestly reports `ENGINE_UNAVAILABLE`
+  (`failure`) because the audit genuinely did not run. Branch protection
+  still requires CI and Benchmark green in every case; the override only
+  ever removes the semantic-audit blocker, never the deterministic ones.
+- The caller (`tessera-merge-governor.yml`) must only pass override
+  comments authored by a trusted human role (`OWNER`/`MEMBER`/
+  `COLLABORATOR`, non-bot) into `find_latest_override` — a bot-authored or
+  outside-contributor comment must never count, even if it matches the
+  override heading verbatim.
+
+### Per-workflow failure-mode policy
+
+| Workflow | Failure mode | Behavior when the engine is unavailable |
+| --- | --- | --- |
+| `tessera-issue-triage.md` | best-effort | Issue stays untriaged; re-run manually or on reopen. No merge-authorization impact. |
+| `tessera-pr-maintainer-audit.md` | **fail-closed** | No audit comment → no authorization. `ENGINE_UNAVAILABLE` on the dedicated check; only escape is a bound human override. |
+| `tessera-pr-fixer.md` | fails, manual fix | PR is unchanged; a maintainer fixes it by hand or re-applies `ai-fix-approved`. |
+| `tessera-post-merge-lifecycle.md` | retry/fallback (future) | Lifecycle PR is simply not opened yet; `workflow_dispatch` re-run recovers it. Cross-engine fallback (e.g. Gemini as a Codex fallback) is explicitly deferred to a future stage. |
+| `tessera-documentation-drift.md` | best-effort | Next scheduled run recovers it; this is a periodic safety net, not a gate. |
+| `tessera-merge-governor.yml` | deterministic, no AI engine | Not subject to engine failure; this is the workflow that *interprets* engine-unavailable state for the other agents. |
+
 ## Engine assignment (initial hypothesis, not a benchmark claim)
 
 ```text
@@ -255,10 +321,14 @@ No secrets are committed by this change. A maintainer must configure:
   Identity Federation if the installed gh-aw version's Gemini engine
   supports it in this environment.
 - **Codex** (`tessera-pr-maintainer-audit.md`, `tessera-post-merge-lifecycle.md`):
-  `CODEX_API_KEY`/`OPENAI_API_KEY` per the installed gh-aw Codex engine
-  configuration. Verify against the currently installed gh-aw version's
-  documented Codex auth options before enabling; do not assume a specific
-  Copilot-billed Codex model alias without confirming it is supported.
+  configured with `engine.model: copilot/auto`, routing Codex's BYOK
+  provider through GitHub Copilot inference instead of OpenAI directly.
+  This requires either `copilot-requests: write` in `permissions:` (both
+  workflows have it, for org-billed AIC) or a `COPILOT_GITHUB_TOKEN`
+  secret (PAT-based, seat-billed) if the org does not support the former.
+  Confirmed as an officially documented gh-aw feature at compile time
+  (`gh aw compile` succeeds and the `.lock.yml` embeds
+  `"agent_model":"copilot/auto"`).
 - **Copilot** (`tessera-pr-fixer.md`): prefer organization-billed Copilot
   requests (`copilot-requests: write`) if your GitHub plan/organization
   supports it; otherwise configure the documented Copilot CLI authentication
@@ -328,10 +398,12 @@ Stage A/B before auto-merge itself is enabled.
   not re-run unless the issue is reopened.
 - **Bad KEEP/ITERATE/BLOCK** — comment or push a new commit; a new commit
   automatically invalidates the prior audit (new head SHA) and re-triggers
-  `tessera-pr-maintainer-audit.md`. A maintainer can also simply disregard
-  the audit comment and merge through normal repository permissions — this
-  automation does not remove human merge ability, it only offers an
-  additional optional required check.
+  `tessera-pr-maintainer-audit.md`. With branch protection enforcing
+  `TESSERA Maintainer Audit` and `tessera-merge-governor` as required
+  checks, the merge button is genuinely blocked until a fresh KEEP lands —
+  a maintainer can no longer just disregard the audit comment. If the
+  audit engine itself is unavailable (not merely a bad decision), see
+  "Engine-failure resilience" above for the human break-glass override.
 - **Unwanted fixer run** — do not apply `ai-fix-approved`; if already
   applied, the label is auto-removed after one run (one-shot), so no
   additional action is needed to stop it recurring.

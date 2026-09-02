@@ -74,9 +74,16 @@ jobs:
         run: |
           set -euo pipefail
           gh pr view "$PR_NUMBER" --repo "$REPO" \
-            --json headRefOid,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup,files \
+            --json headRefOid,isDraft,mergeable,reviewDecision,statusCheckRollup,files \
             > pr.json
           gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate > comments.json
+          head_sha="$(python -c 'import json;print(json.load(open("pr.json")).get("headRefOid") or "")')"
+          # Latest run conclusion of the maintainer-audit workflow for this
+          # exact head, used to distinguish a confirmed engine failure
+          # (quota/auth/timeout/provider outage) from "hasn't run yet". See
+          # governance.merge_governor.is_engine_unavailable.
+          gh api "repos/$REPO/actions/workflows/tessera-pr-maintainer-audit.lock.yml/runs?head_sha=$head_sha&per_page=1" \
+            > audit_runs.json || echo '{"workflow_runs":[]}' > audit_runs.json
 
           python - <<'PY'
           import json
@@ -85,6 +92,8 @@ jobs:
               pr = json.load(fh)
           with open("comments.json", encoding="utf-8") as fh:
               comments = json.load(fh)
+          with open("audit_runs.json", encoding="utf-8") as fh:
+              audit_runs = json.load(fh)
 
           rollup = pr.get("statusCheckRollup") or []
 
@@ -126,12 +135,38 @@ jobs:
           # applicability declaration).
           benchmark_success = all_green("benchmark-reporting")
 
+          # `mergeable` (MERGEABLE/CONFLICTING/UNKNOWN) is GitHub's raw
+          # git-level merge-conflict computation. It is deliberately used
+          # here instead of `mergeStateStatus`, which is the *aggregate* of
+          # git mergeability AND every required status check (including
+          # this workflow's own `tessera-merge-governor` check). Gating on
+          # `mergeStateStatus` created a self-referential loop: the first
+          # pull_request_review-triggered run (right when a fresh audit
+          # submits its review) could see a stale/non-clean aggregate state
+          # from *before* this very run publishes its own checks, and
+          # reject an otherwise fully green head. `mergeable` has no such
+          # circular dependency — it reflects only whether the PR's diff
+          # applies cleanly against the base branch.
+          mergeable = pr.get("mergeable")
+          mergeable_state = {
+              "MERGEABLE": "clean",
+              "CONFLICTING": "conflicting",
+          }.get(mergeable)
+
+          # Latest run conclusion for the maintainer-audit workflow at this
+          # exact head, used by governance.merge_governor.is_engine_unavailable
+          # to distinguish a confirmed engine/provider failure from "the
+          # audit simply hasn't run yet" (both look like "no audit comment
+          # found" from the comment-scraping side alone).
+          audit_workflow_runs = audit_runs.get("workflow_runs") or []
+          audit_workflow_conclusion = (
+              audit_workflow_runs[0].get("conclusion") if audit_workflow_runs else None
+          )
+
           payload = {
               "current_head_sha": pr.get("headRefOid"),
               "is_draft": bool(pr.get("isDraft")),
-              "mergeable_state": (
-                  "clean" if pr.get("mergeStateStatus") == "CLEAN" else pr.get("mergeStateStatus")
-              ),
+              "mergeable_state": mergeable_state,
               "ci_success": ci_success,
               "benchmark_success": benchmark_success,
               "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
@@ -143,14 +178,25 @@ jobs:
               # branch-protection policy before relying on this gate alone.
               "has_unresolved_threads": False,
               "required_checks_satisfied": True,
+              "audit_workflow_conclusion": audit_workflow_conclusion,
               "comments": [
-                  {"id": c.get("id"), "body": c.get("body", ""), "created_at": c.get("created_at")}
+                  {
+                      "id": c.get("id"),
+                      "body": c.get("body", ""),
+                      "created_at": c.get("created_at"),
+                      "author_association": c.get("author_association"),
+                      "author_is_bot": (c.get("user") or {}).get("type") == "Bot",
+                  }
                   for c in comments
               ],
           }
           with open("payload.json", "w", encoding="utf-8") as fh:
               json.dump(payload, fh)
+
+          with open("head_sha.txt", "w", encoding="utf-8") as fh:
+              fh.write(payload["current_head_sha"] or "")
           PY
+          echo "head_sha=$(cat head_sha.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Evaluate deterministic gates
         id: evaluate
@@ -169,7 +215,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_SHA: ${{ steps.gather.outputs.head_sha }}
           RESULT_JSON: ${{ steps.evaluate.outputs.result }}
           STATUS: ${{ steps.evaluate.outputs.status }}
         shell: bash
@@ -183,7 +229,10 @@ jobs:
           import json
           data = json.loads('''$RESULT_JSON''')
           reasons = data.get("reasons") or []
-          print("\n".join(f"- {r}" for r in reasons) or "No blocking reasons.")
+          notes = data.get("notes") or []
+          lines = [f"- {r}" for r in reasons]
+          lines += [f"- (note) {n}" for n in notes]
+          print("\n".join(lines) or "No blocking reasons.")
           PY
           )"
           gh api "repos/$REPO/check-runs" \
@@ -212,7 +261,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_SHA: ${{ steps.gather.outputs.head_sha }}
           RESULT_JSON: ${{ steps.evaluate.outputs.result }}
         shell: bash
         run: |
@@ -221,18 +270,30 @@ jobs:
           import json
           import os
 
-          from governance.merge_governor import audit_check_conclusion
+          from governance.merge_governor import audit_check_status
 
           data = json.loads(os.environ["RESULT_JSON"])
           audit = data.get("audit")
-          conclusion = audit_check_conclusion(audit)
-          if conclusion is None:
-              # No audit recorded yet for this PR at all: leave the check
-              # unpublished so branch protection shows it as pending, not a
-              # false failure raised before the audit has run.
+          engine_unavailable = bool(data.get("engine_unavailable"))
+          status = audit_check_status(audit, engine_unavailable)
+          if status is None:
+              # No audit recorded yet, and no confirmed engine failure: leave
+              # the check unpublished so branch protection shows it as
+              # pending, not a false failure raised before the audit has had
+              # a chance to run.
               out = {"skip": True}
           else:
-              if audit.get("stale"):
+              conclusion = status["conclusion"]
+              label = status["status_label"]
+              if label == "ENGINE_UNAVAILABLE":
+                  summary = (
+                      "The maintainer-audit engine did not complete for this head "
+                      "(provider/quota/auth failure). This check fails closed: a "
+                      "human break-glass override (`## Maintainer override — KEEP`, "
+                      "from a trusted maintainer, with CI and Benchmark green) is "
+                      "the only path to authorize merge without a completed audit."
+                  )
+              elif label.startswith("STALE_"):
                   summary = (
                       f"Stale: audited head `{audit['audited_head_sha']}` does not "
                       "match the current head. A fresh audit is required."
