@@ -1,0 +1,162 @@
+# Canonical Execution/Queue ordering source for `scripts/sync_project_board.py`.
+#
+# ARCHITECTURE DECISION (see docs/PROJECT_BOARD_SYNC.md "Sources of truth"):
+#
+#   Status / Priority / Milestone
+#     -> derived from each issue's own "## Portfolio routing" /
+#        "## Authoritative portfolio routing" block (issue body is the
+#        source of truth), overlaid with live GitHub state (open/closed,
+#        linked PR draft/review state).
+#
+#   Execution (NOW/NEXT/LATER/UNSCHEDULED) / Queue (ordinal position)
+#     -> derived from THIS file, not from issue bodies and not by
+#        regex-scraping docs/ROADMAP.md prose. Issue bodies do not declare
+#        an Execution/Queue value today, and ROADMAP.md's prose is meant for
+#        humans, not a parser contract. This file is the single ordering
+#        source of truth; docs/ROADMAP.md's "Canonical execution board"
+#        section is the human-readable narrative of the same ordering and
+#        must be kept consistent with it, but is never machine-parsed.
+#
+# Do not add an issue to more than one bucket. `queue` is a global ordinal
+# (unique across every bucket); omit `queue` for items without a justified
+# exact position (they still get Execution, just no ordinal).
+#
+# `#16` intentionally appears once. Its P0 containment slice is queue 3
+# (NOW); the full temporal-supersession slice is a later revisit of the same
+# issue, not a second board row. That nuance is recorded in `notes`, not by
+# duplicating the issue in the queue.
+
+now:
+  - issue: 155
+    queue: 1
+    note: "Init UX / source selection. Next release-critical card in the validated #153->#154->#155->#118->#134 chain."
+  - issue: 135
+    queue: 2
+    note: "Decomposer fallback integrity. Parallel Technical Integrity lane; fixes documented LLM failure -> heuristic fallback vs actual runtime LLM failure -> []."
+  - issue: 16
+    queue: 3
+    note: "P0 conflict-resolver containment (stop destructive newest-only filtering). Full M4 temporal-supersession experiment (queue 24) remains a separate later slice of the same issue."
+
+next:
+  - issue: 118
+    queue: 4
+    note: "Clean-room onboarding/CI bootstrap, after #155."
+  - issue: 120
+    queue: 5
+    note: "MCP transport/runtime robustness. Can run in parallel."
+  - issue: 87
+    queue: 6
+    note: "LICENSE/CONTRIBUTING owner decision. Can run in parallel; blocked on owner, not engineering."
+  - issue: 134
+    queue: 7
+    note: "PyPI release, after #118 + #87."
+  - issue: 67
+    queue: 8
+  - issue: 12
+    queue: 9
+  - issue: 69
+    queue: 10
+  - issue: 70
+    queue: 11
+  - issue: 13
+    queue: 12
+  - issue: 157
+    queue: 13
+    note: "Deferred by WIP today (see deferred_status_override); queue position is where it resumes."
+  - issue: 163
+    queue: 14
+  - issue: 160
+    queue: 15
+  - issue: 158
+    queue: 16
+  - issue: 176
+    queue: 17
+  - issue: 192
+    queue: 18
+
+later:
+  - issue: 138
+    queue: 19
+  - issue: 136
+    queue: 20
+  - issue: 137
+    queue: 21
+  - issue: 73
+    queue: 22
+  - issue: 15
+    queue: 23
+  - issue: 139
+    queue: 25
+    note: "Deferred by WIP today; queue position is where it resumes."
+  - issue: 140
+    queue: 26
+  - issue: 25
+    queue: 27
+    note: "Deferred by WIP today; queue position is where it resumes."
+  - issue: 26
+    queue: 28
+  - issue: 159
+    queue: 29
+  - issue: 141
+    queue: 30
+  - issue: 71
+    queue: 31
+  - issue: 32
+    queue: 32
+  - issue: 72
+    queue: 33
+  - issue: 27
+    queue: 34
+  - issue: 20
+    queue: 35
+  - issue: 169
+    queue: 36
+  - issue: 167
+    queue: 37
+  - issue: 171
+    queue: 38
+  - issue: 196
+    queue: 39
+  - issue: 177
+    queue: 40
+  - issue: 190
+    queue: 41
+  - issue: 191
+    queue: 42
+  - issue: 121
+    queue: 43
+  - issue: 193
+    queue: 44
+  - issue: 19
+    queue: 45
+  - issue: 168
+    queue: 46
+  - issue: 21
+    queue: 47
+  - issue: 17
+    queue: 48
+
+# Issues whose own declared Status is READY (or similar) but which this
+# portfolio intentionally keeps parked (Project Status = Backlog) to protect
+# the NOW WIP limit. Execution/Queue above still records where they resume.
+deferred_status_override:
+  - 25
+  - 28
+  - 119
+  - 139
+  - 157
+  - 166
+
+# Type: epic/tracker issues. Coordination-only; never consume Queue/NOW WIP.
+trackers:
+  - 14
+  - 18
+  - 145
+  - 164
+  - 170
+  - 178
+
+# Issue title prefixes that mark repository-automation noise. Ignored
+# entirely: never added to the Project, never classified, never mutated.
+automation_title_prefixes:
+  - "[aw]"

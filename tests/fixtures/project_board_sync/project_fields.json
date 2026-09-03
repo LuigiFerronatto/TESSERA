@@ -1,0 +1,50 @@
+{
+  "data": {
+    "user": {
+      "projectV2": {
+        "id": "PVT_kwHOCdbSLs4BiQrN",
+        "fields": {
+          "nodes": [
+            { "id": "PVTF_lAHOCdbSLs4BiQrNzhhJXMw", "name": "Title", "dataType": "TITLE" },
+            {
+              "id": "PVTSSF_lAHOCdbSLs4BiQrNzhhJXNE",
+              "name": "Status",
+              "dataType": "SINGLE_SELECT",
+              "options": [
+                { "id": "f75ad846", "name": "Backlog" },
+                { "id": "13a3d9b7", "name": "Blocked" },
+                { "id": "e18bf179", "name": "Ready" },
+                { "id": "47fc9ee4", "name": "In progress" },
+                { "id": "aba860b9", "name": "In review" },
+                { "id": "98236657", "name": "Done" }
+              ]
+            },
+            {
+              "id": "PVTSSF_lAHOCdbSLs4BiQrNzhhJXPo",
+              "name": "Priority",
+              "dataType": "SINGLE_SELECT",
+              "options": [
+                { "id": "79628723", "name": "P0" },
+                { "id": "0a877460", "name": "P1" },
+                { "id": "da944a9c", "name": "P2" }
+              ]
+            },
+            {
+              "id": "PVTSSF_lAHOCdbSLs4BiQrNzhhKQb8",
+              "name": "HORIZON",
+              "dataType": "SINGLE_SELECT",
+              "options": [
+                { "id": "5f4068b8", "name": "NOW" },
+                { "id": "dd87723b", "name": "NEXT" },
+                { "id": "fdfe7571", "name": "LATER" },
+                { "id": "c91256fe", "name": "UNSCHEDULED" }
+              ]
+            },
+            { "id": "PVTF_lAHOCdbSLs4BiQrNzhhKWpk", "name": "Queue", "dataType": "NUMBER" },
+            { "id": "PVTF_lAHOCdbSLs4BiQrNzhhJXNU", "name": "Milestone", "dataType": "MILESTONE" }
+          ]
+        }
+      }
+    }
+  }
+}
