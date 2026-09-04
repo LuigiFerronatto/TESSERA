@@ -12,10 +12,11 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  copilot-requests: write
 
 engine:
-  id: gemini
-  version: "0.55.1"
+  id: copilot
+  version: "1.0.80"
 
 network: defaults
 
