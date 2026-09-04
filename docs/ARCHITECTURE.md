@@ -121,6 +121,34 @@ durable memories remain indexable, while selected existing project sources are
 stored as exact allow-list entries. The derived index is written only after
 confirmation and config persistence. Source bytes are never rewritten.
 
+## Episode decomposition failure boundary
+
+Episode decomposition is a pure candidate-producing step before persistence:
+
+```text
+episode
+  -> assisted structured extraction
+       valid non-empty list -> assisted candidates
+       valid []             -> intentional empty result
+       expected provider failure
+       parse/schema failure -> deterministic local fallback candidates
+  -> canonical typed writer
+  -> write gate
+  -> durable memory
+```
+
+The fallback is local, offline, repeatable and provider-independent. It does
+not retry, query another provider, use embeddings or write directly. Only the
+current provider-invocation and parsing/schema failure boundary can select it;
+unrelated programming errors propagate. Engine, Hook, CLI and MCP delegate to
+the same implementation. Diagnostics distinguish `assisted` from
+`deterministic_fallback` without changing the compatibility list-returning
+Python API.
+
+This repair does not redefine QUMem F/P/I semantics, episode construction or
+lineage. The three canonical drawers remain `facts`, `preferences` and
+`insights`, and all candidates use the same existing write gate.
+
 ## Current read / retrieval pipeline
 
 ```text

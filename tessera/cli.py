@@ -682,13 +682,21 @@ def cmd_decompose(args):
     episode = Episode(beginning=args.beginning, middle=args.middle, end=args.end)
     tags = args.tags.split(",") if args.tags else []
 
-    filepaths = engine.decompose_and_write_episode(
+    decomposition = engine.decompose_and_write_episode_result(
         mem_id_prefix=args.mem_id_prefix,
         episode_id=args.episode_id or args.mem_id_prefix,
         episode=episode,
         llm_fn=llm_fn,
         tags=tags,
     )
+    filepaths = list(decomposition.filepaths)
+    print(f"[tessera] decomposition_mode={decomposition.decomposition.mode}.", file=sys.stderr)
+    if decomposition.decomposition.fallback_reason:
+        print(
+            "[tessera] fallback_reason="
+            f"{decomposition.decomposition.fallback_reason}.",
+            file=sys.stderr,
+        )
     engine.build_index()
 
     from .display import get_console

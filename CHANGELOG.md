@@ -82,6 +82,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- Assisted episode decomposition now preserves a valid empty `[]` as an
+  intentional result, while expected provider failures, malformed responses
+  and invalid result schemas invoke the existing deterministic offline
+  heuristic. Fallback candidates still pass through the canonical write gate,
+  and CLI/MCP diagnostics identify the actual decomposition mode. ([#135](https://github.com/LuigiFerronatto/TESSERA/issues/135))
 - Recursive `.tessera-ignore` negations now reopen ignored ancestor paths for
   `**` matches, and mixed source clusters remain selectable from their safe
   children while retaining explicit forbidden-child counts. ([#154](https://github.com/LuigiFerronatto/TESSERA/issues/154))

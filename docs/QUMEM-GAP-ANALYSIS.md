@@ -83,23 +83,28 @@ para manter paridade total:
 - `TesseraEngine.decompose_and_write_episode(mem_id_prefix, episode_id, episode, llm_fn, tags)`
 - `TesseraTaskHook.on_task_end_auto(task_instruction, episode, mem_id_prefix, llm_fn, tags)`
   — alternativa automática ao `on_task_end` manual existente
-- CLI: `tessera decompose <storage_dir> --mem-id-prefix ... --beginning ... --middle ... --end ... [--use-llm]`
-- MCP: tool `decompose_episode(mem_id_prefix, beginning, middle, end, ..., use_llm, llm_backend, llm_engine)`
+- CLI: `tessera decompose <storage_dir> --mem-id-prefix ... --beginning ... --middle ... --end ... --llm-backend <explicit-compatibility-name>`
+- MCP: tool `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id=None, tags=None)`
 
 Cada memória extraída ainda passa pelo `WriteGatingEngine` normal (a
 decomposição só decide *quantas* notas propor, nunca contorna o gate de
 segurança). Dois modos de extração:
-- **LLM real** (`use_llm=True`): 1 chamada ao modelo pede um array JSON
+- **LLM real**: 1 chamada ao modelo pede um array JSON
   `[{"type": ..., "content": ...}, ...]`; parsing tolerante a fences
-  Markdown/prosa ao redor. **Testado ao vivo com o backend Azure Gateway
+  Markdown/prosa ao redor. Um array válido é autoritativo: `[]` significa
+  sucesso sem candidatos e nunca aciona fallback. Falha esperada do provedor,
+  resposta não analisável ou root/schema inválido aciona a heurística local;
+  erros de programação e invariantes não são silenciados. **Testado ao vivo com o backend Azure Gateway
   real** (não simulado) — um episódio de exemplo (bug de connection-pool
   em produção) extraiu corretamente 8 memórias atômicas (6 facts, 1
   preference, 1 procedural_anchor) em 4.6s; outro exemplo (bug de índice
   composto) extraiu 5 memórias em ~3s. Saída malformada degrada
   graciosamente para a heurística offline em vez de falhar.
-- **Heurística offline** (padrão, sem `use_llm`): classificador
+- **Heurística offline** (sem callable ou como fallback diagnosticado): classificador
   determinístico por linha + palavras-chave (sem dependência de rede/API
-  key), mesmo trade-off que `TesseraOrchestrator._simulated_llm` já assume.
+  key, retry, modelo, embedding ou segundo provedor). CLI/MCP mantêm sua
+  exigência atual de seleção de backend; uma falha depois da seleção usa essa
+  mesma implementação canônica do Engine/Hook.
 
 `mem_id_prefix` é obrigatoriamente prefixado por domínio (reforça o fix do
 bug #0 acima) — cada memória extraída vira
@@ -172,8 +177,7 @@ automática"), não uma ineficiência a ser corrigida.
 
 | Capacidade | Engine (Python) | Hook (Python) | CLI | MCP tool |
 |---|---|---|---|---|
-| Decomposição automática | `TesseraEngine.decompose_and_write_episode(...)` | `TesseraTaskHook.on_task_end_auto(...)` | `tessera decompose <dir> --mem-id-prefix ... --beginning ... --middle ... --end ... [--use-llm]` | `decompose_episode(mem_id_prefix, beginning, middle, end, ..., use_llm, llm_backend, llm_engine)` |
+| Decomposição automática | `TesseraEngine.decompose_and_write_episode(...)` | `TesseraTaskHook.on_task_end_auto(...)` | `tessera decompose <dir> --mem-id-prefix ... --beginning ... --middle ... --end ... --llm-backend <name>` | `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id=None, tags=None)` |
 | Fronteira de episódio | `from tessera.episode_boundary import EpisodeBoundaryTracker` | — (primitiva de biblioteca, sem wiring de hook ainda) | — (sem CLI dedicado; uso é programático) | — (sem MCP tool dedicado; uso é programático) |
 
 Ver `Tessera/README.md`, seção "🧩 Decomposição automática de episódios" e "🕐 Detecção de fronteira de episódio", para exemplos de uso completos.
-

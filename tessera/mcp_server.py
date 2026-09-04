@@ -321,19 +321,24 @@ def decompose_episode(
         raise ValueError("FATAL: A real LLM backend is required but none is configured.")
 
     episode = Episode(beginning=beginning, middle=middle, end=end)
-    filepaths = _engine.decompose_and_write_episode(
+    decomposition = _engine.decompose_and_write_episode_result(
         mem_id_prefix=mem_id_prefix,
         episode_id=episode_id or mem_id_prefix,
         episode=episode,
         llm_fn=llm_fn,
         tags=tags or [],
     )
+    filepaths = list(decomposition.filepaths)
+    mode = decomposition.decomposition.mode
     _engine.build_index()
     return {
         "mem_id_prefix": mem_id_prefix,
         "filepaths": filepaths,
         "count": len(filepaths),
-        "llm_backend_used": backend_used,
+        "llm_backend_used": backend_used if mode == "assisted" else None,
+        "llm_backend_attempted": backend_used,
+        "decomposition_mode": mode,
+        "fallback_reason": decomposition.decomposition.fallback_reason,
     }
 
 

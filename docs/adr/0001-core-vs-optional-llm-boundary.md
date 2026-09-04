@@ -125,9 +125,13 @@ Engine and task-hook wrapper but does not resolve or probe a provider. Assisted
 MCP tools still need the lifecycle/envelope refactor owned by #120; direct MCP
 retrieval remains deterministic.
 
-**CURRENT** `decompose_episode()` invokes an LLM and returns no extracted
-memories on call or parse failure. A heuristic helper exists but is not reached
-by the current public path.
+**CURRENT** `decompose_episode()` keeps assisted success distinct from assisted
+failure. A valid JSON array is authoritative, including an intentional empty
+`[]`. Expected provider failures, unparseable responses and invalid result
+schemas reach the deterministic local heuristic. The diagnostic result API
+labels that path `deterministic_fallback`; the compatibility API still returns
+the same list shape. Fallback candidates are not durable until the ordinary
+write gate accepts them.
 
 ### Public entry points and output contracts
 
@@ -140,7 +144,7 @@ by the current public path.
 | CURRENT | CLI `start` | real-LLM orchestration around retrieval | generated need/query/context plus raw hits in rendering |
 | CURRENT | MCP `query_memories_pipeline()` | real-LLM hook orchestration | generated context plus `raw_memories` and backend name |
 | CURRENT | `TesseraTaskHook` | assisted pre-task context; explicit or assisted post-task writes | interception result or persisted paths |
-| CURRENT | CLI/MCP/Python episode decomposition | real-LLM extraction and gated writes | extracted/written memories or empty result on failure |
+| CURRENT | CLI/MCP/Python episode decomposition | assisted extraction; deterministic heuristic on expected provider/parse/schema failure; gated writes | extracted/written memories plus truthful mode diagnostics where supported; valid `[]` remains empty |
 | CURRENT | `tessera` package exports | exposes core and orchestrator/hook types together | flat import surface |
 
 **CURRENT** A retrieval hit preserves stable memory ID, rank order, retrieval
@@ -316,8 +320,10 @@ must identify the requested capability and leave core evidence usable where it
 already exists.
 
 **DEPRECATED** Prompt echo, undocumented backend failover, “simulated” output,
-or heuristic output presented under the same assisted contract are prohibited
-fallbacks because they silently change semantics.
+or heuristic output presented as assisted success are prohibited fallbacks
+because they silently change semantics. The episode decomposer's documented
+deterministic fallback is a separate, explicitly labelled result mode; it
+neither invokes another provider nor persists around the ordinary write gate.
 
 ## Security implications
 
@@ -426,7 +432,7 @@ documented deviation until a scoped compatibility plan is accepted.
 | DEPRECATED | Generated context lacks stable model/adapter/prompt metadata and machine-checked evidence links | add a versioned derived-output envelope that embeds/references the untouched retrieval contract |
 | DEPRECATED | `query_store()` uses a reduced projection while direct `query_memories()` has parity | decide whether typed-store transport adopts the same lossless contract in a dedicated contract change |
 | DEPRECATED | Core and assisted types are flattened in package exports | introduce clear import/install namespaces only with compatibility and packaging tests |
-| DEPRECATED | Episode-decomposition heuristic is documented but unreachable | remove the claim or implement an explicit deterministic compiler under its own Test Card |
+| CURRENT | Episode-decomposition heuristic is the explicit deterministic fallback for expected provider, parse and schema failures | keep valid `[]` authoritative; keep fallback local/offline and label its diagnostics truthfully under Test Card #135 |
 
 **PROPOSED FOLLOW-UP** Migration is incremental: preserve O0 first, isolate MCP
 startup, define adapter interfaces and envelopes, then run controlled O1–O4

@@ -300,6 +300,30 @@ jobs:
           )
           PY
 
+          # Issue #135: expected provider failure reaches the deterministic
+          # offline decomposer, while a valid empty assisted result stays empty.
+          python - <<'PY'
+          from tessera.decomposer import (
+              _decompose_via_heuristic,
+              decompose_episode,
+          )
+          from tessera.models import Episode
+
+          episode = Episode(
+              beginning="The project uses SQLite.",
+              middle="The provider became unavailable.",
+              end="Always test the local fallback.",
+          )
+
+          def provider_failure(*_args):
+              raise RuntimeError("offline smoke provider failure")
+
+          assert decompose_episode(episode, provider_failure) == (
+              _decompose_via_heuristic(episode)
+          )
+          assert decompose_episode(episode, lambda *_args: "[]") == []
+          PY
+
       - name: Upload CLI smoke output
         if: always()
         uses: actions/upload-artifact@v4

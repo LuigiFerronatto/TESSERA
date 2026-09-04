@@ -273,9 +273,12 @@ tessera decompose ./memories \
   --tags "postgres,performance"
 ```
 
-Não há hoje fallback heurístico alcançável nesse comando. Falha de chamada ou
-de parsing produz uma lista vazia. Cada memória extraída passa pelo
-`WriteGatingEngine`; decomposição não contorna a auditoria/sanitização de
+Uma resposta estruturada válida é autoritativa: memórias não vazias são
+gravadas e `[]` significa intencionalmente “nenhuma memória”, sem fallback.
+Falha esperada do provedor, JSON não analisável ou schema/root inválido ativa a
+heurística local determinística. O stderr informa `decomposition_mode` e, no
+fallback, `fallback_reason`. Cada candidato — assistido ou heurístico — passa
+pelo `WriteGatingEngine`; decomposição não contorna a auditoria/sanitização de
 escrita.
 Após rodar, **reindexe** (`tessera index <dir>`) para as novas notas entrarem
 na busca — a não ser que a próxima chamada de `query`/`list` já dispare
@@ -406,7 +409,10 @@ seleção de adapter; a ampliação desse envelope pertence à issue #120:
 Equivalente MCP de `tessera decompose`: extrai N memórias tipadas de um
 episódio bruto e grava todas em `{mem_id_prefix}/{tipo}-{n}.md`, sem sair
 do agente hospedeiro. Exige um backend LLM real resolvível e não aceita flags
-de seleção ou simulação na assinatura atual.
+de seleção ou simulação na assinatura atual. Se o backend selecionado falhar,
+a tool usa o mesmo fallback determinístico do Engine. A resposta informa
+`decomposition_mode`, `fallback_reason`, `llm_backend_attempted` e só preenche
+`llm_backend_used` quando a extração assistida realmente foi usada.
 
 ```jsonc
 { "mem_id_prefix": "research/meu-topico", "beginning": "...", "middle": "...", "end": "..." }
@@ -526,6 +532,12 @@ memories = decompose_episode(
 for m in memories:
     print(m.mem_type, m.content[:80])
 ```
+
+`decompose_episode()` não grava arquivos. Com backend assistido, `[]` é uma
+resposta válida e permanece vazia. Falha esperada de invocação, parsing ou
+schema usa o classificador local determinístico; erros de programação não são
+silenciados como fallback. Para diagnóstico sem mudar o formato legado de
+lista, use `decompose_episode_result()` e leia `mode`/`fallback_reason`.
 
 ### Detecção automática de fronteira de episódio (`EpisodeBoundaryTracker`)
 
