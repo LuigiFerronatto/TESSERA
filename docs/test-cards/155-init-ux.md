@@ -5,7 +5,7 @@
 | Issue | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `CLI_ONBOARDING` |
-| Pull request | Pending |
+| Pull request | [#210](https://github.com/LuigiFerronatto/TESSERA/pull/210) |
 | Branch | `feature/155-init-ux` |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
@@ -139,12 +139,12 @@ is started by this implementation branch.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #155](https://github.com/LuigiFerronatto/TESSERA/issues/155) |
-| Pull request | Pending |
+| Pull request | [PR #210](https://github.com/LuigiFerronatto/TESSERA/pull/210) |
 | Starting main | `51d7f6240dc094ef57ea0d42f38e69976a96d381` |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Pending exact-head audit |
 | Benchmark record | `SMOKE_ONLY`; LongMemEval not required |
-| PR Evolution Audit | Pending |
+| PR Evolution Audit | [PR_EVOLUTION_155.md](../PR_EVOLUTION_155.md) |
 
 ## Evolution
 

@@ -40,7 +40,7 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 0
+NOW executable                 1
 READY                          7 total / 4 executable
 BLOCKED                        39 full cards + #16 full phase
 TRACKER                        5 non-executable epics
@@ -241,7 +241,7 @@ semantics stabilize.
 FIRST PUBLIC RELEASE
 #153 VALIDATED
   -> #154 source discovery VALIDATED
-      -> #155 init UX READY
+      -> #155 init UX IN_PROGRESS
           -> #118 clean onboarding BLOCKED
               -> #134 PyPI release BLOCKED
 
@@ -421,7 +421,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
        -> #117 config/discovery v1   VALIDATED
             -> #153 config v2        VALIDATED
                  -> #154 sources     VALIDATED
-                      -> #155 init UX READY
+                      -> #155 init UX IN_PROGRESS
                            -> #118 clean onboarding BLOCKED
                                 -> #134 first PyPI release BLOCKED
 
@@ -675,7 +675,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
 | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
-| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `READY` | EXECUTABLE | Productization | #117/#153/#154 are satisfied; no active blocker remains. Owns interactive/non-interactive Init UX and is the next release-critical implementation candidate. |
+| [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | open | `IN_PROGRESS` | EXECUTABLE | Productization | PR #210 is the active Queue #1 implementation candidate. #117/#153/#154 are satisfied; final exact-head CI, Maintainer Audit and canonical merge remain pending. |
 | [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #155 lane is primary. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
 | [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
@@ -939,7 +939,7 @@ After the #154 canonical merge and lifecycle reconciliation:
 
 ```text
 #154 Safe project source discovery + .tessera-ignore  VALIDATED
-#155 Init UX / source selection                          READY — next primary
+#155 Init UX / source selection                          IN_PROGRESS — PR #210
 #135/#16 optional parallel integrity lane              not selected
 ```
 
@@ -971,7 +971,7 @@ PRODUCTIZATION / RELEASE
      -> #117 VALIDATED
          -> #153 VALIDATED
              -> #154 VALIDATED
-                 -> #155 READY
+                 -> #155 IN_PROGRESS
                      -> #118 BLOCKED
                          -> #134 BLOCKED
 #87 ADMIN ------------------------------------------^
