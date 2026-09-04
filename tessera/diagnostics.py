@@ -28,7 +28,12 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from .config import CANONICAL_STORAGE_ENV, LEGACY_STORAGE_ENV, resolve_storage_dir
+from .config import (
+    CANONICAL_STORAGE_ENV,
+    LEGACY_STORAGE_ENV,
+    ResolvedConfiguration,
+    resolve_storage_dir,
+)
 
 
 @dataclass
@@ -64,7 +69,9 @@ class DoctorReport:
         }
 
 
-def run_doctor(storage_dir: str) -> DoctorReport:
+def run_doctor(
+    storage_dir: str, *, configuration: Optional[ResolvedConfiguration] = None
+) -> DoctorReport:
     """
     Runs a sequence of independent smoke tests against `storage_dir`.
     Never raises — every check catches its own exceptions and reports
@@ -100,7 +107,11 @@ def run_doctor(storage_dir: str) -> DoctorReport:
     try:
         from .engine import TesseraEngine
 
-        engine = TesseraEngine(storage_dir=storage_dir)
+        engine = (
+            TesseraEngine(configuration=configuration)
+            if configuration is not None
+            else TesseraEngine(storage_dir=storage_dir)
+        )
         engine.build_index()
         report.checks.append(CheckResult(
             "índice constrói sem erro", True,

@@ -146,6 +146,7 @@ def test_post_init_commands_resolve_custom_project_store_without_paths(tmp_path,
         "init", "--project", str(project), "--store", "knowledge/generated",
         "--sources", "recommended", "--non-interactive",
     ], capsys)[0] == 0
+    assert not (project / "knowledge" / "generated" / ".tessera_index").exists()
     monkeypatch.chdir(project)
 
     assert cli.main(["index", "--plain"]) == 0
@@ -154,6 +155,8 @@ def test_post_init_commands_resolve_custom_project_store_without_paths(tmp_path,
     assert json.loads(capsys.readouterr().out)
     assert cli.main(["doctor", "--plain"]) == 0
     assert str((project / "knowledge" / "generated").resolve()) in capsys.readouterr().out
+    assert not (project / "knowledge" / "generated" / ".tessera_index").exists()
+    assert (project / ".tessera" / "index" / "graph.json").is_file()
 
 
 def test_noninteractive_requires_explicit_source_policy_and_never_prompts(tmp_path, monkeypatch, capsys):

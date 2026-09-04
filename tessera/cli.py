@@ -734,7 +734,10 @@ def cmd_doctor(args):
     from .diagnostics import run_doctor
     from .display import get_console, print_doctor_report_plain, render_doctor_report
 
-    report = run_doctor(args.storage_dir)
+    report = run_doctor(
+        args.storage_dir,
+        configuration=getattr(args, "storage_selection", None),
+    )
 
     console = get_console(force_plain=getattr(args, "plain", False))
     if console is not None:
@@ -1168,7 +1171,9 @@ def main(argv=None):
                         for name in (CANONICAL_STORAGE_ENV, LEGACY_STORAGE_ENV)
                     )
                     if configured_project or configured_environment:
-                        args.storage_dir = _selection_from_args(args).storage_dir
+                        selection = _selection_from_args(args)
+                        args.storage_selection = selection
+                        args.storage_dir = selection.storage_dir
                     else:
                         args.storage_dir = resolve_storage_dir(None)
                 else:
