@@ -77,12 +77,41 @@ export TESSERA_STORAGE_DIR="$PWD/memories"
 
 ## CLI — Referência completa
 
-### `tessera init <dir>` — inicializar um diretório de memórias
+### `tessera init` — planejar e inicializar um projeto com segurança
 
 ```bash
-tessera init ./memories
+# assistente interativo: descobre, seleciona, mostra o plano e confirma
+tessera init
+
+# automação/CI: todas as decisões materiais ficam explícitas
+tessera init --project . --store memories \
+  --sources recommended --non-interactive
+
+# seleção customizada
+tessera init --project . --store memories --sources custom \
+  --source README.md --source docs --non-interactive
+
+# somente as novas memórias geradas, sem fontes externas do projeto
+tessera init --project . --store memories \
+  --sources memory-only --non-interactive
+
+# plano completo, sem criar config/store/index
+tessera init --project . --store memories \
+  --sources recommended --dry-run --json
 ```
-Constrói o índice pela primeira vez e confirma quantos nós já existem.
+
+Três locais diferentes são preservados: **memórias geradas** (`store.path`),
+**fontes de conhecimento** (`sources.roots`) e **índice derivado**
+(`index.path`). O modo interativo pede confirmação antes da primeira mutação.
+`--dry-run` e cancelamento fazem zero mutações. Fontes `FORBIDDEN` nunca podem
+ser selecionadas. Uma exclusão só é gravada em `.tessera-ignore` quando
+`--persist-exclusion PATH` é passado explicitamente. Para mudar uma configuração
+existente em modo não interativo, primeiro inspecione o dry-run e depois use
+`--update-existing`.
+
+O formato posicional antigo (`tessera init ./memories`) continua como alias de
+compatibilidade, conservador e store-only. Para novos scripts, prefira as flags
+explícitas acima.
 
 ---
 

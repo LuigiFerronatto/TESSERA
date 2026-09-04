@@ -110,7 +110,7 @@ def test_p8_tty_init_shows_plan_and_confirms(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg"))
     monkeypatch.setattr("sys.stdin.isatty", lambda: True)
-    answers = iter(["1", "yes"])
+    answers = iter(["1", "", "1", "yes"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(answers))
     assert cli.main(["init", "--plain"]) == 0
     output = capsys.readouterr().out
@@ -125,7 +125,7 @@ def test_p9_noninteractive_missing_choice_has_no_input_or_mutation(tmp_path, mon
     assert cli.main(["init", "--non-interactive"]) == 2
     assert "needs --project" in capsys.readouterr().err
     assert list(tmp_path.iterdir()) == []
-    assert cli.main(["init", "--project", ".", "--store", "store", "--non-interactive", "--json"]) == 0
+    assert cli.main(["init", "--project", ".", "--store", "store", "--sources", "memory-only", "--non-interactive", "--json"]) == 0
     assert (tmp_path / ".tessera" / "config.yaml").is_file()
 
 

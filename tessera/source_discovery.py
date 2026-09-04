@@ -177,6 +177,17 @@ class IgnoreRuleSet:
                     "unreadable_ignore_file", relative, str(exc),
                 ),
             )
+        return cls.parse(text, display_path=relative)
+
+    @classmethod
+    def parse(
+        cls, text: str, *, display_path: str = IGNORE_FILENAME
+    ) -> Tuple["IgnoreRuleSet", Tuple[SourceDiscoveryDiagnostic, ...]]:
+        """Parse ignore text without touching the filesystem.
+
+        Initialization planning uses this same canonical parser to validate a
+        proposed explicit ignore edit before the edit is persisted.
+        """
         rules: List[_IgnoreRule] = []
         diagnostics: List[SourceDiscoveryDiagnostic] = []
         for number, raw in enumerate(text.splitlines(), start=1):
@@ -198,7 +209,7 @@ class IgnoreRuleSet:
                 diagnostics.append(
                     SourceDiscoveryDiagnostic(
                         "invalid_ignore_pattern",
-                        relative,
+                        display_path,
                         f"line {number}: unsupported pattern {raw!r}",
                     )
                 )
@@ -439,6 +450,7 @@ def discover_sources(
     configuration: Optional[ResolvedConfiguration] = None,
     *,
     max_file_size: int = DEFAULT_MAX_SOURCE_BYTES,
+    _ignore_text: Optional[str] = None,
 ) -> SourceDiscoveryPlan:
     """Return a deterministic discovery plan without mutating project state."""
     if max_file_size <= 0:
@@ -447,7 +459,12 @@ def discover_sources(
     root = lexical_root.resolve(strict=True)
     if not root.is_dir():
         raise ValueError(f"project_root is not a directory: {root}")
-    ignore_rules, diagnostics = IgnoreRuleSet.load(root / IGNORE_FILENAME, root=root)
+    if _ignore_text is None:
+        ignore_rules, diagnostics = IgnoreRuleSet.load(root / IGNORE_FILENAME, root=root)
+    else:
+        ignore_rules, diagnostics = IgnoreRuleSet.parse(
+            _ignore_text, display_path=IGNORE_FILENAME
+        )
     warnings: List[SourceDiscoveryDiagnostic] = list(diagnostics)
     candidates: List[SourceCandidate] = []
     configured = _configured_roots(configuration, root)
@@ -681,6 +698,22 @@ def discover_sources(
         warnings=tuple(sorted(warnings, key=lambda item: (item.code, item.path, item.detail))),
         metrics=metrics,
         max_source_file_bytes=max_file_size,
+    )
+
+
+def discover_sources_with_ignore_text(
+    project_root: Union[os.PathLike, str],
+    ignore_text: str,
+    configuration: Optional[ResolvedConfiguration] = None,
+    *,
+    max_file_size: int = DEFAULT_MAX_SOURCE_BYTES,
+) -> SourceDiscoveryPlan:
+    """Preview discovery with proposed ignore text and zero mutation."""
+    return discover_sources(
+        project_root,
+        configuration,
+        max_file_size=max_file_size,
+        _ignore_text=ignore_text,
     )
 
 

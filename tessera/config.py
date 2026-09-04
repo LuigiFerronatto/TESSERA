@@ -303,15 +303,15 @@ class ProjectConfig:
                     Path(source.path).resolve(strict=False), project_root
                 )
             ]
-            if external_sources and not (
-                len(sources) == 1
-                and Path(sources[0].path).resolve(strict=False)
-                == Path(store.path).resolve(strict=False)
-                and sources[0].include == ("**/*.md",)
+            if any(
+                Path(source.path).resolve(strict=False)
+                != Path(store.path).resolve(strict=False)
+                or source.include != ("**/*.md",)
+                for source in external_sources
             ):
                 raise ConfigurationError(
-                    "external source roots are allowed only for a conservative "
-                    "store-only v1 migration"
+                    "an external source root is allowed only when it is the exact "
+                    "generated-memory store with the conservative Markdown pattern"
                 )
             index = IndexRecord.from_mapping(
                 raw.get("index"), project_root=project_root,
@@ -628,6 +628,44 @@ def _safe_atomic_yaml_write(path: Path, value: Mapping[str, Any]) -> None:
             temporary = handle.name
             os.chmod(temporary, stat.S_IRUSR | stat.S_IWUSR)
             handle.write(rendered)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        temporary = None
+        try:
+            directory_fd = os.open(parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+        except OSError:
+            pass
+    finally:
+        if temporary:
+            try:
+                os.unlink(temporary)
+            except FileNotFoundError:
+                pass
+
+
+def safe_atomic_text_write(path: Path, text: str) -> None:
+    """Atomically replace a UTF-8 text file without following symlinks."""
+    path = path.absolute()
+    if path.is_symlink():
+        raise ConfigurationError(f"refusing to replace symlink file: {path}")
+    parent = path.parent
+    if parent.exists() and parent.is_symlink():
+        raise ConfigurationError(f"refusing to write through symlink directory: {parent}")
+    parent.mkdir(parents=True, exist_ok=True)
+    temporary: Optional[str] = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=parent, prefix=f".{path.name}.",
+            suffix=".tmp", delete=False,
+        ) as handle:
+            temporary = handle.name
+            os.chmod(temporary, stat.S_IRUSR | stat.S_IWUSR)
+            handle.write(text)
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, path)

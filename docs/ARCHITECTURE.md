@@ -77,8 +77,10 @@ excluded from source iteration and can be deleted/rebuilt independently.
 Schema-v1 project configuration, direct `storage_dir`, environment selection,
 and named-global stores conservatively use their prior store as the sole source.
 They do not gain project README/docs/research files on upgrade. Explicit v2
-project roots must remain physically contained by the project, and symlink
-escapes fail safely. A named global store never absorbs current-project sources.
+source roots must remain physically contained by the project, except for the
+exact generated-memory store when the user selected it outside the project;
+symlink escapes fail safely. A named global store never absorbs current-project
+sources.
 
 Project source discovery is a separate read-only proposal layer:
 
@@ -97,8 +99,27 @@ skips all symlinks, performs metadata-first size/format checks, never traverses
 ancestors/siblings/home, and returns explicit reason codes. Mandatory
 exclusions run before ignore negation, so derived indexes, `.git`, special
 files and high-confidence secret/key artifacts cannot become selectable.
-Discovery does not mutate configured `sources`; display/selection/confirmation,
-config persistence, and index construction remain #155.
+Discovery does not mutate configured `sources`. Issue #155 consumes that plan
+through a separate application boundary:
+
+```text
+InitRequest
+  -> SourceDiscoveryPlan
+  -> explicit source policy
+  -> InitializationPlan + preflight
+  -> human/JSON rendering
+  -> confirmation (interactive only)
+  -> config / explicit ignore mutation
+  -> canonical Engine indexing of selected roots
+```
+
+Interactive, non-interactive, dry-run and JSON modes all serialize the same
+`InitializationPlan`. Planning never constructs an Engine and therefore cannot
+create a store or index. Cancel and dry-run stop before the apply boundary.
+Project configuration includes the generated store as a readable source so new
+durable memories remain indexable, while selected existing project sources are
+stored as exact allow-list entries. The derived index is written only after
+confirmation and config persistence. Source bytes are never rewritten.
 
 ## Current read / retrieval pipeline
 

@@ -201,6 +201,33 @@ jobs:
           corpus="$(mktemp -d)"
           mkdir -p artifacts
 
+          # Issue #155 onboarding smoke: dry-run and applied JSON share one
+          # source-aware plan, and dry-run creates no canonical state.
+          init_project="$(mktemp -d)"
+          mkdir -p "$init_project/docs"
+          printf '# Project\n\nInitialization smoke.\n' > "$init_project/README.md"
+          printf '# Guide\n\nSelected source.\n' > "$init_project/docs/guide.md"
+          tessera init --project "$init_project" --store memories \
+            --sources recommended --non-interactive --dry-run --json \
+            > artifacts/init-dry-run.json
+          test ! -e "$init_project/.tessera"
+          tessera init --project "$init_project" --store memories \
+            --sources recommended --non-interactive --json \
+            > artifacts/init-applied.json
+          INIT_PROJECT="$init_project" python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          dry = json.loads(Path("artifacts/init-dry-run.json").read_text())
+          applied = json.loads(Path("artifacts/init-applied.json").read_text())
+          assert dry["applied"] is False
+          assert dry["plan"]["sources"]["selected"] == applied["plan"]["sources"]["selected"]
+          assert applied["applied"] is True
+          assert applied["result"]["source_files_modified"] == 0
+          assert (Path(os.environ["INIT_PROJECT"]) / ".tessera" / "config.yaml").is_file()
+          PY
+
           tessera write "$corpus" \
             --id "project/charter" \
             --type factual \
@@ -280,6 +307,8 @@ jobs:
           name: tessera-cli-smoke
           path: |
             artifacts/cli-smoke.txt
+            artifacts/init-dry-run.json
+            artifacts/init-applied.json
             artifacts/structured-smoke.json
           if-no-files-found: warn
 
