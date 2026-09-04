@@ -580,11 +580,14 @@ require a non-empty, non-`"none"` `inputs.operation` to run.
   root cause" pattern as the Codex failures above, both Gemini-engine
   workflows were switched to Copilot for consistency rather than pinning
   to a newer/older firewall version and re-testing indefinitely.
-- Two `[aw]` automation-noise issues remain open as evidence of the above:
-  #194 (`Detection Runs`) and #195 (`TESSERA Issue Triage failed`). They
-  are intentionally left as-is (not closed) as the audit trail for this
-  entry; future genuine Gemini/Codex engine failures would no longer be
-  possible since neither engine is referenced by any workflow anymore.
+- Two `[aw]` automation-noise issues recorded evidence of the above: #194
+  (`Detection Runs`, an ongoing detection-run log, remains open by design)
+  and #195 (`TESSERA Issue Triage failed`). #195 was auto-closed by PR
+  #198's `Fixes #195` keyword when that PR merged, rather than being left
+  open as originally planned; its body and comment history remain intact
+  as the audit trail for this entry. Future genuine Gemini/Codex engine
+  failures would no longer be possible since neither engine is referenced
+  by any workflow anymore.
 - This PR itself exercised `tessera-pr-maintainer-audit` and
   `tessera-merge-governor` live (real GitHub Actions runs, first on Codex,
   then on Copilot) and both worked as designed, including correctly
