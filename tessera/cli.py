@@ -185,7 +185,19 @@ def cmd_init(args):
     )
     plan = build_initialization_plan(request)
     if plan.preflight_problems:
-        raise ConfigurationError("preflight failed: " + "; ".join(plan.preflight_problems))
+        message = "preflight failed: " + "; ".join(plan.preflight_problems)
+        if args.json:
+            print(json.dumps({
+                "schema_version": SCHEMA_VERSION,
+                "mode": "dry-run" if args.dry_run else "apply",
+                "plan": plan.to_dict(),
+                "applied": False,
+                "error": {"code": "preflight_failed", "message": message},
+            }, sort_keys=True))
+        else:
+            _render_initialization_plan(plan, dry_run=args.dry_run)
+            print(f"Cannot apply: {message}", file=sys.stderr)
+        return 2
     existing_material_change = (
         plan.current_configuration is not None and plan.material_config_change
     )
@@ -348,8 +360,31 @@ def _render_initialization_plan(plan: InitializationPlan, *, dry_run: bool) -> N
     print("  Indexing: will start after confirmation")
     if plan.current_configuration is not None:
         print("  Existing configuration: loaded and compared")
+        _render_configuration_summary("Current", plan.current_configuration)
+        if plan.proposed_configuration is not None:
+            _render_configuration_summary("Proposed", plan.proposed_configuration)
+    if plan.warnings:
+        print("  Warnings:")
+        for warning in plan.warnings:
+            print(f"    - {warning}")
+    if plan.preflight_problems:
+        print("  Preflight problems:")
+        for problem in plan.preflight_problems:
+            print(f"    - {problem}")
     if dry_run:
         print("\nDRY RUN — no changes made")
+
+
+def _render_configuration_summary(label: str, mapping: Dict) -> None:
+    store = mapping.get("store", mapping)
+    sources = mapping.get("sources", {}).get("roots", [])
+    index = mapping.get("index", {})
+    print(f"  {label}:")
+    print(f"    Generated memories: {store.get('path', '-')}")
+    if sources:
+        include_count = sum(len(root.get("include", [])) for root in sources)
+        print(f"    Source allow-list entries: {include_count}")
+    print(f"    Derived index: {index.get('path', '-')}")
 
 
 def cmd_write(args):

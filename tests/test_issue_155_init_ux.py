@@ -371,7 +371,40 @@ def test_preflight_unwritable_project_fails_before_any_mutation(tmp_path, capsys
         project.chmod(0o755)
     assert code == 2
     assert "preflight failed" in payload["error"]["message"]
+    assert payload["plan"]["preflight_problems"]
     assert not (project / ".tessera").exists()
+
+
+@pytest.mark.parametrize("target", ["config", "store", "index"])
+def test_preflight_reports_each_unwritable_target_in_the_plan(tmp_path, capsys, target):
+    project = tmp_path / target
+    project.mkdir()
+    _write(project / "README.md")
+    config_dir = project / ".tessera"
+    store = project / "generated"
+    index = project / "derived"
+    if target == "config":
+        config_dir.mkdir()
+        locked = config_dir
+    elif target == "store":
+        store.mkdir()
+        locked = store
+    else:
+        index.mkdir()
+        locked = index
+    locked.chmod(0o555)
+    try:
+        code, payload, _ = _run_json([
+            "init", "--project", str(project), "--store", "generated",
+            "--index-path", "derived", "--sources", "recommended",
+            "--non-interactive", "--dry-run",
+        ], capsys)
+    finally:
+        locked.chmod(0o755)
+    assert code == 2
+    assert payload["plan"]["preflight_problems"]
+    assert any("not writable" in item for item in payload["plan"]["preflight_problems"])
+    assert not (project / ".tessera" / "config.yaml").exists()
 
 
 def test_index_failure_reports_truthful_partial_state_and_is_recoverable(tmp_path, monkeypatch, capsys):
