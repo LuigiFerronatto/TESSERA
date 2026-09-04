@@ -147,10 +147,11 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "#153/#154 are satisfied" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
-    now_section = text.split("## NOW", 1)[1].split("## NEXT / READY", 1)[0]
-    assert "No executable feature is selected" in now_section
-    assert "#154 Safe project source discovery + .tessera-ignore  VALIDATED" in now_section
-    assert "#155" in now_section
+    now_section = text.split("## NOW", 1)[1].split("## NEXT", 1)[0]
+    assert "pick only from here" in now_section
+    assert "#155 Init UX / source selection" in now_section
+    assert "#135 Decomposer fallback integrity" in now_section
+    assert "#16  Conflict resolver containment" in now_section
 
     rows = [line for line in text.splitlines() if line.startswith("| [#")]
     now_executable = [
