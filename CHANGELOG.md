@@ -9,6 +9,16 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ## Unreleased
 
 ### Architecture Decisions
+- Added a deterministic, idempotent sync tool
+  (`scripts/sync_project_board.py`) that reflects each open issue's own
+  authoritative `## Portfolio routing` block onto GitHub Project #9's
+  Status/Priority/Milestone fields, and a versioned
+  `governance/portfolio_execution.yaml` manifest as the canonical source for
+  the board's Execution (`HORIZON`) and `Queue` ordering. This is
+  repository-process tooling, not a TESSERA product/runtime capability; see
+  [`docs/PROJECT_BOARD_SYNC.md`](docs/PROJECT_BOARD_SYNC.md). Benchmark
+  applicability: NOT_APPLICABLE (governance tooling only, no runtime
+  behavior changed). ([#203](https://github.com/LuigiFerronatto/TESSERA/issues/203))
 - Added an agentic repository-governance system (issue triage, independent
   PR maintainer audit, opt-in fixer, deterministic merge governor, post-merge
   lifecycle reconciliation, weekly documentation-drift audit) built on

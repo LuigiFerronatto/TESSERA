@@ -73,7 +73,7 @@ past Stage A as unnecessary infrastructure for the current trust level.
 
 ```text
 issue opened/reopened
-  → tessera-issue-triage.md (Gemini): comment + <=4 labels, read-only
+  → tessera-issue-triage.md (Copilot): comment + <=4 labels, read-only
 
 pull request opened/synchronize/ready_for_review
   → TESSERA CI + Benchmark Ledger (deterministic, unchanged)
@@ -100,7 +100,7 @@ human merges (branch protection enforced) → canonical merge on main
     opens one minimal draft lifecycle PR only when actual drift is found
 
 weekly (and workflow_dispatch)
-  → tessera-documentation-drift.md (Gemini): one consolidated `[docs-drift]`
+  → tessera-documentation-drift.md (Copilot): one consolidated `[docs-drift]`
     issue when canonical main and repository documentation disagree
 ```
 
@@ -252,48 +252,69 @@ Constraints enforced by `governance/merge_governor.py`:
 | `tessera-issue-triage.md` | best-effort | Issue stays untriaged; re-run manually or on reopen. No merge-authorization impact. |
 | `tessera-pr-maintainer-audit.md` | **fail-closed** | No audit comment → no authorization. `ENGINE_UNAVAILABLE` on the dedicated check; only escape is a bound human override. |
 | `tessera-pr-fixer.md` | fails, manual fix | PR is unchanged; a maintainer fixes it by hand or re-applies `ai-fix-approved`. |
-| `tessera-post-merge-lifecycle.md` | retry/fallback (future) | Lifecycle PR is simply not opened yet; `workflow_dispatch` re-run recovers it. Cross-engine fallback (e.g. Gemini as a fallback) is explicitly deferred to a future stage. |
+| `tessera-post-merge-lifecycle.md` | retry/fallback (future) | Lifecycle PR is simply not opened yet; `workflow_dispatch` re-run recovers it. Cross-engine fallback is explicitly deferred to a future stage. |
 | `tessera-documentation-drift.md` | best-effort | Next scheduled run recovers it; this is a periodic safety net, not a gate. |
 | `tessera-merge-governor.yml` | deterministic, no AI engine | Not subject to engine failure; this is the workflow that *interprets* engine-unavailable state for the other agents. |
 
 ## Engine assignment (initial hypothesis, not a benchmark claim)
 
 ```text
-Gemini  → issue triage and weekly documentation-drift reconnaissance (broad read)
-Copilot → independent semantic PR audit, post-merge lifecycle reconciliation,
-          and opt-in code fixing where branch mutation is authorized
+Copilot → all five workflows: issue triage, independent semantic PR audit,
+          opt-in code fixing (branch mutation authorized), post-merge
+          lifecycle reconciliation, and weekly documentation-drift
+          reconnaissance
 GitHub Actions (deterministic) → merge authorization only
 ```
 
-`tessera-pr-maintainer-audit.md` and `tessera-post-merge-lifecycle.md`
-originally ran on `engine: {id: codex}`. Both were switched to
-`engine: {id: copilot}` after a live, external OpenAI account/billing
-failure on the Codex engine's `CODEX_API_KEY`/`OPENAI_API_KEY` blocked the
-required Maintainer Audit check on PR #182 (`stream disconnected before
-completion: Your account is not active`). A prior attempt to route Codex
-inference through Copilot billing (`engine.model: copilot/auto`) also
-failed live with `model_not_supported` (see "Known limitations"). Standard
-Copilot engine (`copilot-requests: write`, no external API key dependency)
-avoids both failure modes and is the current assignment for all three
-Copilot-billed roles.
+Every AI-driven TESSERA workflow now runs on `engine: {id: copilot}`. This
+was not the original design — `tessera-pr-maintainer-audit.md` and
+`tessera-post-merge-lifecycle.md` started on `engine: {id: codex}`, and
+`tessera-issue-triage.md`/`tessera-documentation-drift.md` started on
+`engine: {id: gemini}` — but every non-Copilot engine hit a live,
+external, unfixable failure during this delivery:
 
-This assignment is an initial engineering hypothesis based on each engine's
-documented strengths (Copilot has the broadest engine-specific feature set,
-native agent selection, and no external-provider billing dependency;
-Gemini supports broad low-cost reconnaissance). It is **not** evidence that
+- **Codex** (`tessera-pr-maintainer-audit.md`,
+  `tessera-post-merge-lifecycle.md`): a live OpenAI account/billing
+  failure on `CODEX_API_KEY`/`OPENAI_API_KEY` blocked the required
+  Maintainer Audit check on PR #182 (`stream disconnected before
+  completion: Your account is not active`). A prior attempt to route
+  Codex inference through Copilot billing (`engine.model: copilot/auto`)
+  also failed live with `model_not_supported`, despite being gh-aw's own
+  documented pattern. Both switched to Copilot.
+- **Gemini** (`tessera-issue-triage.md`, `tessera-documentation-drift.md`):
+  the first live Issue Triage run (#195, triggered by issue #192) failed
+  with `Invalid auth method selected` (exit code 41), even though
+  `GEMINI_API_KEY` was correctly configured as a repository secret. Root
+  cause is a confirmed upstream infrastructure bug in gh-aw's Agentic
+  Workflow Firewall (AWF) sandbox: the firewall sets `GEMINI_API_BASE_URL`
+  to its local API proxy, but at the pinned firewall version that proxy
+  reported no Gemini protocol support at all (`API proxy enabled:
+  OpenAI=false, Anthropic=false, Copilot=false` — no `Gemini=true`),
+  so the Gemini CLI could never authenticate regardless of the secret's
+  validity (tracked upstream as `github/gh-aw#25294` /
+  `github/gh-aw-firewall#1806`/`#1931`/`#2009`; even the firewall's own
+  partial fix left a follow-on `API_KEY_INVALID` failure from a key
+  the proxy fails to substitute). This is external infrastructure, not a
+  TESSERA workflow-configuration defect, and not something a workflow
+  frontmatter change alone can fully work around. Both switched to
+  Copilot for consistency and because Copilot has no external API-key
+  dependency at all (`copilot-requests: write`, org-billed).
+
+Standard Copilot engine (`copilot-requests: write`, no external API-key
+dependency) avoids every failure mode above and is now the sole engine
+assignment across all five roles.
+
+This assignment is an initial engineering hypothesis based on Copilot's
+documented feature set, native agent selection, and freedom from
+external-provider billing/proxy dependencies. It is **not** evidence that
 one model is objectively superior at each role. A future Test Card should
-measure this directly by running, for a sample of PRs:
-
-```text
-R0: Copilot reviewer only (current)
-R1: Gemini reviewer only
-R2: Copilot + Gemini independent reviewers
-```
-
-and comparing: valid blocking findings, false-positive rate, unique valid
-findings per model, defects caught before merge, human override rate,
-latency, and cost. Dual mandatory reviewers are explicitly **not** enabled
-in this initial delivery.
+measure this directly by running, for a sample of PRs, independent
+reviewers on multiple engines side by side once at least one non-Copilot
+engine is confirmed stable in this environment, and comparing: valid
+blocking findings, false-positive rate, unique valid findings per model,
+defects caught before merge, human override rate, latency, and cost. Dual
+mandatory reviewers are explicitly **not** enabled in this initial
+delivery.
 
 ## Safe outputs and least privilege
 
@@ -334,12 +355,16 @@ sanitization applies to all generated content.
 
 ## Authentication and required secrets/configuration
 
-No secrets are committed by this change. A maintainer must configure:
+No secrets are committed by this change. All five TESSERA workflows now run
+on the standard Copilot engine:
 
-- **Gemini** (`tessera-issue-triage.md`, `tessera-documentation-drift.md`):
-  `GEMINI_API_KEY` repository/organization secret, or Google Workload
-  Identity Federation if the installed gh-aw version's Gemini engine
-  supports it in this environment.
+- **Copilot** (`tessera-issue-triage.md`, `tessera-pr-maintainer-audit.md`,
+  `tessera-pr-fixer.md`, `tessera-post-merge-lifecycle.md`,
+  `tessera-documentation-drift.md`): prefer organization-billed Copilot
+  requests (`copilot-requests: write`, granted to all five workflows) if
+  your GitHub plan/organization supports it; otherwise configure a
+  `COPILOT_GITHUB_TOKEN` secret (fine-grained PAT with Copilot Requests
+  access) per gh-aw's documented Copilot CLI authentication.
 - **Codex**: previously used by `tessera-pr-maintainer-audit.md` and
   `tessera-post-merge-lifecycle.md` (`CODEX_API_KEY`/`OPENAI_API_KEY`).
   Both were switched to the Copilot engine after two consecutive live
@@ -350,15 +375,19 @@ No secrets are committed by this change. A maintainer must configure:
   (`stream disconnected before completion: Your account is not active`).
   Neither is a code defect in this repository; both were external
   provider/billing failures. Codex is no longer used by any TESSERA
-  workflow as of this delivery — this is a design decision, not merely a
-  temporary workaround, since standard Copilot engine has no external
-  API-key dependency at all. See "Known limitations" for the full history.
-- **Copilot** (`tessera-pr-maintainer-audit.md`, `tessera-pr-fixer.md`,
-  `tessera-post-merge-lifecycle.md`): prefer organization-billed Copilot
-  requests (`copilot-requests: write`, granted to all three workflows) if
-  your GitHub plan/organization supports it; otherwise configure a
-  `COPILOT_GITHUB_TOKEN` secret (fine-grained PAT with Copilot Requests
-  access) per gh-aw's documented Copilot CLI authentication.
+  workflow.
+- **Gemini**: previously used by `tessera-issue-triage.md` and
+  `tessera-documentation-drift.md` (`GEMINI_API_KEY`). Switched to Copilot
+  after the first live Issue Triage run failed with `Invalid auth method
+  selected` (exit code 41) due to a confirmed upstream gh-aw
+  Agentic Workflow Firewall bug unrelated to the `GEMINI_API_KEY` secret's
+  validity (see "Engine assignment" and `github/gh-aw#25294`). Gemini is
+  no longer used by any TESSERA workflow.
+
+Standard Copilot engine has no external API-key dependency at all, which is
+now the primary reason it is the sole engine across every role — this is a
+design decision, not merely a temporary workaround. See "Known limitations"
+for the full failure history of both abandoned engines.
 
 Compile-time secret detection (`gh aw compile`) will flag any new secret
 requirement the first time a workflow using it is compiled; each one listed
@@ -529,6 +558,33 @@ require a non-empty, non-`"none"` `inputs.operation` to run.
   API-key dependency and avoids both failure modes; this fail-closed
   Maintainer Audit engine failure is exactly what the `ENGINE_UNAVAILABLE`
   break-glass override contract above exists to handle when it recurs.
+- `tessera-issue-triage.md` and `tessera-documentation-drift.md` moved from
+  `engine: {id: gemini}` to `engine: {id: copilot}` after the first live
+  Issue Triage run (workflow run `33671226992`, triggered by issue #192,
+  recorded in the automatically-filed `[aw]` noise issue #195) failed with
+  `Invalid auth method selected` (exit code 41), immediately after
+  `YOLO mode is enabled` and before any model call was attempted. The
+  `GEMINI_API_KEY` repository secret was confirmed present and valid; the
+  failure is a confirmed upstream gh-aw Agentic Workflow Firewall (AWF)
+  bug (`github/gh-aw#25294`, tracked upstream as
+  `github/gh-aw-firewall#1806`/`#1931`/`#2009`): the firewall sandbox sets
+  `GEMINI_API_BASE_URL` to its own local API proxy, but at the firewall
+  version pinned by this gh-aw release (`0.28.10`) that proxy reports no
+  Gemini protocol support (`API proxy enabled: OpenAI=false,
+  Anthropic=false, Copilot=false`, no `Gemini=true`), so the Gemini CLI
+  cannot select a valid auth method regardless of the secret. Even the
+  firewall's later partial fix (`gh-aw-firewall#1944`/`#1995`) reportedly
+  left a follow-on `API_KEY_INVALID` failure from key-substitution not
+  reaching the sandboxed process. Since this is unfixable from workflow
+  frontmatter alone and matches the same "external, non-code, non-billing
+  root cause" pattern as the Codex failures above, both Gemini-engine
+  workflows were switched to Copilot for consistency rather than pinning
+  to a newer/older firewall version and re-testing indefinitely.
+- Two `[aw]` automation-noise issues remain open as evidence of the above:
+  #194 (`Detection Runs`) and #195 (`TESSERA Issue Triage failed`). They
+  are intentionally left as-is (not closed) as the audit trail for this
+  entry; future genuine Gemini/Codex engine failures would no longer be
+  possible since neither engine is referenced by any workflow anymore.
 - This PR itself exercised `tessera-pr-maintainer-audit` and
   `tessera-merge-governor` live (real GitHub Actions runs, first on Codex,
   then on Copilot) and both worked as designed, including correctly

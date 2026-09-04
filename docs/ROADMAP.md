@@ -93,34 +93,149 @@ QUMem-inspired work, intelligence/model work and Cognitive Continuity must not a
 
 This board is selection guidance, not permission to bypass the owning Test Card.
 
-## NOW
+**73 open issues is not a 73-item queue.** At any moment the team selects from
+`NOW` only (at most 2–4 concurrent items). `NEXT` and the rest of the
+`Full execution queue` exist so the next pick is already known once a `NOW`
+item lands — nobody should be choosing between 73 open cards. Everything that
+is not in the queue below is a tracker/epic (coordination only, never a direct
+implementation PR), research, documentation, a benchmark that enters only when
+its capability needs evidence, or work intentionally deferred to control WIP.
+Of the 73 open issues, roughly 40–50 are executable capabilities/tasks; the
+rest are epics, trackers, docs, benchmarks, research and governance/automation
+noise (see the buckets after the queue).
 
-No executable feature is selected by this lifecycle-only branch.
-
-```text
-#154 Safe project source discovery + .tessera-ignore  VALIDATED
-```
-
-The implementation lane is clear; the next release-critical executable card is
-#155, but it is not started by this lifecycle correction. The optional #135/#16
-integrity lane remains unselected.
-
-## NEXT / READY
-
-Highest-value unblocked work, ranked rather than treated equally:
+## NOW — pick only from here
 
 ```text
-#155 Init UX / source selection              P0 release-critical
-#135 Decomposer fallback integrity           P0 contract integrity
-#16  Conflict resolver containment           P0 state safety
-#120 MCP transport/runtime robustness        agent integration substrate
-#146 QUMem documentation truth               docs-only
-#168 Long-Term Memory architecture contract  cognitive-continuity architecture
+🥇 #155 Init UX / source selection              P0 release-critical
+🥈 #135 Decomposer fallback integrity           P0 contract integrity
+🥉 #16  Conflict resolver containment           P0 state safety
 ```
 
-Cards intentionally parked despite earlier/live `READY` wording are listed under `DEFERRED` below.
+`#155` is the next release-critical executable card in the validated chain
+`#153 -> #154 -> #155 -> #118 -> #134`. `#135`/`#16` run in parallel as a
+Technical Integrity lane: `#135` fixes a live contract break (documented
+`LLM failure -> heuristic fallback`, actual runtime `LLM failure -> []`) and
+`#16` is the P0 destructive-newest-only-filtering containment fix. Neither
+blocks `#155`; neither should be forgotten. When one of these three ships,
+pull the next unblocked item from `NEXT` below.
 
-## BLOCKED — principal chains
+## NEXT
+
+```text
+#118 Clean-room onboarding / CI bootstrap        after #155
+#120 MCP transport/runtime robustness            can start in parallel
+#87  LICENSE / CONTRIBUTING owner decision       can start in parallel
+#134 PyPI release                                after #118 + #87
+```
+
+## Full execution queue
+
+The complete ordering behind `NOW`/`NEXT`, grouped by phase. This is a
+priority/dependency ordering, not a commitment that all 48 items become
+active WIP soon — items later in the queue may still be individually labeled
+`DEFERRED` until WIP allows (see `Deferred` below); their position here is
+where they resume once selected.
+
+```text
+NOW — Product foundation
+1  #155 Init UX / source selection
+2  #135 Decomposer fallback integrity      (parallel)
+3  #16  Conflict resolver containment      (parallel)
+4  #118 Clean-room onboarding
+5  #120 MCP transport/runtime robustness
+6  #87  LICENSE / CONTRIBUTING             (parallel)
+7  #134 PyPI release
+-> TESSERA can be installed, configured, index a real project, and be used via MCP.
+
+NEXT — Real memory system
+8  #67  Quality Gate v2
+9  #12  Incremental/idempotent indexing
+10 #69  Text ingestion beyond Markdown
+11 #70  Structural segmentation
+12 #13  Corpus/metadata doctor
+13 #157 Typed model profiles
+14 #163 Local model lifecycle
+15 #160 Capability pipeline
+16 #158 Semantic embeddings
+17 #176 AI legacy corpus enrichment
+18 #192 Resumable/incremental enrichment runtime
+-> TESSERA understands real corpora, indexes incrementally, does semantic
+   retrieval, and can enrich legacy knowledge.
+
+NEXT+ — Memory construction
+19 #138 Role-aware episode construction
+20 #136 Typed F/P/I decomposition
+21 #137 Source episode / lineage preservation
+22 #73  Versioned revision history
+23 #15  Temporal model / state keys
+24 #16  Full conflict/supersession (revisits the #16 containment fix above
+        with the complete temporal-supersession semantics, once #73/#15 land)
+-> Interactions become auditable, evolving memories (state evolves, newest
+   does not always win).
+
+THEN — Query intelligence
+25 #139 Multiple query-conditioned information needs
+26 #140 Bounded multi-query/multi-store retrieval planning
+27 #25  Query-aware graph expansion
+28 #26  Relation confidence
+29 #159 Reranking
+30 #141 Structured query-conditioned state (Fq/Tq/Iq)
+-> Query -> correct evidence -> reconstructed state.
+
+THEN — Trust and context
+31 #71  Harness adapter registry
+32 #32  Source authority/scope
+33 #72  Instruction Resolver
+34 #27  Evidence arbitration (source arbitration)
+35 #20  Evidence sufficiency / conflict status / abstention
+36 #169 Context Compiler
+37 #167 Working Context
+-> Minimum sufficient, trusted current state.
+
+THEN — Agent integration
+38 #171 Agent-facing semantic API (search/context/evidence/remember/inspect)
+39 #196 Hooks Core (project/runtime-agnostic lifecycle hook contract)
+40 #177 Runtime adapters (Claude/Codex/Gemini/Copilot/...)
+41 #190 Integration UX (`tessera integrate <runtime>` / `tessera mcp setup`)
+42 #191 Historical conversation import
+43 #121 Official TESSERA Skills
+44 #193 Skills/plugin/MCP distribution
+-> Every integrated agent runtime shares the same TESSERA memory.
+
+FINALLY — Autonomous learning
+45 #19  Evidence-aware memory admission
+46 #168 Long-Term Memory architecture contract (full)
+47 #21  Experience traces / utility learning
+48 #17  Adaptive HOW-to-retrieve strategy
+-> Closes the loop: READ BEFORE REASONING, WRITE AFTER LEARNING.
+```
+
+## Deferred
+
+Valid work intentionally parked to control WIP or avoid rework. Each is still
+present in the `Full execution queue` above at the position it resumes from;
+`DEFERRED` only means "not selectable right now."
+
+```text
+#17  adaptive HOW-to-retrieve strategy       -> queue #48
+#19  evidence-aware memory admission          -> queue #45
+#21  utility / experience learning             -> queue #47
+#25  query-aware graph expansion               -> queue #27
+#28  structured-evidence rendering ablation    -> benchmark, enters with #25/#26/#159 evidence
+#119 broad CLI redesign umbrella               -> not yet queued; needs #166 first
+#139 QUMem information-needs implementation    -> queue #25
+#157 typed model profiles                      -> queue #13
+#166 unified CLI presentation system           -> not yet queued
+#80  architecture/roadmap visual assets        -> documentation-only, no dependency gate
+```
+
+`#25`, `#28`, `#139`, `#157` and `#166` have technically executable or
+previously `READY` definitions, but this portfolio intentionally parks them
+until the active release/safety foundations reduce WIP or their surrounding
+semantics stabilize.
+
+## Dependency graph
 
 ```text
 FIRST PUBLIC RELEASE
@@ -178,26 +293,7 @@ consuming agent
 #120 remains the separate MCP transport/runtime dependency for #171.
 ```
 
-## DEFERRED
-
-Valid work intentionally parked to control WIP or avoid rework:
-
-```text
-#17  adaptive HOW-to-retrieve strategy
-#19  evidence-aware memory admission
-#21  utility / experience learning
-#25  query-aware graph expansion
-#28  structured-evidence rendering ablation
-#119 broad CLI redesign umbrella
-#139 QUMem information-needs implementation
-#166 unified CLI presentation system
-#80  architecture/roadmap visual assets
-#157 typed model profiles
-```
-
-`#25`, `#28`, `#139`, `#157` and `#166` have technically executable or previously `READY` definitions, but this portfolio intentionally parks them until the active release/safety foundations reduce WIP or their surrounding semantics stabilize.
-
-## TRACKERS
+## Epics / trackers
 
 ```text
 #14  Graph experiments
@@ -205,17 +301,67 @@ Valid work intentionally parked to control WIP or avoid rework:
 #145 QUMem
 #164 Intelligence
 #170 Agent Cognitive Continuity
+#178 End-to-end onboarding/integration/lifecycle UX epic
 ```
 
-Trackers do not receive direct feature implementation PRs.
+Epics/trackers do not receive direct feature implementation PRs; they are
+coordination umbrellas whose children are the actual queue items above.
 
-## OWNER DECISIONS / ADMIN
+## Research
+
+```text
+#179 Cross-system memory lifecycle/hook architecture survey
+      (MemPalace, Mem0, MemOS, Letta, Graphiti)
+```
+
+Research issues inform design (e.g. `#196`/`#177` above drew on `#179`'s
+findings) but are not themselves implementation work.
+
+## Benchmarks (parallel lane, not a final phase)
+
+```text
+#96  closed  LongMemEval V1 minimal reproducible baseline
+#100 closed  Versioned benchmark ledger
+#28  Structured Evidence rendering ablation
+#103 LongMemEval V1 frozen-evidence reader baseline
+#104 Versioned/calibrated LLM-as-a-judge contract
+#105 LongMemEval V1 full-500 preregistered evaluation
+#106 LongMemEval-V2 multimodal adapter
+#142 QUMem frozen fidelity regression suite
+#143 QUMem-aligned personalized-memory benchmark
+```
+
+Benchmarks enter the active queue only when the capability they measure needs
+evidence — they are not scheduled as a terminal "phase 15".
+
+## Documentation-only (not part of the execution queue)
+
+```text
+#78  remove project-specific references from legacy/deep-dive docs
+#80  architecture/roadmap visual assets
+#146 QUMem documentation truth (reconcile paper-fidelity claims)
+```
+
+## Owner decisions / admin
 
 ```text
 #87 LICENSE / copyright ownership / CONTRIBUTING
 ```
 
-#87 is a direct release blocker and must not be solved by an agent inventing legal ownership.
+`#87` is a direct release blocker (queue #6, parallel to `#155`) and must not
+be solved by an agent inventing legal ownership.
+
+## Automation noise (`[aw]`)
+
+```text
+#189 lifecycle drift reconciliation record       -> fixed by PR #197
+#194 Detection Runs                              -> left open as audit trail
+#195 TESSERA Issue Triage failed (Gemini AWF bug) -> fixed by PR #198
+```
+
+`[aw]`-prefixed issues are auto-filed failure/detection records from gh-aw
+workflows, not roadmap features; they are closed once their underlying
+automation problem is fixed, matching the existing pattern for `#183`-`#188`.
 
 ---
 

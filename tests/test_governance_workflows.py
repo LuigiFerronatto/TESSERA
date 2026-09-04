@@ -22,11 +22,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 
 GH_AW_WORKFLOWS = {
-    "tessera-issue-triage": "gemini",
+    "tessera-issue-triage": "copilot",
     "tessera-pr-maintainer-audit": "copilot",
     "tessera-pr-fixer": "copilot",
     "tessera-post-merge-lifecycle": "copilot",
-    "tessera-documentation-drift": "gemini",
+    "tessera-documentation-drift": "copilot",
 }
 
 MERGE_GOVERNOR_PATH = WORKFLOWS_DIR / "tessera-merge-governor.yml"
