@@ -1,0 +1,5 @@
+{"id":"operational_value","question":"Did the triage route the issue to the correct existing TESSERA ownership and readiness state without creating unsupported implementation work?","answer":"YES","model":"evals","timestamp":"2026-09-04T17:59:57.902Z","runid":"33902859573"}
+{"id":"duplicate_precision","question":"Did the output avoid declaring a duplicate without strong evidence?","answer":"YES","model":"evals","timestamp":"2026-09-04T17:59:57.902Z","runid":"33902859573"}
+{"id":"readiness_truth","question":"Did the output distinguish an open issue from a READY executable Test Card?","answer":"YES","model":"evals","timestamp":"2026-09-04T17:59:57.902Z","runid":"33902859573"}
+{"id":"actionable_next_step","question":"Did the output provide one evidence-backed next routing action?","answer":"YES","model":"evals","timestamp":"2026-09-04T17:59:57.902Z","runid":"33902859573"}
+{"id":"missing_information","question":"When essential information was missing, did the output ask focused questions instead of guessing?","answer":"YES","model":"evals","timestamp":"2026-09-04T17:59:57.902Z","runid":"33902859573"}
