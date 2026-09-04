@@ -694,6 +694,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#78](https://github.com/LuigiFerronatto/TESSERA/issues/78) | open | `READY` | DOCUMENTATION | Docs | Project-agnostic legacy/deep-dive cleanup; coordinate #146, not technical WIP. |
 | [#80](https://github.com/LuigiFerronatto/TESSERA/issues/80) | open | `DEFERRED` | DOCUMENTATION | Docs | Visual/architecture documentation after target contracts stabilize. |
 | [#172](https://github.com/LuigiFerronatto/TESSERA/issues/172) | closed | `VALIDATED` | GOVERNANCE | Portfolio | `KEEP`; canonical execution funnel and WIP taxonomy reconciled by PR #174 after the #173 merge. |
+| [#203](https://github.com/LuigiFerronatto/TESSERA/issues/203) | closed | `IMPLEMENTED` | GOVERNANCE | Portfolio | `KEEP`; PR #205 final candidate `70bfc807f7c43898474f373521b877f352e4e8a1`, canonical squash-free merge `7c0594acc55dfc01da5e2baa750d5b6e3aa8f0e8`; `scripts/sync_project_board.py` and `governance/portfolio_execution.yaml` are canonical. No dedicated benchmark/CI gate applies (`NOT_APPLICABLE`); status recorded as `IMPLEMENTED` rather than `VALIDATED` pending a maintainer-confirmed re-run of the tool against live Project #9 post-merge. |
 
 ---
 
