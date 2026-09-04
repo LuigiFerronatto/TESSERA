@@ -1,0 +1,113 @@
+[
+  {
+    "body": "",
+    "labels": [
+      {
+        "id": "LA_kwDOUIdCK88AAAACzauORg",
+        "name": "agentic-workflows",
+        "description": "",
+        "color": "ededed"
+      }
+    ],
+    "milestone": null,
+    "number": 194,
+    "state": "OPEN",
+    "stateReason": "",
+    "title": "[aw] Detection Runs",
+    "url": "https://github.com/LuigiFerronatto/TESSERA/issues/194"
+  },
+  {
+    "body": "## Portfolio routing\n\n- **Type:** executable CLI/onboarding UX Test Card\n- **Status:** READY\n- **Priority:** P0\n- **Phase:** M1 \u2014 Configuration / Onboarding\n- **Depends on:** #117 \u2705 configuration/discovery foundation; #153 \u2705 Configuration v2 (`2508676d472088733702b6ed920fc829df9a7681`); #154 \u2705 safe source discovery / `.tessera-ignore` (`05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`)\n- **Active blockers:** none\n- **Coordinates with:** #118 clean-room onboarding, #119 broader CLI UX, #134 PyPI release gate\n- **Unlocks:** expanded #118 end-to-end onboarding validation\n- **Benchmark applicability:** SMOKE_ONLY\n- **Routing note:** This is the next release-critical implementation candidate. Do not mark `IN_PROGRESS` until a dedicated implementation branch/PR is started. Consume #154 `SourceDiscoveryPlan`; do not reimplement filesystem discovery, ignore parsing, or forbidden-source policy here.\n\n",
+    "labels": [
+      {
+        "id": "LA_kwDOUIdCK88AAAACy190kA",
+        "name": "enhancement",
+        "description": "New feature or request",
+        "color": "a2eeef"
+      }
+    ],
+    "milestone": {
+      "number": 2,
+      "title": "M1 \u2014 Productization & Release",
+      "description": "",
+      "dueOn": null
+    },
+    "number": 155,
+    "state": "OPEN",
+    "stateReason": "",
+    "title": "[M1 Init UX] Add interactive source selection, initialization plan and non-interactive parity",
+    "url": "https://github.com/LuigiFerronatto/TESSERA/issues/155"
+  },
+  {
+    "body": "## Authoritative portfolio routing\n\n> This block supersedes older status/dependency notes below. Historical experiment detail is preserved for context.\n\n- **Type:** repository governance task\n- **Status:** blocked \u2014 owner decision\n- **Priority:** P1\n- **Phase:** M0 \u2014 Contract & Safety\n- **Depends on:** Luigi confirms license text and copyright ownership\n- **Unlocks:** #134 first public PyPI release gate; professional contribution entrypoint\n- **Routing note:** No agent should infer or fabricate legal ownership from pyproject metadata. #134 must remain blocked until this owner-approved legal/repository entrypoint is complete.\n\n<!-- PORTFOLIO-ROUTING:END -->",
+    "labels": [
+      {
+        "id": "LA_kwDOUIdCK88AAAACy190gw",
+        "name": "documentation",
+        "description": "Improvements or additions to documentation",
+        "color": "0075ca"
+      },
+      {
+        "id": "LA_kwDOUIdCK88AAAACy190kA",
+        "name": "enhancement",
+        "description": "New feature or request",
+        "color": "a2eeef"
+      }
+    ],
+    "milestone": {
+      "number": 1,
+      "title": "M0 \u2014 Contract & Safety",
+      "description": "",
+      "dueOn": null
+    },
+    "number": 87,
+    "state": "OPEN",
+    "stateReason": "",
+    "title": "[Repository] Add standalone LICENSE and contribution guide",
+    "url": "https://github.com/LuigiFerronatto/TESSERA/issues/87"
+  },
+  {
+    "body": "## Authoritative portfolio routing\n\n> This block supersedes older status/dependency notes below. Historical experiment detail is preserved for context.\n\n- **Type:** split Test Card\n- **Status:** P0 containment ready; full experiment blocked\n- **Priority:** P0 containment / P1 research\n- **Phase:** M0 then M4\n- **Depends on:** containment: none; full supersession: #15, #73 and #96\n- **Coordinates with:** #137 lineage, #141 query-conditioned state, #145 QUMem epic\n- **Unlocks:** #141 structured `Fq/Tq/Iq`, #20 evidence status and #27 arbitration\n- **Routing note:** P0 containment is now urgent from the QUMem audit: the current newest-only heuristic can erase preference history required for `Tq`. First stop silent destructive filtering in trajectory/state paths; only then evaluate deterministic state-key/validity/supersession.\n\n<!-- PORTFOLIO-ROUTING:END -->",
+    "labels": [
+      {
+        "id": "LA_kwDOUIdCK88AAAACy190kA",
+        "name": "enhancement",
+        "description": "New feature or request",
+        "color": "a2eeef"
+      }
+    ],
+    "milestone": {
+      "number": 1,
+      "title": "M0 \u2014 Contract & Safety",
+      "description": "",
+      "dueOn": null
+    },
+    "number": 16,
+    "state": "OPEN",
+    "stateReason": "",
+    "title": "[Temporal P1] Conflict resolution and supersession",
+    "url": "https://github.com/LuigiFerronatto/TESSERA/issues/16"
+  },
+  {
+    "body": "## Authoritative portfolio routing\n\n> This block supersedes older status/dependency notes below. Historical experiment detail is preserved for context.\n\n- **Type:** epic / tracker\n- **Status:** planned\n- **Priority:** P1\n- **Phase:** M3 \u2014 Retrieval & Graph\n- **Depends on:** #96 baseline available\n- **Unlocks:** coordinated decisions from #25 and #26\n- **Routing note:** Tracks child experiments; does not produce a direct implementation PR. Children do not depend on this epic as an implementation prerequisite.\n\n<!-- PORTFOLIO-ROUTING:END -->",
+    "labels": [
+      {
+        "id": "LA_kwDOUIdCK88AAAACy190kA",
+        "name": "enhancement",
+        "description": "New feature or request",
+        "color": "a2eeef"
+      }
+    ],
+    "milestone": {
+      "number": 4,
+      "title": "M3 \u2014 Retrieval & Graph",
+      "description": "",
+      "dueOn": null
+    },
+    "number": 14,
+    "state": "OPEN",
+    "stateReason": "",
+    "title": "[Epic M3] Typed relations and controlled graph expansion",
+    "url": "https://github.com/LuigiFerronatto/TESSERA/issues/14"
+  }
+]
