@@ -893,7 +893,11 @@ class TesseraEngine:
                                 f"configured source escapes its root through a symlink: {candidate}"
                             ) from exc
                         relative_parts = resolved.relative_to(root).parts[:-1]
-                        if any(
+                        mandatory_parts = {".git", ".tessera_index"}
+                        if any(part in mandatory_parts for part in relative_parts):
+                            continue
+                        has_wildcard = any(character in pattern for character in "*?[")
+                        if has_wildcard and any(
                             part in _BUILTIN_EXCLUDED_SOURCE_DIRS
                             for part in relative_parts
                         ):

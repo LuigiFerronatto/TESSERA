@@ -59,7 +59,7 @@ Configure this project, write one fact, index it, and query it. The config is
 human-readable and contains no credential:
 
 ```bash
-tessera init --project . --store memories --non-interactive
+tessera init --project . --store memories --sources recommended --non-interactive
 
 tessera write \
   --id project/database \
@@ -100,12 +100,15 @@ compatibility resolver and no-configuration MCP fallback retain historical
 Source files remain the source of truth. New project configuration is schema v2:
 `store.path` is the generated-memory destination, `sources.roots` is an
 explicit read/index allow list, and `index.path` is disposable derived state.
-`tessera init` deliberately starts conservatively with only the store as a
-source and `.tessera/index` as the project index; it does not scan the
-repository. Existing schema-v1 and direct `storage_dir` callers retain their
-previous store-only corpus.
+Interactive `tessera init` keeps those choices separate: it discovers safe
+Markdown through the validated source-discovery contract, presents recommended,
+optional, ignored and forbidden groups, asks for a source policy, shows the
+complete plan, then requires confirmation before configuration or indexing.
+Choose `memory-only` to retain the generated store as the sole source. Existing
+schema-v1 configurations remain store-only unless a broader source policy is
+explicitly selected.
 
-To opt into known project sources explicitly, edit the generated config:
+A generated project configuration can therefore look like:
 
 ```yaml
 schema_version: 2
@@ -124,9 +127,29 @@ index:
   path: .tessera/index
 ```
 
-Source roots are read/index only and must stay within the physical project;
-generated writes remain inside `store.path`. TESSERA can now inspect the
-configured project without changing that allow list:
+Source roots are read/index only; an external source root is permitted only
+when it is the exact generated-memory store. Generated writes remain inside
+`store.path`. The derived index remains inside the project and outside the
+generated-memory store.
+
+The same plan is available without mutation or terminal interaction:
+
+```bash
+tessera init --project . --store memories --sources recommended --dry-run
+tessera init --project . --store memories --sources recommended --dry-run --json
+tessera init --project . --store memories --sources custom \
+  --source README.md --source docs --non-interactive
+tessera init --project . --store memories --sources memory-only --non-interactive
+```
+
+Non-interactive project initialization requires an explicit `--sources`
+policy and never prompts. A material change to an existing configuration must
+first be inspected with `--dry-run`, then explicitly allowed with
+`--update-existing`. Deselecting a source never edits `.tessera-ignore`;
+`--persist-exclusion PATH` is the explicit, planned opt-in.
+
+TESSERA can also inspect the configured project without changing its allow
+list:
 
 ```python
 from tessera.source_discovery import discover_sources_for_configuration
@@ -147,8 +170,10 @@ An optional root `.tessera-ignore` supports blank lines, `#` comments, `*`,
 documented subset, not a claim of perfect `.gitignore` compatibility. Mandatory
 exclusions—including `.git`, the resolved derived index, legacy
 `.tessera_index`, unsafe symlinks, special files, and private-key/credential
-artifacts—cannot be re-included. Interactive display, selection, confirmation,
-config persistence, and indexing remain #155 work.
+artifacts—cannot be re-included. The initialization plan, selection,
+confirmation, configuration persistence, optional ignore edit, and
+selected-source indexing are implemented by #155. No provider or model is
+called, and source files are never rewritten.
 
 Markdown is the only canonical writable persistence format. Every successful
 Engine, CLI, or MCP write creates a `.md` source that the current indexer can

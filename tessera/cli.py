@@ -18,16 +18,24 @@ from pathlib import Path
 from typing import Dict
 
 from .config import (
+    CANONICAL_STORAGE_ENV,
+    LEGACY_STORAGE_ENV,
     SCHEMA_VERSION,
     ConfigurationError,
     ConfigurationResolver,
     GlobalRegistry,
-    apply_init_plan,
-    build_init_plan,
     discover_project_config,
     global_registry_path,
     resolve_storage_dir,
     unregister_global_store,
+)
+from .init_flow import (
+    SOURCE_MODES,
+    InitRequest,
+    InitializationApplyError,
+    InitializationPlan,
+    apply_initialization_plan,
+    build_initialization_plan,
 )
 from .engine import TesseraEngine
 from .models import Connection, Entity
@@ -38,6 +46,10 @@ STORAGE_HELP = (
     "Path to memory storage (default precedence: explicit argument, "
     "TESSERA_STORAGE_DIR, ./memories)"
 )
+
+
+class InitializationCancelled(ConfigurationError):
+    """A user cancelled before the initialization apply boundary."""
 
 
 def _engine_for_args(args):
@@ -79,72 +91,300 @@ def cmd_init(args):
     mode = "global" if args.global_name else ("project" if args.project is not None else None)
     compatibility_positional = args.storage_dir
     store_path = args.store or compatibility_positional
-    prompted = False
+    interactive = not args.non_interactive and not args.json and sys.stdin.isatty()
     if mode is None and compatibility_positional:
         mode = "project"  # documented compatibility for `tessera init PATH`
     if mode is None:
-        if args.non_interactive or not sys.stdin.isatty():
+        if not interactive:
             raise ConfigurationError(
                 "init needs --project [PATH] or --global NAME in non-interactive mode"
             )
-        prompted = True
-        print("Where should TESSERA configure this store?\n1. This project\n2. User-global registry")
-        choice = input("Selection [1/2]: ").strip()
+        print("TESSERA\nPersistent memory for this project\n")
+        print(
+            "How would you like to configure TESSERA?\n"
+            "1. This project (recommended)\n2. Named global store\n3. Cancel"
+        )
+        choice = _init_input("Selection [1]: ").strip() or "1"
         if choice == "1":
             mode = "project"
             args.project = "."
         elif choice == "2":
             mode = "global"
-            args.global_name = input("Registry name: ").strip()
-            if not store_path:
-                store_path = input("Store path: ").strip()
+            args.global_name = _init_input("Named global store: ").strip()
+        elif choice == "3":
+            print("Initialization cancelled; no files were changed.")
+            return 1
         else:
-            raise ConfigurationError("init selection must be 1 or 2")
+            raise ConfigurationError("init selection must be 1, 2, or 3")
     if args.store and compatibility_positional:
         raise ConfigurationError("pass either positional storage_dir or --store, not both")
-    registry_path = global_registry_path()
-    plan = build_init_plan(
+    if compatibility_positional and args.sources is None:
+        args.sources = "memory-only"
+    if args.source and args.sources is None:
+        args.sources = "custom"
+    if args.source and args.sources not in {None, "custom"}:
+        raise ConfigurationError("--source PATH requires --sources custom")
+    if args.persist_exclusion and mode != "project":
+        raise ConfigurationError("--persist-exclusion is available only for project initialization")
+    if mode == "global" and args.sources not in {None, "memory-only"}:
+        raise ConfigurationError("named global stores use only their generated-memory store as a source")
+    if mode == "global" and args.source:
+        raise ConfigurationError("named global stores do not accept project --source paths")
+    if mode == "global" and args.index_path:
+        raise ConfigurationError("named global indexes use the generated store's derived index path")
+    if not interactive and mode == "project" and args.sources is None and not compatibility_positional:
+        raise ConfigurationError(
+            "non-interactive project init requires --sources recommended, custom, or memory-only"
+        )
+
+    project_root = args.project if mode == "project" else None
+    if interactive:
+        if mode == "project":
+            root = Path(project_root or ".").expanduser().resolve(strict=False)
+            existing_path = root / ".tessera" / "config.yaml"
+            default_store = "memories"
+            if existing_path.exists():
+                from .config import ProjectConfig
+                current = ProjectConfig.load(existing_path)
+                try:
+                    default_store = str(Path(current.store.path).relative_to(root))
+                except ValueError:
+                    default_store = current.store.path
+            if store_path is None:
+                store_path = _init_input(
+                    f"Where should newly generated TESSERA memories be stored? [{default_store}]: "
+                ).strip() or default_store
+            discovery = _interactive_discovery(root)
+            if args.sources is None:
+                args.sources, custom = _interactive_source_choice(discovery)
+                args.source = custom
+            if args.sources == "custom" and not args.persist_exclusion:
+                exclusions = _init_input(
+                    "Optional: paths to save explicitly in .tessera-ignore (comma-separated, blank for none): "
+                ).strip()
+                if exclusions:
+                    args.persist_exclusion = [item.strip() for item in exclusions.split(",") if item.strip()]
+        else:
+            if not args.global_name:
+                args.global_name = _init_input("Named global store: ").strip()
+            if not store_path:
+                store_path = _init_input("Generated-memory store path: ").strip()
+            args.sources = "memory-only"
+
+    source_mode = args.sources or "memory-only"
+    request = InitRequest(
         mode=mode,
-        store_path=store_path,
-        project_root=args.project if mode == "project" else None,
+        project_root=project_root,
         registry_name=args.global_name,
-        registry_path=registry_path,
+        store_path=store_path,
+        source_mode=source_mode,
+        source_paths=tuple(args.source or ()),
+        persist_exclusions=tuple(args.persist_exclusion or ()),
+        index_path=args.index_path,
+        registry_path=str(global_registry_path()),
     )
+    plan = build_initialization_plan(request)
+    if plan.preflight_problems:
+        message = "preflight failed: " + "; ".join(plan.preflight_problems)
+        if args.json:
+            print(json.dumps({
+                "schema_version": SCHEMA_VERSION,
+                "mode": "dry-run" if args.dry_run else "apply",
+                "plan": plan.to_dict(),
+                "applied": False,
+                "error": {"code": "preflight_failed", "message": message},
+            }, sort_keys=True))
+        else:
+            _render_initialization_plan(plan, dry_run=args.dry_run)
+            print(f"Cannot apply: {message}", file=sys.stderr)
+        return 2
+    existing_material_change = (
+        plan.current_configuration is not None and plan.material_config_change
+    )
+    if existing_material_change and not interactive and not args.dry_run and not args.update_existing:
+        raise ConfigurationError(
+            "existing configuration would change; inspect with --dry-run and repeat with --update-existing"
+        )
     if args.json:
         if args.dry_run:
-            print(json.dumps({"schema_version": SCHEMA_VERSION, "plan": plan.to_dict(), "applied": False}, sort_keys=True))
+            print(json.dumps({
+                "schema_version": SCHEMA_VERSION, "mode": "dry-run",
+                "plan": plan.to_dict(), "applied": False,
+            }, sort_keys=True))
             return 0
     else:
-        print("Initialization plan:")
-        print(f"  Mode: {plan.mode}")
-        print(f"  Project root: {Path(plan.config_path).parent.parent if plan.mode == 'project' else '-'}")
-        print(f"  Store path: {plan.storage_dir}")
-        print(f"  Configuration file: {plan.config_path}")
-        print(f"  Store id: {plan.store_id}")
-        print(f"  Registry entry: {plan.registry_name or '-'}")
-        print(f"  Creates: {', '.join(plan.creates) or '-'}")
-        print(f"  Updates: {', '.join(plan.updates) or '-'}")
-        print("  Deletes: none")
+        _render_initialization_plan(plan, dry_run=args.dry_run)
         if args.dry_run:
             return 0
-    if prompted and input("Apply this plan? [y/N]: ").strip().lower() not in {"y", "yes"}:
-        print("Initialization cancelled; no files were changed.")
-        return 1
-    selection = apply_init_plan(plan)
-    engine = TesseraEngine(configuration=selection)
-    engine.build_index()
+    if interactive:
+        answer = _init_input("Proceed? [y/N]: ").strip().lower()
+        if answer not in {"y", "yes"}:
+            print("Initialization cancelled; no files were changed.")
+            return 1
+    try:
+        result = apply_initialization_plan(plan)
+    except InitializationApplyError as exc:
+        if args.json:
+            print(json.dumps({
+                "schema_version": SCHEMA_VERSION,
+                "applied": False,
+                "partial_state": {
+                    "config_applied": exc.config_applied,
+                    "ignore_applied": exc.ignore_applied,
+                    "store_prepared": exc.store_prepared,
+                    "index_applied": False,
+                    "source_files_modified": 0,
+                },
+                "error": str(exc),
+                "plan": plan.to_dict(),
+            }, sort_keys=True))
+        else:
+            print(f"Initialization incomplete: {exc}", file=sys.stderr)
+            if exc.config_applied:
+                print("Configuration was saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
+            else:
+                print("Configuration was not saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
+            print("Source files modified: 0", file=sys.stderr)
+        return 3
     if args.json:
+        result_payload = result.to_dict()
         print(json.dumps({
             "schema_version": SCHEMA_VERSION,
             "plan": plan.to_dict(),
             "applied": True,
-            "storage_selection": selection.to_dict(),
-            "indexed_nodes": engine.graph.number_of_nodes(),
+            "result": result_payload,
+            # Compatibility aliases retained for the established init JSON
+            # envelope while Issue #155 adds the complete semantic plan.
+            "storage_selection": result_payload["storage_selection"],
+            "indexed_nodes": result_payload["indexed_nodes"],
         }, sort_keys=True))
     else:
-        print(f"✔ TESSERA configured {selection.storage_dir}")
-        print(f"  ({engine.graph.number_of_nodes()} nodes indexed)")
+        print(f"✔ TESSERA configured {result.configuration.storage_dir}")
+        print(f"✔ {result.indexed_nodes} nodes indexed from {len(result.indexed_sources)} selected files")
+        print("✔ source files modified: 0")
+        print("Next: `tessera doctor`, `tessera index`, or `tessera query \"...\"`")
     return 0
+
+
+def _init_input(prompt: str) -> str:
+    try:
+        return input(prompt)
+    except (EOFError, KeyboardInterrupt) as exc:
+        raise InitializationCancelled("initialization cancelled") from exc
+
+
+def _interactive_discovery(root: Path):
+    from .source_discovery import discover_sources, discover_sources_for_configuration
+
+    config_path = root / ".tessera" / "config.yaml"
+    if config_path.exists():
+        selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
+        discovery = discover_sources_for_configuration(selection)
+    else:
+        discovery = discover_sources(root)
+    print("\nKnowledge sources found")
+    for cluster in discovery.clusters:
+        marker = "x" if cluster.recommended else (" " if cluster.selectable else "!")
+        count = cluster.recommended_count + cluster.supported_count
+        detail = f"{count} selectable"
+        if cluster.forbidden_count:
+            detail += f", {cluster.forbidden_count} forbidden"
+        print(f"  [{marker}] {cluster.path:<28} {detail}")
+    clustered = {item.path.split('/', 1)[0] for item in discovery.files if "/" in item.path}
+    for item in discovery.files:
+        if "/" in item.path and item.path.split('/', 1)[0] in clustered:
+            continue
+        marker = (
+            "x" if item.selected_by_default
+            else " " if item.selectable
+            else "!" if item.classification == "FORBIDDEN"
+            else "-"
+        )
+        print(f"  [{marker}] {item.path:<28} {item.classification.lower()}")
+    return discovery
+
+
+def _interactive_source_choice(discovery):
+    selectable = [item.path for item in discovery.files if item.kind == "file" and item.selectable]
+    if not selectable:
+        print("\nNo compatible project sources were found. You can still initialize an empty generated-memory store.")
+        answer = _init_input("1. Generated-memory store only\n2. Cancel\nSelection [1]: ").strip() or "1"
+        if answer == "2":
+            raise InitializationCancelled("initialization cancelled")
+        if answer != "1":
+            raise ConfigurationError("source selection must be 1 or 2")
+        return "memory-only", []
+    answer = _init_input(
+        "\nWhat should TESSERA use?\n"
+        "1. Recommended sources\n2. Choose files/folders\n"
+        "3. Generated-memory store only\n4. Cancel\nSelection [1]: "
+    ).strip() or "1"
+    if answer == "1":
+        return "recommended", []
+    if answer == "2":
+        print("Selectable sources:")
+        for index, path in enumerate(selectable, start=1):
+            print(f"  {index}. {path}")
+        raw = _init_input("Enter comma-separated numbers or project-relative paths: ").strip()
+        selected = []
+        for item in (part.strip() for part in raw.split(",") if part.strip()):
+            if item.isdigit() and 1 <= int(item) <= len(selectable):
+                selected.append(selectable[int(item) - 1])
+            else:
+                selected.append(item)
+        return "custom", selected
+    if answer == "3":
+        return "memory-only", []
+    if answer == "4":
+        raise InitializationCancelled("initialization cancelled")
+    raise ConfigurationError("source selection must be 1, 2, 3, or 4")
+
+
+def _render_initialization_plan(plan: InitializationPlan, *, dry_run: bool) -> None:
+    payload = plan.to_dict()
+    sources = payload["sources"]
+    print("\nInitialization plan:")
+    print(f"  Scope: {plan.mode}")
+    print(f"  Project: {plan.project_root or '-'}")
+    print(f"  Configuration: {plan.config_path}")
+    print(f"  Store id: {plan.store_id}")
+    print(f"  Generated memories: {plan.generated_memory_store}")
+    print(f"  Source mode: {plan.source_mode}")
+    print(f"  Selected project sources: {sources['selected_count']} files")
+    print(f"  Derived index: {plan.index_path}")
+    print(f"  Ignored: {sources['ignored_count']}")
+    print(f"  Forbidden: {sources['forbidden_count']}")
+    print("  Source files modified: 0")
+    print(f"  Configuration changes: {', '.join(plan.config_changes) or 'none'}")
+    print(f"  Ignore changes: {', '.join(plan.ignore_changes) or 'none'}")
+    print("  Indexing: will start after confirmation")
+    if plan.current_configuration is not None:
+        print("  Existing configuration: loaded and compared")
+        _render_configuration_summary("Current", plan.current_configuration)
+        if plan.proposed_configuration is not None:
+            _render_configuration_summary("Proposed", plan.proposed_configuration)
+    if plan.warnings:
+        print("  Warnings:")
+        for warning in plan.warnings:
+            print(f"    - {warning}")
+    if plan.preflight_problems:
+        print("  Preflight problems:")
+        for problem in plan.preflight_problems:
+            print(f"    - {problem}")
+    if dry_run:
+        print("\nDRY RUN — no changes made")
+
+
+def _render_configuration_summary(label: str, mapping: Dict) -> None:
+    store = mapping.get("store", mapping)
+    sources = mapping.get("sources", {}).get("roots", [])
+    index = mapping.get("index", {})
+    print(f"  {label}:")
+    print(f"    Generated memories: {store.get('path', '-')}")
+    if sources:
+        include_count = sum(len(root.get("include", [])) for root in sources)
+        print(f"    Source allow-list entries: {include_count}")
+    print(f"    Derived index: {index.get('path', '-')}")
 
 
 def cmd_write(args):
@@ -494,7 +734,10 @@ def cmd_doctor(args):
     from .diagnostics import run_doctor
     from .display import get_console, print_doctor_report_plain, render_doctor_report
 
-    report = run_doctor(args.storage_dir)
+    report = run_doctor(
+        args.storage_dir,
+        configuration=getattr(args, "storage_selection", None),
+    )
 
     console = get_console(force_plain=getattr(args, "plain", False))
     if console is not None:
@@ -737,6 +980,26 @@ def build_parser():
     p_init.add_argument("--project", nargs="?", const=".", default=None, metavar="PATH", help="Write project config (default PATH: current directory)")
     p_init.add_argument("--global", dest="global_name", default=None, metavar="NAME", help="Write/update this named global registry entry")
     p_init.add_argument("--store", default=None, metavar="PATH", help="Store path (positional path remains a compatibility alias)")
+    p_init.add_argument(
+        "--sources", choices=SOURCE_MODES, default=None,
+        help="Source selection policy: recommended, custom, or memory-only",
+    )
+    p_init.add_argument(
+        "--source", action="append", default=None, metavar="PATH",
+        help="Safe project-relative file/directory (repeatable; requires --sources custom)",
+    )
+    p_init.add_argument(
+        "--persist-exclusion", action="append", default=None, metavar="PATH",
+        help="Explicitly add a selectable exclusion to .tessera-ignore (repeatable)",
+    )
+    p_init.add_argument(
+        "--index-path", default=None, metavar="PATH",
+        help="Project-relative derived index path (default: .tessera/index)",
+    )
+    p_init.add_argument(
+        "--update-existing", action="store_true",
+        help="Allow a declared non-interactive material update to existing configuration",
+    )
     p_init.add_argument("--non-interactive", action="store_true", help="Never prompt; fail when choices are missing")
     p_init.add_argument("--dry-run", action="store_true", help="Show the complete mutation plan without writing")
     p_init.add_argument("--json", action="store_true", help="Emit stable machine-readable output")
@@ -901,18 +1164,44 @@ def main(argv=None):
     try:
         if hasattr(args, "storage_dir") and args.command not in {"init", "quickstart"}:
             if args.command == "doctor":
-                with warnings.catch_warnings(record=True) as caught:
-                    warnings.simplefilter("always")
-                    args.storage_dir = resolve_storage_dir(args.storage_dir)
-                for warning in caught:
-                    print(f"[tessera] warning: {warning.message}", file=sys.stderr)
+                if args.storage_dir is None:
+                    configured_project = discover_project_config(os.getcwd())
+                    configured_environment = any(
+                        os.environ.get(name)
+                        for name in (CANONICAL_STORAGE_ENV, LEGACY_STORAGE_ENV)
+                    )
+                    if configured_project or configured_environment:
+                        selection = _selection_from_args(args)
+                        args.storage_selection = selection
+                        args.storage_dir = selection.storage_dir
+                    else:
+                        args.storage_dir = resolve_storage_dir(None)
+                else:
+                    with warnings.catch_warnings(record=True) as caught:
+                        warnings.simplefilter("always")
+                        args.storage_dir = resolve_storage_dir(args.storage_dir)
+                    for warning in caught:
+                        print(f"[tessera] warning: {warning.message}", file=sys.stderr)
             else:
                 selection = _selection_from_args(args)
                 args.storage_selection = selection
                 args.storage_dir = selection.storage_dir
         return args.func(args) or 0
+    except InitializationCancelled:
+        if getattr(args, "json", False) and args.command == "init":
+            print(json.dumps({"schema_version": SCHEMA_VERSION, "applied": False, "cancelled": True}, sort_keys=True))
+        else:
+            print("Initialization cancelled; no files were changed.")
+        return 1
     except ConfigurationError as exc:
-        print(f"tessera: configuration error: {exc}", file=sys.stderr)
+        if getattr(args, "json", False) and args.command == "init":
+            print(json.dumps({
+                "schema_version": SCHEMA_VERSION,
+                "applied": False,
+                "error": {"code": "configuration_error", "message": str(exc)},
+            }, sort_keys=True))
+        else:
+            print(f"tessera: configuration error: {exc}", file=sys.stderr)
         return 2
     except BrokenPipeError:
         # Harmless: happens when output is piped into `head`/`grep -m` and the
