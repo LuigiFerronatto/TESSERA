@@ -4,11 +4,12 @@
 
 - **Issue:** [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135)
 - **Decision:** `PENDING`
-- **Lifecycle status:** `PLANNED`
-- **Implementation PR:** pending publication
+- **Lifecycle status:** `IN_PROGRESS`
+- **Implementation PR:** [#216](https://github.com/LuigiFerronatto/TESSERA/pull/216)
 - **Candidate branch:** `fix/135-decomposition-fallback`
 - **Starting canonical main:** `f57727b11977e9ba9619bd2202f5897fb20c334b`
-- **Final candidate SHA:** pending publication
+- **Validated implementation candidate:** `555a8354343bb8458c6f9650dd349eb28374d2f6`
+- **Final candidate SHA:** pending exact-head audit
 - **Canonical merge SHA:** not merged
 - **Benchmark applicability:** `SMOKE_ONLY`
 
@@ -91,6 +92,12 @@ and 3.12, installed-artifact smoke, deterministic fallback equality,
 deterministic retrieval sanity, compileall, diff checks, exact-head CI and an
 exact-head Maintainer Audit. LongMemEval is not required for this contract
 repair.
+
+At implementation candidate `555a8354343bb8458c6f9650dd349eb28374d2f6`,
+the focused decomposition/memory/write-gate suite passed `113` tests. Clean
+full suites passed on Python 3.9 and 3.12 with `523 passed, 5 skipped` and 14
+expected warnings on each version. Publication metadata is the only subsequent
+repository change before the exact final-head rerun.
 
 ## Downstream routing
 

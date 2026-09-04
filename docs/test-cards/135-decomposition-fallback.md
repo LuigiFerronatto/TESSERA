@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | Issue | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) |
-| Record status | `PLANNED` |
+| Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Pending publication |
-| Head commit | Pending publication |
+| Pull request | [#216](https://github.com/LuigiFerronatto/TESSERA/pull/216) |
+| Head commit | `555a8354343bb8458c6f9650dd349eb28374d2f6` |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -74,13 +74,17 @@ success.
 
 ## How was it validated?
 
-Candidate validation is recorded on the implementation pull request and in
+Candidate validation is recorded on [PR #216](https://github.com/LuigiFerronatto/TESSERA/pull/216) and in
 [`PR_EVOLUTION_135.md`](../PR_EVOLUTION_135.md). Focused tests separately cover
 assisted non-empty output, valid empty output with zero fallback calls,
 expected provider exceptions, malformed JSON, unsupported prose, invalid root
 and item schemas, programming-error propagation, repeatability, canonical
 write-gate rejection, and Engine/CLI/MCP delegation. Exact final Python 3.9,
-Python 3.12, smoke, sanity and CI evidence remains pending publication.
+Python 3.12, smoke, sanity and CI evidence. At candidate
+`555a8354343bb8458c6f9650dd349eb28374d2f6`, the focused decomposition/gate
+set passed `113` tests and the clean full suite passed on both Python 3.9 and
+3.12 (`523 passed, 5 skipped`, with the same 14 expected warnings). Exact final
+head smoke, sanity, CI and Maintainer Audit evidence remains pending.
 
 ## What improved?
 
@@ -108,7 +112,7 @@ automatically.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #135](https://github.com/LuigiFerronatto/TESSERA/issues/135) |
-| Pull request | Pending publication |
+| Pull request | [PR #216](https://github.com/LuigiFerronatto/TESSERA/pull/216) |
 | Starting canonical main | `f57727b11977e9ba9619bd2202f5897fb20c334b` |
 | Evidence/Learnings/Decision | This record and the implementation PR; `PENDING` |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity required, LongMemEval not required |
