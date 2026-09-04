@@ -3,136 +3,113 @@
 | Field | Value |
 |---|---|
 | Issue | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `CLI_ONBOARDING` |
 | Pull request | [#210](https://github.com/LuigiFerronatto/TESSERA/pull/210) |
 | Branch | `feature/155-init-ux` |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Final candidate | `cf9f9c754becb87923c5a5c6bad4c3172cc9f344` |
+| Canonical merge | `4c112195f1572bf352d1cc6a1042c69711381da8` |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-09-04 |
 
 ## In one sentence
 
-TESSERA can turn safe project-source discovery into one reviewable plan, then
-configure and index exactly that plan only after explicit approval.
+TESSERA now turns safe project-source discovery into one reviewable initialization plan, then configures and indexes exactly that plan only after explicit approval.
 
-## What problem existed?
+## Previous behavior
 
-Configuration v2 separated generated memories, readable sources and the
-derived index, while source discovery safely classified project candidates.
-The old `init` command did not connect those contracts: it configured a
-store-only corpus and indexed immediately, without source selection or a
-complete source-aware plan.
-
-## How did TESSERA behave before?
+Before #155, Configuration v2 and safe discovery existed, but `tessera init` still behaved as a storage-oriented flow:
 
 ```text
 choose project/global store
--> print storage mutation summary
--> write config
--> index store only
+→ print storage mutation summary
+→ write config
+→ index store only
 ```
 
-Project README, documentation and other recommended knowledge could only be
-added by manually editing YAML.
+Project README, documentation and other recommended knowledge had to be added manually to configuration.
 
-## What changed or is being tested?
+## Canonical behavior after PR #210
 
-The candidate delivery adds a first-class `InitializationPlan` and keeps its
-planning and apply phases separate:
+The merged implementation adds a first-class `InitializationPlan` and keeps planning separate from mutation:
 
 ```text
 resolve scope and generated-memory destination
--> consume #154 SourceDiscoveryPlan
--> recommended / custom / memory-only selection
--> preflight config, store, sources, ignore and index
--> render the complete plan
--> confirm
--> persist configuration and explicit ignore edit
--> invoke canonical indexing with selected source roots
+→ consume #154 SourceDiscoveryPlan
+→ recommended / custom / memory-only selection
+→ preflight config, store, sources, ignore and index
+→ render complete plan
+→ confirm
+→ persist Configuration v2 and any explicitly approved ignore edit
+→ invoke canonical selected-source indexing
 ```
 
-The same plan drives interactive, non-interactive, dry-run and JSON modes.
+Interactive, non-interactive, dry-run and JSON modes use the same semantic plan.
 
-## How does it work now? — candidate, not yet on main
+### Safety invariants
 
-Interactive project setup prefers the current project, asks where newly
-generated durable memories belong, displays the #154 groups and safety counts,
-asks for a source policy, and prints the complete plan. A negative response,
-Cancel, EOF or Ctrl+C stops before the apply boundary.
+- Generated memories, readable sources and the derived index remain distinct.
+- `--dry-run`, Cancel, EOF, Ctrl+C and negative confirmation mutate no canonical state.
+- Source files remain unchanged.
+- Forbidden, escaping and unsafe symlink sources are rejected before mutation.
+- `.tessera-ignore` persistence is explicit and reuses #154 parsing semantics.
+- Existing material configuration changes require explicit confirmation or `--update-existing`.
+- No provider, model or network dependency was introduced.
 
-Non-interactive project setup requires `--sources recommended`, `custom`, or
-`memory-only`. Custom mode accepts repeatable safe project-relative `--source`
-paths. Mandatory forbidden candidates, symlinks and boundary escapes fail before
-mutation. `--dry-run` validates the plan without creating config, store, ignore
-or index state. `--json` emits only a machine-readable envelope derived from
-the same plan.
+## Validation evidence
 
-Existing configuration is loaded and compared. A non-interactive material
-change requires `--update-existing`; an equivalent rerun has no configuration
-change. Schema-v1 input stays store-only unless the caller explicitly selects
-a broader policy.
+The final candidate `cf9f9c754becb87923c5a5c6bad4c3172cc9f344` received an independent Maintainer Audit decision of `KEEP` with no supported P0/P1 findings.
 
-Deselection is one-run-only. A `.tessera-ignore` change exists only when a
-selectable path is explicitly named with `--persist-exclusion`; the proposed
-text is previewed through #154's canonical parser before apply and discovery is
-re-run after persistence.
+Exact-head evidence recorded on PR #210 includes:
 
-## Concrete example
+- focused #117/#153/#154/#155 suite: `89 passed`;
+- Python 3.9 clean-worktree suite: `502 passed, 5 skipped`;
+- Python 3.12 clean-worktree suite: `502 passed, 5 skipped`;
+- successful distribution build and installed-wheel smoke;
+- deterministic sanity unchanged: Hit@1 `0.75`, Hit@3/5 `1.00`, MRR `0.875`, evidence hit rate `1.00`;
+- source byte/hash equality across init/index/doctor/query/repeat init;
+- `source_files_modified: 0`;
+- LongMemEval correctly skipped under `SMOKE_ONLY` because retrieval/ranking/evidence semantics did not change.
+
+PR #210 was canonically merged into `main` as `4c112195f1572bf352d1cc6a1042c69711381da8` and Issue #155 closed as completed.
+
+## User-facing examples
 
 ```bash
-tessera init --project . --store memories \
-  --sources recommended --dry-run
+tessera init --project . --store memories/generated \
+  --sources recommended --non-interactive
 
-tessera init --project . --store memories \
-  --sources custom --source README.md --source docs \
-  --non-interactive
+tessera init --project . --store memories/generated \
+  --sources custom --source README.md --source docs --non-interactive
+
+tessera init --project . --store memories/generated \
+  --sources memory-only --non-interactive
+
+tessera init --project . --store memories/generated \
+  --sources recommended --dry-run --json
 ```
 
-The plan distinguishes:
+## What remains outside #155
 
-```text
-Generated memories   ./memories
-Knowledge sources    README.md + docs/*.md
-Derived index        ./.tessera/index
-Source files changed 0
-```
+This card does not implement:
 
-## How was it validated?
+- #118 clean-room release certification;
+- #119/#166 broader CLI presentation architecture;
+- #120 MCP robustness;
+- #134 PyPI publication;
+- #157–#165 intelligence/model stack;
+- #176 AI enrichment;
+- #177/#196 lifecycle hooks;
+- #190 agent-integration setup;
+- #191 conversation import;
+- incremental indexing or non-Markdown ingestion.
 
-`tests/test_issue_155_init_ux.py` covers deterministic zero-mutation dry-run,
-JSON-only output, recommended/custom/memory-only policies, forbidden and
-symlink rejection, mixed safe/forbidden clusters, explicit ignore persistence,
-existing-config diff/no-op behavior, schema-v1 migration, unwritable preflight,
-selected-source indexing, partial index failure, external generated stores,
-idempotency and source byte equality.
+## Downstream lifecycle
 
-Focused #117/#153/#154/#155 validation currently passes. Full-suite, clean-copy,
-Python 3.9/3.12, smoke, sanity, distribution and exact-head CI evidence will be
-recorded on the pull request before a final decision.
+#118 declared #155 as its only active blocker. With #155 now canonically validated, #118 is eligible to transition from `BLOCKED` to `READY` after routing/board reconciliation.
 
-## What improved?
-
-- A user sees the complete realistic plan before mutation.
-- Scripts and CI can declare the same decisions without a pseudo-TTY.
-- Generated memory, readable sources and derived index remain separate.
-- #154 policy remains the only source scanner and ignore parser.
-- Indexing happens only after planning, confirmation and configuration.
-- Source files remain byte-identical through init and repeat init.
-
-## What remains unimplemented?
-
-This card does not add a broad Rich/Textual renderer, AI enrichment, model
-profiles, semantic embeddings, reranking, incremental indexing, MCP setup,
-runtime hooks, agent integration, clean-room onboarding certification, PyPI
-publication or non-Markdown ingestion.
-
-## What is unlocked next?
-
-#118 remains blocked until this candidate is canonically merged and lifecycle
-validation is complete. #120 remains independently ready. No downstream card
-is started by this implementation branch.
+This does not change execution order. Queue remains historical/ordinal, and #135 remains the next implementation card at Queue #2.
 
 ## Technical provenance
 
@@ -141,16 +118,17 @@ is started by this implementation branch.
 | Issue/Test Card | [Issue #155](https://github.com/LuigiFerronatto/TESSERA/issues/155) |
 | Pull request | [PR #210](https://github.com/LuigiFerronatto/TESSERA/pull/210) |
 | Starting main | `51d7f6240dc094ef57ea0d42f38e69976a96d381` |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Pending exact-head audit |
+| Final candidate | `cf9f9c754becb87923c5a5c6bad4c3172cc9f344` |
+| Canonical merge | `4c112195f1572bf352d1cc6a1042c69711381da8` |
+| Decision | `KEEP` |
 | Benchmark record | `SMOKE_ONLY`; LongMemEval not required |
 | PR Evolution Audit | [PR_EVOLUTION_155.md](../PR_EVOLUTION_155.md) |
 
 ## Evolution
 
 ```text
-#153 store / sources / index
--> #154 discover / classify / group / explain
--> #155 select / plan / confirm / persist / index
--> #118 clean-room onboarding validation after canonical merge
+#153 store / sources / index VALIDATED
+→ #154 discover / classify / group / explain VALIDATED
+→ #155 select / plan / confirm / persist / index VALIDATED
+→ #118 clean-room onboarding READY after routing reconciliation
 ```
