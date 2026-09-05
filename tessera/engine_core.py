@@ -3,7 +3,7 @@ TesseraEngine — the core of the Temporal Evolving State Synthesis with Explici
 
 Integrates physical note persistence (Markdown + YAML frontmatter), the
 heterogeneous knowledge graph index, Dynamic Weighted PageRank (DW-PR)
-subgraph retrieval, and temporal conflict resolution.
+subgraph retrieval, and non-destructive conflict containment.
 """
 
 import datetime
@@ -57,8 +57,8 @@ PROCEDURAL_RELATION_BOOST_FACTOR = 1.35
 
 # How many top TF-IDF matches to consider as seed nodes for subgraph expansion.
 # Kept wide (30, not 5) so dense, highly-similar note sets — e.g. dozens of
-# evolving preference notes about the same topic — don't get truncated before
-# the ConflictResolver ever sees the full temporal history.
+# evolving preference notes about the same topic — remain available to the
+# non-destructive containment pass before the requested top_n cap is applied.
 SEED_NODE_LIMIT = 30
 SEED_NODE_MIN_SIMILARITY = 0.01
 
@@ -461,8 +461,8 @@ class TesseraEngine:
     ) -> str:
         """
         Writes a behavior/taste/feedback statement to the `preferences` store.
-        Superseded automatically by ConflictResolver at retrieval time when a
-        newer preference about the same subject exists.
+        Retrieval preserves earlier and later preference evidence; no memory is
+        treated as superseded without a separately validated deterministic rule.
         """
         return self.write_memory_note(
             mem_id=mem_id,
@@ -1083,7 +1083,7 @@ class TesseraEngine:
         3. Dynamically weights edges based on similarity + procedural-anchor boosts (DW-PR).
         4. Runs personalized PageRank over the subgraph.
         5. Filters down to actual memory-note candidates using explainable multi-signal ranking.
-        6. Applies temporal conflict resolution over preferences/facts.
+        6. Applies non-destructive possible-conflict containment.
         """
         if not self.graph or not self.node_corpus or self.tfidf_matrix is None:
             return []
@@ -1313,7 +1313,7 @@ class TesseraEngine:
 
         retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
 
-        # 6. Temporal conflict resolution (FinPerMA & QUMem).
+        # 6. Non-destructive possible-conflict containment (#16 P0).
         if resolve_conflicts:
             retrieved_memories = ConflictResolver.resolve_temporal_conflicts(retrieved_memories)
             retrieved_memories.sort(key=lambda x: x["score"], reverse=True)

@@ -53,13 +53,17 @@ class WriteGatingEngine:
     def audit_and_sanitize(self, content_text: str, tags: List[str]) -> Tuple[str, float, bool]:
         # Identifica tentativas de bypass ou envenenamento e higieniza o conteúdo.
 Ação: Varre o texto em busca de instruções contraditórias (ex: "ignore as instruções anteriores"). Se detectado, o score de risco é elevado e o trecho hostil é expurgado do texto físico gravado no disco, neutralizando a injeção oculta [12].
-### 3. Resolução Cronológica de Contradições (`tessera/conflict.py`)
-Diferente de sistemas de perfil estáticos que ignoram choques de comportamento ou mudanças de preferências do usuário [13], o ConflictResolver processa as memórias candidatas e resolve contradições:
+### 3. Contenção Não Destrutiva de Conflitos (`tessera/conflict.py`)
+O `ConflictResolver` preserva as memórias candidatas quando ainda não existe
+regra determinística capaz de provar supersessão:
 
 class ConflictResolver:
     @staticmethod
     def resolve_temporal_conflicts(retrieved_memories: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-Funcionamento: Utiliza a biblioteca datetime.fromisoformat de forma defensiva para ler os timestamps. Ele mapeia um "assunto de conflito" (ex: alex_banco_dados) e, caso haja múltiplos registros de preferências ou fatos concorrentes sobre o mesmo tema, descarta os registros obsoletos, mantendo apenas a informação cronologicamente mais recente (a preferência válida e ativa) [3, 10, 13].
+Funcionamento: devolve uma nova lista com os mesmos objetos, IDs, proveniência,
+scores e ordem do ranking. A antiga chave aproximada (`primeira entidade +
+primeira tag`) não é tratada como `state_key`, e recência sozinha não apaga
+histórico. Validade temporal e supersessão completa continuam experimentais.
 ### 4. Construção Dinâmica de Grafo e DW-PR (`tessera/engine.py`)
 A classe core do sistema gerencia o ciclo de vida físico e lógico do grafo de memórias:
 
@@ -82,7 +86,7 @@ class LAOAgent:
         self.memory_engine.build_index()
 
     def run_task(self, task_instruction: str):
-        # 1. Recupera o contexto relevante e resolve conflitos temporais autonomamente
+        # 1. Recupera o contexto e preserva possíveis conflitos para inspeção
         retrieved_context = self.memory_engine.retrieve_context(
             query_text=task_instruction,
             top_n=3,
