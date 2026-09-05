@@ -107,18 +107,17 @@ noise (see the buckets after the queue).
 ## NOW — pick only from here
 
 ```text
-🥇 #155 Init UX / source selection              P0 release-critical
-🥈 #135 Decomposer fallback integrity           P0 contract integrity
-🥉 #16  Conflict resolver containment           P0 state safety
+🥇 #155 Init UX / source selection              VALIDATED
+🥈 #135 Decomposer fallback integrity           VALIDATED
+🥉 #16  Conflict resolver containment           P0 state safety; next selection
 ```
 
-`#155` is the next release-critical executable card in the validated chain
-`#153 -> #154 -> #155 -> #118 -> #134`. `#135`/`#16` run in parallel as a
-Technical Integrity lane: `#135` fixes a live contract break (documented
-`LLM failure -> heuristic fallback`, actual runtime `LLM failure -> []`) and
-`#16` is the P0 destructive-newest-only-filtering containment fix. Neither
-blocks `#155`; neither should be forgotten. When one of these three ships,
-pull the next unblocked item from `NEXT` below.
+`#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
+canonical validated deliveries. `#135` (decomposer fallback integrity) merged
+as `c324ac2f46d48f7b49769b2fea9df0a2a93b42de` with decision `KEEP`. `#16`,
+historical Queue #3, is now the next implementation selection for the P0
+destructive-newest-only-filtering containment slice. Its full temporal
+supersession scope remains later work.
 
 ## NEXT
 
@@ -139,12 +138,12 @@ where they resume once selected.
 
 ```text
 NOW — Product foundation
-1  #155 Init UX / source selection
-2  #135 Decomposer fallback integrity      (parallel)
-3  #16  Conflict resolver containment      (parallel)
+1  #155 Init UX / source selection          VALIDATED
+2  #135 Decomposer fallback integrity       VALIDATED (`KEEP`; `c324ac2f...`)
+3  #16  Conflict resolver containment       next selection
 4  #118 Clean-room onboarding
 5  #120 MCP transport/runtime robustness
-6  #87  LICENSE / CONTRIBUTING             (parallel)
+6  #87  LICENSE / CONTRIBUTING              (parallel)
 7  #134 PyPI release
 -> TESSERA can be installed, configured, index a real project, and be used via MCP.
 
@@ -661,9 +660,9 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
 | [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153/#154 are satisfied; #155 remains the transitive productization blocker through #118. |
-| [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | open | `READY` | EXECUTABLE | QUMem | P0 deterministic decomposition fallback; no hard dependency. |
-| [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135/#74; F/P/I fidelity + 1-pass vs 3-pass. |
-| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #135; source episode/supporting turns/temporal position. |
+| [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
+| [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
+| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) dependency satisfied; source episode/supporting turns/temporal position. |
 | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) | open | `BLOCKED` | EXECUTABLE | QUMem | #74 satisfied; DoR still requires frozen reviewed episode-boundary fixture. |
 | [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) | open | `DEFERRED` | EXECUTABLE | QUMem | Hard dependency #74 is satisfied; intentionally parked while release/safety lane is selected. |
 | [#140](https://github.com/LuigiFerronatto/TESSERA/issues/140) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #139/#74/#96; owns WHAT subqueries/stores retrieve evidence. |
@@ -985,8 +984,8 @@ INTELLIGENCE EPIC #164                             TRACKER
 later #17 adaptive retrieval
 
 QUMEM EPIC #145                                    TRACKER
-#135 READY
-#136/#137 BLOCKED
+#135 VALIDATED
+#136/#137 READY
 #138 BLOCKED
 #139 DEFERRED -> #140 BLOCKED
 #73 -> #15 -> #16 full

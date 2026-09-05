@@ -76,7 +76,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
         "#25", "#26", "#27", "#28", "#32", "#67", "#69", "#70", "#71", "#72",
         "#73", "#78", "#80", "#87", "#103", "#104", "#105", "#106",
         "#118", "#119", "#120", "#121", "#134",
-        "#135", "#136", "#137", "#138", "#139", "#140", "#141", "#142",
+        "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
         "#155", "#157", "#158", "#159", "#160", "#161",
         "#162", "#163", "#164", "#165", "#166", "#167", "#168", "#169",
@@ -85,7 +85,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#153", "#154", "#172"):
+    for issue in ("#135", "#153", "#154", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -118,10 +118,12 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 4, ready_executable
+    assert len(ready_executable) == 5, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert any("[#155]" in line for line in ready_executable)
-    assert any("[#135]" in line for line in ready_executable)
+    assert not any("[#135]" in line for line in ready_executable)
+    assert any("[#136]" in line for line in ready_executable)
+    assert any("[#137]" in line for line in ready_executable)
 
 
 def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
