@@ -127,8 +127,8 @@ class TesseraTaskHook:
           1. Information-Need Agent — what history does this task need?
           2. Retrieval Planner Agent — which store(s) + what search query?
           3. Retrieval — pulls candidates from the relevant typed store(s),
-             with ConflictResolver already discarding obsolete entries.
-          4. User-State Inference Agent — consolidates surviving memories
+             preserving possible-conflict history.
+          4. User-State Inference Agent — consolidates retrieved memories
              into one clean, validated context block.
 
         `llm_fn`: overrides this call's LLM backend for the 3 pipeline

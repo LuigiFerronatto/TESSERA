@@ -196,8 +196,19 @@ EVIDENCE LEDGER / PROVENANCE
    ├─ exact span when uniquely provable
    └─ freshness state
    ↓
+NON-DESTRUCTIVE CONFLICT CONTAINMENT
+   ├─ possible conflict != resolved conflict
+   ├─ newer != more true
+   └─ preserve candidate identity, provenance, score and order
+   ↓
 STRUCTURED RETRIEVAL RESULT
 ```
+
+The #16 P0 containment pass deliberately removes no candidates. The former
+compatibility key (`first entity + first tag`) was order-sensitive and could
+group unrelated memories; it was not a validated `state_key`. Full temporal
+validity, state identity and auditable supersession remain planned work under
+#15 and the later #16 slice.
 
 ## Current write path
 
@@ -498,7 +509,7 @@ Sanity metrics are regression indicators, not competitive benchmark claims.
 | `tessera/engine.py` | Evidence-aware facade integrating retrieval with provenance |
 | `tessera/evidence.py` | Evidence records, ledger, freshness and span/provenance helpers |
 | `tessera/security.py` | Basic deterministic write-side hostile-pattern audit/sanitization |
-| `tessera/conflict.py` | Existing compatibility conflict logic; future state/arbitration redesign is experimental |
+| `tessera/conflict.py` | Non-destructive P0 containment; full state/supersession remains experimental |
 | `tessera/models.py` | Domain models for memory/write paths |
 | `tessera/config.py` | Closed v1/v2 project and global schemas, bounded discovery, and one resolved store/source/index boundary |
 | `tessera/cli.py` | Human CLI surface |
@@ -536,7 +547,7 @@ Planned / experimental:
 #15 temporal model + state keys
 #71/#72 harness adapters + instruction resolver
 #73 source/memory revision history
-#16 conflict/supersession
+#16 P0 destructive-filter containment (implemented); full supersession planned
 #27 Evidence Arbitration
 #32 source authority + instruction precedence
 #20 four-state evidence sufficiency/abstention

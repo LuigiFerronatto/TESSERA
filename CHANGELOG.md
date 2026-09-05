@@ -82,6 +82,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- Default Engine, CLI, MCP and assisted retrieval no longer discard older
+  factual/preference candidates through the coarse `first entity + first tag`
+  newest-only heuristic. Possible-conflict evidence now remains ranked and
+  provenance-preserving; full temporal supersession is still deferred.
+  ([#16](https://github.com/LuigiFerronatto/TESSERA/issues/16))
 - Assisted episode decomposition now preserves a valid empty `[]` as an
   intentional result, while expected provider failures, malformed responses
   and invalid result schemas invoke the existing deterministic offline

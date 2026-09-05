@@ -3,7 +3,7 @@ TESSERA MCP Server — exposes the TESSERA engine as a Model Context Protocol se
 
 Tools:
     rebuild_index()                 — re-scans the storage dir and rebuilds the graph.
-    query_memories(query, top_n)    — DW-PR subgraph retrieval + conflict resolution.
+    query_memories(query, top_n)    — DW-PR retrieval + conflict containment.
     query_store(query, store)       — same, scoped to one typed store.
     write_memory(...)               — gated, sanitized write of a new memory note.
     decompose_episode(...)          — QUMem-style automatic typed decomposition: mechanically
@@ -78,7 +78,7 @@ def rebuild_index() -> Dict[str, Any]:
 def query_memories(query: str, top_n: int = 7, resolve_conflicts: bool = True) -> List[Dict[str, Any]]:
     """
     Retrieves the most relevant memory notes for a query using DW-PR subgraph
-    search, with temporal conflict resolution applied over preferences/facts.
+    search, preserving possible-conflict preference/factual history.
 
     Each result includes `filepath` (so a caller can jump straight to the
     file) and `related_ids` (other memory notes directly connected in the
@@ -214,7 +214,7 @@ def query_memories_pipeline(
     Runs the optional three-step pipeline (Information Need -> Retrieval Planner
     -> State Inference) around TESSERA retrieval. Returns the consolidated
     context plus the reasoning trail, including stores queried, rewritten query
-    and raw memories that survived conflict resolution.
+    and raw memories preserved by non-destructive conflict containment.
 
     This assisted mode is optional; direct deterministic retrieval remains a
     first-class TESSERA capability.

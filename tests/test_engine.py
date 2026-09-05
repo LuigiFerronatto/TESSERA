@@ -79,7 +79,7 @@ def test_write_gating_rejects_direct_hostile_content(engine):
     assert not (Path(engine.storage_dir) / "mem_unsafe.md").exists()
 
 
-def test_conflict_resolver_keeps_most_recent_preference(engine):
+def test_conflict_resolver_preserves_preference_history(engine):
     engine.write_memory_note(
         mem_id="mem_pref_old",
         mem_type="preference",
@@ -100,8 +100,8 @@ def test_conflict_resolver_keeps_most_recent_preference(engine):
 
     results = engine.retrieve_context("Qual linguagem o Alex prefere?", top_n=5, resolve_conflicts=True)
     ids = [r["id"] for r in results]
-    # Only the most recent preference note about the same subject should remain.
-    assert "mem_pref_old" not in ids
+    # Possible conflict is not enough evidence to delete the older preference.
+    assert "mem_pref_old" in ids
     assert "mem_pref_new" in ids
 
 
