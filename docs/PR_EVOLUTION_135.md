@@ -19,6 +19,8 @@ Benchmark applicability: NOT_APPLICABLE
 
 This reconciliation changes documentation and portfolio routing only; it does
 not change runtime, evaluation, retrieval, or decomposition behavior.
+Project #9 was synchronized from the authoritative issue routing and portfolio
+manifest; the verification dry-run reported `0` remaining changes.
 
 The branch started only after Issue #155 merged as canonical commit
 `4c112195f1572bf352d1cc6a1042c69711381da8` and its lifecycle reconciliation
