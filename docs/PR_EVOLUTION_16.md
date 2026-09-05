@@ -4,14 +4,14 @@
 
 - **Issue:** [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16)
 - **Slice:** P0 containment only
-- **Decision:** `PENDING`
-- **Lifecycle status:** `IN_PROGRESS`
+- **Decision:** `KEEP`
+- **Lifecycle status:** `VALIDATED` (P0 containment only; full #16 supersession remains `BLOCKED` on #15/#73/#96)
 - **Implementation PR:** [#219](https://github.com/LuigiFerronatto/TESSERA/pull/219)
 - **Candidate branch:** `fix/16-conflict-resolver-containment`
 - **Starting canonical main:** `700b5ada9be059ced1c9f0d3d369b9824f4baaa5`
-- **Final candidate SHA:** pending exact-head audit
-- **Canonical merge SHA:** not merged
-- **Benchmark applicability:** `REQUIRED`
+- **Final candidate SHA:** `2420bb5aa70e5d9663b92ae2785eda33f42f1cbe`
+- **Canonical merge SHA:** `708c973e23d5c4eb8a52d359a2cadc153e161a90`
+- **Benchmark applicability:** `REQUIRED` (met — LongMemEval V1 dev-50 passed at the candidate head with 0 gating/query regressions)
 
 ## Audited destructive baseline
 
@@ -71,9 +71,11 @@ evidence are required before a `KEEP` decision.
 - Ranking, graph expansion, PageRank, embeddings and recency scoring are
   unchanged.
 
-## Expected lifecycle routing
+## Lifecycle routing (post-merge reconciliation)
 
-Only after canonical merge and lifecycle reconciliation may the P0 slice be
-recorded as `VALIDATED`. The conceptual full #16 issue remains split and its
-P1 supersession work stays later/blocked on #15/#73/#96. No downstream card is
-promoted automatically; #118 remains Queue #4.
+PR #219 merged into `main` as `708c973e23d5c4eb8a52d359a2cadc153e161a90`. The
+P0 containment slice of #16 is now recorded as `VALIDATED`. The conceptual
+full #16 issue remains split: its P1 temporal supersession work stays
+`LATER`/`BLOCKED` on #15/#73/#96, since none of those prerequisites changed as
+part of this merge. No downstream card is promoted automatically; #118
+remains Queue #4.
