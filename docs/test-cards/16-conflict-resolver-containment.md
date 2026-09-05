@@ -5,7 +5,7 @@
 | Issue | [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) |
 | Record status | `IN_PROGRESS` (P0 containment); `BLOCKED` (full supersession) |
 | Capability type | `runtime` |
-| Pull request | Pending publication |
+| Pull request | [#219](https://github.com/LuigiFerronatto/TESSERA/pull/219) |
 | Head commit | Pending exact-head audit |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
@@ -110,7 +110,7 @@ Queue #4 remains #118.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Issue #16](https://github.com/LuigiFerronatto/TESSERA/issues/16) |
-| Pull request | Pending publication |
+| Pull request | [PR #219](https://github.com/LuigiFerronatto/TESSERA/pull/219) |
 | Starting canonical main | `700b5ada9be059ced1c9f0d3d369b9824f4baaa5` |
 | Evidence/Learnings/Decision | Focused pre-fix and post-fix regression runs; decision pending exact-head audit |
 | Benchmark record | `REQUIRED`; candidate-set membership changes, so LongMemEval regression evidence is required |

@@ -6,6 +6,7 @@
 - **Slice:** P0 containment only
 - **Decision:** `PENDING`
 - **Lifecycle status:** `IN_PROGRESS`
+- **Implementation PR:** [#219](https://github.com/LuigiFerronatto/TESSERA/pull/219)
 - **Candidate branch:** `fix/16-conflict-resolver-containment`
 - **Starting canonical main:** `700b5ada9be059ced1c9f0d3d369b9824f4baaa5`
 - **Final candidate SHA:** pending exact-head audit
