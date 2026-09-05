@@ -138,7 +138,7 @@ Narre:
 > É o seguinte: primeiro, ele pega a minha pergunta em português normal e usa uma parada clássica de busca chamada **TF-IDF com similaridade de cosseno** pra achar os arquivos mais parecidos (que são as 'sementes').
 > Depois, ele olha pro **grafo de conhecimento** que montamos com as notas do LAO e faz uma expansão de 1-hop: ele puxa todos os arquivos conectados (por tags ou entidades) até um nível de distância.
 > Aí vem o pulo do gato: ele roda uma versão modificada do algoritmo **PageRank do Google** (o Dynamic Weighted PageRank) sobre esse pedaço do grafo, dando um bônus de peso para arestas de procedimentos importantes. O PageRank faz os arquivos mais relevantes 'ganharem força' no ranking.
-> Por fim, ele roda um **ConflictResolver** que checa a data de tudo e descarta memórias antigas que foram atualizadas ou canceladas. Assim, ele te entrega só a verdade atual em milissegundos, sem precisar de um agente de memória especializado engatilhando dezenas de subprocessos manuais de `grep` e `glob` no bash, gastando tempo precioso e tokens, o que antes causava timeouts silenciosos!"
+> Por fim, ele roda um **ConflictResolver** de contenção: possíveis conflitos continuam visíveis, porque uma data mais recente não prova sozinha que a memória anterior deixou de valer. A busca continua determinística e offline sem apagar evidência histórica."
 
 ### Cena 4 — Benchmark lado a lado (a tabela de verdade)
 
@@ -241,8 +241,8 @@ Narre:
 >
 > Primeiro, o **Agente de Necessidade (Need)** analisa o prompt principal e se pergunta: 'Cara, o que eu realmente preciso resgatar do passado do LAO pra fazer isso?'. Ele define a intenção da busca de forma lógica.
 > Depois, o **Agente de Planejamento (Planner)** traduz essa necessidade em uma query de busca otimizada pro nosso motor. E ele é esperto: decide em quais 'gavetas tipadas' do Tessera (Facts, Preferences ou Insights) buscar, evitando ler arquivos inúteis e cruzar dados à toa.
-> Aí, o motor offline que mostrei na Cena 3 entra em ação, puxa as notas e o ConflictResolver limpa as versões obsoletas.
-> Por fim, o **Agente de Inferência de Estado** junta os sobreviventes, descarta redundâncias e consolida tudo num resumo Markdown redondinho pra injetar no prompt do LEAD.
+> Aí, o motor offline que mostrei na Cena 3 entra em ação, puxa as notas e o ConflictResolver preserva possíveis conflitos em vez de escolher um vencedor por recência.
+> Por fim, o **Agente de Inferência de Estado** recebe toda a evidência ranqueada e consolida um resumo Markdown para o LEAD, sem tratar “mais novo” como sinônimo de “mais verdadeiro”.
 >
 > E o melhor de tudo: se a rede cair ou o Azure Gateway falhar, o Tessera tem um **fallback determinístico offline** que simula esses três agentes localmente sem quebrar o fluxo.
 > Note o tempo: ~6-8 segundos para as 3 chamadas reais de LLM na nuvem do Azure, entregando uma síntese perfeita pro agente trabalhar!"

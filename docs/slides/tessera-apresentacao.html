@@ -597,7 +597,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
     <div class="pipe-step">
       <span class="step-num">03</span>
       <h3>Retrieval + ConflictResolver</h3>
-      <p>Resgata notas físicas, caminha no grafo pelo PageRank e executa a exclusão e substituição pesada do que for conflitante no tempo.</p>
+      <p>Resgata notas físicas, caminha no grafo pelo PageRank e preserva possíveis conflitos para inspeção, sem exclusão silenciosa por recência.</p>
       <span class="pipe-arrow">→</span>
     </div>
     <div class="pipe-step" style="background:var(--dark-blue);">
@@ -613,29 +613,24 @@ h2{font-weight:700; letter-spacing:-.01em;}
 <section class="slide bg-white content">
   <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
   <div class="kicker"><span class="dot"></span>Mecânica Interna</div>
-  <h2>ConflictResolver: Salvando o Bolo de Chocolate</h2>
-  <p class="lede">O algoritmo de resolução em <code>conflict.py</code> é a garantia de que as preferências obsoletas nunca chegarão no LAO. É ele quem "mata" a nota velha de bolo de cenoura.</p>
+  <h2>ConflictResolver: Preservando a História</h2>
+  <p class="lede">O algoritmo de contenção em <code>conflict.py</code> impede que uma preferência antiga seja apagada só porque outra foi registrada depois.</p>
   <div class="split" style="margin-top:8px;">
     <div>
       <div class="codeblock" style="font-size:12px; line-height:1.5;">
-<span class="cm"># Algoritmo de resolução de conflito temporal</span>
-<span class="kw">for</span> note <span class="kw">in</span> retrieved_notes:
-    key = note.entity_name + note.tags[<span class="st">0</span>]
-    <span class="kw">if</span> key <span class="kw">in</span> active_states:
-        <span class="kw">if</span> note.timestamp > active_states[key].timestamp:
-            <span class="fn">invalidate_note</span>(active_states[key])
-            active_states[key] = note
-        <span class="kw">else</span>:
-            <span class="fn">invalidate_note</span>(note)
-    <span class="kw">else</span>:
-        active_states[key] = note
+<span class="cm"># Contenção P0: preservar evidência</span>
+contained = <span class="fn">list</span>(retrieved_notes)
+
+<span class="cm"># possível conflito != conflito resolvido</span>
+<span class="cm"># mais novo != mais verdadeiro</span>
+<span class="kw">return</span> contained
       </div>
     </div>
     <div style="display:flex; flex-direction:column; gap:16px; justify-content:center;">
-      <h3 style="font-size:20px; font-weight:700;">Como bloqueamos a contaminação:</h3>
-      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">1. <b>A Chave Composta:</b> Juntamos a Entidade Foco com a primeira Tag (<code>User + #sobremesa</code>). Se colidir, sabemos que o tópico é o mesmo.</p>
-      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">2. <b>Override Histórico:</b> A nota do bolo de chocolate de Julho descarta instantaneamente a de Janeiro por Timestamp. Ambas vivem no disco, mas só a verdade prevalece.</p>
-      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">3. <b>Purificação do Fluxo:</b> O Agente final nunca nem fica sabendo que o bolo de cenoura um dia existiu.</p>
+      <h3 style="font-size:20px; font-weight:700;">Como contemos o risco:</h3>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">1. <b>Sem falsa identidade:</b> Entidade + primeira tag não é um <code>state_key</code> validado.</p>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">2. <b>Histórico preservado:</b> Janeiro e Julho continuam disponíveis para entender mudança, contexto e motivo.</p>
+      <p style="font-size:14.5px; line-height:1.5; color:var(--mgray1);">3. <b>Sem falsa resolução:</b> A etapa futura de estado decide aplicabilidade somente com regras e evidência suficientes.</p>
     </div>
   </div>
 <div class="slide-index">15 / 22</div>

@@ -140,13 +140,13 @@ Se você perguntar offline: *"Quanto tempo demora chamar a IA pelo gateway da Az
 2.  **Seguindo os Barbantes:** A partir de `Nota A`, o motor caminha fisicamente pelas linhas de lã vermelha:
     *   Ele segue a ponte da tag `#azure` e descobre a `Nota B` (custos).
     *   Ele segue a ponte da entidade `Azure AI Gateway` e descobre a `Nota C` (um erro que aconteceu semana passada).
-3.  **Ranking e Limpeza:** Mesmo que a pergunta não falasse sobre "custos" ou "erros", o sistema as encontrou porque elas estavam a "um palmo de barbante" de distância. Ele calcula quais notas têm mais linhas ligadas a elas (PageRank) e descarta as antigas que foram atualizadas (ConflictResolver).
+3.  **Ranking e Contenção:** Mesmo que a pergunta não falasse sobre "custos" ou "erros", o sistema as encontrou porque elas estavam a "um palmo de barbante" de distância. Ele calcula quais notas têm mais linhas ligadas a elas (PageRank) e preserva possíveis conflitos; ser mais recente, sozinho, não apaga uma nota antiga.
 
 ### D. E como funcionam os Agentes no Modo Online (Com LLM)?
 No modo online, você contrata **três investigadores auxiliares (agentes especialistas)** para irem ao quadro por você:
 *   **O Investigador 1 (Necessidade - Need):** Lê sua tarefa e define o objetivo: *"Pra fazer isso, preciso descobrir o procedimento técnico e o tempo de resposta que usamos antes."*
 *   **O Investigador 2 (Planejador - Planner):** Transforma o objetivo em uma busca certeira pro motor caminhar nos barbantes, escolhendo as gavetas certas (Fatos, Preferências ou Insights) para não perder tempo. O motor offline roda e resgata as notas físicas do quadro.
-*   **O Investigador 3 (Inferência - Inference):** Lê todos os papéis coletados, joga fora o lixo e o que está desatualizado, e resume tudo em um único relatório limpo de uma página para o agente principal trabalhar.
+*   **O Investigador 3 (Inferência - Inference):** Lê todos os papéis coletados, inclusive possíveis conflitos preservados, e resume o contexto sem assumir que o registro mais recente é automaticamente verdadeiro.
 *   *Se a rede cair ou o LLM falhar:* O Tessera aciona um **fallback offline determinístico** que simula os detetives localmente por regras, impedindo o pipeline do LAO de quebrar.
 
 ---

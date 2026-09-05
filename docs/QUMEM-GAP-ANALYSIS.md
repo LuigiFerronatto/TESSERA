@@ -136,24 +136,21 @@ para retornar uma lista de `(sub_query, target_stores)` em vez de uma
 tupla única, e `retrieve_context()` já suporta ser chamado múltiplas vezes
 com merge de resultados no chamador. Não é urgente hoje.
 
-## 4. Conflict Resolution — fiel em espírito, chave de conflito é grosseira
+## 4. Conflict Resolution — contenção segura, supersessão ainda pendente
 
 **Paper**: cita abordagens tipo Zep (grafo de conhecimento temporal) como
 related work para lidar com validade temporal de fatos.
 
-**Tessera hoje**: `ConflictResolver.resolve_temporal_conflicts()` em
-`conflict.py` resolve por timestamp, com chave `entity[0] + first_tag`.
-Isso captura o caso comum bem, mas tem 2 edge cases reais:
-- **Falso merge**: duas notas sobre sujeitos genuinamente diferentes que
-  compartilham a mesma primeira entidade + primeira tag colidem na mesma
-  chave de conflito.
-- **Falso negativo**: a mesma entidade/sujeito, mas com tags em ordem
-  diferente entre notas, não é detectada como conflito.
+**Tessera hoje**: o P0 de #16 contém o risco preservando todos os candidatos
+na ordem ranqueada. O algoritmo anterior agrupava por
+`entity[0] + first_tag` e mantinha apenas o registro mais recente. Essa chave
+causava falso merge, dependia da ordem dos metadados e não provava que duas
+memórias representavam o mesmo estado.
 
-**Recomendação concreta**: baixa prioridade agora (nenhum caso real
-reportado ainda), mas se aparecer, o fix é trocar `first_tag` por um
-`frozenset(tags)` ou por uma combinação determinística
-(`entity[0] + sorted(tags)[0]`), tornando a chave insensível à ordem.
+O método público e o parâmetro de compatibilidade continuam existindo, mas o
+fluxo normal não apaga histórico. Isto não implementa `state_key`, validade
+temporal, trajetória `Tq` nem supersessão: #15 e o slice posterior de #16
+continuam donos dessas decisões.
 
 ## 5. Eficiência — não comparável diretamente
 
@@ -171,7 +168,7 @@ automática"), não uma ineficiência a ser corrigida.
 | 1 | Sem detecção dinâmica de fronteira de episódio | 🟡 Gap real vs. paper | ✅ Implementado (`episode_boundary.py`, heurística timeout+TF-IDF) |
 | 2 | Decomposição típica é manual, não automática | 🟡 Divergência de design documentada | ✅ Implementado (`decomposer.py` + engine/hooks/CLI/MCP), testado com LLM real (Azure Gateway, ~3-5s, 5-8 memórias/episódio) |
 | 3 | Retrieval planning é single-query, keyword-heurístico | 🟢 Simplificação aceitável no volume atual | Documentado, plano de extensão descrito - não implementado |
-| 4 | Chave de conflito (`entity[0]+first_tag`) é grosseira | 🟢 Nenhum caso real reportado ainda | Documentado, fix trivial se aparecer - não implementado |
+| 4 | Filtro destrutivo por `entity[0]+first_tag` | 🔴 Perda de evidência/trajetória | ✅ P0 contido: todos os candidatos preservados; supersessão completa continua pendente |
 
 ## Como usar as duas novas capacidades (paridade Engine/Hook/CLI/MCP)
 

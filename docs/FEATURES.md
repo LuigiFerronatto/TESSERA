@@ -111,6 +111,12 @@ The purpose is not to claim full semantic retrieval. The purpose is to make rank
 
 The project-agnostic sanity fixture includes both direct and colloquial purpose queries. A paraphrase can still rank the intended charter memory below another relevant candidate because the current retrieval path remains strongly lexical. That limitation is kept visible rather than hidden by query-specific tuning.
 
+After ranking, the compatibility `ConflictResolver` preserves all retrieved
+candidates in order. It does not use recency or the historical coarse
+`first entity + first tag` grouping to delete evidence. This is containment,
+not a claim that temporal conflict or supersession is solved; those semantics
+remain in #15 and the later #16 slice.
+
 ---
 
 ## 5. Query-aware Relevant Evidence
@@ -293,6 +299,7 @@ source text
 → explainable ranking
 → relevant evidence
 → provenance/evidence ledger
+→ non-destructive possible-conflict containment
 → structured retrieval result
 
 write_memory_note
@@ -315,7 +322,7 @@ temporal state / state keys                  #15
 harness adapters / instruction resolver      #71/#72
 authority + instruction precedence           #32
 source revision history                      #73
-conflict resolution                          #16
+full conflict/supersession                   #16 later slice
 evidence/source arbitration                  #27
 4-state sufficiency / abstention              #20
 LongMemEval                                   #18

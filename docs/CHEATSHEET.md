@@ -362,7 +362,9 @@ já consegue invocar diretamente.
 ### `query_memories(query, top_n=3, resolve_conflicts=True)`
 Mesma busca do `tessera query`. Cada resultado já inclui `filepath` e
 `related_ids` (equivalente a `--paths-only`/`--show-related`, sem precisar
-de flag — sempre vem preenchido).
+de flag — sempre vem preenchido). `resolve_conflicts=True` mantém a passagem
+de compatibilidade, mas ela é não destrutiva: conflito possível não elimina
+evidência e recência sozinha não prova supersessão.
 
 ### `query_store(query, store, top_n=3, resolve_conflicts=True)`
 Igual, mas filtra por typed store: `store="factual"` \| `"preference"` \|

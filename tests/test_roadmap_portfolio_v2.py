@@ -118,12 +118,16 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 5, ready_executable
+    assert len(ready_executable) == 4, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
     assert any("[#136]" in line for line in ready_executable)
     assert any("[#137]" in line for line in ready_executable)
+
+    issue_16 = _row(text, "#16")
+    assert "`IN_PROGRESS` containment" in issue_16
+    assert "`BLOCKED` full" in issue_16
 
 
 def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
@@ -163,7 +167,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 0
+    assert len(now_executable) == 1
+    assert "[#16]" in now_executable[0]
 
     assert "NOW executable                 0" in text
     assert "READY                          7 total / 4 executable" in text

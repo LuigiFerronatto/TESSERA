@@ -12,12 +12,12 @@ preferences / insights) before the main agent ever acts:
     2. Retrieval Planner Agent  — turns that need into a focused search plan,
        decides which typed store(s) (facts / preferences / insights) are
        relevant, and pulls candidates from each via
-       TesseraEngine.retrieve_from_store (DW-PR + ConflictResolver).
+       TesseraEngine.retrieve_from_store (DW-PR + non-destructive conflict
+       containment).
     3. User-State Inference Agent — joins the clues found across stores,
-       discards memories that are now obsolete (ConflictResolver already
-       drops superseded preferences/facts at retrieval time), and produces
-       a validated summary of current state, ready to inject into the main
-       agent's context.
+       receives the preserved candidate evidence and produces an assisted
+       summary for the main agent. It must not assume that newer evidence
+       automatically supersedes older evidence.
 
 Each "agent" step is a prompt template plus a call to an explicitly supplied
 `llm_fn`. Pass an application-owned callable of
@@ -53,7 +53,7 @@ PLANNER_AGENT_SYSTEM_PROMPT = (
 
 INFERENCE_AGENT_SYSTEM_PROMPT = (
     "You are the Tessera State Inference Agent. Given the raw retrieved memory notes "
-    "(already chronologically resolved by the ConflictResolver), "
+    "(with possible conflicts preserved rather than silently resolved), "
     "consolidate them into a clean, actionable, and non-redundant context block "
     "for the main agent.\n\n"
     "CRITICAL CONSTRAINTS FOR EXPLICIT GRAPH PROVENANCE & RELATIONAL TRACING:\n"
@@ -156,8 +156,8 @@ class TesseraOrchestrator:
     def infer_user_state(self, task_instruction: str, raw_memories: List[Dict[str, Any]]) -> str:
         """Step 3 (User-State Inference Agent): joins the clues found across
         stores and consolidates them into a clean, deduplicated context block.
-        Obsolete memories were already discarded by ConflictResolver at
-        retrieval time, so this step only needs to synthesize what survived."""
+        Earlier and later candidates remain available; this assisted step must
+        not treat recency alone as proof of supersession."""
         if not raw_memories:
             return "(No relevant memory found for this task.)"
 
