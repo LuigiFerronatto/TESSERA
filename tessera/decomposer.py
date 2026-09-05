@@ -39,7 +39,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Literal, Optional, Tuple
 
 from .models import Episode
 
@@ -77,17 +77,60 @@ class DecomposedMemory:
     content: str
 
 
-def decompose_episode(episode: Episode, llm_fn: LlmFn) -> List[DecomposedMemory]:
+@dataclass(frozen=True)
+class DecompositionResult:
+    """Pure decomposition output plus truthful assisted/fallback diagnostics."""
+
+    memories: Tuple[DecomposedMemory, ...]
+    mode: Literal["assisted", "deterministic_fallback"]
+    fallback_reason: Optional[
+        Literal["provider_unavailable", "provider_error", "parse_error", "invalid_schema"]
+    ] = None
+
+
+@dataclass(frozen=True)
+class DecompositionWriteResult:
+    """Gated persistence result without changing the existing list-returning API."""
+
+    filepaths: Tuple[str, ...]
+    decomposition: DecompositionResult
+
+
+@dataclass(frozen=True)
+class _AssistedOutcome:
+    memories: Optional[Tuple[DecomposedMemory, ...]]
+    failure_reason: Optional[
+        Literal["provider_unavailable", "provider_error", "parse_error", "invalid_schema"]
+    ]
+
+
+EXPECTED_PROVIDER_FAILURES = (RuntimeError, TimeoutError, ConnectionError)
+
+
+def decompose_episode_result(
+    episode: Episode, llm_fn: Optional[LlmFn]
+) -> DecompositionResult:
+    """Return candidates and their actual extraction mode without persisting them."""
+    assisted = _decompose_via_llm(episode, llm_fn)
+    if assisted.memories is not None:
+        return DecompositionResult(memories=assisted.memories, mode="assisted")
+    return DecompositionResult(
+        memories=tuple(_decompose_via_heuristic(episode)),
+        mode="deterministic_fallback",
+        fallback_reason=assisted.failure_reason,
+    )
+
+
+def decompose_episode(
+    episode: Episode, llm_fn: Optional[LlmFn]
+) -> List[DecomposedMemory]:
     """
     Extracts zero or more atomic (type, content) memories from a raw
     episode. Pure function — does not write anything to disk. Pair with
     `TesseraEngine.write_fact/write_preference/write_insight` (or use
     `decompose_and_write()` below to do both steps in one call).
     """
-    extracted = _decompose_via_llm(episode, llm_fn)
-    if extracted is not None:
-        return extracted
-    return []
+    return list(decompose_episode_result(episode, llm_fn).memories)
 
 
 def decompose_and_write(
@@ -95,7 +138,7 @@ def decompose_and_write(
     mem_id_prefix: str,
     episode_id: str,
     episode: Episode,
-    llm_fn: LlmFn,
+    llm_fn: Optional[LlmFn],
     tags: Optional[List[str]] = None,
 ) -> List[str]:
     """
@@ -113,9 +156,29 @@ def decompose_and_write(
     Returns the list of filepaths written (may be empty if nothing was
     judged worth persisting).
     """
-    from .engine import STORE_TO_NODE_TYPE  # local import - avoid a cycle at module load
+    return list(
+        decompose_and_write_result(
+            engine=engine,
+            mem_id_prefix=mem_id_prefix,
+            episode_id=episode_id,
+            episode=episode,
+            llm_fn=llm_fn,
+            tags=tags,
+        ).filepaths
+    )
 
-    extracted = decompose_episode(episode, llm_fn=llm_fn)
+
+def decompose_and_write_result(
+    engine: "TesseraEngine",  # noqa: F821 - avoid a hard import cycle; typed via string
+    mem_id_prefix: str,
+    episode_id: str,
+    episode: Episode,
+    llm_fn: Optional[LlmFn],
+    tags: Optional[List[str]] = None,
+) -> DecompositionWriteResult:
+    """Decompose, then persist every candidate through the canonical write gate."""
+    decomposition = decompose_episode_result(episode, llm_fn=llm_fn)
+    extracted = decomposition.memories
     tags = tags or []
 
     write_fn_by_type = {
@@ -135,13 +198,15 @@ def decompose_and_write(
         filepaths.append(
             write_fn(mem_id=mem_id, episode_id=episode_id, content=mem.content, tags=tags)
         )
-    return filepaths
+    return DecompositionWriteResult(tuple(filepaths), decomposition)
 
 
 # ---------------------------------------------------------------------------
 # Real-LLM extraction
 # ---------------------------------------------------------------------------
-def _decompose_via_llm(episode: Episode, llm_fn: LlmFn) -> Optional[List[DecomposedMemory]]:
+def _decompose_via_llm(
+    episode: Episode, llm_fn: Optional[LlmFn]
+) -> _AssistedOutcome:
     user_prompt = (
         "Episódio:\n"
         f"## Início (contexto/gatilho)\n{episode.beginning.strip()}\n\n"
@@ -149,30 +214,52 @@ def _decompose_via_llm(episode: Episode, llm_fn: LlmFn) -> Optional[List[Decompo
         f"## Fim (resultado/aprendizado)\n{episode.end.strip()}\n\n"
         "Responda apenas com o array JSON de memórias atômicas."
     )
+    if llm_fn is None:
+        return _AssistedOutcome(None, "provider_unavailable")
+
     try:
         raw_response = llm_fn(DECOMPOSER_SYSTEM_PROMPT, user_prompt)
-    except Exception:
-        return None
+    except EXPECTED_PROVIDER_FAILURES:
+        return _AssistedOutcome(None, "provider_error")
 
-    parsed = _extract_json_array(raw_response)
+    parsed, failure_reason = _extract_json_array_outcome(raw_response)
     if parsed is None:
-        return None
+        return _AssistedOutcome(None, failure_reason)
 
     results = []
     for item in parsed:
         if not isinstance(item, dict):
-            continue
-        mem_type = str(item.get("type", "")).strip()
-        content = str(item.get("content", "")).strip()
-        if mem_type in VALID_TYPES and content:
-            results.append(DecomposedMemory(mem_type=mem_type, content=content))
-    return results
+            return _AssistedOutcome(None, "invalid_schema")
+        raw_mem_type = item.get("type")
+        raw_content = item.get("content")
+        if not isinstance(raw_mem_type, str) or not isinstance(raw_content, str):
+            return _AssistedOutcome(None, "invalid_schema")
+        mem_type = raw_mem_type.strip()
+        content = raw_content.strip()
+        if mem_type not in VALID_TYPES or not content:
+            return _AssistedOutcome(None, "invalid_schema")
+        results.append(DecomposedMemory(mem_type=mem_type, content=content))
+    return _AssistedOutcome(tuple(results), None)
 
 
 def _extract_json_array(raw_response: str) -> Optional[List[Any]]:
     """Best-effort JSON array extraction — tolerates a real LLM wrapping the
     array in prose or a Markdown code fence, which happens often enough in
     practice to be worth handling rather than hard-failing."""
+    parsed, _failure_reason = _extract_json_array_outcome(raw_response)
+    return parsed
+
+
+def _extract_json_array_outcome(
+    raw_response: Any,
+) -> Tuple[
+    Optional[List[Any]],
+    Optional[Literal["parse_error", "invalid_schema"]],
+]:
+    """Parse supported JSON wrappers while distinguishing syntax from schema failure."""
+    if not isinstance(raw_response, str):
+        return None, "invalid_schema"
+
     text = raw_response.strip()
     # Strip a ```json ... ``` or ``` ... ``` fence if present.
     fence_match = re.search(r"```(?:json)?\s*(\[.*?\])\s*```", text, re.DOTALL)
@@ -186,8 +273,10 @@ def _extract_json_array(raw_response: str) -> Optional[List[Any]]:
     try:
         parsed = json.loads(text)
     except (json.JSONDecodeError, ValueError):
-        return None
-    return parsed if isinstance(parsed, list) else None
+        return None, "parse_error"
+    if not isinstance(parsed, list):
+        return None, "invalid_schema"
+    return parsed, None
 
 
 # ---------------------------------------------------------------------------

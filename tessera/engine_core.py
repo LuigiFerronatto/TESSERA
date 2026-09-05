@@ -573,6 +573,26 @@ class TesseraEngine:
             tags=tags,
         )
 
+    def decompose_and_write_episode_result(
+        self,
+        mem_id_prefix: str,
+        episode_id: str,
+        episode: Episode,
+        llm_fn: Optional[Any] = None,
+        tags: Optional[List[str]] = None,
+    ) -> Any:
+        """Gated decomposition with truthful assisted/fallback diagnostics."""
+        from .decomposer import decompose_and_write_result
+
+        return decompose_and_write_result(
+            engine=self,
+            mem_id_prefix=mem_id_prefix,
+            episode_id=episode_id,
+            episode=episode,
+            llm_fn=llm_fn,
+            tags=tags,
+        )
+
     def retrieve_from_store(
         self, query_text: str, store: str, top_n: int = 7, resolve_conflicts: bool = True
     ) -> List[Dict[str, Any]]:

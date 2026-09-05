@@ -8,7 +8,7 @@
 | Pull request | [#210](https://github.com/LuigiFerronatto/TESSERA/pull/210) |
 | Branch | `feature/155-init-ux` |
 | Final candidate | `cf9f9c754becb87923c5a5c6bad4c3172cc9f344` |
-| Canonical merge | `4c112195f1572bf352d1cc6a1042c69711381da8` |
+| Merge commit | `4c112195f1572bf352d1cc6a1042c69711381da8` |
 | Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-09-04 |
@@ -17,7 +17,13 @@
 
 TESSERA now turns safe project-source discovery into one reviewable initialization plan, then configures and indexes exactly that plan only after explicit approval.
 
-## Previous behavior
+## What problem existed?
+
+Configuration v2 and safe discovery existed, but no single initialization
+contract connected source selection, a reviewable plan, confirmation and
+selected-source indexing.
+
+## How did TESSERA behave before?
 
 Before #155, Configuration v2 and safe discovery existed, but `tessera init` still behaved as a storage-oriented flow:
 
@@ -30,7 +36,7 @@ choose project/global store
 
 Project README, documentation and other recommended knowledge had to be added manually to configuration.
 
-## Canonical behavior after PR #210
+## What changed or is being tested?
 
 The merged implementation adds a first-class `InitializationPlan` and keeps planning separate from mutation:
 
@@ -47,6 +53,12 @@ resolve scope and generated-memory destination
 
 Interactive, non-interactive, dry-run and JSON modes use the same semantic plan.
 
+## How does it work now?
+
+Planning is side-effect free. Apply begins only after the complete plan is
+accepted, persists the approved configuration and exclusions, and then indexes
+exactly the selected sources.
+
 ### Safety invariants
 
 - Generated memories, readable sources and the derived index remain distinct.
@@ -57,7 +69,7 @@ Interactive, non-interactive, dry-run and JSON modes use the same semantic plan.
 - Existing material configuration changes require explicit confirmation or `--update-existing`.
 - No provider, model or network dependency was introduced.
 
-## Validation evidence
+## How was it validated?
 
 The final candidate `cf9f9c754becb87923c5a5c6bad4c3172cc9f344` received an independent Maintainer Audit decision of `KEEP` with no supported P0/P1 findings.
 
@@ -74,7 +86,7 @@ Exact-head evidence recorded on PR #210 includes:
 
 PR #210 was canonically merged into `main` as `4c112195f1572bf352d1cc6a1042c69711381da8` and Issue #155 closed as completed.
 
-## User-facing examples
+## Concrete example
 
 ```bash
 tessera init --project . --store memories/generated \
@@ -90,7 +102,13 @@ tessera init --project . --store memories/generated \
   --sources recommended --dry-run --json
 ```
 
-## What remains outside #155
+## What improved?
+
+Users can see and approve one complete source-aware initialization plan, and
+automation receives the same plan as the interactive flow. Dry-run and cancel
+remain non-mutating, while apply indexes only explicitly selected safe sources.
+
+## What remains unimplemented?
 
 This card does not implement:
 
@@ -105,7 +123,7 @@ This card does not implement:
 - #191 conversation import;
 - incremental indexing or non-Markdown ingestion.
 
-## Downstream lifecycle
+## What is unlocked next?
 
 #118 declared #155 as its only active blocker. With #155 now canonically validated, #118 is eligible to transition from `BLOCKED` to `READY` after routing/board reconciliation.
 
