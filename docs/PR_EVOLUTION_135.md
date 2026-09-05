@@ -13,6 +13,13 @@
 - **Canonical merge SHA:** `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`
 - **Benchmark applicability:** `SMOKE_ONLY`
 
+## Post-merge lifecycle reconciliation
+
+Benchmark applicability: NOT_APPLICABLE
+
+This reconciliation changes documentation and portfolio routing only; it does
+not change runtime, evaluation, retrieval, or decomposition behavior.
+
 The branch started only after Issue #155 merged as canonical commit
 `4c112195f1572bf352d1cc6a1042c69711381da8` and its lifecycle reconciliation
 merged as `f57727b11977e9ba9619bd2202f5897fb20c334b`. Issue #135 was then the next
@@ -103,6 +110,7 @@ repository change before the exact final-head rerun.
 
 The canonical merge and this lifecycle reconciliation satisfy the declared
 #135 blocker for #136 (also depends on #74, already `VALIDATED`) and #137
-(depends only on #135). Neither issue is set `READY` by this record alone;
-Roadmap reconciliation applies the actual status transition. Do not change
-the canonical Queue or promote all QUMem cards.
+(depends only on #135). All declared hard blockers are therefore satisfied,
+so both issues become `READY`; neither moves ahead of Queue #3 (#16). The
+historical Queue #2 position remains attached to #135, and no other QUMem card
+is promoted by this reconciliation.

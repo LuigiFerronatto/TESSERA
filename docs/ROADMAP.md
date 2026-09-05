@@ -107,16 +107,17 @@ noise (see the buckets after the queue).
 ## NOW — pick only from here
 
 ```text
-🥇 #155 Init UX / source selection              P0 release-critical
-🥈 #16  Conflict resolver containment           P0 state safety
+🥇 #155 Init UX / source selection              VALIDATED
+🥈 #135 Decomposer fallback integrity           VALIDATED
+🥉 #16  Conflict resolver containment           P0 state safety; next selection
 ```
 
-`#155` is the next release-critical executable card in the validated chain
-`#153 -> #154 -> #155 -> #118 -> #134`. `#135` (decomposer fallback integrity)
-canonically merged `c324ac2f46d48f7b49769b2fea9df0a2a93b42de` with decision
-`KEEP` and is no longer an open lane item. `#16` remains the P0
-destructive-newest-only-filtering containment fix and does not block `#155`.
-When one of these ships, pull the next unblocked item from `NEXT` below.
+`#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
+canonical validated deliveries. `#135` (decomposer fallback integrity) merged
+as `c324ac2f46d48f7b49769b2fea9df0a2a93b42de` with decision `KEEP`. `#16`,
+historical Queue #3, is now the next implementation selection for the P0
+destructive-newest-only-filtering containment slice. Its full temporal
+supersession scope remains later work.
 
 ## NEXT
 
@@ -137,14 +138,13 @@ where they resume once selected.
 
 ```text
 NOW — Product foundation
-1  #155 Init UX / source selection
-2  #16  Conflict resolver containment      (parallel)
-3  #118 Clean-room onboarding
-4  #120 MCP transport/runtime robustness
-5  #87  LICENSE / CONTRIBUTING             (parallel)
-6  #134 PyPI release
--> #135 Decomposer fallback integrity: VALIDATED, canonical merge
-   `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`, decision `KEEP`.
+1  #155 Init UX / source selection          VALIDATED
+2  #135 Decomposer fallback integrity       VALIDATED (`KEEP`; `c324ac2f...`)
+3  #16  Conflict resolver containment       next selection
+4  #118 Clean-room onboarding
+5  #120 MCP transport/runtime robustness
+6  #87  LICENSE / CONTRIBUTING              (parallel)
+7  #134 PyPI release
 -> TESSERA can be installed, configured, index a real project, and be used via MCP.
 
 NEXT — Real memory system

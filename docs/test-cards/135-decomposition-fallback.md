@@ -104,11 +104,10 @@ selection and broader optional-capability envelopes remain separate work.
 ## What is unlocked next?
 
 Now that this change is canonically merged and reconciled, #136 and #137 have
-their declared #135 blocker satisfied (both still separately depend on other
-undelivered prerequisites: #136 also depends on #74, already `VALIDATED`;
-#137 depends only on #135). Neither is promoted to `READY` automatically by
-this record alone — see the Roadmap dependency reconciliation. No other
-QUMem card becomes Ready automatically.
+their declared #135 blocker satisfied. #136's other declared dependency, #74,
+is already `VALIDATED`, so #136 is `READY`; #137 declares no other hard
+blocker, so it is also `READY`. They retain their existing queue positions and
+do not move ahead of #16. No other QUMem card becomes Ready automatically.
 
 ## Technical provenance
 

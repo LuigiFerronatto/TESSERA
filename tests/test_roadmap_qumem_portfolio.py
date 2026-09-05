@@ -34,9 +34,8 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
     text = ROADMAP.read_text(encoding="utf-8")
 
     expected = {
-        "#135": "`READY`",
-        "#136": "`BLOCKED`",
-        "#137": "`BLOCKED`",
+        "#136": "`READY`",
+        "#137": "`READY`",
         "#138": "`BLOCKED`",
         "#139": "`DEFERRED`",
         "#140": "`BLOCKED`",
@@ -53,6 +52,11 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
         assert status in row
         assert "`VALIDATED`" not in row
         assert "`IMPLEMENTED`" not in row
+
+    issue_135 = _markdown_table_row(text, "#135")
+    assert "closed" in issue_135
+    assert "`VALIDATED`" in issue_135
+    assert "c324ac2f46d48f7b49769b2fea9df0a2a93b42de" in issue_135
 
     issue_147 = _markdown_table_row(text, "#147")
     assert "closed" in issue_147
