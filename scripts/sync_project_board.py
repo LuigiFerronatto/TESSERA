@@ -924,8 +924,14 @@ def apply_number(schema: ProjectSchema, item_id: str, field_name: str, value: in
     )
 
 
-def apply_issue_milestone(number: int, milestone_number: int) -> None:
-    run_gh(["issue", "edit", str(number), "--repo", REPO, "--milestone", str(milestone_number)])
+def apply_issue_milestone(number: int, milestone_title: str) -> None:
+    """Apply a native issue milestone using the title accepted by ``gh``.
+
+    GitHub's REST data model identifies milestones by number, but
+    ``gh issue edit --milestone`` resolves a milestone by its title. Passing
+    the numeric API identifier therefore fails even when the milestone exists.
+    """
+    run_gh(["issue", "edit", str(number), "--repo", REPO, "--milestone", milestone_title])
 
 
 def apply_plan(
@@ -953,7 +959,12 @@ def apply_plan(
                     apply_single_select(schema, item_id, ch.field, ch.after)
 
             if p.milestone_change:
-                apply_issue_milestone(c.issue, p.milestone_change.after)
+                if c.milestone_title is None:
+                    raise GhCliError(
+                        f"Cannot apply milestone #{p.milestone_change.after} to issue "
+                        f"#{c.issue}: resolved milestone title is missing."
+                    )
+                apply_issue_milestone(c.issue, c.milestone_title)
 
             succeeded.append(c.issue)
         except GhCliError as exc:

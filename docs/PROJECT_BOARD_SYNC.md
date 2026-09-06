@@ -67,9 +67,12 @@ Live GitHub evidence always overrides stale issue-body text:
   `Blocked` (`STATUS_READY_CONDITIONAL_UNVERIFIABLE_CONSERVATIVE_BLOCKED`)
   rather than inventing readiness.
 
-Split cards such as `#16` ("P0 containment ready; full experiment blocked")
-surface as `Ready` -- the executable slice can start now -- while the split
-nuance is preserved in `reasons`, not silently discarded.
+Split cards surface as `Ready` while an executable slice can start now, with
+the split nuance preserved in `reasons`. After `#16`'s P0 containment was
+validated, its authoritative routing changed to the remaining blocked full
+experiment; the manifest therefore routes that single open Project item to
+`LATER` / Queue `24`, while lifecycle documentation preserves the completed
+historical Queue `3` delivery.
 
 ## Sources of truth (architecture decision)
 

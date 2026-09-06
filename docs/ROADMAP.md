@@ -104,7 +104,7 @@ Of the 73 open issues, roughly 40–50 are executable capabilities/tasks; the
 rest are epics, trackers, docs, benchmarks, research and governance/automation
 noise (see the buckets after the queue).
 
-## NOW — pick only from here
+## Completed NOW positions — historical delivery record
 
 ```text
 🥇 #155 Init UX / source selection              VALIDATED
@@ -119,6 +119,10 @@ historical Queue #3, P0 destructive-newest-only-filtering containment slice
 merged as `708c973e23d5c4eb8a52d359a2cadc153e161a90` with decision `KEEP` and
 is now `VALIDATED`. Its full temporal supersession scope remains later work
 and stays blocked on #15/#73/#96, unaffected by this merge.
+
+These rows preserve Queue #1–#3 delivery history; they are not active `NOW`
+work. The single open Project item for #16 now represents only the remaining
+full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NEXT
 
