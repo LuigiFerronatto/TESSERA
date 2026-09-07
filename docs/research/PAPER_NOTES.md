@@ -548,3 +548,12 @@ Implemented / Experimental / Planned / Dropped / Deferred.
 ```
 
 If a paper does not create a testable hypothesis, it may remain only in `REFERENCES.md`.
+
+
+## Dated expansion — 7 September 2026
+
+The [AI-memory paper review](MEMORY_PAPERS_2026-09-07.md) preserves 28 main-paper reviews plus one supplementary limited-evidence watchlist source. Each review separates the source finding, TESSERA opportunity, existing owner and material limitation. It includes counterevidence on information lost through construction, interference under memory growth and constraint regressions from procedural memory.
+
+The [48-opportunity map](IMPROVEMENT_MAP_2026-09-07.md) audits all 82 issues open at the recorded snapshot: 11 candidates for dedicated contracts and 37 extensions. Candidate IDs are not opened GitHub issues. Priorities and experiments are recommendations; the current roadmap and WIP policy remain authoritative.
+
+**Status:** Research documented; methods not reproduced on TESSERA and no new runtime capability promoted. [Canonical bibliography](REFERENCES.md).
