@@ -1,0 +1,6 @@
+node_modules/
+dist/
+verification/*.png
+verification/*.html
+verification/lighthouse-*.json
+verification/retrieval.json

@@ -1,0 +1,77 @@
+schema_version: 2
+store:
+  id: f6bba7b1-9e39-5be3-be37-bf2e258d4c77
+  path: memories
+sources:
+  roots:
+  - path: memories
+    include:
+    - '**/*.md'
+  - path: .
+    include:
+    - docs/adr/0001-core-vs-optional-llm-boundary.md
+    - docs/adr/0002-repository-layout-and-distribution-boundary.md
+    - docs/adr/0003-configuration-and-store-discovery.md
+    - docs/adr/0004-safe-project-source-discovery.md
+    - docs/adr/README.md
+    - docs/AGENTIC_GOVERNANCE.md
+    - docs/ARCHITECTURE.md
+    - docs/assets/brand/README.md
+    - docs/BENCHMARK_CI.md
+    - docs/CHANGE_POLICY.md
+    - docs/CHEATSHEET.md
+    - docs/CODE_EXPLANATION.md
+    - docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md
+    - docs/CONCEPTS.md
+    - docs/FEATURES.md
+    - docs/OUTPUT_CONTRACT.md
+    - docs/OVERVIEW.md
+    - docs/PR_EVOLUTION_115.md
+    - docs/PR_EVOLUTION_116.md
+    - docs/PR_EVOLUTION_117.md
+    - docs/PR_EVOLUTION_135.md
+    - docs/PR_EVOLUTION_153.md
+    - docs/PR_EVOLUTION_154.md
+    - docs/PR_EVOLUTION_155.md
+    - docs/PR_EVOLUTION_16.md
+    - docs/PR_EVOLUTION_92.md
+    - docs/PR_EVOLUTION_93.md
+    - docs/PR_EVOLUTION_95.md
+    - docs/PROCEDURAL_ANCHORS.md
+    - docs/PROJECT_BOARD_SYNC.md
+    - docs/QUERY_EXAMPLES.md
+    - docs/QUMEM-GAP-ANALYSIS.md
+    - docs/README.md
+    - docs/REFERENCES.md
+    - docs/research/COMPETITIVE_LANDSCAPE.md
+    - docs/research/DECISION_TRACE.md
+    - docs/research/PAPER_NOTES.md
+    - docs/research/REFERENCES.md
+    - docs/ROADMAP.md
+    - docs/ROTEIRO-DEMO-VIDEO.md
+    - docs/slides/README.md
+    - docs/test-cards/100-benchmark-ledger-and-ci.md
+    - docs/test-cards/112-tessera-ascii-banner.md
+    - docs/test-cards/114-evolution-auditable-templates.md
+    - docs/test-cards/115-repository-layout-architecture.md
+    - docs/test-cards/116-packaging-hardening.md
+    - docs/test-cards/117-configuration-init-discovery.md
+    - docs/test-cards/135-decomposition-fallback.md
+    - docs/test-cards/153-configuration-v2-store-sources-index.md
+    - docs/test-cards/154-safe-source-discovery.md
+    - docs/test-cards/155-init-ux.md
+    - docs/test-cards/16-conflict-resolver-containment.md
+    - docs/test-cards/68-retrieval-contract-parity.md
+    - docs/test-cards/74-core-vs-optional-llm-boundary.md
+    - docs/test-cards/92-write-gate-integrity.md
+    - docs/test-cards/93-storage-configuration-parity.md
+    - docs/test-cards/94-markdown-only-persistence.md
+    - docs/test-cards/95-remove-legacy-runtime-coupling.md
+    - docs/test-cards/96-longmemeval-v1-dev-50.md
+    - docs/test-cards/README.md
+    - docs/test-cards/TEMPLATE.md
+    - docs/TEST_CARD_OPERATING_MODEL.md
+    - docs/WRITE_GATE_CONTRACT.md
+    - README.md
+index:
+  path: .tessera/index

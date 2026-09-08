@@ -1,0 +1,1351 @@
+{
+  "schema_version": 1,
+  "derived": true,
+  "source_of_truth": "source_files",
+  "records": [
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_0172333ff3dea43d",
+      "memory_id": "docs/CHEATSHEET",
+      "source": {
+        "document_id": "doc_2f01bfd375b4",
+        "path": "docs/CHEATSHEET.md",
+        "document_hash": "45bbdf19c40d5252ad8cd41da6238bd931a03cdaa1d764e468b8bf5eaac073e7",
+        "content_hash": "45bbdf19c40d5252ad8cd41da6238bd931a03cdaa1d764e468b8bf5eaac073e7",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 635
+      },
+      "fingerprint": "0172333ff3dea43de0fb650260d78264a81269ba534526f03caf796bf3c0a55b",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_040234fbeb537898",
+      "memory_id": "docs/PR_EVOLUTION_117",
+      "source": {
+        "document_id": "doc_674fc45ec817",
+        "path": "docs/PR_EVOLUTION_117.md",
+        "document_hash": "285a729881e7ab3c8d66a18a4ba2aae80860bbe29ea2db22316ad41a95341fe2",
+        "content_hash": "285a729881e7ab3c8d66a18a4ba2aae80860bbe29ea2db22316ad41a95341fe2",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 114
+      },
+      "fingerprint": "040234fbeb537898d4528fb5bce961fcfd9152cacea2765f3a593896b5d977ae",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_06f1239248f3cfdd",
+      "memory_id": "docs/AGENTIC_GOVERNANCE",
+      "source": {
+        "document_id": "doc_d5e694ffb9c5",
+        "path": "docs/AGENTIC_GOVERNANCE.md",
+        "document_hash": "6c5c765d578cac44a0953a3f0985acc389263f83f642ea8afa6d0d7e2f676e5e",
+        "content_hash": "6c5c765d578cac44a0953a3f0985acc389263f83f642ea8afa6d0d7e2f676e5e",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 608
+      },
+      "fingerprint": "06f1239248f3cfdd40d5329197854b08f1911a7bf9fe6a18bf9b560073fa3b5f",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_171dc8d9bbb28630",
+      "memory_id": "docs/OUTPUT_CONTRACT",
+      "source": {
+        "document_id": "doc_6b24e3a56e26",
+        "path": "docs/OUTPUT_CONTRACT.md",
+        "document_hash": "e89ea7df24d6219bd17568e37dd612b3f4f370e5431be851343373f04c86b0f5",
+        "content_hash": "e89ea7df24d6219bd17568e37dd612b3f4f370e5431be851343373f04c86b0f5",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 372
+      },
+      "fingerprint": "171dc8d9bbb2863067f5c41aeba25f4fbc5b2bdee0ea0ed1274b5b695e5f3d12",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_1d7c234024a05889",
+      "memory_id": "docs/test-cards/116-packaging-hardening",
+      "source": {
+        "document_id": "doc_54b6a4741b2b",
+        "path": "docs/test-cards/116-packaging-hardening.md",
+        "document_hash": "706d9714c6858774e5f7584cf5e35e6454868615df255f662233e520c8e2cb37",
+        "content_hash": "706d9714c6858774e5f7584cf5e35e6454868615df255f662233e520c8e2cb37",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 180
+      },
+      "fingerprint": "1d7c234024a05889f39f1052b5a247b5661d866b3143551646b38cd780310589",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_1eecbc326e51d5f9",
+      "memory_id": "docs/README",
+      "source": {
+        "document_id": "doc_0b5ca119d2be",
+        "path": "docs/README.md",
+        "document_hash": "170241c1d69421eb72618723255d85c994043fb4ed209f831e481fb8e4688047",
+        "content_hash": "170241c1d69421eb72618723255d85c994043fb4ed209f831e481fb8e4688047",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 212
+      },
+      "fingerprint": "1eecbc326e51d5f980e5701b0096bd70dc10b0d56a10a7b1a9c3bc17de2d9204",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_261e62a21358c507",
+      "memory_id": "docs/research/COMPETITIVE_LANDSCAPE",
+      "source": {
+        "document_id": "doc_37eb56eaeef3",
+        "path": "docs/research/COMPETITIVE_LANDSCAPE.md",
+        "document_hash": "f4adfd276ef9f751319101ad9dac81659708f8dba44291e975c9738398e73a4c",
+        "content_hash": "f4adfd276ef9f751319101ad9dac81659708f8dba44291e975c9738398e73a4c",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 608
+      },
+      "fingerprint": "261e62a21358c507e5e1156f6baf591c55d260c834dc70cd1c4a1add5ab619ec",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_273efc5a54d42907",
+      "memory_id": "docs/adr/0001-core-vs-optional-llm-boundary",
+      "source": {
+        "document_id": "doc_d89706aeb5ac",
+        "path": "docs/adr/0001-core-vs-optional-llm-boundary.md",
+        "document_hash": "3d90f8eb24bf96230a6d4f31ccc7e1fde6af7592ae112dc68f4590a08a1e4c83",
+        "content_hash": "3d90f8eb24bf96230a6d4f31ccc7e1fde6af7592ae112dc68f4590a08a1e4c83",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 466
+      },
+      "fingerprint": "273efc5a54d429078cb58575496eb13fc2307afa6bc270d9598cc27ce97f03b3",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_2810c5e07d2f6332",
+      "memory_id": "docs/PR_EVOLUTION_135",
+      "source": {
+        "document_id": "doc_613ed015d966",
+        "path": "docs/PR_EVOLUTION_135.md",
+        "document_hash": "0bbe20ae958161d146149387762c810c8f132371ed5f9ee4b8ea5bed51fde399",
+        "content_hash": "0bbe20ae958161d146149387762c810c8f132371ed5f9ee4b8ea5bed51fde399",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 118
+      },
+      "fingerprint": "2810c5e07d2f63324df13332711f215c8dafab850aba1ae6a8972f06905f7485",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_2c0572226919cf51",
+      "memory_id": "docs/test-cards/93-storage-configuration-parity",
+      "source": {
+        "document_id": "doc_0f79246690bd",
+        "path": "docs/test-cards/93-storage-configuration-parity.md",
+        "document_hash": "d6eaa2fd7ad5f1a80ab01ffa3677b352a60007aafcab34bb762ed9b8a738560d",
+        "content_hash": "d6eaa2fd7ad5f1a80ab01ffa3677b352a60007aafcab34bb762ed9b8a738560d",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 160
+      },
+      "fingerprint": "2c0572226919cf51d82f240b1ebdaba9dc6451de974568d1d968f79b4e22bad9",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_2c2972b08ef8acfc",
+      "memory_id": "docs/test-cards/112-tessera-ascii-banner",
+      "source": {
+        "document_id": "doc_ebfb7ed580d6",
+        "path": "docs/test-cards/112-tessera-ascii-banner.md",
+        "document_hash": "7526d7dbca6f5c5b804cad961de45a594a73b76d6903992ac1b6b645ba4b869b",
+        "content_hash": "7526d7dbca6f5c5b804cad961de45a594a73b76d6903992ac1b6b645ba4b869b",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 86
+      },
+      "fingerprint": "2c2972b08ef8acfcef65a52b8b2b94d1a999ee1c736b57cb4df16f7939592f4f",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_2caaca76dbf53922",
+      "memory_id": "docs/test-cards/135-decomposition-fallback",
+      "source": {
+        "document_id": "doc_b89e0244966f",
+        "path": "docs/test-cards/135-decomposition-fallback.md",
+        "document_hash": "d4f8dd6ba311d0949a266b174e982be27902c24d0a67525fd12f5732334ea03a",
+        "content_hash": "d4f8dd6ba311d0949a266b174e982be27902c24d0a67525fd12f5732334ea03a",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 130
+      },
+      "fingerprint": "2caaca76dbf539227a388bd1f0c40761a7d9bfa6988f8ee24995387469c7dc35",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_2f7dd2ae6e86f225",
+      "memory_id": "docs/CHANGE_POLICY",
+      "source": {
+        "document_id": "doc_da992717f384",
+        "path": "docs/CHANGE_POLICY.md",
+        "document_hash": "3166bb7269f2ba7a37122eea04577fb2747f3cd89df781a1dc2a46340ae1f197",
+        "content_hash": "3166bb7269f2ba7a37122eea04577fb2747f3cd89df781a1dc2a46340ae1f197",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 184
+      },
+      "fingerprint": "2f7dd2ae6e86f225c6bae404414623a1a189527b8abd0500890414ab5983c3df",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_3097735161dfe894",
+      "memory_id": "docs/test-cards/114-evolution-auditable-templates",
+      "source": {
+        "document_id": "doc_2ba34120a795",
+        "path": "docs/test-cards/114-evolution-auditable-templates.md",
+        "document_hash": "37c40fcda0dca1652c379b8da14aff9a6f22eb47b41f39499b3c5ccd4f333729",
+        "content_hash": "37c40fcda0dca1652c379b8da14aff9a6f22eb47b41f39499b3c5ccd4f333729",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 82
+      },
+      "fingerprint": "3097735161dfe894b577f9d603b590e103d089fa4c559b1e2210d56904ab9811",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_41e4070f7090c734",
+      "memory_id": "docs/test-cards/115-repository-layout-architecture",
+      "source": {
+        "document_id": "doc_45172e1b65ab",
+        "path": "docs/test-cards/115-repository-layout-architecture.md",
+        "document_hash": "7402f2842d675c87d028c935c00f6642cb51bce66ded56157564499eb6f6eb42",
+        "content_hash": "7402f2842d675c87d028c935c00f6642cb51bce66ded56157564499eb6f6eb42",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 170
+      },
+      "fingerprint": "41e4070f7090c7346502ba703c9c8ea79d0ba402b03eacbdde621eac7a59f570",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_43b96f252343e8ec",
+      "memory_id": "docs/assets/brand/README",
+      "source": {
+        "document_id": "doc_ddecd73d5d7e",
+        "path": "docs/assets/brand/README.md",
+        "document_hash": "f85e27243a51475251a81a9fa49e6bee2ee8bb0dc8a8e0bc8c74014c8bbb48ae",
+        "content_hash": "f85e27243a51475251a81a9fa49e6bee2ee8bb0dc8a8e0bc8c74014c8bbb48ae",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 79
+      },
+      "fingerprint": "43b96f252343e8ec939157790712329152284f3a7738787c11b38e83d78aa158",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_4b223a723c60d44e",
+      "memory_id": "docs/TEST_CARD_OPERATING_MODEL",
+      "source": {
+        "document_id": "doc_2d5ba5bb570a",
+        "path": "docs/TEST_CARD_OPERATING_MODEL.md",
+        "document_hash": "834fa82a75aacaa8539e39ef88f14d88dc459fc48e96ab827b94d89b958d9add",
+        "content_hash": "834fa82a75aacaa8539e39ef88f14d88dc459fc48e96ab827b94d89b958d9add",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 128
+      },
+      "fingerprint": "4b223a723c60d44ef190a5cfbc81efc30dd9106251c3b28359509e5f3af00026",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_4f8936f73c0fecfc",
+      "memory_id": "docs/test-cards/92-write-gate-integrity",
+      "source": {
+        "document_id": "doc_9eea261a5dc2",
+        "path": "docs/test-cards/92-write-gate-integrity.md",
+        "document_hash": "2552755b4e1af1152f913d05452591e69dedba2fe8e25b9199914942a984056a",
+        "content_hash": "2552755b4e1af1152f913d05452591e69dedba2fe8e25b9199914942a984056a",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 118
+      },
+      "fingerprint": "4f8936f73c0fecfcba4d372f91143f9d2e9427a15ba857ad20147e5c63090775",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_560f62d37bfba160",
+      "memory_id": "docs/research/REFERENCES",
+      "source": {
+        "document_id": "doc_8618405d8d5b",
+        "path": "docs/research/REFERENCES.md",
+        "document_hash": "8ec5333254becd7bb3afaac8c1fa85cb25a10ce886247b56ddf862a38361eadb",
+        "content_hash": "8ec5333254becd7bb3afaac8c1fa85cb25a10ce886247b56ddf862a38361eadb",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 509
+      },
+      "fingerprint": "560f62d37bfba160dd35e17716c28fb243ba75917442101a1f3ec4919607fde1",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_59a858c6d5cb4982",
+      "memory_id": "docs/test-cards/96-longmemeval-v1-dev-50",
+      "source": {
+        "document_id": "doc_ab77933d9ddb",
+        "path": "docs/test-cards/96-longmemeval-v1-dev-50.md",
+        "document_hash": "32410559f7fb3fd23e8e59fbffd8b1f4228c946796bc0d270cfeec48307f0a08",
+        "content_hash": "32410559f7fb3fd23e8e59fbffd8b1f4228c946796bc0d270cfeec48307f0a08",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 72
+      },
+      "fingerprint": "59a858c6d5cb4982b2db7277074aebd7c069ffbc93e02b4c52a382101680e093",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_5fd608e4a0e245b3",
+      "memory_id": "docs/REFERENCES",
+      "source": {
+        "document_id": "doc_8d461432b25b",
+        "path": "docs/REFERENCES.md",
+        "document_hash": "f92823c18a98d57b7d3aa2e5d8a015e8a5031cb5ef0ef0ff29bbb7fd9940a4cc",
+        "content_hash": "f92823c18a98d57b7d3aa2e5d8a015e8a5031cb5ef0ef0ff29bbb7fd9940a4cc",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 48
+      },
+      "fingerprint": "5fd608e4a0e245b3dd7cfc37aad9d4290994ba1726731a62bdd58a8a89da7696",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_5ffeb3868bedafdd",
+      "memory_id": "docs/PR_EVOLUTION_92",
+      "source": {
+        "document_id": "doc_e00f3c991b74",
+        "path": "docs/PR_EVOLUTION_92.md",
+        "document_hash": "36d196974569ac8474d3cabe130a9d12c6d146a36726641a9763d1a16612b74e",
+        "content_hash": "36d196974569ac8474d3cabe130a9d12c6d146a36726641a9763d1a16612b74e",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 171
+      },
+      "fingerprint": "5ffeb3868bedafdda6abdec54eaa98369cbffc113e17410f01f6cb82432db5ee",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_6005c5f730473cb7",
+      "memory_id": "docs/test-cards/94-markdown-only-persistence",
+      "source": {
+        "document_id": "doc_af7b3f3cde0f",
+        "path": "docs/test-cards/94-markdown-only-persistence.md",
+        "document_hash": "9b57a7c43c6e332b62bc6ff51fc09166998c39246f7892ea9801bfd22cbcc9f2",
+        "content_hash": "9b57a7c43c6e332b62bc6ff51fc09166998c39246f7892ea9801bfd22cbcc9f2",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 77
+      },
+      "fingerprint": "6005c5f730473cb7174f7b56ad6226ee68bec22a74bed44e888a38241f5e71e2",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_61870c4f48541d31",
+      "memory_id": "docs/test-cards/74-core-vs-optional-llm-boundary",
+      "source": {
+        "document_id": "doc_a0267e39d1db",
+        "path": "docs/test-cards/74-core-vs-optional-llm-boundary.md",
+        "document_hash": "28a142500459f83262e62beb4ec1a97599b628b7f5fc7f6784c54d4c78f8c12e",
+        "content_hash": "28a142500459f83262e62beb4ec1a97599b628b7f5fc7f6784c54d4c78f8c12e",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 73
+      },
+      "fingerprint": "61870c4f48541d31f6078240694651629ad7eb2ccb5e08eb8820a6702ec0f964",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_64347de768c5c83b",
+      "memory_id": "docs/test-cards/155-init-ux",
+      "source": {
+        "document_id": "doc_fa5f4660cb0f",
+        "path": "docs/test-cards/155-init-ux.md",
+        "document_hash": "06d8ea54d950407eb30f4f90cc73b2da326d482fdf45d64def5852da6ea65af3",
+        "content_hash": "06d8ea54d950407eb30f4f90cc73b2da326d482fdf45d64def5852da6ea65af3",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 152
+      },
+      "fingerprint": "64347de768c5c83b0df75c497a428027a4fb572ec9cc840a6414cee828a458a6",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_646f6070bd8f45f4",
+      "memory_id": "docs/CODE_EXPLANATION",
+      "source": {
+        "document_id": "doc_3b386ce31b87",
+        "path": "docs/CODE_EXPLANATION.md",
+        "document_hash": "a6ea54769f56f9710934a8e46302197517049982d2b66c58ff742b32cca6099c",
+        "content_hash": "a6ea54769f56f9710934a8e46302197517049982d2b66c58ff742b32cca6099c",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 117
+      },
+      "fingerprint": "646f6070bd8f45f4702d72c73eaf39a546f7657cfb4c5b23d8f634d2617f5352",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_65854ebe08db6fee",
+      "memory_id": "docs/PR_EVOLUTION_93",
+      "source": {
+        "document_id": "doc_7015b7eb3aae",
+        "path": "docs/PR_EVOLUTION_93.md",
+        "document_hash": "0a088a202a43a6adc74ea48f26429c8a80313b3523970a1edc17cbbc13369f59",
+        "content_hash": "0a088a202a43a6adc74ea48f26429c8a80313b3523970a1edc17cbbc13369f59",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 181
+      },
+      "fingerprint": "65854ebe08db6fee442a9089b5bca4a21d1354207e544cfd555636f3ed68a2e2",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_725bba2e2217788f",
+      "memory_id": "docs/QUMEM-GAP-ANALYSIS",
+      "source": {
+        "document_id": "doc_2c40f6e9c6e7",
+        "path": "docs/QUMEM-GAP-ANALYSIS.md",
+        "document_hash": "6191a4343db58df1c3274018d9ef848ceea2cd75ba76f14f09db5ffb15bc550a",
+        "content_hash": "6191a4343db58df1c3274018d9ef848ceea2cd75ba76f14f09db5ffb15bc550a",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 180
+      },
+      "fingerprint": "725bba2e2217788f16008f44f702293552539fef0e74353409c1c884c18d08f5",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_73e5ba7816e55239",
+      "memory_id": "docs/test-cards/117-configuration-init-discovery",
+      "source": {
+        "document_id": "doc_88fc9ef0a9d4",
+        "path": "docs/test-cards/117-configuration-init-discovery.md",
+        "document_hash": "32594435ac132a747fa9f87eaf8172036a4eb5409082a78ca40307f35d194d9f",
+        "content_hash": "32594435ac132a747fa9f87eaf8172036a4eb5409082a78ca40307f35d194d9f",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 172
+      },
+      "fingerprint": "73e5ba7816e55239182447effb0398020abc15ae14b00309fbbfb9daba24ff6d",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_7405bf6c089bf4e0",
+      "memory_id": "docs/test-cards/16-conflict-resolver-containment",
+      "source": {
+        "document_id": "doc_46aeb23505ec",
+        "path": "docs/test-cards/16-conflict-resolver-containment.md",
+        "document_hash": "e8504b3b7d83cf21c7b860a16489d9380ffc0c256e25387b88788777b97c82df",
+        "content_hash": "e8504b3b7d83cf21c7b860a16489d9380ffc0c256e25387b88788777b97c82df",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 126
+      },
+      "fingerprint": "7405bf6c089bf4e0535b8c03b414b392381e6a2525f8a13decbe822ae435f92f",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_77e7635a41aabbd4",
+      "memory_id": "docs/PR_EVOLUTION_16",
+      "source": {
+        "document_id": "doc_9d840870edc7",
+        "path": "docs/PR_EVOLUTION_16.md",
+        "document_hash": "39cb603701b6cf99176f68977b4b3b264f7da53032fcfbe97c2e6a7f6972748a",
+        "content_hash": "39cb603701b6cf99176f68977b4b3b264f7da53032fcfbe97c2e6a7f6972748a",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 79
+      },
+      "fingerprint": "77e7635a41aabbd4092817a03cdae8fb200c950cf510cdd88e919cc9705396ad",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_7a0db8d59eef5a07",
+      "memory_id": "docs/ROADMAP",
+      "source": {
+        "document_id": "doc_0d96796e2b2a",
+        "path": "docs/ROADMAP.md",
+        "document_hash": "7fe2415b25bb3bc3c3aeab19861c1dcb23f98567dae511fd7b867a0cc534cf8f",
+        "content_hash": "7fe2415b25bb3bc3c3aeab19861c1dcb23f98567dae511fd7b867a0cc534cf8f",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 1006
+      },
+      "fingerprint": "7a0db8d59eef5a0792d7e974c36c72a77f8fb428edddf4fbeba136d4e77fc2e7",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_81437b8b574e5275",
+      "memory_id": "docs/PR_EVOLUTION_116",
+      "source": {
+        "document_id": "doc_fb16f21e78dc",
+        "path": "docs/PR_EVOLUTION_116.md",
+        "document_hash": "8f520b0ce09d57afaac915cd8de251fd56b96966f57a0b501bdaf9c31849ce26",
+        "content_hash": "8f520b0ce09d57afaac915cd8de251fd56b96966f57a0b501bdaf9c31849ce26",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 169
+      },
+      "fingerprint": "81437b8b574e527588e0891a821854d7b707bfbb21bdb143901e37340d50ae50",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_8ac3b34d45b8a8f8",
+      "memory_id": "docs/PR_EVOLUTION_153",
+      "source": {
+        "document_id": "doc_f0c954176b29",
+        "path": "docs/PR_EVOLUTION_153.md",
+        "document_hash": "6b6c067330df0269df8469d3d3db8359506263b825a938f0aa820d4fc8955f50",
+        "content_hash": "6b6c067330df0269df8469d3d3db8359506263b825a938f0aa820d4fc8955f50",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 190
+      },
+      "fingerprint": "8ac3b34d45b8a8f8445434a972d617247ff92ff84992372e0343888a39b23190",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_9780f609a4a6563c",
+      "memory_id": "docs/PR_EVOLUTION_95",
+      "source": {
+        "document_id": "doc_beef3a832879",
+        "path": "docs/PR_EVOLUTION_95.md",
+        "document_hash": "e99ac6b73b2e645a8cb48404a69405f944f55474390ea741fbd5a22e91bdec23",
+        "content_hash": "e99ac6b73b2e645a8cb48404a69405f944f55474390ea741fbd5a22e91bdec23",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 199
+      },
+      "fingerprint": "9780f609a4a6563c782038dca15fb9f72d54bb330105b4db24cc5b74174bb709",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_989853a77ffc0c5d",
+      "memory_id": "docs/FEATURES",
+      "source": {
+        "document_id": "doc_dfea6b4a44c8",
+        "path": "docs/FEATURES.md",
+        "document_hash": "9e5dc14bb3d387b0bed03338f9082051e1eb0f5072baac3a7c46e22fdef52e9b",
+        "content_hash": "9e5dc14bb3d387b0bed03338f9082051e1eb0f5072baac3a7c46e22fdef52e9b",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 379
+      },
+      "fingerprint": "989853a77ffc0c5d238656656a3d7f5ebb09184fccb101c8ce4d1a78a8d90309",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_99ee03181dc25492",
+      "memory_id": "docs/adr/0004-safe-project-source-discovery",
+      "source": {
+        "document_id": "doc_aea7d4e96f38",
+        "path": "docs/adr/0004-safe-project-source-discovery.md",
+        "document_hash": "b5118d3b6cd910d0b6132beb3660ad589e2ddd9d5d039121ad90aeaad33471e7",
+        "content_hash": "b5118d3b6cd910d0b6132beb3660ad589e2ddd9d5d039121ad90aeaad33471e7",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 73
+      },
+      "fingerprint": "99ee03181dc254924eeefd82596ae41efd4aec732cf6ce323a94afa4fbf7e623",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_9cb2e1be84e58328",
+      "memory_id": "docs/CONCEPTS",
+      "source": {
+        "document_id": "doc_55062dc0fc1d",
+        "path": "docs/CONCEPTS.md",
+        "document_hash": "f4bdff3dbf4587b9e288c2574569e65074e092412e2ee81eceb3cc4049faa914",
+        "content_hash": "f4bdff3dbf4587b9e288c2574569e65074e092412e2ee81eceb3cc4049faa914",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 468
+      },
+      "fingerprint": "9cb2e1be84e58328e03a6fb2a53eb5b99ab46f08a2a756b7223d3ce150261d4b",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_a2242361856b6205",
+      "memory_id": "docs/slides/README",
+      "source": {
+        "document_id": "doc_8701a5fd2cc5",
+        "path": "docs/slides/README.md",
+        "document_hash": "5d0470a271d284768eadb4b07b71c81a631dea0312a5aac3318f7b4cf575b58f",
+        "content_hash": "5d0470a271d284768eadb4b07b71c81a631dea0312a5aac3318f7b4cf575b58f",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 61
+      },
+      "fingerprint": "a2242361856b6205f6413c2d20524b023401efd7f61082808954fc3405eab4dd",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_a836c9fc7f92cafe",
+      "memory_id": "docs/PR_EVOLUTION_155",
+      "source": {
+        "document_id": "doc_51f596ef3c7e",
+        "path": "docs/PR_EVOLUTION_155.md",
+        "document_hash": "db097ab37dd911228135eacd032a5ef25ac43d9f589e987b2c0d0d3f9693c4b1",
+        "content_hash": "db097ab37dd911228135eacd032a5ef25ac43d9f589e987b2c0d0d3f9693c4b1",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 124
+      },
+      "fingerprint": "a836c9fc7f92cafe9602d9f2d11fdea6ea9857b581032b7a827eb146969f2d56",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_b05fda53599d7984",
+      "memory_id": "docs/adr/0003-configuration-and-store-discovery",
+      "source": {
+        "document_id": "doc_de40fed03904",
+        "path": "docs/adr/0003-configuration-and-store-discovery.md",
+        "document_hash": "a3b02cc32be74dd0aa96c9f75f64d1718fc8e7d41e7389eea6ec8d5b5026273b",
+        "content_hash": "a3b02cc32be74dd0aa96c9f75f64d1718fc8e7d41e7389eea6ec8d5b5026273b",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 115
+      },
+      "fingerprint": "b05fda53599d7984abd126c948787e15bc962f6a950b9f1e748ba995c0e6c0b6",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_b6b32a3ae6c52c0c",
+      "memory_id": "docs/PROCEDURAL_ANCHORS",
+      "source": {
+        "document_id": "doc_49a489d491d0",
+        "path": "docs/PROCEDURAL_ANCHORS.md",
+        "document_hash": "93982ede67dabc2a51250022710966e86957207c0d4c59ad615ee0e37065434b",
+        "content_hash": "93982ede67dabc2a51250022710966e86957207c0d4c59ad615ee0e37065434b",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 19
+      },
+      "fingerprint": "b6b32a3ae6c52c0c59d951981739db5d7bd1f1f35ce7ef917dcba43bbd16a7b7",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_babd8ad6139508b4",
+      "memory_id": "docs/adr/0002-repository-layout-and-distribution-boundary",
+      "source": {
+        "document_id": "doc_1253780c24e9",
+        "path": "docs/adr/0002-repository-layout-and-distribution-boundary.md",
+        "document_hash": "c4024114589421c980e968fcde1737ba62398b3955e8fc56d6d47ea5c873be35",
+        "content_hash": "c4024114589421c980e968fcde1737ba62398b3955e8fc56d6d47ea5c873be35",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 166
+      },
+      "fingerprint": "babd8ad6139508b4bedc12e2c4070c3f783b1dc52ef5566dfe84c992604601af",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_bef0f4e93c28e5d5",
+      "memory_id": "docs/adr/README",
+      "source": {
+        "document_id": "doc_5767cabc35c1",
+        "path": "docs/adr/README.md",
+        "document_hash": "67d9779c886e78d716b56d9191ce86e5d21fac7c64d2dd2ec6fd4838be13ce05",
+        "content_hash": "67d9779c886e78d716b56d9191ce86e5d21fac7c64d2dd2ec6fd4838be13ce05",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 12
+      },
+      "fingerprint": "bef0f4e93c28e5d51d18c40ebb0c985ca1b2aca446de1300bcff642a9bf6edea",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_bfe7f2a27313df34",
+      "memory_id": "docs/test-cards/TEMPLATE",
+      "source": {
+        "document_id": "doc_68fa1963a36c",
+        "path": "docs/test-cards/TEMPLATE.md",
+        "document_hash": "e3ccd011eb3b78f0e749a91366daa2f7a285ba2d0aca27582ea50ffc05fd65fc",
+        "content_hash": "e3ccd011eb3b78f0e749a91366daa2f7a285ba2d0aca27582ea50ffc05fd65fc",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 73
+      },
+      "fingerprint": "bfe7f2a27313df34c1dd7589150c2ad424d2f4750c441f175d46e95c1d1c6aac",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_c2d5a6b5e0d84909",
+      "memory_id": "docs/research/DECISION_TRACE",
+      "source": {
+        "document_id": "doc_18fed86893cf",
+        "path": "docs/research/DECISION_TRACE.md",
+        "document_hash": "7fd5c51e568a00ba7dae27265e9fcef9c30fec1943517ab41253b3b23f2bba71",
+        "content_hash": "7fd5c51e568a00ba7dae27265e9fcef9c30fec1943517ab41253b3b23f2bba71",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 346
+      },
+      "fingerprint": "c2d5a6b5e0d849090051000a079a8f33cf6ce8871cdf16c35bae1ffadea93f7f",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_c5737f55ea2b8e50",
+      "memory_id": "docs/ARCHITECTURE",
+      "source": {
+        "document_id": "doc_ff21b6b9a3a3",
+        "path": "docs/ARCHITECTURE.md",
+        "document_hash": "8cd4800340d0ab387b9f4daa629a6324a1fd36ad51e639cfb7632293aada22fe",
+        "content_hash": "8cd4800340d0ab387b9f4daa629a6324a1fd36ad51e639cfb7632293aada22fe",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 590
+      },
+      "fingerprint": "c5737f55ea2b8e50a7ba7d315fb6b3040babf7ad2807e33612cac5e5d68e52ab",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_c8aa58d751f813a8",
+      "memory_id": "docs/PR_EVOLUTION_115",
+      "source": {
+        "document_id": "doc_46cc5e57886d",
+        "path": "docs/PR_EVOLUTION_115.md",
+        "document_hash": "2cb2868b91c74db196b1e61ccb700dc05bfa4ea3d1e933c414d7b282420ec7d2",
+        "content_hash": "2cb2868b91c74db196b1e61ccb700dc05bfa4ea3d1e933c414d7b282420ec7d2",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 365
+      },
+      "fingerprint": "c8aa58d751f813a8d09deae5e22e0871abb95f7320bd10270d5ebdc4be73011a",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_cf21e191fc353ed0",
+      "memory_id": "docs/test-cards/95-remove-legacy-runtime-coupling",
+      "source": {
+        "document_id": "doc_685b2ad415d5",
+        "path": "docs/test-cards/95-remove-legacy-runtime-coupling.md",
+        "document_hash": "00209865c023a89756d9892872d662ad1e4399e9c9a58f17ae2e0d845aef8bf0",
+        "content_hash": "00209865c023a89756d9892872d662ad1e4399e9c9a58f17ae2e0d845aef8bf0",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 122
+      },
+      "fingerprint": "cf21e191fc353ed04a0e075e931024585af80a4ff4f7b9aa20e71ef91fa63f36",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_d0af2b8cb78067fc",
+      "memory_id": "docs/test-cards/154-safe-source-discovery",
+      "source": {
+        "document_id": "doc_6c5818cc0149",
+        "path": "docs/test-cards/154-safe-source-discovery.md",
+        "document_hash": "6d4de7cbbc799a4255e2818de6be12fe30867f3cfff0344754dd50f6a41d2699",
+        "content_hash": "6d4de7cbbc799a4255e2818de6be12fe30867f3cfff0344754dd50f6a41d2699",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 165
+      },
+      "fingerprint": "d0af2b8cb78067fc49c8d65425e6ce21d376155b245a992632cabe94bc9e51b3",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_d0b601d53f89b20e",
+      "memory_id": "README",
+      "source": {
+        "document_id": "doc_b33563055168",
+        "path": "README.md",
+        "document_hash": "0178ba435be1895854680debb92b8a9085b57a961e2312b319300a07289ec10a",
+        "content_hash": "0178ba435be1895854680debb92b8a9085b57a961e2312b319300a07289ec10a",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 489
+      },
+      "fingerprint": "d0b601d53f89b20ee96b21e970f38a110c090abb8be00ee0f9e08bc8769f5a5e",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_d2f13c8cdcdcc90e",
+      "memory_id": "docs/test-cards/153-configuration-v2-store-sources-index",
+      "source": {
+        "document_id": "doc_bf7d1e182456",
+        "path": "docs/test-cards/153-configuration-v2-store-sources-index.md",
+        "document_hash": "9d20b54bfb326cad1b0b9b4ae9be259ff637f58400deedd3d7b6639cd0b3ed41",
+        "content_hash": "9d20b54bfb326cad1b0b9b4ae9be259ff637f58400deedd3d7b6639cd0b3ed41",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 160
+      },
+      "fingerprint": "d2f13c8cdcdcc90e05145ca4a392ec1708869b92d5a2774cc963cac2bc3716e1",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_d400be041c457e2b",
+      "memory_id": "docs/PR_EVOLUTION_154",
+      "source": {
+        "document_id": "doc_e935d93ceff4",
+        "path": "docs/PR_EVOLUTION_154.md",
+        "document_hash": "788df3be7483db14158d2cf7bcd582e71ad8edd4d670e35a06c62dbdc6212470",
+        "content_hash": "788df3be7483db14158d2cf7bcd582e71ad8edd4d670e35a06c62dbdc6212470",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 164
+      },
+      "fingerprint": "d400be041c457e2b0aa0dae47df0f5a64c98a43f2dbc6d5f3e793f51cf3cb586",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_da51068bbf33b5b0",
+      "memory_id": "docs/test-cards/README",
+      "source": {
+        "document_id": "doc_92a96d0793b3",
+        "path": "docs/test-cards/README.md",
+        "document_hash": "2b2cf70c5f653671052bf9e795b78797a569e08361a10421de7c1c3e9e207dd5",
+        "content_hash": "2b2cf70c5f653671052bf9e795b78797a569e08361a10421de7c1c3e9e207dd5",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 81
+      },
+      "fingerprint": "da51068bbf33b5b029f13d1b146eabd70d363a136a115cafbb77b7e0fef3dd57",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_e20245f6e2405930",
+      "memory_id": "docs/PROJECT_BOARD_SYNC",
+      "source": {
+        "document_id": "doc_7f965ed006ce",
+        "path": "docs/PROJECT_BOARD_SYNC.md",
+        "document_hash": "eb4e156e28f8397ce2654d4489ae7aa022f57bed30953ae5232661c320b87dd7",
+        "content_hash": "eb4e156e28f8397ce2654d4489ae7aa022f57bed30953ae5232661c320b87dd7",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 165
+      },
+      "fingerprint": "e20245f6e240593058bf9d2a03e7192ade012703db872877c19b527af2438f96",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_e97c234f2976bc2d",
+      "memory_id": "docs/test-cards/68-retrieval-contract-parity",
+      "source": {
+        "document_id": "doc_1676cb6a9dcf",
+        "path": "docs/test-cards/68-retrieval-contract-parity.md",
+        "document_hash": "4e927ce82912b08384b2e45c1541d00aee3da3b8c517f6a2f7ef2fa9ddbf433b",
+        "content_hash": "4e927ce82912b08384b2e45c1541d00aee3da3b8c517f6a2f7ef2fa9ddbf433b",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 76
+      },
+      "fingerprint": "e97c234f2976bc2d4c7278eaed685c23386aca5c7b0667d4ebd399e94eabc264",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_ebf3542b40925e4a",
+      "memory_id": "docs/research/PAPER_NOTES",
+      "source": {
+        "document_id": "doc_aedc93daf1ee",
+        "path": "docs/research/PAPER_NOTES.md",
+        "document_hash": "12a70aded9621be93dcd24e6ac9005507e6a720d062241d7c5dd8e79a37fab57",
+        "content_hash": "12a70aded9621be93dcd24e6ac9005507e6a720d062241d7c5dd8e79a37fab57",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 550
+      },
+      "fingerprint": "ebf3542b40925e4ab0f52b1458016140d0153ba5b59f80be3c3ec24bb62c3813",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_ec03ea362bc402ac",
+      "memory_id": "docs/test-cards/100-benchmark-ledger-and-ci",
+      "source": {
+        "document_id": "doc_71b5077e7b37",
+        "path": "docs/test-cards/100-benchmark-ledger-and-ci.md",
+        "document_hash": "25716bd1c1e8ae5748b98b73fdd20077195f4af798f975423b1ec1bab91f8cfa",
+        "content_hash": "25716bd1c1e8ae5748b98b73fdd20077195f4af798f975423b1ec1bab91f8cfa",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 72
+      },
+      "fingerprint": "ec03ea362bc402ac99b4c4b973450418e0f50881905188918b620f63e0790298",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_ee16732b5cb18e0b",
+      "memory_id": "docs/ROTEIRO-DEMO-VIDEO",
+      "source": {
+        "document_id": "doc_0e299732900b",
+        "path": "docs/ROTEIRO-DEMO-VIDEO.md",
+        "document_hash": "2b0a29d8ce996e7ac1bb1d8694a31dd95441ef9057ab4c279bd3d8213e226231",
+        "content_hash": "2b0a29d8ce996e7ac1bb1d8694a31dd95441ef9057ab4c279bd3d8213e226231",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 312
+      },
+      "fingerprint": "ee16732b5cb18e0b61b9d776e0c77e0c804f0a5688f9b8217ceae11cdfa2233c",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_efc1b61dbe56b095",
+      "memory_id": "docs/BENCHMARK_CI",
+      "source": {
+        "document_id": "doc_0630c9e0e369",
+        "path": "docs/BENCHMARK_CI.md",
+        "document_hash": "d7b90e4b6bc256cb809361d6e863cba6dfb346aa64d782fe4ee0dfc38688e6fb",
+        "content_hash": "d7b90e4b6bc256cb809361d6e863cba6dfb346aa64d782fe4ee0dfc38688e6fb",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 92
+      },
+      "fingerprint": "efc1b61dbe56b095dacbe6bdc1bf4017cc510187ea2d147a1cd9f2ae4c48b1aa",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_f03058b253c77ee2",
+      "memory_id": "docs/OVERVIEW",
+      "source": {
+        "document_id": "doc_427e3c3bcf03",
+        "path": "docs/OVERVIEW.md",
+        "document_hash": "695fb9290a798cda04fcc1be68c3c5851f92c1739671eceb9a164c422809921f",
+        "content_hash": "695fb9290a798cda04fcc1be68c3c5851f92c1739671eceb9a164c422809921f",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 450
+      },
+      "fingerprint": "f03058b253c77ee25b84ed7aedab609c496d024e2d6361fe4e4a7789c6eab772",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_f6b0ef39c21dee8d",
+      "memory_id": "docs/WRITE_GATE_CONTRACT",
+      "source": {
+        "document_id": "doc_cefb3aa3fd2d",
+        "path": "docs/WRITE_GATE_CONTRACT.md",
+        "document_hash": "3f29ab6a2ee8c12f10140338d2187b95b5e394127ef8b62412416d055fda9c91",
+        "content_hash": "3f29ab6a2ee8c12f10140338d2187b95b5e394127ef8b62412416d055fda9c91",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 125
+      },
+      "fingerprint": "f6b0ef39c21dee8d30fffc3b6fa57cf1752addc9ab21e7ecebe44e37ff444269",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_f8383590eaff8fff",
+      "memory_id": "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS",
+      "source": {
+        "document_id": "doc_573cfb206d00",
+        "path": "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md",
+        "document_hash": "2e33483847578f8588ecd056fec6780316a6361d27c92b680637431bd87078fe",
+        "content_hash": "2e33483847578f8588ecd056fec6780316a6361d27c92b680637431bd87078fe",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 292
+      },
+      "fingerprint": "f8383590eaff8fffb5a4db1a6899d62e70e4e2d194182a86cf56ed038f247750",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "ev_fe474a5bf018785b",
+      "memory_id": "docs/QUERY_EXAMPLES",
+      "source": {
+        "document_id": "doc_8bbaf646288d",
+        "path": "docs/QUERY_EXAMPLES.md",
+        "document_hash": "e1598e8b92476a055eeb3c74b3228f14cdf344c6d126b5b7507c5ee859cf2bfb",
+        "content_hash": "e1598e8b92476a055eeb3c74b3228f14cdf344c6d126b5b7507c5ee859cf2bfb",
+        "format": "markdown"
+      },
+      "span": {
+        "start_line": 1,
+        "end_line": 312
+      },
+      "fingerprint": "fe474a5bf018785b123542e8730ff61a7ec6b25a5237e6fdd3072ba21e353b96",
+      "extraction": {
+        "method": "canonical_document",
+        "inferred": false
+      }
+    }
+  ]
+}
