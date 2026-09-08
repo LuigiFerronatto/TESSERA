@@ -90,6 +90,8 @@ Directory: [`research/`](research/)
 |---|---|
 | [research/REFERENCES.md](research/REFERENCES.md) | Primary papers/product references used by current project decisions. |
 | [research/PAPER_NOTES.md](research/PAPER_NOTES.md) | What each paper says, what TESSERA learned, and which Test Card it influenced. |
+| [research/MEMORY_PAPERS_2026-09-07.md](research/MEMORY_PAPERS_2026-09-07.md) | Dated review of 28 main AI-memory papers plus one supplementary source, with limitations and experiment crosswalk. |
+| [research/IMPROVEMENT_MAP_2026-09-07.md](research/IMPROVEMENT_MAP_2026-09-07.md) | 48 proposed opportunities checked against the 82-issue audit snapshot; research candidates, not a replacement roadmap. |
 | [research/COMPETITIVE_LANDSCAPE.md](research/COMPETITIVE_LANDSCAPE.md) | Mem0, Zep/Graphiti, Letta, LangGraph/LangMem, MemOS, MemPalace and research-system comparison. |
 | [research/DECISION_TRACE.md](research/DECISION_TRACE.md) | Source → insight → Test Card → decision trace. |
 

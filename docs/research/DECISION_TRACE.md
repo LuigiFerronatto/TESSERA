@@ -344,3 +344,27 @@ Does it expose a TESSERA gap or hypothesis?
 ```
 
 This is how TESSERA avoids paper-driven architecture drift.
+
+
+## Research intake — memory possibilities beyond the existing backlog (2026-09-07)
+
+### Signal
+
+The [dated paper review](MEMORY_PAPERS_2026-09-07.md) expands primary-source coverage across evidence loss, stale state, correlated origins, experience learning, memory interference, operational maintenance and sharing permissions. The [opportunity map](IMPROVEMENT_MAP_2026-09-07.md) cross-checks these signals against audited main `708c973e23d5c4eb8a52d359a2cadc153e161a90` and the 82 issues open during research.
+
+### Interpretation and proposed measurement
+
+- Compare raw-source and constructed-memory retrieval with a fixed reader and evidence-token budget before adding complexity.
+- Test whether source corrections invalidate dependent conclusions and whether correlated restatements create false support.
+- Evaluate scoped lessons from comparable successes/failures and probe earlier capabilities as memory grows.
+- Investigate source-version/citation consistency, multiwriter updates and index/identity recovery independently of model quality.
+
+### Decision boundary
+
+This intake preserves research and a candidate experiment map. It **does not adopt the proposed architecture**, change existing priorities/dependencies or add feature issues automatically. Existing owners retain their scopes; new-contract candidates require separately scoped Test Cards before implementation. Exactly three drawers, canonical source authority, the optional-LLM boundary and consuming-agent cognition remain unchanged.
+
+### Status
+
+Archive tracking: [#223](https://github.com/LuigiFerronatto/TESSERA/issues/223).
+
+RESEARCH_ONLY / NOT_IMPLEMENTED. The documentation can be accepted without declaring any paper method or proposed improvement validated. The existing governed WIP policy remains in force.
