@@ -126,7 +126,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
     assert any("[#137]" in line for line in ready_executable)
 
     issue_16 = _row(text, "#16")
-    assert "`IN_PROGRESS` containment" in issue_16
+    assert "`VALIDATED` containment" in issue_16
     assert "`BLOCKED` full" in issue_16
 
 
@@ -153,11 +153,13 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "#153/#154 are satisfied" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
-    now_section = text.split("## NOW", 1)[1].split("## NEXT", 1)[0]
-    assert "pick only from here" in now_section
+    now_section = text.split("## Completed NOW positions", 1)[1].split("## NEXT", 1)[0]
+    assert "historical delivery record" in text
     assert "#155 Init UX / source selection" in now_section
     assert "#135 Decomposer fallback integrity" in now_section
     assert "#16  Conflict resolver containment" in now_section
+    assert "not active `NOW`" in now_section
+    assert "`LATER` / Queue #24" in now_section
 
     rows = [line for line in text.splitlines() if line.startswith("| [#")]
     now_executable = [
@@ -167,8 +169,7 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 1
-    assert "[#16]" in now_executable[0]
+    assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
     assert "READY                          7 total / 4 executable" in text

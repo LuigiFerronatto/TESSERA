@@ -21,10 +21,10 @@
 # (unique across every bucket); omit `queue` for items without a justified
 # exact position (they still get Execution, just no ordinal).
 #
-# `#16` intentionally appears once. Its P0 containment slice is queue 3
-# (NOW); the full temporal-supersession slice is a later revisit of the same
-# issue, not a second board row. That nuance is recorded in `notes`, not by
-# duplicating the issue in the queue.
+# `#16` intentionally appears once. Its completed P0 containment slice keeps
+# historical Queue #3 provenance in docs/lifecycle records; the still-open
+# issue now represents the full temporal-supersession slice at Queue #24
+# (LATER). Do not duplicate it here to preserve the historical position.
 
 now:
   - issue: 155
@@ -33,10 +33,6 @@ now:
   - issue: 135
     queue: 2
     note: "Decomposer fallback integrity. Parallel Technical Integrity lane; fixes documented LLM failure -> heuristic fallback vs actual runtime LLM failure -> []."
-  - issue: 16
-    queue: 3
-    note: "P0 conflict-resolver containment (stop destructive newest-only filtering). Full M4 temporal-supersession experiment (queue 24) remains a separate later slice of the same issue."
-
 next:
   - issue: 118
     queue: 4
@@ -85,6 +81,9 @@ later:
     queue: 22
   - issue: 15
     queue: 23
+  - issue: 16
+    queue: 24
+    note: "Full M4 temporal-supersession experiment, blocked on #15, #73, and #96. The validated P0 containment delivery retains historical Queue #3 provenance in lifecycle documentation."
   - issue: 139
     queue: 25
     note: "Deferred by WIP today; queue position is where it resumes."

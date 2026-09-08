@@ -104,20 +104,25 @@ Of the 73 open issues, roughly 40–50 are executable capabilities/tasks; the
 rest are epics, trackers, docs, benchmarks, research and governance/automation
 noise (see the buckets after the queue).
 
-## NOW — pick only from here
+## Completed NOW positions — historical delivery record
 
 ```text
 🥇 #155 Init UX / source selection              VALIDATED
 🥈 #135 Decomposer fallback integrity           VALIDATED
-🥉 #16  Conflict resolver containment           P0 candidate IN_PROGRESS
+🥉 #16  Conflict resolver containment           P0 VALIDATED (`KEEP`; `708c973e...`)
 ```
 
 `#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
 canonical validated deliveries. `#135` (decomposer fallback integrity) merged
 as `c324ac2f46d48f7b49769b2fea9df0a2a93b42de` with decision `KEEP`. `#16`,
-historical Queue #3, now has an implementation candidate for the P0
-destructive-newest-only-filtering containment slice. Its full temporal
-supersession scope remains later work and stays blocked.
+historical Queue #3, P0 destructive-newest-only-filtering containment slice
+merged as `708c973e23d5c4eb8a52d359a2cadc153e161a90` with decision `KEEP` and
+is now `VALIDATED`. Its full temporal supersession scope remains later work
+and stays blocked on #15/#73/#96, unaffected by this merge.
+
+These rows preserve Queue #1–#3 delivery history; they are not active `NOW`
+work. The single open Project item for #16 now represents only the remaining
+full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NEXT
 
@@ -140,7 +145,7 @@ where they resume once selected.
 NOW — Product foundation
 1  #155 Init UX / source selection          VALIDATED
 2  #135 Decomposer fallback integrity       VALIDATED (`KEEP`; `c324ac2f...`)
-3  #16  Conflict resolver containment       IN_PROGRESS candidate
+3  #16  Conflict resolver containment       VALIDATED (`KEEP`; `708c973e...`)
 4  #118 Clean-room onboarding
 5  #120 MCP transport/runtime robustness
 6  #87  LICENSE / CONTRIBUTING              (parallel)
@@ -404,11 +409,11 @@ Already validated:
 Still open:
 
 ```text
-#16 P0 containment
+#16 P0 containment VALIDATED (`708c973e`)
 #67 Quality Gate v2 / regression-gate integration
 ```
 
-The P0 containment of #16 is independent from the later full temporal supersession experiment.
+The P0 containment of #16 is independent from the later full temporal supersession experiment, which remains blocked on #15/#73/#96.
 
 ## FASE 2 — FAZER VIRAR PRODUTO
 
@@ -629,7 +634,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#116](https://github.com/LuigiFerronatto/TESSERA/issues/116) | closed | `VALIDATED` | FOUNDATION | Product | Packaging PR #131 canonical `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4`; lifecycle `b3be96f4aa842a81c135b6ac87d3311ed292d339`. |
 | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) | closed | `VALIDATED` | FOUNDATION | Product | `KEEP`; implementation `61cf76fbd6ed61972f0f5abae515ba9bffca4b55`; lifecycle `fc0ed763ad47f5eba88775f3517cbee99d00a8b9`. |
 | [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | closed | `VALIDATED` | GOVERNANCE | Docs | Roadmap/QUMem reconciliation #149 canonical `a13abbbba2138e48e237f14a182dd6746e3ec7d4`; lifecycle #156 canonical `0880ef3ec417735c105898039cc202450407af2b`. |
-| [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `IN_PROGRESS` containment / `BLOCKED` full | EXECUTABLE | Safety | P0 containment candidate preserves all possible-conflict evidence; full supersession waits on #15/#73/#96. |
+| [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `VALIDATED` containment / `BLOCKED` full | EXECUTABLE | Safety | P0 containment merged (`708c973e...`, `KEEP`); preserves all possible-conflict evidence; full supersession waits on #15/#73/#96. |
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | EXECUTABLE | Safety | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | open | `BLOCKED` | EXECUTABLE | Storage | Depends on #67/#94; incremental/idempotent indexing. |
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#94; text ingestion beyond Markdown. |
@@ -961,7 +966,7 @@ Do not start #166 before #155 semantics stabilize. Keep #157 deliberately deferr
 ```text
 FOUNDATION / TRUTH
 #68/#74/#92/#93/#94/#95/#96/#100/#112/#114  VALIDATED
-#16 containment                                  READY
+#16 containment                                  VALIDATED (`708c973e`)
 #67 Quality Gate                                 BLOCKED
 
 PRODUCTIZATION / RELEASE
@@ -989,7 +994,7 @@ QUMEM EPIC #145                                    TRACKER
 #138 BLOCKED
 #139 DEFERRED -> #140 BLOCKED
 #73 -> #15 -> #16 full
-#16 P0 containment IN_PROGRESS
+#16 P0 containment VALIDATED; full slice BLOCKED on #15/#73/#96
 #141/#142/#143/#144 BLOCKED
 #146 READY docs
 

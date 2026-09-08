@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) |
-| Record status | `IN_PROGRESS` (P0 containment); `BLOCKED` (full supersession) |
+| Record status | `VALIDATED` (P0 containment); `BLOCKED` (full supersession) |
 | Capability type | `runtime` |
 | Pull request | [#219](https://github.com/LuigiFerronatto/TESSERA/pull/219) |
-| Head commit | Pending exact-head audit |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
-| Benchmark applicability | `REQUIRED` |
+| Head commit | `2420bb5aa70e5d9663b92ae2785eda33f42f1cbe` |
+| Merge commit | `708c973e23d5c4eb8a52d359a2cadc153e161a90` |
+| Decision | `KEEP` |
+| Benchmark applicability | `REQUIRED` (met — LongMemEval V1 dev-50 passed, 0 regressions) |
 | Last audited | 2026-09-05 |
 
 ## In one sentence
@@ -47,7 +47,7 @@ path. The public method and list return type remain compatible, but the pass
 returns a shallow list copy containing the original candidate objects in the
 same order. No legacy newest-only mode is retained.
 
-## How does it work now? — CANDIDATE, NOT YET ON MAIN
+## How does it work now? — VALIDATED ON MAIN
 
 ```text
 ranked candidates
@@ -100,10 +100,10 @@ not claim which candidate is current.
 
 ## What is unlocked next?
 
-No downstream card becomes `READY` from the candidate alone. After canonical
-merge and lifecycle reconciliation, #16 P0 may become `VALIDATED`, while the
-full #16 slice remains blocked. #141, #20 and #27 retain their other blockers.
-Queue #4 remains #118.
+No downstream card becomes `READY` from this merge alone. #16 P0 containment
+is now `VALIDATED`, while the full #16 slice remains `BLOCKED` on #15/#73/#96
+(none of which changed as a result of this merge). #141, #20 and #27 retain
+their other blockers unchanged. Queue #4 remains #118.
 
 ## Technical provenance
 
@@ -112,15 +112,15 @@ Queue #4 remains #118.
 | Issue/Test Card | [Issue #16](https://github.com/LuigiFerronatto/TESSERA/issues/16) |
 | Pull request | [PR #219](https://github.com/LuigiFerronatto/TESSERA/pull/219) |
 | Starting canonical main | `700b5ada9be059ced1c9f0d3d369b9824f4baaa5` |
-| Evidence/Learnings/Decision | Focused pre-fix and post-fix regression runs; decision pending exact-head audit |
-| Benchmark record | `REQUIRED`; candidate-set membership changes, so LongMemEval regression evidence is required |
+| Canonical merge SHA | `708c973e23d5c4eb8a52d359a2cadc153e161a90` |
+| Evidence/Learnings/Decision | Focused pre-fix (10 failed) and post-fix (14 passed) regression runs; exact-head Maintainer Audit `KEEP`; decision `KEEP` |
+| Benchmark record | `REQUIRED`; met — LongMemEval V1 dev-50 passed at the merged head, 0 gating/query regressions |
 | PR Evolution Audit | [`docs/PR_EVOLUTION_16.md`](../PR_EVOLUTION_16.md) |
 
 ## Evolution
 
 ```text
 coarse key + newest-only deletion
-→ P0 containment candidate preserves evidence
-→ canonical validation still required
-→ #15 + later #16 full supersession experiment
+→ P0 containment merged and validated (708c973e)
+→ #15 + later #16 full supersession experiment (blocked)
 ```

@@ -365,17 +365,17 @@ class TestPortfolioManifest:
         manifest = sut.PortfolioManifest.load()
         assert manifest.horizon_by_issue[155] == "NOW"
         assert manifest.horizon_by_issue[135] == "NOW"
-        assert manifest.horizon_by_issue[16] == "NOW"
+        assert manifest.horizon_by_issue[16] == "LATER"
         assert manifest.queue_by_issue[155] == 1
         assert manifest.queue_by_issue[135] == 2
-        assert manifest.queue_by_issue[16] == 3
+        assert manifest.queue_by_issue[16] == 24
         assert 25 in manifest.deferred_status_override
         assert 14 in manifest.trackers
 
-    def test_now_wip_is_exactly_three(self):
+    def test_now_manifest_retains_two_completed_historical_positions(self):
         manifest = sut.PortfolioManifest.load()
         now_issues = [n for n, h in manifest.horizon_by_issue.items() if h == "NOW"]
-        assert len(now_issues) == 3
+        assert now_issues == [155, 135]
 
     def test_no_duplicate_queue_values(self):
         manifest = sut.PortfolioManifest.load()
@@ -591,6 +591,17 @@ class TestRendering:
 
 
 class TestGhCliPlumbing:
+    def test_issue_milestone_uses_title_accepted_by_gh(self, monkeypatch):
+        calls = []
+        monkeypatch.setattr(sut, "run_gh", lambda args: calls.append(args) or "")
+
+        sut.apply_issue_milestone(16, "M4 — Temporal & Trust")
+
+        assert calls == [[
+            "issue", "edit", "16", "--repo", "LuigiFerronatto/tessera",
+            "--milestone", "M4 — Temporal & Trust",
+        ]]
+
     def test_missing_gh_binary_raises(self, monkeypatch):
         monkeypatch.setattr(sut.shutil, "which", lambda name: None)
         with pytest.raises(sut.GhCliError, match="not found on PATH"):
