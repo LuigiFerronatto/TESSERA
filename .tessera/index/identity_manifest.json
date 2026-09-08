@@ -1,0 +1,386 @@
+{
+  "README.md": {
+    "id": "README",
+    "document_id": "doc_b33563055168",
+    "content_hash": "0178ba435be1895854680debb92b8a9085b57a961e2312b319300a07289ec10a",
+    "updated_at": "2026-09-05T20:37:20.079724"
+  },
+  "docs/AGENTIC_GOVERNANCE.md": {
+    "id": "docs/AGENTIC_GOVERNANCE",
+    "document_id": "doc_d5e694ffb9c5",
+    "content_hash": "6c5c765d578cac44a0953a3f0985acc389263f83f642ea8afa6d0d7e2f676e5e",
+    "updated_at": "2026-09-05T20:37:20.080613"
+  },
+  "docs/ARCHITECTURE.md": {
+    "id": "docs/ARCHITECTURE",
+    "document_id": "doc_ff21b6b9a3a3",
+    "content_hash": "8cd4800340d0ab387b9f4daa629a6324a1fd36ad51e639cfb7632293aada22fe",
+    "updated_at": "2026-09-05T20:37:20.081175"
+  },
+  "docs/BENCHMARK_CI.md": {
+    "id": "docs/BENCHMARK_CI",
+    "document_id": "doc_0630c9e0e369",
+    "content_hash": "d7b90e4b6bc256cb809361d6e863cba6dfb346aa64d782fe4ee0dfc38688e6fb",
+    "updated_at": "2026-09-05T20:37:20.081834"
+  },
+  "docs/CHANGE_POLICY.md": {
+    "id": "docs/CHANGE_POLICY",
+    "document_id": "doc_da992717f384",
+    "content_hash": "3166bb7269f2ba7a37122eea04577fb2747f3cd89df781a1dc2a46340ae1f197",
+    "updated_at": "2026-09-05T20:37:20.082521"
+  },
+  "docs/CHEATSHEET.md": {
+    "id": "docs/CHEATSHEET",
+    "document_id": "doc_2f01bfd375b4",
+    "content_hash": "45bbdf19c40d5252ad8cd41da6238bd931a03cdaa1d764e468b8bf5eaac073e7",
+    "updated_at": "2026-09-05T20:37:20.083141"
+  },
+  "docs/CODE_EXPLANATION.md": {
+    "id": "docs/CODE_EXPLANATION",
+    "document_id": "doc_3b386ce31b87",
+    "content_hash": "a6ea54769f56f9710934a8e46302197517049982d2b66c58ff742b32cca6099c",
+    "updated_at": "2026-09-05T20:37:20.083584"
+  },
+  "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md": {
+    "id": "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS",
+    "document_id": "doc_573cfb206d00",
+    "content_hash": "2e33483847578f8588ecd056fec6780316a6361d27c92b680637431bd87078fe",
+    "updated_at": "2026-09-05T20:37:20.084111"
+  },
+  "docs/CONCEPTS.md": {
+    "id": "docs/CONCEPTS",
+    "document_id": "doc_55062dc0fc1d",
+    "content_hash": "f4bdff3dbf4587b9e288c2574569e65074e092412e2ee81eceb3cc4049faa914",
+    "updated_at": "2026-09-05T20:37:20.084683"
+  },
+  "docs/FEATURES.md": {
+    "id": "docs/FEATURES",
+    "document_id": "doc_dfea6b4a44c8",
+    "content_hash": "9e5dc14bb3d387b0bed03338f9082051e1eb0f5072baac3a7c46e22fdef52e9b",
+    "updated_at": "2026-09-05T20:37:20.085116"
+  },
+  "docs/OUTPUT_CONTRACT.md": {
+    "id": "docs/OUTPUT_CONTRACT",
+    "document_id": "doc_6b24e3a56e26",
+    "content_hash": "e89ea7df24d6219bd17568e37dd612b3f4f370e5431be851343373f04c86b0f5",
+    "updated_at": "2026-09-05T20:37:20.085702"
+  },
+  "docs/OVERVIEW.md": {
+    "id": "docs/OVERVIEW",
+    "document_id": "doc_427e3c3bcf03",
+    "content_hash": "695fb9290a798cda04fcc1be68c3c5851f92c1739671eceb9a164c422809921f",
+    "updated_at": "2026-09-05T20:37:20.086553"
+  },
+  "docs/PROCEDURAL_ANCHORS.md": {
+    "id": "docs/PROCEDURAL_ANCHORS",
+    "document_id": "doc_49a489d491d0",
+    "content_hash": "93982ede67dabc2a51250022710966e86957207c0d4c59ad615ee0e37065434b",
+    "updated_at": "2026-09-05T20:37:20.087082"
+  },
+  "docs/PROJECT_BOARD_SYNC.md": {
+    "id": "docs/PROJECT_BOARD_SYNC",
+    "document_id": "doc_7f965ed006ce",
+    "content_hash": "eb4e156e28f8397ce2654d4489ae7aa022f57bed30953ae5232661c320b87dd7",
+    "updated_at": "2026-09-05T20:37:20.087579"
+  },
+  "docs/PR_EVOLUTION_115.md": {
+    "id": "docs/PR_EVOLUTION_115",
+    "document_id": "doc_46cc5e57886d",
+    "content_hash": "2cb2868b91c74db196b1e61ccb700dc05bfa4ea3d1e933c414d7b282420ec7d2",
+    "updated_at": "2026-09-05T20:37:20.088260"
+  },
+  "docs/PR_EVOLUTION_116.md": {
+    "id": "docs/PR_EVOLUTION_116",
+    "document_id": "doc_fb16f21e78dc",
+    "content_hash": "8f520b0ce09d57afaac915cd8de251fd56b96966f57a0b501bdaf9c31849ce26",
+    "updated_at": "2026-09-05T20:37:20.088970"
+  },
+  "docs/PR_EVOLUTION_117.md": {
+    "id": "docs/PR_EVOLUTION_117",
+    "document_id": "doc_674fc45ec817",
+    "content_hash": "285a729881e7ab3c8d66a18a4ba2aae80860bbe29ea2db22316ad41a95341fe2",
+    "updated_at": "2026-09-05T20:37:20.089630"
+  },
+  "docs/PR_EVOLUTION_153.md": {
+    "id": "docs/PR_EVOLUTION_153",
+    "document_id": "doc_f0c954176b29",
+    "content_hash": "6b6c067330df0269df8469d3d3db8359506263b825a938f0aa820d4fc8955f50",
+    "updated_at": "2026-09-05T20:37:20.091038"
+  },
+  "docs/PR_EVOLUTION_154.md": {
+    "id": "docs/PR_EVOLUTION_154",
+    "document_id": "doc_e935d93ceff4",
+    "content_hash": "788df3be7483db14158d2cf7bcd582e71ad8edd4d670e35a06c62dbdc6212470",
+    "updated_at": "2026-09-05T20:37:20.091692"
+  },
+  "docs/PR_EVOLUTION_155.md": {
+    "id": "docs/PR_EVOLUTION_155",
+    "document_id": "doc_51f596ef3c7e",
+    "content_hash": "db097ab37dd911228135eacd032a5ef25ac43d9f589e987b2c0d0d3f9693c4b1",
+    "updated_at": "2026-09-05T20:37:20.092537"
+  },
+  "docs/PR_EVOLUTION_92.md": {
+    "id": "docs/PR_EVOLUTION_92",
+    "document_id": "doc_e00f3c991b74",
+    "content_hash": "36d196974569ac8474d3cabe130a9d12c6d146a36726641a9763d1a16612b74e",
+    "updated_at": "2026-09-05T20:37:20.093676"
+  },
+  "docs/PR_EVOLUTION_93.md": {
+    "id": "docs/PR_EVOLUTION_93",
+    "document_id": "doc_7015b7eb3aae",
+    "content_hash": "0a088a202a43a6adc74ea48f26429c8a80313b3523970a1edc17cbbc13369f59",
+    "updated_at": "2026-09-05T20:37:20.094448"
+  },
+  "docs/PR_EVOLUTION_95.md": {
+    "id": "docs/PR_EVOLUTION_95",
+    "document_id": "doc_beef3a832879",
+    "content_hash": "e99ac6b73b2e645a8cb48404a69405f944f55474390ea741fbd5a22e91bdec23",
+    "updated_at": "2026-09-05T20:37:20.095312"
+  },
+  "docs/QUERY_EXAMPLES.md": {
+    "id": "docs/QUERY_EXAMPLES",
+    "document_id": "doc_8bbaf646288d",
+    "content_hash": "e1598e8b92476a055eeb3c74b3228f14cdf344c6d126b5b7507c5ee859cf2bfb",
+    "updated_at": "2026-09-05T20:37:20.095992"
+  },
+  "docs/QUMEM-GAP-ANALYSIS.md": {
+    "id": "docs/QUMEM-GAP-ANALYSIS",
+    "document_id": "doc_2c40f6e9c6e7",
+    "content_hash": "6191a4343db58df1c3274018d9ef848ceea2cd75ba76f14f09db5ffb15bc550a",
+    "updated_at": "2026-09-05T20:37:20.096473"
+  },
+  "docs/README.md": {
+    "id": "docs/README",
+    "document_id": "doc_0b5ca119d2be",
+    "content_hash": "170241c1d69421eb72618723255d85c994043fb4ed209f831e481fb8e4688047",
+    "updated_at": "2026-09-05T20:37:20.097193"
+  },
+  "docs/REFERENCES.md": {
+    "id": "docs/REFERENCES",
+    "document_id": "doc_8d461432b25b",
+    "content_hash": "f92823c18a98d57b7d3aa2e5d8a015e8a5031cb5ef0ef0ff29bbb7fd9940a4cc",
+    "updated_at": "2026-09-05T20:37:20.097879"
+  },
+  "docs/ROADMAP.md": {
+    "id": "docs/ROADMAP",
+    "document_id": "doc_0d96796e2b2a",
+    "content_hash": "7fe2415b25bb3bc3c3aeab19861c1dcb23f98567dae511fd7b867a0cc534cf8f",
+    "updated_at": "2026-09-05T20:37:20.098663"
+  },
+  "docs/ROTEIRO-DEMO-VIDEO.md": {
+    "id": "docs/ROTEIRO-DEMO-VIDEO",
+    "document_id": "doc_0e299732900b",
+    "content_hash": "2b0a29d8ce996e7ac1bb1d8694a31dd95441ef9057ab4c279bd3d8213e226231",
+    "updated_at": "2026-09-05T20:37:20.099161"
+  },
+  "docs/TEST_CARD_OPERATING_MODEL.md": {
+    "id": "docs/TEST_CARD_OPERATING_MODEL",
+    "document_id": "doc_2d5ba5bb570a",
+    "content_hash": "834fa82a75aacaa8539e39ef88f14d88dc459fc48e96ab827b94d89b958d9add",
+    "updated_at": "2026-09-05T20:37:20.099725"
+  },
+  "docs/WRITE_GATE_CONTRACT.md": {
+    "id": "docs/WRITE_GATE_CONTRACT",
+    "document_id": "doc_cefb3aa3fd2d",
+    "content_hash": "3f29ab6a2ee8c12f10140338d2187b95b5e394127ef8b62412416d055fda9c91",
+    "updated_at": "2026-09-05T20:37:20.100340"
+  },
+  "docs/adr/0001-core-vs-optional-llm-boundary.md": {
+    "id": "docs/adr/0001-core-vs-optional-llm-boundary",
+    "document_id": "doc_d89706aeb5ac",
+    "content_hash": "3d90f8eb24bf96230a6d4f31ccc7e1fde6af7592ae112dc68f4590a08a1e4c83",
+    "updated_at": "2026-09-05T20:37:20.101173"
+  },
+  "docs/adr/0002-repository-layout-and-distribution-boundary.md": {
+    "id": "docs/adr/0002-repository-layout-and-distribution-boundary",
+    "document_id": "doc_1253780c24e9",
+    "content_hash": "c4024114589421c980e968fcde1737ba62398b3955e8fc56d6d47ea5c873be35",
+    "updated_at": "2026-09-05T20:37:20.101758"
+  },
+  "docs/adr/0003-configuration-and-store-discovery.md": {
+    "id": "docs/adr/0003-configuration-and-store-discovery",
+    "document_id": "doc_de40fed03904",
+    "content_hash": "a3b02cc32be74dd0aa96c9f75f64d1718fc8e7d41e7389eea6ec8d5b5026273b",
+    "updated_at": "2026-09-05T20:37:20.102626"
+  },
+  "docs/adr/0004-safe-project-source-discovery.md": {
+    "id": "docs/adr/0004-safe-project-source-discovery",
+    "document_id": "doc_aea7d4e96f38",
+    "content_hash": "b5118d3b6cd910d0b6132beb3660ad589e2ddd9d5d039121ad90aeaad33471e7",
+    "updated_at": "2026-09-05T20:37:20.103505"
+  },
+  "docs/adr/README.md": {
+    "id": "docs/adr/README",
+    "document_id": "doc_5767cabc35c1",
+    "content_hash": "67d9779c886e78d716b56d9191ce86e5d21fac7c64d2dd2ec6fd4838be13ce05",
+    "updated_at": "2026-09-05T20:37:20.104777"
+  },
+  "docs/assets/brand/README.md": {
+    "id": "docs/assets/brand/README",
+    "document_id": "doc_ddecd73d5d7e",
+    "content_hash": "f85e27243a51475251a81a9fa49e6bee2ee8bb0dc8a8e0bc8c74014c8bbb48ae",
+    "updated_at": "2026-09-05T20:37:20.105788"
+  },
+  "docs/research/COMPETITIVE_LANDSCAPE.md": {
+    "id": "docs/research/COMPETITIVE_LANDSCAPE",
+    "document_id": "doc_37eb56eaeef3",
+    "content_hash": "f4adfd276ef9f751319101ad9dac81659708f8dba44291e975c9738398e73a4c",
+    "updated_at": "2026-09-05T20:37:20.106942"
+  },
+  "docs/research/DECISION_TRACE.md": {
+    "id": "docs/research/DECISION_TRACE",
+    "document_id": "doc_18fed86893cf",
+    "content_hash": "7fd5c51e568a00ba7dae27265e9fcef9c30fec1943517ab41253b3b23f2bba71",
+    "updated_at": "2026-09-05T20:37:20.107726"
+  },
+  "docs/research/PAPER_NOTES.md": {
+    "id": "docs/research/PAPER_NOTES",
+    "document_id": "doc_aedc93daf1ee",
+    "content_hash": "12a70aded9621be93dcd24e6ac9005507e6a720d062241d7c5dd8e79a37fab57",
+    "updated_at": "2026-09-05T20:37:20.108482"
+  },
+  "docs/research/REFERENCES.md": {
+    "id": "docs/research/REFERENCES",
+    "document_id": "doc_8618405d8d5b",
+    "content_hash": "8ec5333254becd7bb3afaac8c1fa85cb25a10ce886247b56ddf862a38361eadb",
+    "updated_at": "2026-09-05T20:37:20.109269"
+  },
+  "docs/slides/README.md": {
+    "id": "docs/slides/README",
+    "document_id": "doc_8701a5fd2cc5",
+    "content_hash": "5d0470a271d284768eadb4b07b71c81a631dea0312a5aac3318f7b4cf575b58f",
+    "updated_at": "2026-09-05T20:37:20.110304"
+  },
+  "docs/test-cards/100-benchmark-ledger-and-ci.md": {
+    "id": "docs/test-cards/100-benchmark-ledger-and-ci",
+    "document_id": "doc_71b5077e7b37",
+    "content_hash": "25716bd1c1e8ae5748b98b73fdd20077195f4af798f975423b1ec1bab91f8cfa",
+    "updated_at": "2026-09-05T20:37:20.111343"
+  },
+  "docs/test-cards/112-tessera-ascii-banner.md": {
+    "id": "docs/test-cards/112-tessera-ascii-banner",
+    "document_id": "doc_ebfb7ed580d6",
+    "content_hash": "7526d7dbca6f5c5b804cad961de45a594a73b76d6903992ac1b6b645ba4b869b",
+    "updated_at": "2026-09-05T20:37:20.112307"
+  },
+  "docs/test-cards/114-evolution-auditable-templates.md": {
+    "id": "docs/test-cards/114-evolution-auditable-templates",
+    "document_id": "doc_2ba34120a795",
+    "content_hash": "37c40fcda0dca1652c379b8da14aff9a6f22eb47b41f39499b3c5ccd4f333729",
+    "updated_at": "2026-09-05T20:37:20.113267"
+  },
+  "docs/test-cards/115-repository-layout-architecture.md": {
+    "id": "docs/test-cards/115-repository-layout-architecture",
+    "document_id": "doc_45172e1b65ab",
+    "content_hash": "7402f2842d675c87d028c935c00f6642cb51bce66ded56157564499eb6f6eb42",
+    "updated_at": "2026-09-05T20:37:20.114545"
+  },
+  "docs/test-cards/116-packaging-hardening.md": {
+    "id": "docs/test-cards/116-packaging-hardening",
+    "document_id": "doc_54b6a4741b2b",
+    "content_hash": "706d9714c6858774e5f7584cf5e35e6454868615df255f662233e520c8e2cb37",
+    "updated_at": "2026-09-05T20:37:20.115726"
+  },
+  "docs/test-cards/117-configuration-init-discovery.md": {
+    "id": "docs/test-cards/117-configuration-init-discovery",
+    "document_id": "doc_88fc9ef0a9d4",
+    "content_hash": "32594435ac132a747fa9f87eaf8172036a4eb5409082a78ca40307f35d194d9f",
+    "updated_at": "2026-09-05T20:37:20.116795"
+  },
+  "docs/test-cards/153-configuration-v2-store-sources-index.md": {
+    "id": "docs/test-cards/153-configuration-v2-store-sources-index",
+    "document_id": "doc_bf7d1e182456",
+    "content_hash": "9d20b54bfb326cad1b0b9b4ae9be259ff637f58400deedd3d7b6639cd0b3ed41",
+    "updated_at": "2026-09-05T20:37:20.118956"
+  },
+  "docs/test-cards/154-safe-source-discovery.md": {
+    "id": "docs/test-cards/154-safe-source-discovery",
+    "document_id": "doc_6c5818cc0149",
+    "content_hash": "6d4de7cbbc799a4255e2818de6be12fe30867f3cfff0344754dd50f6a41d2699",
+    "updated_at": "2026-09-05T20:37:20.119623"
+  },
+  "docs/test-cards/155-init-ux.md": {
+    "id": "docs/test-cards/155-init-ux",
+    "document_id": "doc_fa5f4660cb0f",
+    "content_hash": "06d8ea54d950407eb30f4f90cc73b2da326d482fdf45d64def5852da6ea65af3",
+    "updated_at": "2026-09-05T20:37:20.120274"
+  },
+  "docs/test-cards/68-retrieval-contract-parity.md": {
+    "id": "docs/test-cards/68-retrieval-contract-parity",
+    "document_id": "doc_1676cb6a9dcf",
+    "content_hash": "4e927ce82912b08384b2e45c1541d00aee3da3b8c517f6a2f7ef2fa9ddbf433b",
+    "updated_at": "2026-09-05T20:37:20.121216"
+  },
+  "docs/test-cards/74-core-vs-optional-llm-boundary.md": {
+    "id": "docs/test-cards/74-core-vs-optional-llm-boundary",
+    "document_id": "doc_a0267e39d1db",
+    "content_hash": "28a142500459f83262e62beb4ec1a97599b628b7f5fc7f6784c54d4c78f8c12e",
+    "updated_at": "2026-09-05T20:37:20.121726"
+  },
+  "docs/test-cards/92-write-gate-integrity.md": {
+    "id": "docs/test-cards/92-write-gate-integrity",
+    "document_id": "doc_9eea261a5dc2",
+    "content_hash": "2552755b4e1af1152f913d05452591e69dedba2fe8e25b9199914942a984056a",
+    "updated_at": "2026-09-05T20:37:20.122254"
+  },
+  "docs/test-cards/93-storage-configuration-parity.md": {
+    "id": "docs/test-cards/93-storage-configuration-parity",
+    "document_id": "doc_0f79246690bd",
+    "content_hash": "d6eaa2fd7ad5f1a80ab01ffa3677b352a60007aafcab34bb762ed9b8a738560d",
+    "updated_at": "2026-09-05T20:37:20.122839"
+  },
+  "docs/test-cards/94-markdown-only-persistence.md": {
+    "id": "docs/test-cards/94-markdown-only-persistence",
+    "document_id": "doc_af7b3f3cde0f",
+    "content_hash": "9b57a7c43c6e332b62bc6ff51fc09166998c39246f7892ea9801bfd22cbcc9f2",
+    "updated_at": "2026-09-05T20:37:20.123364"
+  },
+  "docs/test-cards/95-remove-legacy-runtime-coupling.md": {
+    "id": "docs/test-cards/95-remove-legacy-runtime-coupling",
+    "document_id": "doc_685b2ad415d5",
+    "content_hash": "00209865c023a89756d9892872d662ad1e4399e9c9a58f17ae2e0d845aef8bf0",
+    "updated_at": "2026-09-05T20:37:20.123945"
+  },
+  "docs/test-cards/96-longmemeval-v1-dev-50.md": {
+    "id": "docs/test-cards/96-longmemeval-v1-dev-50",
+    "document_id": "doc_ab77933d9ddb",
+    "content_hash": "32410559f7fb3fd23e8e59fbffd8b1f4228c946796bc0d270cfeec48307f0a08",
+    "updated_at": "2026-09-05T20:37:20.124476"
+  },
+  "docs/test-cards/README.md": {
+    "id": "docs/test-cards/README",
+    "document_id": "doc_92a96d0793b3",
+    "content_hash": "2b2cf70c5f653671052bf9e795b78797a569e08361a10421de7c1c3e9e207dd5",
+    "updated_at": "2026-09-05T20:37:20.125020"
+  },
+  "docs/test-cards/TEMPLATE.md": {
+    "id": "docs/test-cards/TEMPLATE",
+    "document_id": "doc_68fa1963a36c",
+    "content_hash": "e3ccd011eb3b78f0e749a91366daa2f7a285ba2d0aca27582ea50ffc05fd65fc",
+    "updated_at": "2026-09-05T20:37:20.125559"
+  },
+  "docs/PR_EVOLUTION_135.md": {
+    "id": "docs/PR_EVOLUTION_135",
+    "document_id": "doc_613ed015d966",
+    "content_hash": "0bbe20ae958161d146149387762c810c8f132371ed5f9ee4b8ea5bed51fde399",
+    "updated_at": "2026-09-05T20:37:20.090306"
+  },
+  "docs/PR_EVOLUTION_16.md": {
+    "id": "docs/PR_EVOLUTION_16",
+    "document_id": "doc_9d840870edc7",
+    "content_hash": "39cb603701b6cf99176f68977b4b3b264f7da53032fcfbe97c2e6a7f6972748a",
+    "updated_at": "2026-09-05T20:37:20.092969"
+  },
+  "docs/test-cards/135-decomposition-fallback.md": {
+    "id": "docs/test-cards/135-decomposition-fallback",
+    "document_id": "doc_b89e0244966f",
+    "content_hash": "d4f8dd6ba311d0949a266b174e982be27902c24d0a67525fd12f5732334ea03a",
+    "updated_at": "2026-09-05T20:37:20.117843"
+  },
+  "docs/test-cards/16-conflict-resolver-containment.md": {
+    "id": "docs/test-cards/16-conflict-resolver-containment",
+    "document_id": "doc_46aeb23505ec",
+    "content_hash": "e8504b3b7d83cf21c7b860a16489d9380ffc0c256e25387b88788777b97c82df",
+    "updated_at": "2026-09-05T20:37:20.120722"
+  }
+}

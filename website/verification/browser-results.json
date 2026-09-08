@@ -1,0 +1,50 @@
+{
+  "url": "http://localhost:4174",
+  "browser": "151.0.7922.34",
+  "testedAt": "2026-09-06T00:09:56.191Z",
+  "viewports": [
+    {
+      "width": 360,
+      "overflow": false,
+      "axeViolations": 0,
+      "fullJourney": "pass",
+      "disclosures": "pass"
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0,
+      "fullJourney": "pass",
+      "disclosures": "pass"
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "axeViolations": 0,
+      "fullJourney": "pass",
+      "disclosures": "pass"
+    },
+    {
+      "width": 1024,
+      "overflow": false,
+      "axeViolations": 0,
+      "fullJourney": "pass",
+      "disclosures": "pass"
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0,
+      "fullJourney": "pass",
+      "disclosures": "pass"
+    }
+  ],
+  "checks": [
+    "Keyboard-only steps, source focus, reset and native disclosures",
+    "Reduced motion: complete story with zero running animations",
+    "Both clipboard buttons copy their exact command",
+    "No JavaScript: crawlable narrative, complete example, native disclosures and working documentation links"
+  ],
+  "errors": [],
+  "passed": true
+}

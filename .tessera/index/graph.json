@@ -1,0 +1,328 @@
+{
+  "storage_dir": "/home/luigiferronatto/Desktop/Workspace/tessera/memories",
+  "generated_at": "2026-09-05T20:37:20.181736-03:00",
+  "num_nodes": 64,
+  "num_edges": 115,
+  "nodes": {
+    "README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/README.md",
+      "tags": []
+    },
+    "docs/AGENTIC_GOVERNANCE": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/AGENTIC_GOVERNANCE.md",
+      "tags": []
+    },
+    "docs/ARCHITECTURE": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/ARCHITECTURE.md",
+      "tags": []
+    },
+    "docs/BENCHMARK_CI": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/BENCHMARK_CI.md",
+      "tags": []
+    },
+    "docs/CHANGE_POLICY": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/CHANGE_POLICY.md",
+      "tags": []
+    },
+    "docs/CHEATSHEET": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/CHEATSHEET.md",
+      "tags": []
+    },
+    "docs/CODE_EXPLANATION": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/CODE_EXPLANATION.md",
+      "tags": []
+    },
+    "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md",
+      "tags": []
+    },
+    "docs/CONCEPTS": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/CONCEPTS.md",
+      "tags": []
+    },
+    "docs/FEATURES": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/FEATURES.md",
+      "tags": []
+    },
+    "docs/OUTPUT_CONTRACT": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/OUTPUT_CONTRACT.md",
+      "tags": []
+    },
+    "docs/OVERVIEW": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/OVERVIEW.md",
+      "tags": []
+    },
+    "docs/PROCEDURAL_ANCHORS": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PROCEDURAL_ANCHORS.md",
+      "tags": []
+    },
+    "docs/PROJECT_BOARD_SYNC": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PROJECT_BOARD_SYNC.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_115": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_115.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_116": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_116.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_117": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_117.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_135": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_135.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_153": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_153.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_154": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_154.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_155": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_155.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_16": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_16.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_92": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_92.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_93": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_93.md",
+      "tags": []
+    },
+    "docs/PR_EVOLUTION_95": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/PR_EVOLUTION_95.md",
+      "tags": []
+    },
+    "docs/QUERY_EXAMPLES": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/QUERY_EXAMPLES.md",
+      "tags": []
+    },
+    "docs/QUMEM-GAP-ANALYSIS": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/QUMEM-GAP-ANALYSIS.md",
+      "tags": []
+    },
+    "docs/README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/README.md",
+      "tags": []
+    },
+    "docs/REFERENCES": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/REFERENCES.md",
+      "tags": []
+    },
+    "docs/ROADMAP": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/ROADMAP.md",
+      "tags": []
+    },
+    "docs/ROTEIRO-DEMO-VIDEO": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/ROTEIRO-DEMO-VIDEO.md",
+      "tags": []
+    },
+    "docs/TEST_CARD_OPERATING_MODEL": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/TEST_CARD_OPERATING_MODEL.md",
+      "tags": []
+    },
+    "docs/WRITE_GATE_CONTRACT": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/WRITE_GATE_CONTRACT.md",
+      "tags": []
+    },
+    "docs/adr/0001-core-vs-optional-llm-boundary": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/adr/0001-core-vs-optional-llm-boundary.md",
+      "tags": []
+    },
+    "docs/adr/0002-repository-layout-and-distribution-boundary": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/adr/0002-repository-layout-and-distribution-boundary.md",
+      "tags": []
+    },
+    "docs/adr/0003-configuration-and-store-discovery": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/adr/0003-configuration-and-store-discovery.md",
+      "tags": []
+    },
+    "docs/adr/0004-safe-project-source-discovery": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/adr/0004-safe-project-source-discovery.md",
+      "tags": []
+    },
+    "docs/adr/README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/adr/README.md",
+      "tags": []
+    },
+    "docs/assets/brand/README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/assets/brand/README.md",
+      "tags": []
+    },
+    "docs/research/COMPETITIVE_LANDSCAPE": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/research/COMPETITIVE_LANDSCAPE.md",
+      "tags": []
+    },
+    "docs/research/DECISION_TRACE": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/research/DECISION_TRACE.md",
+      "tags": []
+    },
+    "docs/research/PAPER_NOTES": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/research/PAPER_NOTES.md",
+      "tags": []
+    },
+    "docs/research/REFERENCES": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/research/REFERENCES.md",
+      "tags": []
+    },
+    "docs/slides/README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/slides/README.md",
+      "tags": []
+    },
+    "docs/test-cards/100-benchmark-ledger-and-ci": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/100-benchmark-ledger-and-ci.md",
+      "tags": []
+    },
+    "docs/test-cards/112-tessera-ascii-banner": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/112-tessera-ascii-banner.md",
+      "tags": []
+    },
+    "docs/test-cards/114-evolution-auditable-templates": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/114-evolution-auditable-templates.md",
+      "tags": []
+    },
+    "docs/test-cards/115-repository-layout-architecture": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/115-repository-layout-architecture.md",
+      "tags": []
+    },
+    "docs/test-cards/116-packaging-hardening": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/116-packaging-hardening.md",
+      "tags": []
+    },
+    "docs/test-cards/117-configuration-init-discovery": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/117-configuration-init-discovery.md",
+      "tags": []
+    },
+    "docs/test-cards/135-decomposition-fallback": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/135-decomposition-fallback.md",
+      "tags": []
+    },
+    "docs/test-cards/153-configuration-v2-store-sources-index": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/153-configuration-v2-store-sources-index.md",
+      "tags": []
+    },
+    "docs/test-cards/154-safe-source-discovery": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/154-safe-source-discovery.md",
+      "tags": []
+    },
+    "docs/test-cards/155-init-ux": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/155-init-ux.md",
+      "tags": []
+    },
+    "docs/test-cards/16-conflict-resolver-containment": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/16-conflict-resolver-containment.md",
+      "tags": []
+    },
+    "docs/test-cards/68-retrieval-contract-parity": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/68-retrieval-contract-parity.md",
+      "tags": []
+    },
+    "docs/test-cards/74-core-vs-optional-llm-boundary": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/74-core-vs-optional-llm-boundary.md",
+      "tags": []
+    },
+    "docs/test-cards/92-write-gate-integrity": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/92-write-gate-integrity.md",
+      "tags": []
+    },
+    "docs/test-cards/93-storage-configuration-parity": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/93-storage-configuration-parity.md",
+      "tags": []
+    },
+    "docs/test-cards/94-markdown-only-persistence": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/94-markdown-only-persistence.md",
+      "tags": []
+    },
+    "docs/test-cards/95-remove-legacy-runtime-coupling": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/95-remove-legacy-runtime-coupling.md",
+      "tags": []
+    },
+    "docs/test-cards/96-longmemeval-v1-dev-50": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/96-longmemeval-v1-dev-50.md",
+      "tags": []
+    },
+    "docs/test-cards/README": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/README.md",
+      "tags": []
+    },
+    "docs/test-cards/TEMPLATE": {
+      "node_type": "factual",
+      "filepath": "/home/luigiferronatto/Desktop/Workspace/tessera/docs/test-cards/TEMPLATE.md",
+      "tags": []
+    }
+  }
+}

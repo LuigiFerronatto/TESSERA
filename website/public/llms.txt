@@ -1,0 +1,14 @@
+# TESSERA
+
+> A text-first memory and evidence layer for AI agents.
+
+TESSERA indexes selected Markdown sources and returns structured evidence, original memory content, relevance signals and source provenance where available. New memory writes, readable source roots and the derived index have distinct configuration roles.
+
+The website walkthrough is a deterministic illustration using fictional data. It does not run a live model or the TESSERA engine. Final reasoning belongs to the consuming agent. Automatic temporal arbitration and full supersession are planned, not shipped capabilities.
+
+## Documentation
+
+- [Getting started](https://github.com/LuigiFerronatto/TESSERA#quickstart): Installation, configuration and first query.
+- [Output contract](https://github.com/LuigiFerronatto/TESSERA/blob/main/docs/OUTPUT_CONTRACT.md): Evidence, provenance and field semantics.
+- [Architecture](https://github.com/LuigiFerronatto/TESSERA/blob/main/docs/ARCHITECTURE.md): Current implementation and planned work.
+- [Project status](https://github.com/LuigiFerronatto/TESSERA#project-status): Implemented capabilities and research boundaries.
