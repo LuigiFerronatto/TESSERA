@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime` / distribution validation |
 | Pull request | [#225](https://github.com/LuigiFerronatto/TESSERA/pull/225) |
-| Head commit | Exact candidate and CI evidence recorded in the PR |
-| Merge commit | Not merged |
-| Decision | `KEEP` candidate; exact-head audit/merge gate remains independent |
+| Head commit | `b83c18494f9a2bc5687010ee27f077ac81688b6f` |
+| Merge commit | `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d` |
+| Decision | `KEEP`; final audit and canonical-merge checks passed |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-09-09 |
 
@@ -60,8 +60,6 @@ installed console script for every product operation. Python observation probes
 verify installed metadata, config, discovery timing and actual index membership.
 
 ## How does it work now?
-
-**TARGET — NOT YET ON MAIN**
 
 ```text
 clean source commit -> python -m build -> sdist -> wheel
@@ -129,7 +127,7 @@ filesystem obstruction at `graph.pkl` forces failure after config persistence;
 the experiment observes partial state and removes only the obstruction before
 retrying. No runtime function is replaced to create that failure.
 
-The completed local matrix used Python 3.9.25 and 3.12.13; each passed 67 installed
+The predecessor local matrix used Python 3.9.25 and 3.12.13; each passed 67 installed
 CLI commands plus observation probes, including successful uninstall. The clean
 full suite passed **538 tests, 5 skipped**. Canonical sanity stayed Hit@1 0.75,
 Hit@3/5 1.00, MRR 0.875 and evidence hit 1.00. The predecessor CI matrix also
@@ -141,6 +139,18 @@ output.
 identify their measured candidate explicitly. The final PR body and CI artifact
 links bind the final exact head; neither predecessor evidence nor candidate KEEP
 substitutes for its independent audit or canonical merge.
+
+The final candidate passed 68 installed CLI commands and 69 source-integrity
+checkpoints per interpreter. Its independent [Maintainer Audit returned KEEP](https://github.com/LuigiFerronatto/TESSERA/pull/225#issuecomment-5603811873)
+with no supported P0/P1 findings, and the maintainer merged #225 on 2026-09-09.
+Candidate and merge have identical Git trees: one runtime delivery.
+
+Canonical-merge [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274210)
+and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274180)
+passed on `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. Both installed Python
+3.9.25/3.12.14 reports bind that SHA and pass the full onboarding/uninstall
+contract. [Canonical evidence](../evidence/118-clean-room/canonical-merge.json)
+preserves report hashes, artifact metadata, import origins and sanity results.
 
 ## What improved?
 
@@ -163,10 +173,11 @@ regressions as well as installed-wheel coverage.
 
 ## What is unlocked next?
 
-#118 stays `IN_PROGRESS` / Queue 4 while its PR is open. After canonical merge
-and lifecycle validation, #120 becomes the next execution task (currently
-`READY` / Queue 5). #134 remains blocked on #118 validation and #87's owner/legal
-decision. Neither downstream implementation nor publication starts here.
+#118 is closed, `VALIDATED / KEEP`, with historical Queue 4 preserved. #120
+remains `READY` / Queue 5 and is the next implementation after this lifecycle
+correction merges into main. #134's #118 prerequisite is satisfied; its only
+remaining blocker is #87's owner/legal decision. Neither downstream implementation
+nor publication is included in this lifecycle correction.
 
 ## Technical provenance
 
@@ -178,13 +189,13 @@ decision. Neither downstream implementation nor publication starts here.
 | Environment driver | `scripts/clean_room/run_clean_room.py` |
 | Evidence/Learnings/Decision | [PR Evolution Audit](../PR_EVOLUTION_118.md) and exact-head PR evidence |
 | Benchmark | `benchmarks/sanity/ci_eval.py`, `SMOKE_ONLY` |
-| Merge commit | Not merged |
+| Merge commit | `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d` |
 
 ## Evolution
 
 ```text
 #116 packaging + #117/#153 configuration + #154 discovery + #155 init
--> #118 installed-artifact candidate IN_PROGRESS
--> maintainer review, canonical merge and lifecycle validation
+-> #118 installed-artifact contract VALIDATED / KEEP
+-> canonical merge 0ee5bbfe and green post-merge CI
 -> #120 next; #134 still requires #87
 ```

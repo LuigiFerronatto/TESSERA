@@ -1,15 +1,19 @@
 # PR Evolution Audit — #118 clean-room onboarding
 
-## Candidate lifecycle
+## Canonical lifecycle
 
-- Issue: #118; status `IN_PROGRESS`; Queue 4.
+- Issue: #118; closed; status `VALIDATED`; decision `KEEP`; historical Queue 4.
 - Branch: `test-card/118-clean-room-onboarding`.
 - Audited starting main: `112ae63c9ba1d8ffbe6ed3f2edf439d7dbe5b3a0`.
-- Canonical merge: none. Final candidate SHA is bound by the PR's head and its
-  exact-head CI/Maintainer Audit, not a claim of merged delivery.
+- Final candidate: `b83c18494f9a2bc5687010ee27f077ac81688b6f`.
+- Canonical squash merge: `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`,
+  merged by the maintainer on 2026-09-09; #118 closed automatically.
+- Candidate and canonical merge have identical Git trees and count as **one
+  runtime delivery**. This post-merge reconciliation is `DOCUMENTATION_CORRECTION`.
 - Benchmark applicability: `SMOKE_ONLY`.
-- Candidate decision: `KEEP`. Final exact-head CI and independent Maintainer Audit
-  remain mandatory review gates; see [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225).
+- Final exact-head [Maintainer Audit: KEEP](https://github.com/LuigiFerronatto/TESSERA/pull/225#issuecomment-5603811873)
+  and [Merge Governor: success](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34365927883)
+  preceded the human merge of [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225).
 
 ## Relevant delivery history
 
@@ -23,6 +27,7 @@
 | #16 / #219 | `708c973e23d5c4eb8a52d359a2cadc153e161a90` | Non-destructive conflict containment |
 | #221 / #222 | `21b726acb9bce519960de389ebb75181b1b9df6a` | Canonical lifecycle reconciliation; prerequisite to starting #118 |
 | #223 / #224 | `112ae63c9ba1d8ffbe6ed3f2edf439d7dbe5b3a0` | Six research/documentation files; no additional runtime delivery |
+| #118 / #225 | `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d` | Installed onboarding gate and two narrow init/discovery fixes; candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f` is the same delivery |
 
 The fetched main matched the supplied starting SHA. #222 was merged and #221
 closed before the dedicated branch was created. #155's canonical Test Card and
@@ -58,7 +63,7 @@ experiments use the wheel directly and prove imports originate in the temporary
 venv's `site-packages`. Neither editable installs nor checkout imports count as
 installed-artifact evidence.
 
-Candidate validation: **538 passed, 5 skipped** in the clean full suite; **62**
+Predecessor candidate validation: **538 passed, 5 skipped** in the clean full suite; **62**
 focused init/discovery regressions, **96** routing/documentation checks, and **54
 passed, 5 skipped** packaging/governance checks. Both local installed environments
 passed 67 console commands plus probes and uninstall. TESSERA CI
@@ -77,6 +82,22 @@ See the PR's final evidence record for final source SHA, distribution inventory,
 hashes/sizes, Python/build/installer versions, source fixture hashes, durations,
 query/rebuild comparisons, test counts, sanity after and exact-head CI links.
 `environment.json` and `installed.json` are uploaded by each distribution job.
+
+Final candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f` passed **68 installed
+CLI commands and 69 source-integrity checkpoints per environment**, with zero
+source mutations. [CI 34363459711](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34363459711)
+and [Benchmark Ledger 34363459996](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34363459996)
+passed at that exact head. The first independent ITERATE requested prior-gitlink
+provenance and completed-check evidence; the final audit accepted the evidence
+and returned KEEP with no supported P0/P1 findings, without a new candidate.
+
+Post-merge [CI 34367274210](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274210)
+and [Benchmark Ledger 34367274180](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274180)
+both passed on canonical `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. The downloaded
+Python 3.9.25/3.12.14 distribution reports explicitly bind that SHA, report
+`passed: true`, and prove installed `site-packages` imports, the complete fixture
+contract and successful uninstall. [Canonical merge evidence](evidence/118-clean-room/canonical-merge.json)
+records their artifact hashes, report hashes and unchanged sanity metrics.
 
 ## Findings and classification
 
@@ -106,16 +127,25 @@ query/rebuild comparisons, test counts, sanity after and exact-head CI links.
 
 ## Decision
 
-**KEEP the candidate**: the installed-artifact contract passed on Python 3.9 and
+**VALIDATED / KEEP**: the installed-artifact contract passed on Python 3.9 and
 3.12, both reproduced runtime defects have focused regressions, and the held-
 constant sanity corpus is unchanged. The inherited checkout defect is repaired
 without moving/deleting site files or changing its gitlink commit. Independent
-Maintainer Audit and CI must bind the final head before review readiness is
-reported. The PR remains IN_PROGRESS and unmerged; KEEP does not authorize merge.
+audit and governor passed for the final candidate; the maintainer merged it;
+canonical-merge CI and Benchmark Ledger then passed. These are distinct gates,
+now satisfied. The lifecycle correction adds no runtime delivery or release.
 
 ## Scope and downstream routing
 
-#120 remains READY / Queue 5. #87 remains the owner decision / Queue 6. #134 is
-BLOCKED until both #118 canonical validation and #87 are satisfied. No automatic
+#120 remains READY / Queue 5 and is the next implementation after this lifecycle
+correction merges. Start it from fresh canonical main, not this lifecycle branch.
+#87 remains the owner decision / Queue 6. #134's #118 prerequisite is satisfied;
+it remains BLOCKED solely by #87. No automatic
 merge, publication, release, tag, #119/#120/#121/#134 implementation, intelligence,
 enrichment, hooks, integration setup or import work is authorized by this PR.
+
+Residual repository hygiene: the existing external site's ownership and host
+longevity were not independently certified. Its gitlink was introduced by
+`4fdb4b79dab06cdce638eb78eea024b188c1272a`, before #225, and remains at
+`ae439b0e1c4ffbeabc39f19f0579e8f0f0dedc50` with `update = none`. Any ownership or
+hosting review is a separate follow-up; it does not reopen #118 or expand #120.

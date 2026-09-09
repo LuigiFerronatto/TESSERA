@@ -6,7 +6,7 @@ TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/sou
 
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
-> #118 routing correction (2026-09-09): audited `112ae63c9ba1d8ffbe6ed3f2edf439d7dbe5b3a0`; #155 is canonically validated and #118 is IN_PROGRESS at Queue 4. Other portfolio ownership stays as recorded.
+> #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #120 remains READY / Queue 5; #134 is blocked only by #87.
 
 ## Status contract
 
@@ -42,7 +42,7 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 1
+NOW executable                 0
 READY                          6 total / 3 executable
 BLOCKED                        38 full cards + #16 full phase
 TRACKER                        5 non-executable epics
@@ -112,6 +112,7 @@ noise (see the buckets after the queue).
 🥇 #155 Init UX / source selection              VALIDATED
 🥈 #135 Decomposer fallback integrity           VALIDATED
 🥉 #16  Conflict resolver containment           P0 VALIDATED (`KEEP`; `708c973e...`)
+4  #118 Clean-room onboarding                   VALIDATED (`KEEP`; `0ee5bbfe...`)
 ```
 
 `#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
@@ -122,24 +123,29 @@ merged as `708c973e23d5c4eb8a52d359a2cadc153e161a90` with decision `KEEP` and
 is now `VALIDATED`. Its full temporal supersession scope remains later work
 and stays blocked on #15/#73/#96, unaffected by this merge.
 
-These rows preserve Queue #1–#3 delivery history; they are not active `NOW`
+#118 clean-room onboarding merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`
+with green canonical-merge CI/Benchmark Ledger and decision `KEEP`. Its final
+candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f` has the same tree: one delivery.
+
+These rows preserve Queue #1–#4 delivery history; they are not active `NOW`
 work. The single open Project item for #16 now represents only the remaining
 full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NOW
 
 ```text
-#118 Clean-room onboarding / CI bootstrap        IN_PROGRESS / Queue 4
+No active implementation card; #118 completed historical Queue 4.
 ```
 
-The candidate is under test; canonical validation remains gated on merge.
+#120 is the next implementation after this lifecycle correction merges. It remains
+READY at Queue 5; no MCP implementation starts from the lifecycle branch.
 
 ## NEXT
 
 ```text
-#120 MCP transport/runtime robustness            can start in parallel
+#120 MCP transport/runtime robustness            READY / Queue 5; next implementation
 #87  LICENSE / CONTRIBUTING owner decision       can start in parallel
-#134 PyPI release                                after #118 + #87
+#134 PyPI release                                BLOCKED only on #87
 ```
 
 ## Full execution queue
@@ -155,7 +161,7 @@ NOW — Product foundation
 1  #155 Init UX / source selection          VALIDATED
 2  #135 Decomposer fallback integrity       VALIDATED (`KEEP`; `c324ac2f...`)
 3  #16  Conflict resolver containment       VALIDATED (`KEEP`; `708c973e...`)
-4  #118 Clean-room onboarding                  IN_PROGRESS
+4  #118 Clean-room onboarding                  VALIDATED (`KEEP`; `0ee5bbfe...`)
 5  #120 MCP transport/runtime robustness
 6  #87  LICENSE / CONTRIBUTING              (parallel)
 7  #134 PyPI release
@@ -255,7 +261,7 @@ FIRST PUBLIC RELEASE
 #153 VALIDATED
   -> #154 source discovery VALIDATED
       -> #155 init UX VALIDATED
-          -> #118 clean onboarding IN_PROGRESS
+          -> #118 clean onboarding VALIDATED
               -> #134 PyPI release BLOCKED
 
 #87 owner-approved LICENSE/contribution decision
@@ -361,7 +367,7 @@ evidence — they are not scheduled as a terminal "phase 15".
 #87 LICENSE / copyright ownership / CONTRIBUTING
 ```
 
-`#87` is a direct release blocker (queue #6, parallel to `#118`) and must not
+`#87` is the remaining direct release blocker (queue #6, parallel to `#120`) and must not
 be solved by an agent inventing legal ownership.
 
 ## Automation noise (`[aw]`)
@@ -435,7 +441,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
             -> #153 config v2        VALIDATED
                  -> #154 sources     VALIDATED
                       -> #155 init UX VALIDATED
-                           -> #118 clean onboarding IN_PROGRESS
+                           -> #118 clean onboarding VALIDATED
                                 -> #134 first PyPI release BLOCKED
 
 #87 legal/repository entrypoint -------------------------------> #134
@@ -448,10 +454,10 @@ Parallel product surfaces:
 #166 presentation child      DEFERRED
 ```
 
-#116/#117/#153/#154/#155 are canonically satisfied. #118 is `IN_PROGRESS`
-at Queue 4. Its installed-artifact candidate must pass exact-head CI and an
-independent Maintainer Audit, then merge and complete lifecycle validation
-before its #134 dependency can be marked satisfied.
+#116/#117/#153/#154/#155/#118 are canonically satisfied. #118 validated the
+installed-artifact contract on Python 3.9/3.12 and merged as
+`0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. Its #134 prerequisite is satisfied;
+#87 is the only remaining release blocker.
 
 The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 
@@ -669,12 +675,12 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #74/#100/#103; calibrated judge. |
 | [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #96/#100/#103/#104; LongMemEval V1 full-500. |
 | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #74/#100/#103/#104/#105; LongMemEval-V2. |
-| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | open | `IN_PROGRESS` | EXECUTABLE | Productization | Queue 4; #116/#117/#153/#154/#155 satisfied. Clean installed-wheel Python 3.9/3.12 candidate; canonical validation pending merge. [Test Card](test-cards/118-clean-room-onboarding.md). |
+| [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; historical Queue 4; #116/#117/#153/#154/#155 satisfied. PR #225 final candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f`, canonical squash merge `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; one runtime delivery. [Test Card](test-cards/118-clean-room-onboarding.md). |
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #155 semantics stabilize; #166 owns presentation architecture. |
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | EXECUTABLE | Agent Integration | MCP startup/transport/config/schema/errors/timeouts/concurrency. Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Requires #118 VALIDATED + #87. #153/#154 are satisfied; #155 is canonically validated. No publication starts from #118. |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Only remaining blocker: #87 owner/legal decision. #117/#118 are satisfied; #153/#154/#155 are canonically validated. No publication starts from this reconciliation. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
 | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) dependency satisfied; source episode/supporting turns/temporal position. |
@@ -690,7 +696,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
 | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
 | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | closed | `VALIDATED` | EXECUTABLE | Productization | Init UX delivered by #210 (`4c112195f1572bf352d1cc6a1042c69711381da8`), lifecycle #212. `KEEP`; no active blocker remains. |
-| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while the release-critical #118 lane is primary. |
+| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while #120 is the next canonical implementation and #87 still gates release. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
 | [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
 | [#160](https://github.com/LuigiFerronatto/TESSERA/issues/160) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#74; capability-level pipeline modes/fallbacks. |
@@ -949,19 +955,19 @@ No roadmap entry may imply that `tessera` is already the published PyPI distribu
 
 The repository uses bounded WIP rather than starting every technically executable card at once.
 
-After #155, #135 and the #16 P0 containment deliveries and lifecycle reconciliation:
+After #155, #135, the #16 P0 containment and #118 installed onboarding deliveries:
 
 ```text
-#118 Clean-room onboarding / CI bootstrap       IN_PROGRESS — Queue 4
+#118 Clean-room onboarding / CI bootstrap       VALIDATED / KEEP — historical Queue 4
 #120 MCP transport/runtime robustness           READY — Queue 5
 #87  LICENSE / CONTRIBUTING                     owner decision — Queue 6
-#134 PyPI release                              BLOCKED on #118 validation + #87
+#134 PyPI release                              BLOCKED only on #87
 ```
 
-#118 tests installed artifacts against the validated configuration/discovery/init
-contract. Its candidate remains `IN_PROGRESS` while the PR is open. Only a
-canonical merge followed by lifecycle validation can satisfy #134's #118 gate.
-#120 is the next queue item; this card does not start it.
+#118 proved the installed configuration/discovery/init contract; its canonical
+merge and green post-merge gates satisfy #134's #118 prerequisite. #120 is the
+next implementation at Queue 5 after this lifecycle correction merges. Start
+from fresh main; this documentation correction does not implement MCP work.
 
 Keep #157 deliberately deferred. #119/#121, enrichment, model/intelligence,
 hooks, setup and conversation import retain their separate ownership.
@@ -983,7 +989,7 @@ PRODUCTIZATION / RELEASE
          -> #153 VALIDATED
              -> #154 VALIDATED
                  -> #155 VALIDATED
-                     -> #118 IN_PROGRESS
+                     -> #118 VALIDATED
                          -> #134 BLOCKED
 #87 ADMIN ------------------------------------------^
 

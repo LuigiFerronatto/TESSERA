@@ -1,0 +1,102 @@
+{
+  "issue": 118,
+  "implementation_pr": 225,
+  "status": "VALIDATED",
+  "decision": "KEEP",
+  "final_candidate_sha": "b83c18494f9a2bc5687010ee27f077ac81688b6f",
+  "canonical_merge_sha": "0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d",
+  "candidate_and_merge_tree": "4658b77d7ea4c5f2b0c9dc3094a1ef1e16d23225",
+  "runtime_deliveries": 1,
+  "merged_at": "2026-09-09T14:59:33Z",
+  "benchmark_applicability": "SMOKE_ONLY",
+  "canonical_ci": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274210",
+  "canonical_benchmark": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34367274180",
+  "candidate_audit": "https://github.com/LuigiFerronatto/TESSERA/pull/225#issuecomment-5603811873",
+  "candidate_governor": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34365927883",
+  "installed_matrix": {
+    "3.9": {
+      "python": "3.9.25 (main, Nov  3 2025, 15:16:36) \n[GCC 13.3.0]",
+      "source_sha": "0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d",
+      "passed": true,
+      "import_origin": "/tmp/tessera-118-yk6g9xde/venv/lib/python3.9/site-packages/tessera/__init__.py",
+      "installed_cli_commands": 68,
+      "source_integrity_checkpoints": 69,
+      "source_files_modified": 0,
+      "uninstall": {
+        "stdout": "Found existing installation: tessera 3.4.0\nUninstalling tessera-3.4.0:\n  Successfully uninstalled tessera-3.4.0\n",
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "temporary_state_removed": true,
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "ad7781b5c6496754d102025259e0280b5679265c8853d67c9a4a5777f042b39b",
+          "bytes": 123151,
+          "inventory_entries": 32
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "6c89bc48a82aab39229f37e8c21182e82c4091d453423ca218e8a8cca247b862",
+          "bytes": 119418,
+          "inventory_entries": 42
+        }
+      },
+      "report_sha256": {
+        "build.json": "a36a5264035fe69b9ad202afea7e976e5d4f2ba85b664ae903251d4801a28f36",
+        "environment.json": "354e1eaee982414b1a458121f02509afbd309f2da55e828c382bf4c9157f82d1",
+        "installed.json": "8fda84b712c0a15b4a0e947e7dec77e1df6358ee0986c8b1db6a09628aeba318"
+      }
+    },
+    "3.12": {
+      "python": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+      "source_sha": "0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d",
+      "passed": true,
+      "import_origin": "/tmp/tessera-118-xjylxi8n/venv/lib/python3.12/site-packages/tessera/__init__.py",
+      "installed_cli_commands": 68,
+      "source_integrity_checkpoints": 69,
+      "source_files_modified": 0,
+      "uninstall": {
+        "stdout": "Found existing installation: tessera 3.4.0\nUninstalling tessera-3.4.0:\n  Successfully uninstalled tessera-3.4.0\n",
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "temporary_state_removed": true,
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "afb0ec900205cef7452d19fa9a42abf072c783db7977dba8637cba00cafbb745",
+          "bytes": 123153,
+          "inventory_entries": 32
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "3627980af694d9d47e6e9ebe478ef8f79610a5b79f52ef88f053cd9cd53e61be",
+          "bytes": 119461,
+          "inventory_entries": 42
+        }
+      },
+      "report_sha256": {
+        "build.json": "c005cd4e73d7f8e6fa3e2f5d47751919a25445cd169cb9843a04bec7e01a95da",
+        "environment.json": "9f69fef51f5959d446e5c67b38dc217011f27f2c5c3ac610f7d2d760d3ae29e1",
+        "installed.json": "ceab8dda78ff92048118cfae016fceafb9a330e4787d29337ca63ffc8357c8a1"
+      }
+    }
+  },
+  "canonical_sanity": {
+    "dataset": "tessera-sanity-ci-v2-project-agnostic",
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "average_latency_ms": 8.577869750000744,
+    "average_returned_chars": 417.75,
+    "missing_evidence_check": "passed"
+  },
+  "limits": [
+    "Linux/POSIX execution; no Windows/macOS runtime certification.",
+    "Archive bytes vary across independent builds; no artifact promotion/publication claimed.",
+    "Historical predecessor validation.json remains bound to its original source SHA.",
+    "External site ownership and host longevity were not independently certified."
+  ]
+}
