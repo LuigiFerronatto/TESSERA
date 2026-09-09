@@ -51,7 +51,7 @@ the installed license outside the checkout. Existing runtime smoke checks remain
 
 ## Concrete example
 
-After installing the built wheel, `importlib.metadata.distribution("tessera")`
+After installing the built wheel, `importlib.metadata.distribution("tessera-agent-memory")`
 exposes `License-Expression: MIT`, `License-File: LICENSE` and the same text through
 `read_text("licenses/LICENSE")`. A README reader follows CONTRIBUTING.md to the
 existing Test Card, PR, benchmark and change-policy contracts.

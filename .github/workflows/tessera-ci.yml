@@ -127,8 +127,8 @@ jobs:
         shell: bash
         run: |
           python scripts/clean_room/run_clean_room.py \
-            --wheel dist/tessera-3.4.0-py3-none-any.whl \
-            --sdist dist/tessera-3.4.0.tar.gz \
+            --wheel dist/tessera_agent_memory-3.4.0-py3-none-any.whl \
+            --sdist dist/tessera-agent-memory-3.4.0.tar.gz \
             --source-sha "$(git rev-parse HEAD)" \
             --output artifacts/clean-room --tty
 
@@ -166,8 +166,8 @@ jobs:
 
           package_path = pathlib.Path(tessera.__file__).resolve()
           assert "site-packages" in package_path.parts
-          assert importlib.metadata.version("tessera") == tessera.__version__ == "3.4.0"
-          distribution = importlib.metadata.distribution("tessera")
+          assert importlib.metadata.version("tessera-agent-memory") == tessera.__version__ == "3.4.0"
+          distribution = importlib.metadata.distribution("tessera-agent-memory")
           assert distribution.metadata["License-Expression"] == "MIT"
           assert distribution.metadata.get_all("License-File") == ["LICENSE"]
           assert distribution.read_text("licenses/LICENSE") == (

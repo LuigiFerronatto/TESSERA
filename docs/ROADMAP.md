@@ -151,7 +151,7 @@ unselected. No release or downstream implementation is selected by this work.
 ## NEXT
 
 ```text
-#134 PyPI release                                BLOCKED only on #87
+#134 PyPI release                                READY / NEXT — #87 satisfied
 ```
 
 ## Full execution queue
@@ -268,7 +268,7 @@ FIRST PUBLIC RELEASE
   -> #154 source discovery VALIDATED
       -> #155 init UX VALIDATED
           -> #118 clean onboarding VALIDATED
-              -> #134 PyPI release BLOCKED
+              -> #134 PyPI release READY / NEXT
 
 #87 owner-approved LICENSE/contribution decision
   -------------------------------------> #134
@@ -448,7 +448,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
                  -> #154 sources     VALIDATED
                       -> #155 init UX VALIDATED
                            -> #118 clean onboarding VALIDATED
-                                -> #134 first PyPI release BLOCKED
+                                -> #134 first PyPI release READY / NEXT
 
 #87 legal/repository entrypoint -------------------------------> #134
 
@@ -463,7 +463,7 @@ Parallel product surfaces:
 #116/#117/#153/#154/#155/#118 are canonically satisfied. #118 validated the
 installed-artifact contract on Python 3.9/3.12 and merged as
 `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. Its #134 prerequisite is satisfied;
-#87 is the only remaining release blocker.
+#87's legal prerequisite is satisfied; #134 now owns the release gate.
 
 The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 

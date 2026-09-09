@@ -205,7 +205,7 @@ em qualquer repositório, qualquer CLI (Claude Code, Copilot CLI, Gemini
 CLI, Cursor, o que for), deve poder rodar:
 
 ```bash
-pip install tessera
+pip install tessera-agent-memory
 tessera init ./meu-projeto/memory
 tessera-mcp   # registra o MCP server, aponta pro storage_dir do projeto
 ```
@@ -225,7 +225,7 @@ sobre LAO ou sobre a Blip.
   projeto é só mudar essa variável.
 
 ### O que falta para o "plug-and-play" de verdade (próximas evoluções):
-1. **Publicar no PyPI** (`pip install tessera` de qualquer lugar, sem
+1. **Publicar no PyPI** (`pip install tessera-agent-memory` de qualquer lugar, sem
    clonar o repo). *(ainda pendente)*
 2. ✅ **Um wizard de setup** (`tessera quickstart`) — implementado
    2026-08-25: detecta o projeto atual (node/python/rust/go/genérico),
