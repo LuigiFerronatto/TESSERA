@@ -140,8 +140,9 @@ episode
 The fallback is local, offline, repeatable and provider-independent. It does
 not retry, query another provider, use embeddings or write directly. Only the
 current provider-invocation and parsing/schema failure boundary can select it;
-unrelated programming errors propagate. Engine, Hook, CLI and MCP delegate to
-the same implementation. Diagnostics distinguish `assisted` from
+unrelated programming errors propagate. Engine, Hook and CLI delegate to
+the same implementation. MCP #120 uses pure decomposition before its commit
+phase and reports failed assistance before any fallback write. Diagnostics distinguish `assisted` from
 `deterministic_fallback` without changing the compatibility list-returning
 Python API.
 
@@ -444,9 +445,10 @@ Two additional Foundation gaps are explicit rather than implied:
 The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
 
 Direct Engine retrieval, CLI JSON query output and MCP `query_memories()` use
-the same lossless evidence contract; #68 closed that parity gap. The typed-store
-MCP helper `query_store()` still uses a smaller hand-projected shape and is not
-the canonical direct-query contract.
+the same lossless evidence contract; #68 closed that parity gap. The #120
+candidate also preserves the full typed-store `query_store()` result, including
+evidence/provenance, inside its versioned transport envelope. See
+[MCP runtime contract](MCP_RUNTIME.md) for the migration to `data`.
 
 # 9. Optional orchestration boundary
 
@@ -478,11 +480,11 @@ CLI start / MCP pipeline / task hook
 → LLM-generated context + raw_memories
 ```
 
-Current limitations include an eager task-hook wrapper during MCP startup and
-assisted MCP signatures that cannot yet carry the full adapter selection
-envelope. Issue #120 owns that lifecycle refactor. Generic startup performs no
-project-specific provider probing, and compatibility failures never become raw
-prompt output.
+The #120 candidate starts an explicitly configured Engine in its MCP lifespan,
+selects optional providers at server construction and runs assisted work over
+disposable inputs before commit. Import is free of configuration/index activity.
+Generic startup performs no provider probing; generated context still has no
+machine-checked grounding envelope, which remains a separate semantic contract.
 
 # 10. CI and experimental governance
 
@@ -513,7 +515,7 @@ Sanity metrics are regression indicators, not competitive benchmark claims.
 | `tessera/models.py` | Domain models for memory/write paths |
 | `tessera/config.py` | Closed v1/v2 project and global schemas, bounded discovery, and one resolved store/source/index boundary |
 | `tessera/cli.py` | Human CLI surface |
-| `tessera/mcp_server.py` | MCP transport; direct `query_memories()` has #68 parity, while legacy assisted-hook startup is an ADR 0001 deviation |
+| `tessera/mcp_server.py` | MCP tool adapter; #120 runtime/stdio modules own lifecycle, lossless transport and structured failures |
 | `tessera/orchestrator.py` | Legacy optional assisted planning/synthesis path governed by ADR 0001 |
 | `benchmarks/sanity/` | Deterministic project-agnostic regression evaluation |
 

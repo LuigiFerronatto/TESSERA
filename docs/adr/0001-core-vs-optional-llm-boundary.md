@@ -5,6 +5,21 @@
 - **Decision owner:** TESSERA architecture governance / issue #74
 - **Benchmark applicability:** `NOT_APPLICABLE`
 
+## Implementation reconciliation — #120 candidate, 2026-09-09
+
+The historical observations below retain the accepted decision's provenance.
+The unmerged #120 candidate supersedes its MCP startup/reduced-projection
+observations: import is lazy, an explicit configured Engine starts in lifespan,
+`query_store` preserves full evidence, and stdio responses/errors have contract
+`1.0`. Optional provider preparation is separate from persistence; remote assisted
+failure cannot write heuristic fallback notes. Python/CLI #135 fallback remains.
+The flat public exports remain compatible through lazy optional attributes.
+
+This implements transport/runtime boundaries, not O1/O2/O3/O4 semantic contracts
+or machine-checked grounding. See [MCP runtime](../MCP_RUNTIME.md) and
+[#120 evolution audit](../PR_EVOLUTION_120.md). No #171/#167/#169/#121 capability
+is declared complete by this reconciliation.
+
 ## Status vocabulary
 
 Every architecture assertion in this record carries one of these labels:

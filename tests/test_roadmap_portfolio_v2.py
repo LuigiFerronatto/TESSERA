@@ -119,7 +119,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 3, ready_executable
+    assert len(ready_executable) == 2, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
@@ -170,9 +170,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 0
+    assert len(now_executable) == 1
 
-    assert "NOW executable                 0" in text
-    assert "READY                          6 total / 3 executable" in text
+    assert "NOW executable                 1" in text
+    assert "READY                          5 total / 2 executable" in text
     assert "BLOCKED                        38 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

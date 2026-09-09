@@ -301,7 +301,7 @@ auto-probed. Target O0–O4 adapter semantics in the ADR are architecture
 constraints, not claims that those future modes are implemented.
 
 Base installation does not install an LLM provider SDK. `tessera[mcp]` adds the
-MCP transport and `tessera[llm]` adds the current HTTP bridge dependency; these
+MCP transport (SDK v1.30+, Python 3.10+; certified on 3.12) and `tessera[llm]` adds the current HTTP bridge dependency; these
 extras do not change ownership of reasoning or final-answer policy.
 
 Storage resolution is deterministic: an explicit command/API path wins, then
@@ -498,3 +498,7 @@ A dedicated `CONTRIBUTING.md` is tracked separately; until it is versioned, the 
 TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
 
 See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
+
+The #120 MCP candidate adds `tessera-mcp --project /absolute/project`, isolated
+startup and versioned `data`/`error` responses. See [MCP runtime contract](docs/MCP_RUNTIME.md)
+for configuration precedence, provider injection, deadlines and migration.

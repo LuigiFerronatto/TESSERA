@@ -74,7 +74,7 @@ import tessera.mcp_server as server
 query = %r
 payload = {
     "storage_dir": str(Path(server._engine.storage_dir).resolve()),
-    "provider_initialized": server._hook._orchestrator is not None,
+    "provider_initialized": server._hook is not None,
     "transport": transport,
 }
 if query is not None:

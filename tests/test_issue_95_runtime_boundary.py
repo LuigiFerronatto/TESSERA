@@ -184,7 +184,8 @@ def test_mcp_import_does_not_resolve_an_optional_provider(tmp_path, monkeypatch)
     monkeypatch.setitem(sys.modules, "mcp.server.fastmcp", fastmcp_module)
     sys.modules.pop("tessera.mcp_server", None)
     module = importlib.import_module("tessera.mcp_server")
-    assert module._hook._orchestrator is None
+    assert module._hook is None
+    assert module._default_runtime.engine is None
 
 
 def test_generic_foreign_frontmatter_remains_supported(tmp_path):

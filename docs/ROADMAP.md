@@ -6,7 +6,7 @@ TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/sou
 
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
-> #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #120 remains READY / Queue 5; #134 is blocked only by #87.
+> #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #120 is IN_PROGRESS / Queue 5 after canonical #227/#228; #134 is blocked only by #87.
 
 ## Status contract
 
@@ -42,8 +42,8 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 0
-READY                          6 total / 3 executable
+NOW executable                 1
+READY                          5 total / 2 executable
 BLOCKED                        38 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
@@ -134,16 +134,16 @@ full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 ## NOW
 
 ```text
-No active implementation card; #118 completed historical Queue 4.
+#120 MCP transport/runtime robustness            IN_PROGRESS / Queue 5
 ```
 
-#120 is the next implementation after this lifecycle correction merges. It remains
-READY at Queue 5; no MCP implementation starts from the lifecycle branch.
+#227/#228 is merged as `a88600b491528cddb746bf909a303aefabf01e45`, with green
+canonical CI and Benchmark Ledger. #120 started from that fresh main in an
+isolated branch. It remains open until human merge and reconciliation.
 
 ## NEXT
 
 ```text
-#120 MCP transport/runtime robustness            READY / Queue 5; next implementation
 #87  LICENSE / CONTRIBUTING owner decision       can start in parallel
 #134 PyPI release                                BLOCKED only on #87
 ```
@@ -447,7 +447,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
 #87 legal/repository entrypoint -------------------------------> #134
 
 Parallel product surfaces:
-#120 MCP runtime             READY
+#120 MCP runtime             IN_PROGRESS
   -> #121 official Skills    BLOCKED
 
 #119 broad CLI umbrella      DEFERRED
@@ -677,7 +677,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #74/#100/#103/#104/#105; LongMemEval-V2. |
 | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; historical Queue 4; #116/#117/#153/#154/#155 satisfied. PR #225 final candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f`, canonical squash merge `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; one runtime delivery. [Test Card](test-cards/118-clean-room-onboarding.md). |
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #155 semantics stabilize; #166 owns presentation architecture. |
-| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `READY` | EXECUTABLE | Agent Integration | MCP startup/transport/config/schema/errors/timeouts/concurrency. Semantic memory intents belong #171. |
+| [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | open | `IN_PROGRESS` | EXECUTABLE | Agent Integration | Queue 5, active implementation from canonical `a88600b4`. [Test Card](test-cards/120-mcp-runtime-robustness.md). Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Remaining blocker #120; official Skills only. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
 | [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Only remaining blocker: #87 owner/legal decision. #117/#118 are satisfied; #153/#154/#155 are canonically validated. No publication starts from this reconciliation. |
@@ -959,7 +959,7 @@ After #155, #135, the #16 P0 containment and #118 installed onboarding deliverie
 
 ```text
 #118 Clean-room onboarding / CI bootstrap       VALIDATED / KEEP — historical Queue 4
-#120 MCP transport/runtime robustness           READY — Queue 5
+#120 MCP transport/runtime robustness           IN_PROGRESS — Queue 5
 #87  LICENSE / CONTRIBUTING                     owner decision — Queue 6
 #134 PyPI release                              BLOCKED only on #87
 ```
@@ -993,7 +993,7 @@ PRODUCTIZATION / RELEASE
                          -> #134 BLOCKED
 #87 ADMIN ------------------------------------------^
 
-#120 READY -> #121 BLOCKED
+#120 IN_PROGRESS -> #121 BLOCKED
 #119/#166 DEFERRED
 
 INTELLIGENCE EPIC #164                             TRACKER

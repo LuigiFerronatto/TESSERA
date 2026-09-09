@@ -270,26 +270,17 @@ def _import_mcp_server(monkeypatch, storage_dir):
     return importlib.import_module("tessera.mcp_server")
 
 
-def test_mcp_uses_canonical_fallback_and_does_not_claim_assisted_success(
-    tmp_path, monkeypatch
-):
+def test_mcp_provider_failure_is_reported_before_any_fallback_write(tmp_path, monkeypatch):
+    # #135's Python/CLI fallback remains covered above. #120 makes remote
+    # assisted failure non-mutating, so clients cannot mistake it for a commit.
     server = _import_mcp_server(monkeypatch, tmp_path / "store")
     monkeypatch.setattr(
         "tessera.llm_bridge.resolve_llm_fn",
         lambda **_kwargs: (_provider_failure, "fixture-provider"),
     )
-
-    result = server.decompose_episode(
-        mem_id_prefix="project/mcp-fallback",
-        episode_id="issue-135",
-        beginning=EPISODE.beginning,
-        middle=EPISODE.middle,
-        end=EPISODE.end,
-    )
-
-    assert result["count"] == 3
-    assert result["decomposition_mode"] == "deterministic_fallback"
-    assert result["fallback_reason"] == "provider_error"
-    assert result["llm_backend_attempted"] == "fixture-provider"
-    assert result["llm_backend_used"] is None
-    assert all(Path(path).is_file() for path in result["filepaths"])
+    with pytest.raises(server.RuntimeFailure, match="no notes were written"):
+        server.decompose_episode(
+            mem_id_prefix="project/mcp-fallback", episode_id="issue-135",
+            beginning=EPISODE.beginning, middle=EPISODE.middle, end=EPISODE.end,
+        )
+    assert list((tmp_path / "store").rglob("*.md")) == []
