@@ -2,14 +2,18 @@
 
 ## Candidate lifecycle
 
-- Issue: #118; status `IN_PROGRESS`; Queue 4.
+- Issue: #118; status `VALIDATED`; Queue 4.
 - Branch: `test-card/118-clean-room-onboarding`.
 - Audited starting main: `112ae63c9ba1d8ffbe6ed3f2edf439d7dbe5b3a0`.
-- Canonical merge: none. Final candidate SHA is bound by the PR's head and its
-  exact-head CI/Maintainer Audit, not a claim of merged delivery.
+- Final candidate SHA: `b83c18494f9a2bc5687010ee27f077ac81688b6f`.
+- Canonical merge: `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d` (PR #225, merged
+  2026-09-09). Exact-head CI (`test`/`distribution`/`smoke`/`sanity-eval`, both
+  Python 3.9/3.12) and the independent Maintainer Audit both reported success
+  for this exact candidate head prior to merge.
 - Benchmark applicability: `SMOKE_ONLY`.
 - Candidate decision: `KEEP`. Final exact-head CI and independent Maintainer Audit
-  remain mandatory review gates; see [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225).
+  reported success (KEEP) for `b83c18494f9a2bc5687010ee27f077ac81688b6f`; see
+  [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225).
 
 ## Relevant delivery history
 
@@ -110,12 +114,17 @@ query/rebuild comparisons, test counts, sanity after and exact-head CI links.
 3.12, both reproduced runtime defects have focused regressions, and the held-
 constant sanity corpus is unchanged. The inherited checkout defect is repaired
 without moving/deleting site files or changing its gitlink commit. Independent
-Maintainer Audit and CI must bind the final head before review readiness is
-reported. The PR remains IN_PROGRESS and unmerged; KEEP does not authorize merge.
+Maintainer Audit and CI reported success (KEEP) for the exact final head, and
+PR #225 merged to `main` at `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. #118 is
+now `VALIDATED`.
 
 ## Scope and downstream routing
 
-#120 remains READY / Queue 5. #87 remains the owner decision / Queue 6. #134 is
-BLOCKED until both #118 canonical validation and #87 are satisfied. No automatic
-merge, publication, release, tag, #119/#120/#121/#134 implementation, intelligence,
-enrichment, hooks, integration setup or import work is authorized by this PR.
+#120 becomes the next execution task (`READY` / Queue 5; unaffected in
+itself but its blocking condition on #118 is now satisfied). #87 remains the
+owner decision / Queue 6. #134 was BLOCKED on both #118 canonical validation
+and #87; #118's half of that blocker is now satisfied, so #134 is BLOCKED
+solely on #87. No automatic merge, publication, release, tag,
+#119/#120/#121/#134 implementation, intelligence, enrichment, hooks,
+integration setup or import work is authorized by this lifecycle
+reconciliation.
