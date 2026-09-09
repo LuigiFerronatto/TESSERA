@@ -29,11 +29,12 @@ def snapshot(root):
     """Full lstat inventory: never follow links or read FIFO/device contents."""
     result = {}
     for path in sorted(root.rglob("*")):
-        mode = path.lstat().st_mode
+        info = path.lstat()
+        mode = info.st_mode
         kind = stat.S_IFMT(mode)
         content = (os.readlink(path) if stat.S_ISLNK(mode) else
                    digest(path) if stat.S_ISREG(mode) else None)
-        result[path.relative_to(root).as_posix()] = [kind, stat.S_IMODE(mode), content]
+        result[path.relative_to(root).as_posix()] = [kind, stat.S_IMODE(mode), content, info.st_mtime_ns]
     return result
 
 
@@ -234,6 +235,10 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
             {"path": "memories/generated", "include": ["**/*.md"]},
             {"path": ".", "include": selected}]
         self.cases["noninteractive"] = {"result": applied, "config": cfg}
+        # Index/query/doctor read project sources but may write only declared
+        # generated/derived destinations. Read-only files remain indexable.
+        for name in selected:
+            (project / name).chmod(0o444)
         self.run(project, ["doctor", "--plain"])
         assert not (project / "memories/generated/.tessera_index").exists()
         diagnostic = self.run(project, ["config", "doctor", "--json"], parse=True)

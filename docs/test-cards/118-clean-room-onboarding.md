@@ -41,6 +41,11 @@ experiments reproduced it and found a second diagnostic failure:
 Both are `IN_SCOPE_FIX` findings. Neither requires changing ranking, evidence
 selection, conflict behavior, the semantic drawers, or provider setup.
 
+The required independent audit also exposed a pre-existing malformed hosted-site
+gitlink: checkout credential cleanup failed because `.gitmodules` was absent.
+The candidate records the existing module metadata with `update = none`, keeping
+its commit/files intact and preventing product checkout from fetching the site.
+
 ## What changed or is being tested?
 
 The global no-change apply path now uses the accepted named-global plan.
@@ -96,13 +101,15 @@ byte-identical. Relocation removes the old project path before commands run.
 
 ## How was it validated?
 
-The `distribution` CI matrix runs the complete installed-wheel gate on Linux
+The `distribution` CI matrix checks out the exact PR head and runs the complete installed-wheel gate on Linux
 with Python 3.9 and 3.12. Each job uploads `clean-room-python-<version>`:
 
 - `environment.json`: source SHA, artifact hashes/sizes/inventories, interpreter,
   installer, environment/installation durations and offline guard proof;
 - `installed.json`: commands, outputs, timings, fixture digest, per-stage source
   hashes, semantic comparisons, controlled TTY transcript and uninstall proof.
+- `build.json`: build frontend/interpreter, source SHA and duration; the wheel is
+  built from the freshly produced sdist.
 
 The non-interactive commands use closed stdin. The separate standard-library
 PTY cases exercise the actual installed executable, including confirmation,

@@ -1,0 +1,6 @@
+# Hosted site is a separate optional checkout, outside the Python distribution.
+# Keep its existing commit; ordinary product/CI checkout must not fetch it.
+[submodule "sites/tessera-memory-mobile"]
+	path = sites/tessera-memory-mobile
+	url = https://git.chatgpt-team.site/e534b832-f84d-454f-bb35-13a04816857f/appgprj_6a9e3c30b3788191a95602acb900b15e.git
+	update = none

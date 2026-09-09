@@ -72,6 +72,8 @@ query/rebuild comparisons, test counts, sanity after and exact-head CI links.
 | Ambient build dependency index failed; temporary venv installation exhausted local disk | `ENVIRONMENTAL` | Explicit public dependency index, credential-free child environment, and cleanup restricted to this task's temporary environments |
 | Initial harness compared casefold source order with filesystem order | `FALSE_POSITIVE` | Preserve exact semantic source order and compare independently sorted index membership |
 | Initial audit-hook namespace failed its own active-guard probe | `FALSE_POSITIVE` | Use an explicit execution namespace; no product change |
+| Existing hosted-site gitlink had no `.gitmodules` mapping, making the required Maintainer Audit checkout fail before review | `IN_SCOPE_FIX` (CI bootstrap) | Record its verified existing remote and path with `update = none`; preserve the exact gitlink commit and site files, with no site fetch or deployment |
+| Board status parsing maps a branch-only IN_PROGRESS declaration to Backlog | `OUT_OF_SCOPE_FOLLOW_UP` | The canonical linked-PR overlay correctly routes this card after its draft PR exists; no board-classifier redesign included |
 
 ## Learnings
 
