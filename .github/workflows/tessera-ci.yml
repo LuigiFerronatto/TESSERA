@@ -179,7 +179,19 @@ jobs:
           scripts = {entry.name: entry.value for entry in importlib.metadata.entry_points(group="console_scripts")}
           assert scripts["tessera-mcp"] == "tessera.mcp_server:main"
           assert server.mcp.name == "tessera"
+          assert server._default_runtime.engine is None
+          assert "site-packages" in server.__file__
           PY
+          "$clean_root/venv/bin/python" "$GITHUB_WORKSPACE/scripts/clean_room/check_mcp.py" \
+            --output "$GITHUB_WORKSPACE/artifacts/mcp-protocol.json"
+
+      - name: Upload installed MCP protocol evidence
+        if: always() && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tessera-mcp-protocol
+          path: artifacts/mcp-protocol.json
+          if-no-files-found: error
 
   test:
     name: test (Python ${{ matrix.python-version }})
@@ -202,6 +214,10 @@ jobs:
 
       - name: Install TESSERA and test dependencies
         run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Install optional transport for real protocol tests
+        if: matrix.python-version == '3.12'
+        run: python -m pip install -e ".[mcp]"
 
       - name: Run full test suite
         env:

@@ -363,8 +363,10 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
 - `recency_boost` debug naming is less explicit than the desired raw/weight/applied model.
 - `frontmatter` remains a compatibility surface; canonical semantics should be preferred internally.
 - Human CLI formatting is not a formal machine serialization protocol.
-- MCP `query_memories()` exposes the lossless engine contract. The separate
-  typed-store helper `query_store()` currently uses a reduced projection.
+- MCP `query_memories()` and `query_store()` preserve their complete Engine
+  results. The #120 candidate wraps wire results as contract `1.0` with
+  `schema_version`, `operation`, `data`, and `error`; clients read results from
+  `data`. See [MCP runtime contract](MCP_RUNTIME.md).
 - Generated context from the legacy assisted orchestrator is derived output,
   not source evidence and not a replacement for this retrieval contract. See
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).

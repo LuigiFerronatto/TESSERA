@@ -42,28 +42,42 @@ import os
 from typing import Any, Dict, List, Literal, Optional
 
 from .config import resolve_runtime_configuration
-from .engine import TesseraEngine
-from .hooks import TesseraTaskHook
 from .models import Connection, Entity
 from .evidence import retrieval_results_contract
 
-try:
-    from mcp.server.fastmcp import FastMCP
-except ImportError as exc:  # pragma: no cover - only hit when 'mcp' extra isn't installed
-    raise ImportError(
-        "The MCP server requires the 'mcp' extra. Install it with: pip install 'tessera[mcp]'"
-    ) from exc
+from .mcp_runtime import EngineProxy, MCPRuntime, RuntimeFailure, current_runtime as _current_runtime
 
-DEFAULT_CONFIGURATION = resolve_runtime_configuration()
-DEFAULT_STORAGE_DIR = DEFAULT_CONFIGURATION.storage_dir
+from functools import partial
 
-mcp = FastMCP("tessera")
-_engine = TesseraEngine(configuration=DEFAULT_CONFIGURATION)
-_engine.build_index()
-_hook = TesseraTaskHook(_engine)
+_default_runtime = MCPRuntime()
+current_runtime = partial(_current_runtime, _default_runtime)
+_engine = EngineProxy(_default_runtime)
+_hook = None  # Optional orchestration is constructed only for an assisted request.
 
 
-@mcp.tool()
+class _LazyServer:
+    """Keep importing the adapter free of configuration, filesystem and SDK activity."""
+
+    name = "tessera"
+
+    def run(self):
+        create_server().run()
+
+
+mcp = _LazyServer()
+
+
+def create_server(configuration=None, *, provider=None, provider_options=None,
+                  request_timeout=60.0):
+    """Create an isolated stdio server; no Engine/provider is started until lifespan."""
+    from .mcp_transport import build_server
+
+    return build_server(MCPRuntime(
+        configuration=configuration, provider=provider,
+        provider_options=provider_options, request_timeout=request_timeout,
+    ))
+
+
 def rebuild_index() -> Dict[str, Any]:
     """Re-scans the memory storage directory and rebuilds the in-memory knowledge graph."""
     _engine.build_index()
@@ -74,7 +88,6 @@ def rebuild_index() -> Dict[str, Any]:
     }
 
 
-@mcp.tool()
 def query_memories(query: str, top_n: int = 7, resolve_conflicts: bool = True) -> List[Dict[str, Any]]:
     """
     Retrieves the most relevant memory notes for a query using DW-PR subgraph
@@ -89,7 +102,6 @@ def query_memories(query: str, top_n: int = 7, resolve_conflicts: bool = True) -
     return retrieval_results_contract(results)
 
 
-@mcp.tool()
 def write_memory(
     mem_id: str,
     mem_type: str,
@@ -154,17 +166,20 @@ def write_memory(
     return payload
 
 
-@mcp.resource("memories://{memory_id}")
 def get_memory(memory_id: str) -> str:
     """Returns the raw Markdown content (frontmatter + body) of a single memory note."""
     filepath = _engine.file_registry.get(memory_id)
     if not filepath or not os.path.exists(filepath):
-        return f"Memory '{memory_id}' was not found in the current index."
+        raise RuntimeFailure("NOT_FOUND", "Memory is absent from the current index.")
+    from pathlib import Path
+
+    path = Path(filepath)
+    if any(part.is_symlink() for part in (path, *path.parents)):
+        raise RuntimeFailure("SOURCE_CHANGED", "Indexed source became a symlink; rebuild the index.")
     with open(filepath, "r", encoding="utf-8") as f:
         return f.read()
 
 
-@mcp.resource("graph://index")
 def get_index_stats() -> Dict[str, Any]:
     """Returns consolidated statistics about the current in-memory knowledge graph."""
     type_counts: Dict[str, int] = {}
@@ -180,7 +195,6 @@ def get_index_stats() -> Dict[str, Any]:
     }
 
 
-@mcp.tool()
 def query_store(query: str, store: str, top_n: int = 7, resolve_conflicts: bool = True) -> List[Dict[str, Any]]:
     """
     Retrieves memories scoped to a single typed store: 'facts', 'preferences',
@@ -193,19 +207,9 @@ def query_store(query: str, store: str, top_n: int = 7, resolve_conflicts: bool 
         top_n=top_n,
         resolve_conflicts=resolve_conflicts,
     )
-    return [
-        {
-            "id": r["id"],
-            "type": r["type"],
-            "score": r["score"],
-            "body": r["body"],
-            "filename": r.get("filename"),
-        }
-        for r in results
-    ]
+    return retrieval_results_contract(results)
 
 
-@mcp.tool()
 def query_memories_pipeline(
     task_instruction: str,
     top_n: int = 7,
@@ -219,19 +223,20 @@ def query_memories_pipeline(
     This assisted mode is optional; direct deterministic retrieval remains a
     first-class TESSERA capability.
     """
-    from .llm_bridge import resolve_llm_fn
+    from .orchestrator import TesseraOrchestrator
 
-    llm_fn, backend_used = resolve_llm_fn(return_backend_name=True)
-    if llm_fn is None:
-        raise ValueError("FATAL: A real LLM backend is required but none is configured.")
-
-    result = _hook.on_task_start(task_instruction, top_n=top_n, llm_fn=llm_fn)
+    llm_fn, backend_used = current_runtime().resolve_provider()
+    # Preserve the hook's refresh-on-call behavior on the disposable snapshot.
+    _engine.build_index(persist=False)
+    result = TesseraOrchestrator(_engine, llm_fn=llm_fn).run(
+        task_instruction, top_n=top_n
+    )
     payload = result.to_dict()
+    payload.pop("task_instruction", None)  # Preserve the existing hook output shape.
     payload["llm_backend_used"] = backend_used
     return payload
 
 
-@mcp.tool()
 def get_index_composition() -> Dict[str, Any]:
     """
     Breaks down the current index by node type: real memory notes
@@ -258,7 +263,6 @@ def get_index_composition() -> Dict[str, Any]:
     }
 
 
-@mcp.tool()
 def run_doctor(storage_dir: Optional[str] = None) -> Dict[str, Any]:
     """
     Runs TESSERA's post-install smoke tests: storage writability, index build,
@@ -270,11 +274,13 @@ def run_doctor(storage_dir: Optional[str] = None) -> Dict[str, Any]:
     """
     from .diagnostics import run_doctor as _run_doctor
 
-    report = _run_doctor(storage_dir or _engine.storage_dir)
+    report = _run_doctor(
+        storage_dir or _engine.storage_dir,
+        configuration=None if storage_dir else _engine.configuration,
+    )
     return report.to_dict()
 
 
-@mcp.tool()
 def run_quickstart(
     project_root: Optional[str] = None,
     storage_dir: Optional[str] = None,
@@ -295,7 +301,6 @@ def run_quickstart(
     return plan.to_dict()
 
 
-@mcp.tool()
 def decompose_episode(
     mem_id_prefix: str,
     beginning: str,
@@ -313,37 +318,98 @@ def decompose_episode(
     "research/some-topic" or "project/some-run". Extracted memories are stored
     under "{mem_id_prefix}/{type}-{n}.md".
     """
+    arguments = dict(
+        mem_id_prefix=mem_id_prefix, beginning=beginning, middle=middle, end=end,
+        episode_id=episode_id, tags=tags,
+    )
+    prepared = prepare_decomposition(arguments)
+    return persist_decomposition(arguments, prepared)
+
+
+def prepare_decomposition(arguments):
+    """Call the optional provider without giving it a persistence continuation."""
+    from .decomposer import decompose_episode_result
     from .models import Episode
-    from .llm_bridge import resolve_llm_fn
 
-    llm_fn, backend_used = resolve_llm_fn(return_backend_name=True)
-    if llm_fn is None:
-        raise ValueError("FATAL: A real LLM backend is required but none is configured.")
+    llm_fn, backend = current_runtime().resolve_provider()
+    result = decompose_episode_result(
+        Episode(arguments["beginning"], arguments["middle"], arguments["end"]), llm_fn
+    )
+    if result.mode != "assisted":
+        raise RuntimeFailure("PROVIDER_FAILED", "Assisted decomposition failed; no notes were written.")
+    return result, backend
 
-    episode = Episode(beginning=beginning, middle=middle, end=end)
+
+def persist_decomposition(arguments, prepared):
+    """Reuse the canonical typed writer/gate with already accepted local candidates."""
+    import json
+    from .models import Episode
+
+    result, backend = prepared
+    local_response = json.dumps([
+        {"type": item.mem_type, "content": item.content} for item in result.memories
+    ])
     decomposition = _engine.decompose_and_write_episode_result(
-        mem_id_prefix=mem_id_prefix,
-        episode_id=episode_id or mem_id_prefix,
-        episode=episode,
-        llm_fn=llm_fn,
-        tags=tags or [],
+        mem_id_prefix=arguments["mem_id_prefix"],
+        episode_id=arguments.get("episode_id") or arguments["mem_id_prefix"],
+        episode=Episode(arguments["beginning"], arguments["middle"], arguments["end"]),
+        llm_fn=lambda *_: local_response, tags=arguments.get("tags") or [],
     )
     filepaths = list(decomposition.filepaths)
-    mode = decomposition.decomposition.mode
-    _engine.build_index()
+    if filepaths:
+        _engine.build_index()
     return {
-        "mem_id_prefix": mem_id_prefix,
-        "filepaths": filepaths,
-        "count": len(filepaths),
-        "llm_backend_used": backend_used if mode == "assisted" else None,
-        "llm_backend_attempted": backend_used,
-        "decomposition_mode": mode,
-        "fallback_reason": decomposition.decomposition.fallback_reason,
+        "mem_id_prefix": arguments["mem_id_prefix"], "filepaths": filepaths,
+        "count": len(filepaths), "llm_backend_used": backend,
+        "llm_backend_attempted": backend, "decomposition_mode": "assisted",
+        "fallback_reason": None,
     }
 
 
-def main():
-    mcp.run()
+def get_server_health() -> Dict[str, Any]:
+    """Report runtime readiness/configuration without probing providers or writing notes."""
+    return current_runtime().health()
+
+
+TOOLS = (
+    rebuild_index, query_memories, write_memory, query_store,
+    query_memories_pipeline, get_index_composition, run_doctor, run_quickstart,
+    decompose_episode, get_server_health,
+)
+RESOURCES = {"graph://index": get_index_stats, "server://health": get_server_health}
+
+
+def main(argv=None):
+    import argparse
+    from .config import ConfigurationResolver
+
+    parser = argparse.ArgumentParser(description="TESSERA MCP stdio server")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--store", help="Explicit writable store path")
+    selection.add_argument("--project", help="Project configuration discovery root")
+    selection.add_argument("--global", dest="global_name", help="Registered global store name")
+    parser.add_argument("--request-timeout", type=float, default=60.0,
+                        help="Seconds for queue/read/assisted phases; started writes finish")
+    args = parser.parse_args(argv)
+    try:
+        configuration = (
+            ConfigurationResolver().resolve(
+                explicit=args.store, project=args.project, global_name=args.global_name,
+            ) if any((args.store, args.project, args.global_name))
+            else resolve_runtime_configuration()
+        )
+        create_server(configuration, request_timeout=args.request_timeout).run(transport="stdio")
+    except ImportError:
+        parser.exit(2, "tessera-mcp: Install the optional transport with pip install 'tessera[mcp]'.\n")
+    except Exception:
+        import json
+        from .mcp_runtime import SCHEMA_VERSION
+
+        parser.exit(2, json.dumps({
+            "schema_version": SCHEMA_VERSION, "operation": "startup", "data": None,
+            "error": {"code": "SERVER_FAILED", "message":
+                "Check the configured store/index paths, permissions and positive request timeout."},
+        }) + "\n")
 
 
 if __name__ == "__main__":

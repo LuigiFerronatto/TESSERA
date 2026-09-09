@@ -1,0 +1,153 @@
+{
+  "issue": 120,
+  "classification": "runtime implementation",
+  "status": "IN_PROGRESS",
+  "canonical_merge": null,
+  "audited_main": "a88600b491528cddb746bf909a303aefabf01e45",
+  "baseline": {
+    "passed": 538,
+    "skipped": 5,
+    "probe": {
+      "import_created_store": true,
+      "import_built_index": true,
+      "full_fields": [
+        "id",
+        "type",
+        "filepath",
+        "filename",
+        "score",
+        "score_explain",
+        "relevant_evidence",
+        "evidence_info",
+        "body",
+        "frontmatter",
+        "related_ids",
+        "provenance",
+        "evidence"
+      ],
+      "typed_fields": [
+        "id",
+        "type",
+        "score",
+        "body",
+        "filename"
+      ],
+      "typed_missing_fields": [
+        "evidence",
+        "evidence_info",
+        "filepath",
+        "frontmatter",
+        "provenance",
+        "related_ids",
+        "relevant_evidence",
+        "score_explain"
+      ]
+    }
+  },
+  "candidate_tests": {
+    "passed": 542,
+    "skipped": 5,
+    "runtime_test_functions": 4
+  },
+  "protocol": {
+    "passed": true,
+    "checks": [
+      "initialize/version/capabilities/ping",
+      "lossless/full-and-typed-retrieval/evidence/order/provenance",
+      "strict-request-validation/unknown-tool/missing-provider/protocol-error",
+      "health/configuration-v2/composition/rebuild/doctor/quickstart-dry-run",
+      "resources/raw-markdown/versioned-json/structured-not-found",
+      "canonical-write/gate-rejection/index-refresh",
+      "provider-failure/nonmutation/retrieval-survives",
+      "provider-invalid/nonmutation/retrieval-survives",
+      "provider-slow/nonmutation/retrieval-survives",
+      "real-cancellation/no-late-provider-write/continued-session",
+      "explicit-provider/successful-gated-decomposition/pipeline-evidence",
+      "empty-provider-output-is-not-generated-success",
+      "queue/serialized-write/queued-cancel-or-timeout/started-write-completes",
+      "write/serialized-write/queued-cancel-or-timeout/started-write-completes",
+      "started-write-cancellation-is-not-rollback/lock-released",
+      "cancelled-failing-write/no-duplicate-response/session-survives",
+      "EOF-cancels-assisted-preparation/no-late-write",
+      "EOF-drains-started-write/clean-shutdown"
+    ],
+    "check_count": 18,
+    "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
+    "sdk": "1.30.0",
+    "package_path": "/tmp/tessera-120-installed/lib/python3.12/site-packages/tessera/__init__.py",
+    "source_sha256": "091bec1f68e60df8ada3e16d7b5b676277d2cca7058ac7e27aacb150671f4918"
+  },
+  "artifact": {
+    "package_path": "/tmp/tessera-120-installed/lib/python3.12/site-packages/tessera/__init__.py",
+    "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
+    "sdk": "1.30.0",
+    "base_version": "3.4.0",
+    "public_exports": 42,
+    "artifacts": {
+      "tessera-3.4.0-py3-none-any.whl": {
+        "sha256": "96f317a4f073c08ac93ce95cec711319ecb87d9ae6edc57dff4751f70ca468ab",
+        "bytes": 130297,
+        "entries": 34
+      },
+      "tessera-3.4.0.tar.gz": {
+        "sha256": "cc6d1036f9f82feba040d4a95ca17c87220096f88a23ba1424716b70dc683834",
+        "bytes": 125833,
+        "entries": 44
+      }
+    },
+    "runtime_bytes_match_checkout": true,
+    "provider_and_development_dependencies_absent": true,
+    "build_method": "python -m build (sdist then isolated wheel from sdist)"
+  },
+  "benchmark_applicability": "SMOKE_ONLY",
+  "sanity": {
+    "dataset": "tessera-sanity-ci-v2-project-agnostic",
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "average_latency_ms": 9.433501500097918,
+    "average_returned_chars": 417.75,
+    "missing_evidence_check": "passed"
+  },
+  "sanity_quality_delta": 0,
+  "project_sync": {
+    "issues_inspected": 80,
+    "changes": 0,
+    "noops": 75,
+    "ignored": 5,
+    "trackers": 6
+  },
+  "file_sha256": {
+    "tessera/__init__.py": "8f4965eb97a99ecba2cf626982534f9efdab7854d77224ffc332d3e26b7ee0e5",
+    "tessera/mcp_server.py": "6e611d59c9d9111d2c72978e0f80c1bcaf28de219492e17bc8b407ee565db731",
+    "tessera/mcp_runtime.py": "3e10988f2d3a8db5ab2a7f5bfd20aad9a0e1b35ac981fb8b4a379ea1f3170e68",
+    "tessera/mcp_transport.py": "bf745c59d8a313d575945b9ef760276846f146c45a342e6d898253f40e44fb90",
+    "pyproject.toml": "4168bee4eea4ca0f356699c047e17dc82f98a4fd20d1ab94dc9177679c8c5376",
+    "scripts/clean_room/check_mcp.py": "1e0ad872efced191d668bf43e9aa50c5bcae27f7df1536b4c06a9107d0e4795f",
+    ".github/workflows/tessera-ci.yml": "50924f4303593d8bb545829a549ae7a64868b3a4b6b1799bbc31415e1c3e6731"
+  },
+  "limitations": [
+    "stdio only",
+    "started writes complete; cancellation is not rollback",
+    "multi-note commits are not transactions",
+    "provider threads are bounded but not forcibly killed",
+    "human merge and post-merge reconciliation pending"
+  ],
+  "cancellation_error_regression": {
+    "before": "Cancelling a writer that subsequently raises OSError triggers SDK Request already responded to and kills the session.",
+    "after": "Release the lock and deliver cancellation in finally for both worker success and failure.",
+    "real_stdio_reproduced": true,
+    "installed_wheel_regression_passed": true
+  },
+  "predecessor_remote_evidence": {
+    "head": "02a411a30621593bfd4c17fb620b9499a79bc892",
+    "ci": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596857",
+    "benchmark": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596875",
+    "audit": "https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606666989",
+    "audit_decision": "KEEP",
+    "carries_to_new_head": false
+  }
+}

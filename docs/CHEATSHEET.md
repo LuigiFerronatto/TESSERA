@@ -373,20 +373,24 @@ raiz do projeto e imprime o bloco JSON com `TESSERA_STORAGE_DIR` pronto para `.m
 
 ## MCP — Tools disponíveis (servidor `tessera`)
 
+A candidata #120 usa o envelope `1.0`: leia resultados em `data` e falhas em
+`error` (`isError=true`). Inicie com `tessera-mcp --project /caminho/absoluto`.
+Configuração, seleção de provedor e cancelamento: [contrato MCP](MCP_RUNTIME.md).
+
 Registrado em `.mcp.json` (Claude Code/Copilot CLI) e `.gemini/settings.json`
 (Gemini CLI). Nenhum comando de shell — são tool calls que qualquer agente
 já consegue invocar diretamente.
 
-### `query_memories(query, top_n=3, resolve_conflicts=True)`
+### `query_memories(query, top_n=7, resolve_conflicts=True)`
 Mesma busca do `tessera query`. Cada resultado já inclui `filepath` e
 `related_ids` (equivalente a `--paths-only`/`--show-related`, sem precisar
 de flag — sempre vem preenchido). `resolve_conflicts=True` mantém a passagem
 de compatibilidade, mas ela é não destrutiva: conflito possível não elimina
 evidência e recência sozinha não prova supersessão.
 
-### `query_store(query, store, top_n=3, resolve_conflicts=True)`
-Igual, mas filtra por typed store: `store="factual"` \| `"preference"` \|
-`"procedural_anchor"`.
+### `query_store(query, store, top_n=7, resolve_conflicts=True)`
+Igual, mas filtra por typed store: `store="facts"`, `"preferences"` ou
+`"insights"`. Preserva todos os campos de evidência produzidos pelo Engine.
 
 ### `write_memory(mem_id, mem_type, episode_id, content, tags=None, entity_names=None, connect_to=None, relation_type="related_to", persist_format="md")`
 Equivalente ao `tessera write`. `connect_to` aceita uma **lista** de ids
@@ -401,11 +405,14 @@ compatível `is_sanitized`. IDs usam segmentos com `/`, sem caminhos absolutos,
 `..`, barras invertidas ou escape por symlink. `reject` e `review` não gravam
 nem reindexam; instruções hostis diretas conhecidas são rejeitadas.
 
-### `get_memory(memory_id)`
-Devolve o corpo bruto de uma nota específica pelo id.
+### Resource `memories://{memory_id}`
+Devolve Markdown bruto pelo id; ausência é erro estruturado.
 
-### `get_index_stats()`
-Contagem de nós/arestas do índice atual.
+### Resource `graph://index`
+Contagem de nós/arestas do índice atual no envelope `1.0`.
+
+### `get_server_health()` / resource `server://health`
+Estado de startup, configuração selecionada, versões e limites, sem chamar provedor.
 
 ### `rebuild_index()`
 Reconstrói o grafo em memória do processo MCP (não recarrega o código
@@ -415,8 +422,8 @@ Python — ver nota de troubleshooting abaixo).
 Pipeline completo Need→Planner→Retrieval→Inference via MCP (equivalente ao
 `tessera start`, sem sair do agente/CLI hospedeiro).
 
-Nenhum backend é resolvido automaticamente. A assinatura MCP atual não aceita
-seleção de adapter; a ampliação desse envelope pertence à issue #120:
+Selecione o provedor na aplicação com `create_server(configuration, provider=...)`.
+A seleção pertence ao servidor; argumentos da tool não escolhem credenciais:
 
 ```jsonc
 { "task_instruction": "...", "top_n": 7 }
@@ -426,13 +433,11 @@ seleção de adapter; a ampliação desse envelope pertence à issue #120:
 - Falhas de compatibilidade são tipadas e nunca degradam para eco do prompt.
 
 ### `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id="start", tags=None)`
-Equivalente MCP de `tessera decompose`: extrai N memórias tipadas de um
-episódio bruto e grava todas em `{mem_id_prefix}/{tipo}-{n}.md`, sem sair
-do agente hospedeiro. Exige um backend LLM real resolvível e não aceita flags
-de seleção ou simulação na assinatura atual. Se o backend selecionado falhar,
-a tool usa o mesmo fallback determinístico do Engine. A resposta informa
-`decomposition_mode`, `fallback_reason`, `llm_backend_attempted` e só preenche
-`llm_backend_used` quando a extração assistida realmente foi usada.
+Extrai N memórias tipadas e grava em `{mem_id_prefix}/{tipo}-{n}.md` após a
+preparação assistida completa. Exige provedor explícito no servidor. Falha,
+saída inválida, timeout ou cancelamento durante a preparação retornam erro sem
+gravação tardia. O fallback determinístico de Python/CLI permanece disponível
+nessas interfaces; não vira uma gravação remota após falha assistida.
 
 ```jsonc
 { "mem_id_prefix": "research/meu-topico", "beginning": "...", "middle": "...", "end": "..." }

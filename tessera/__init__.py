@@ -46,8 +46,6 @@ from .security import (
 )
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
-from .orchestrator import TesseraOrchestrator, OrchestratorResult
-from .hooks import TesseraTaskHook, TaskInterceptionResult
 from .skills import SKILL_IDS, install_default_skills, list_default_skill_files
 from .init_flow import (
     InitRequest,
@@ -118,3 +116,18 @@ __all__ = [
     "verify_evidence_freshness",
     "__version__",
 ]
+
+
+def __getattr__(name):
+    """Preserve optional public exports while keeping adapter imports lazy."""
+    from importlib import import_module
+
+    modules = {
+        "TesseraOrchestrator": "orchestrator", "OrchestratorResult": "orchestrator",
+        "TesseraTaskHook": "hooks", "TaskInterceptionResult": "hooks",
+    }
+    if name not in modules:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = getattr(import_module(f".{modules[name]}", __name__), name)
+    globals()[name] = value
+    return value

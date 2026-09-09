@@ -52,7 +52,7 @@ def test_metadata_and_entry_points_match_the_public_contract() -> None:
         "tessera": "tessera.cli:main",
         "tessera-mcp": "tessera.mcp_server:main",
     }
-    assert project["optional-dependencies"]["mcp"] == ["mcp>=1.2.0,<2.0.0"]
+    assert project["optional-dependencies"]["mcp"] == ["mcp>=1.30.0,<2.0.0"]
     assert project["optional-dependencies"]["llm"] == ["requests>=2.28"]
 
 

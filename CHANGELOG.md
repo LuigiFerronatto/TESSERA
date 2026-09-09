@@ -8,6 +8,18 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### MCP runtime (#120)
+- Added lazy, explicitly configured stdio startup, operational health and
+  versioned request/result/error contracts with serialized Engine access.
+- Changed MCP wire results to contract `1.0`: existing results live in `data`,
+  with structured `error`/`isError` on failure. Clients must unwrap `data`.
+- Fixed typed-store evidence loss and doctor dropping configured sources/index.
+  Failed or cancelled remote assisted work cannot later persist fallback notes;
+  Python/CLI deterministic decomposition fallback remains unchanged.
+- Raised the optional MCP SDK minimum to 1.30.0 (v1; Python 3.10+), with real
+  installed-wheel stdio protocol validation on Python 3.12. Base Python 3.9
+  support remains. See [runtime contract](docs/MCP_RUNTIME.md).
+
 ### Architecture Decisions
 - Added a deterministic, idempotent sync tool
   (`scripts/sync_project_board.py`) that reflects each open issue's own

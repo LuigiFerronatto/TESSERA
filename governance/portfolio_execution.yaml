@@ -36,10 +36,10 @@ now:
   - issue: 118
     queue: 4
     note: "Completed historical Queue 4: #118 VALIDATED/KEEP via #225 canonical 0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d. Closed; not active NOW WIP."
-next:
   - issue: 120
     queue: 5
-    note: "MCP transport/runtime robustness. READY; next implementation after #118 post-merge lifecycle reconciliation."
+    note: "MCP transport/runtime robustness. IN_PROGRESS from canonical lifecycle a88600b4; active Queue 5."
+next:
   - issue: 87
     queue: 6
     note: "LICENSE/CONTRIBUTING owner decision. Can run in parallel; blocked on owner, not engineering."
