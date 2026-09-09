@@ -46,7 +46,7 @@ Current reconciliation-matrix counts:
 ```text
 NOW executable                 0
 READY                          6 total / 3 executable
-BLOCKED                        35 full cards + #16 full phase
+BLOCKED                        34 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
 
@@ -140,15 +140,17 @@ full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NOW
 
-No executable implementation is selected. #120 has completed historical Queue 5.
-#121 is technically READY after #120 validation, but remains LATER / Queue 43.
-Dependency readiness does not reorder the execution queue. Start dependent work
-only from fresh main after this lifecycle reconciliation merges.
+#87 LICENSE / CONTRIBUTING is IN_PROGRESS at Queue 6, selected by the owner
+for a reviewable repository/legal proposal. License text and copyright ownership
+remain unconfirmed until the owner explicitly approves them before merge.
+This ADMIN task adds no executable runtime WIP. #134 remains blocked by #87.
+
+#120 has completed historical Queue 5. #121 remains READY / LATER / Queue 43,
+unselected. No release or downstream implementation is selected by this work.
 
 ## NEXT
 
 ```text
-#87  LICENSE / CONTRIBUTING owner decision       can start in parallel
 #134 PyPI release                                BLOCKED only on #87
 ```
 
@@ -167,7 +169,7 @@ NOW — Product foundation
 3  #16  Conflict resolver containment       VALIDATED (`KEEP`; `708c973e...`)
 4  #118 Clean-room onboarding                  VALIDATED (`KEEP`; `0ee5bbfe...`)
 5  #120 MCP transport/runtime robustness    VALIDATED (`KEEP`; `b4ead4d...`)
-6  #87  LICENSE / CONTRIBUTING              (parallel)
+6  #87  LICENSE / CONTRIBUTING              IN_PROGRESS (owner confirmation pending)
 7  #134 PyPI release
 -> TESSERA can be installed, configured, index a real project, and be used via MCP.
 
@@ -683,7 +685,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #155 semantics stabilize; #166 owns presentation architecture. |
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | closed | `VALIDATED` | FOUNDATION | Agent Integration | `KEEP`; historical Queue 5. PR #229 candidate `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211`, canonical squash merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; one runtime delivery. [Test Card](test-cards/120-mcp-runtime-robustness.md). Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `READY` | EXECUTABLE | Agent Integration | #116/#117/#120/#68/#92 satisfied; official Skills only. LATER / Queue 43, unselected; dependent implementation waits for lifecycle reconciliation to merge. |
-| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `BLOCKED` | ADMIN | Release | Owner legal decision required for LICENSE/copyright/CONTRIBUTING; direct #134 blocker. |
+| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `IN_PROGRESS` | ADMIN | Release | NOW / Queue 6; owner-requested draft LICENSE/CONTRIBUTING and artifact checks. Explicit license/copyright confirmation is still required before merge; direct #134 blocker. [Test Card](test-cards/87-license-contribution.md). |
 | [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Only remaining blocker: #87 owner/legal decision. #117/#118 are satisfied; #153/#154/#155 are canonically validated. No publication starts from this reconciliation. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
@@ -965,7 +967,7 @@ After #155, #135, the #16 P0 containment, #118 onboarding and #120 MCP deliverie
 #118 Clean-room onboarding / CI bootstrap       VALIDATED / KEEP — historical Queue 4
 #120 MCP transport/runtime robustness           VALIDATED / KEEP — historical Queue 5
 #121 Official Skills                            READY / LATER — Queue 43 (unselected)
-#87  LICENSE / CONTRIBUTING                     owner decision — Queue 6
+#87  LICENSE / CONTRIBUTING                     IN_PROGRESS — Queue 6; owner confirmation pending
 #134 PyPI release                              BLOCKED only on #87
 ```
 
@@ -997,7 +999,7 @@ PRODUCTIZATION / RELEASE
                  -> #155 VALIDATED
                      -> #118 VALIDATED
                          -> #134 BLOCKED
-#87 ADMIN ------------------------------------------^
+#87 ADMIN IN_PROGRESS (owner confirmation pending) --^
 
 #120 VALIDATED -> #121 READY (LATER / Queue 43)
 #119/#166 DEFERRED

@@ -1,4 +1,5 @@
 include README.md
+include CONTRIBUTING.md
 include pyproject.toml
 recursive-include tessera *.py
 recursive-include tessera/skills_library *.md

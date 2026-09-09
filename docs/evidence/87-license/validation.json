@@ -1,0 +1,87 @@
+{
+  "issue": 87,
+  "baseline_sha": "31df35e2885bcb81efbe3b9f87fdf8b15a858a4b",
+  "classification": "GOVERNANCE / PACKAGING_METADATA",
+  "benchmark_applicability": "NOT_APPLICABLE",
+  "owner_confirmation": "PENDING",
+  "proposed_copyright_notice": "Copyright (c) 2026 Luigi Ferronatto",
+  "build_method": "python -m build; isolated wheel rebuilt from sdist",
+  "artifacts": {
+    "baseline": {
+      "wheel": {
+        "name": "tessera-3.4.0-py3-none-any.whl",
+        "sha256": "0600d3258832b252ead6dad5a1eded151a70f4805b9d6bc200d780a17d19015e",
+        "bytes": 130297,
+        "entries": 34,
+        "license_expression": "MIT",
+        "license_files": [],
+        "license_paths": []
+      },
+      "sdist": {
+        "name": "tessera-3.4.0.tar.gz",
+        "sha256": "86a67fa469a5e759868d8b0f96f0b9374c8aec00600a9abff2abb7fd713814bb",
+        "bytes": 125487,
+        "entries": 44,
+        "license_expression": "MIT",
+        "license_files": [],
+        "has_license": false,
+        "has_contributing": false
+      }
+    },
+    "candidate": {
+      "wheel": {
+        "name": "tessera-3.4.0-py3-none-any.whl",
+        "sha256": "156e8786c0ba0e2b72dd9eefcedb7bedaeffa775254d10c5faa2dee3bc994950",
+        "bytes": 131157,
+        "entries": 35,
+        "license_expression": "MIT",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_paths": [
+          "tessera-3.4.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "sdist": {
+        "name": "tessera-3.4.0.tar.gz",
+        "sha256": "c2675f600b941e787e6349a8224ac2a34e94629071dbeb16899e308fa88108c1",
+        "bytes": 127320,
+        "entries": 46,
+        "license_expression": "MIT",
+        "license_files": [
+          "LICENSE"
+        ],
+        "has_license": true,
+        "has_contributing": true
+      }
+    }
+  },
+  "runtime_payload_byte_identical": true,
+  "runtime_package_files": 29,
+  "license_sha256": "38eec562894f2a06058f36ea90d29cd09c36e03b65a1c62403674b76f47e45ed",
+  "sources": {
+    "mit_text": "https://opensource.org/license/mit",
+    "packaging_metadata": "https://packaging.python.org/en/latest/specifications/pyproject-toml/",
+    "setuptools_support": "https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html"
+  },
+  "installed_metadata": {
+    "passed": true,
+    "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
+    "installed_directory": "/tmp/tessera-87-evidence/installed/lib/python3.12/site-packages",
+    "license_expression": "MIT",
+    "license_files": [
+      "LICENSE"
+    ],
+    "installed_license_matches": true,
+    "mode": "fresh venv; wheel installed with --no-deps for metadata inspection; runtime installation covered by CI"
+  },
+  "ci_artifact_inspection_executed_locally": true,
+  "local_checks": {
+    "focused_passed": 157,
+    "focused_skipped": 5,
+    "ci_archive_inspection": "passed",
+    "installed_metadata": "passed",
+    "relative_document_links": "passed",
+    "git_diff_check": "passed"
+  }
+}
