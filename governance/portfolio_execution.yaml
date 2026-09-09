@@ -33,10 +33,10 @@ now:
   - issue: 135
     queue: 2
     note: "Decomposer fallback integrity. Parallel Technical Integrity lane; fixes documented LLM failure -> heuristic fallback vs actual runtime LLM failure -> []."
-next:
   - issue: 118
     queue: 4
-    note: "Clean-room onboarding/CI bootstrap, after #155."
+    note: "Clean-room onboarding/CI bootstrap IN_PROGRESS; #155 canonically validated."
+next:
   - issue: 120
     queue: 5
     note: "MCP transport/runtime robustness. Can run in parallel."

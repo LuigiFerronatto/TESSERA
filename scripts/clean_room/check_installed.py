@@ -249,6 +249,8 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         self.cases["idempotency"] = repeated
         self.run(project, ["write", "--id", "project/calibration", "--type", "factual", "--episode", "fixture",
                            "--content", "Cedar calibration completed locally.", "--json"], parse=True)
+        self.run(project, ["write", "--id", "../docs/illegal", "--type", "factual", "--episode", "fixture",
+                           "--content", "Must not write to a source root.", "--json"], code=2, parse=True)
         generated = list((project / "memories/generated").rglob("*.md"))
         assert len(generated) == 1
         generated_hash = {str(x.relative_to(project)): digest(x) for x in generated}
@@ -400,6 +402,11 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         prefix = [("Selection [1]:", b"1\n"), ("memories]:", b"memories/generated\n"),
                   ("Selection [1]:", b"1\n")]
         transcript = self.interactive(p, prefix + [("Proceed? [y/N]:", b"y\n")])
+        for marker in ("Initialization plan:", "Scope: project", dry["plan"]["project_root"],
+                       dry["plan"]["store"]["id"], dry["plan"]["index"]["path"],
+                       "Ignored: " + str(dry["plan"]["sources"]["ignored_count"]),
+                       "Forbidden: " + str(dry["plan"]["sources"]["forbidden_count"])):
+            assert marker in transcript, marker
         assert self.config(p) == dry["plan"]["proposed_configuration"]
         assert self.membership(p)["files"] == sorted(dry["plan"]["sources"]["selected"])
         # Compare same project identity via restoring this throwaway fixture.
@@ -427,12 +434,15 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
 
     def global_isolation(self, project):
         global_store = self.root / "shared-store"
+        global_store.mkdir()
+        global_source = global_store / "global.md"
+        global_source.write_text("# Shared source\n\nGlobalonlybeacon is intentionally shared knowledge.\n")
         args = ["init", "--global", "shared", "--store", str(global_store), "--non-interactive", "--json"]
         first = self.run(project, args, parse=True)
         local_before = snapshot(project)
         # Exercise explicit global rerun while local configuration exists.
         repeated = self.run(project, args, parse=True)
-        assert repeated["result"]["indexed_sources"] == []
+        assert repeated["result"]["indexed_sources"] == [str(global_source)]
         assert repeated["plan"]["store"] == first["plan"]["store"]
         assert snapshot(project) == local_before
         registry = self.root / "xdg/tessera/registry.yaml"
@@ -440,6 +450,7 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         registry_before = registry.read_bytes()
         self.init(project)
         assert snapshot(global_store) == global_before and registry.read_bytes() == registry_before
+        assert str(global_source) not in self.run(project, ["query", "Globalonlybeacon", "--json"])
         self.cases["global_isolation"] = {"first": first, "repeat": repeated}
 
 
@@ -459,6 +470,7 @@ def main():
         uninstall = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "tessera"],
                                    capture_output=True, text=True, check=True, timeout=60)
         assert not Path(exp.cli).exists()
+        assert not (Path(exp.cli).parent / ("tessera-mcp.exe" if os.name == "nt" else "tessera-mcp")).exists()
         probe = subprocess.run([sys.executable, "-c", "import importlib.util; assert importlib.util.find_spec('tessera') is None"],
                                cwd=moved, capture_output=True, text=True, check=True)
         assert snapshot(args.root) == preserved

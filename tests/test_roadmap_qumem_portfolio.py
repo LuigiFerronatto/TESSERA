@@ -21,12 +21,12 @@ def test_roadmap_tracks_productization_v2_and_release_routing() -> None:
     assert "`VALIDATED`" in _markdown_table_row(text, "#117")
     assert "`VALIDATED`" in _markdown_table_row(text, "#153")
     assert "`VALIDATED`" in _markdown_table_row(text, "#154")
-    assert "`READY`" in _markdown_table_row(text, "#155")
-    assert "`BLOCKED`" in _markdown_table_row(text, "#118")
+    assert "`VALIDATED`" in _markdown_table_row(text, "#155")
+    assert "`IN_PROGRESS`" in _markdown_table_row(text, "#118")
     assert "`READY`" in _markdown_table_row(text, "#120")
     assert "`BLOCKED`" in _markdown_table_row(text, "#121")
     assert "`BLOCKED`" in _markdown_table_row(text, "#134")
-    assert "#153/#154 are satisfied; #155 remains the transitive productization blocker through #118" in _markdown_table_row(text, "#134")
+    assert "#153/#154 are satisfied; #155 is canonically validated" in _markdown_table_row(text, "#134")
     assert "`BLOCKED`" in _markdown_table_row(text, "#87")
 
 

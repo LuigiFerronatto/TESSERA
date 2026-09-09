@@ -372,10 +372,10 @@ class TestPortfolioManifest:
         assert 25 in manifest.deferred_status_override
         assert 14 in manifest.trackers
 
-    def test_now_manifest_retains_two_completed_historical_positions(self):
+    def test_now_manifest_preserves_completed_positions_and_active_118(self):
         manifest = sut.PortfolioManifest.load()
         now_issues = [n for n, h in manifest.horizon_by_issue.items() if h == "NOW"]
-        assert now_issues == [155, 135]
+        assert now_issues == [155, 135, 118]
 
     def test_no_duplicate_queue_values(self):
         manifest = sut.PortfolioManifest.load()

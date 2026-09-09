@@ -15,9 +15,9 @@ import zipfile
 import tarfile
 
 
-def run(argv, cwd, env):
+def run(argv, cwd, env, timeout=300):
     start = time.monotonic()
-    p = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, timeout=300)
+    p = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout)
     if p.returncode:
         raise RuntimeError(p.stdout + p.stderr)
     return {"seconds": time.monotonic() - start, "stdout": p.stdout, "stderr": p.stderr}
@@ -39,7 +39,7 @@ def main():
         "PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "LANG", "LC_ALL",
         "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE"}}
     env.update(PIP_CONFIG_FILE=os.devnull, PIP_INDEX_URL="https://pypi.org/simple",
-               PIP_DISABLE_PIP_VERSION_CHECK="1", PYTHONDONTWRITEBYTECODE="1",
+               PIP_DISABLE_PIP_VERSION_CHECK="1", PIP_NO_CACHE_DIR="1", PYTHONDONTWRITEBYTECODE="1",
                HOME=str(root / "installer-home"), XDG_CONFIG_HOME=str(root / "installer-xdg"))
     metadata = {"source_sha": args.source_sha, "python": sys.version, "root": str(root), "artifacts": {}}
     for path in (args.wheel.resolve(), args.sdist.resolve()):
@@ -53,6 +53,11 @@ def main():
         assert not [n for n in names if any(p in forbidden for p in Path(n).parts)], names
         assert not [n for n in names if Path(n).name in {".env", "private.key"}]
         assert "tessera/cli.py" in names and "tessera/init_flow.py" in names
+        source_root = Path(__file__).resolve().parents[2]
+        runtime_files = {p.relative_to(source_root).as_posix()
+                         for p in (source_root / "tessera").glob("*.py")}
+        assert runtime_files
+        assert {n for n in names if n.startswith("tessera/") and n.endswith(".py")} == runtime_files
         assert len([n for n in names if n.startswith("tessera/skills_library/") and n.endswith(".md")]) == 5
         metadata["artifacts"][path.name] = {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                                              "bytes": path.stat().st_size, "inventory": names}
@@ -83,7 +88,7 @@ if os.environ.get("TESSERA_CLEAN_ROOM_OFFLINE") == "1":
             forbidden("provider import forbidden")
     sys.addaudithook(audit)
 '''
-    (site / "clean_room_audit.pth").write_text("import builtins; exec(" + repr(guard) + ")\n")
+    (site / "clean_room_audit.pth").write_text("import builtins; exec(" + repr(guard) + ", {})\n")
     offline = dict(env, TESSERA_CLEAN_ROOM_OFFLINE="1")
     metadata["offline_guard"] = run([str(python), "-c", "import socket\ntry: socket.create_connection(('127.0.0.1',9))\nexcept RuntimeError as e: print(e)\nelse: raise AssertionError('guard not active')"], root, offline)
     here = Path(__file__).parent
@@ -94,8 +99,10 @@ if os.environ.get("TESSERA_CLEAN_ROOM_OFFLINE") == "1":
     if args.tty:
         command.append("--tty")
     try:
-        metadata["experiment"] = run(command, root, env)
+        metadata["experiment"] = run(command, root, env, timeout=600)
         metadata["passed"] = True
+        shutil.rmtree(root)
+        metadata["temporary_state_removed"] = True
     finally:
         (output / "environment.json").write_text(json.dumps(metadata, indent=2) + "\n")
         print("Clean-room evidence:", output, flush=True)
