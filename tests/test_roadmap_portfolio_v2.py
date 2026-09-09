@@ -31,7 +31,7 @@ def test_productization_v2_critical_path_is_explicit() -> None:
     assert "`VALIDATED`" in _row(text, "#155")
     assert "`VALIDATED`" in _row(text, "#118")
     for issue in ("#134",):
-        assert "`BLOCKED`" in _row(text, issue)
+        assert "`READY`" in _row(text, issue)
 
 
 def test_intelligence_tracker_and_children_are_dependency_routed() -> None:
@@ -75,7 +75,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     open_issues = (
         "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
         "#25", "#26", "#27", "#28", "#32", "#67", "#69", "#70", "#71", "#72",
-        "#73", "#78", "#80", "#87", "#103", "#104", "#105", "#106",
+        "#73", "#78", "#80", "#103", "#104", "#105", "#106",
         "#119", "#121", "#134",
         "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
@@ -102,9 +102,9 @@ def test_trackers_and_owner_decision_cannot_masquerade_as_ready_execution() -> N
 
     issue_87 = _row(text, "#87")
     assert "| ADMIN |" in issue_87
-    assert "`IN_PROGRESS`" in issue_87
-    assert "owner-confirmed candidate" in issue_87
-    assert "direct #134 blocker" in issue_87
+    assert "`VALIDATED`" in issue_87
+    assert "canonical merge" in issue_87
+    assert "direct #134 blocker" not in issue_87
 
 
 def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
@@ -154,7 +154,7 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "no active blocker remains" in issue_155
 
     assert "#116/#117/#153/#154/#155 satisfied" in _row(text, "#118")
-    assert "Only remaining blocker: #87" in _row(text, "#134")
+    assert "#87 legal prerequisite satisfied" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
     now_section = text.split("## Completed NOW positions", 1)[1].split("## NEXT", 1)[0]
@@ -176,8 +176,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
-    assert "READY                          6 total / 3 executable" in text
+    assert "READY                          7 total / 3 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
-    assert len(blocked_full_cards) == 34
-    assert "BLOCKED                        34 full cards + #16 full phase" in text
+    assert len(blocked_full_cards) == 33
+    assert "BLOCKED                        33 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

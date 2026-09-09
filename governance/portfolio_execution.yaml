@@ -41,11 +41,11 @@ now:
     note: "Completed historical Queue 5: #120 VALIDATED/KEEP via #229 canonical b4ead4d7407b8caa2571e1e366616a468f2ef74f. Closed; not active NOW WIP."
   - issue: 87
     queue: 6
-    note: "IN_PROGRESS: owner confirmed MIT and the copyright notice on 2026-09-09. Required human review and canonical merge remain pending; #134 stays blocked."
+    note: "VALIDATED/KEEP: owner confirmed MIT and the copyright notice; PR #233 canonically merged as d473f230b914908fcaad3a46291b5046bde6b918. Historical Queue 6."
 next:
   - issue: 134
     queue: 7
-    note: "PyPI release. #118 canonically VALIDATED; #87 owner decision confirmed, but its canonical merge and lifecycle remain blocking."
+    note: "PyPI release. #118 and #87 are canonically VALIDATED; #134 is the next release gate with its own publication checks."
   - issue: 67
     queue: 8
   - issue: 12

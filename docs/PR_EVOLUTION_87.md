@@ -2,9 +2,9 @@
 
 ## Candidate lifecycle
 
-- Issue #87: OPEN / IN_PROGRESS, NOW / Queue 6, selected by the owner's request.
+- Issue #87: CLOSED / VALIDATED, historical NOW / Queue 6.
 - Starting main: `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` (#232 merged; #231 closed).
-- Branch: `test-card/87-license-contribution`; review candidate in PR #233, not merged.
+- Branch: `test-card/87-license-contribution`; PR #233 merged 2026-09-09.
 - Classification: repository governance and packaging metadata.
 - Benchmark: `NOT_APPLICABLE`; no runtime, retrieval, corpus or benchmark change.
 - Owner confirmation: **CONFIRMED** on 2026-09-09. The owner answered
@@ -12,7 +12,10 @@
   `Copyright (c) 2026 Luigi Ferronatto`. The agent recorded that conversation
   [decision](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368);
   it is not inferred from Git history, package authors, or account identity.
-- #134 remains BLOCKED by #87. No legal completion or release authorization is claimed.
+- Final candidate: `c27ede1b6552e9a2b3a0f51a41185c558186e895`.
+- Canonical merge: `d473f230b914908fcaad3a46291b5046bde6b918`.
+- Decision: **KEEP**; canonical CI and Benchmark Ledger passed on main.
+- #134's #87 prerequisite is satisfied; release authorization remains owned by #134.
 
 ## Relevant delivery history
 
@@ -86,8 +89,18 @@ exact-head checks are required and recorded in PR #233.
 
 ## Remaining decisions
 
-The owner prerequisite is satisfied. Required human review and canonical merge
-remain pending. If the notice changes, rebuild the artifact proof and rerun
-exact-head CI and audit. After approved merge, record the canonical SHA and reconcile #87;
-only then reassess #134 under its separate release gates. No publication, legal
+The owner prerequisite, human review, canonical merge and lifecycle validation
+are satisfied. If the notice changes, rebuild the artifact proof and rerun
+exact-head CI and audit. #134 is now eligible for its separate release gates. No publication, legal
 ownership determination, CLA/DCO policy or downstream implementation is included.
+
+## Canonical lifecycle verification
+
+PR #233 merged into `main` on 2026-09-09 as canonical commit
+`d473f230b914908fcaad3a46291b5046bde6b918`; the final candidate was
+`c27ede1b6552e9a2b3a0f51a41185c558186e895`. Canonical push CI and Benchmark
+Ledger both passed on the merge commit (CI run `34397399990`, Ledger run
+`34397400126`). The implementation candidate and canonical merge count as one
+delivery. #87 is CLOSED / VALIDATED / KEEP, and #134 is READY for its own
+release gates. This reconciliation contains documentation and routing updates
+only; no runtime delivery is counted.
