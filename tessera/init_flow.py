@@ -581,6 +581,18 @@ def apply_initialization_plan(plan: InitializationPlan) -> InitializationResult:
         if plan.planned_mutations.get("config"):
             selection = apply_init_plan(base)
             config_applied = True
+        elif plan.mode == "global":
+            # This is an explicitly accepted global init plan. General command
+            # discovery prefers a nearby project, which must not replace this
+            # plan's store on an otherwise idempotent global reinitialization.
+            selection = ResolvedConfiguration(
+                plan.store_id, plan.generated_memory_store, "global_registry",
+                registry_name=plan.registry_name, registry_path=plan.config_path,
+                source_roots=plan.source_roots, index_dir=plan.index_path,
+                identity_root=plan.generated_memory_store,
+                config_schema_version=1,
+            )
+            Path(selection.storage_dir).mkdir(parents=True, exist_ok=True)
         else:
             resolver = ConfigurationResolver(
                 cwd=plan.project_root or os.getcwd(),

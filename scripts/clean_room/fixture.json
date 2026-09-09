@@ -1,0 +1,19 @@
+{
+  "README.md": "# Aster Observatory\n\nThis project is the Aster Observatory, a local observatory documenting cedar telescope calibration.\n",
+  "AGENTS.md": "# Working agreement\n\nUse documented observatory measurements and preserve the source records.\n",
+  "docs/architecture.md": "# Architecture\n\nThe cedar telescope uses an offline SQLite observation catalog.\n",
+  "docs/decisions.md": "# Decisions\n\nCalibration is performed before every clear night observation.\n",
+  "docs/nested/ignored.md": "# Ignored\n\nIgnoredrecursivebeacon must never appear.\n",
+  "docs/nested/keep.md": "# Retained\n\nRecursivekeepbeacon describes safe calibration.\n",
+  "research/market-notes.md": "# Market\n\nLocal observatories need a searchable calibration notebook.\n",
+  "memories/existing-learning.md": "# Learning\n\nClean the cedar telescope lens before calibration.\n",
+  "examples/optional.md": "# Optional\n\nOptionalsourcebeacon supports demonstration work.\n",
+  "archive/old-note.md": "# Archive\n\nArchivebeacon is an old historical source.\n",
+  "node_modules/ignored.md": "# Dependency\n\nDependencybeacon must never appear.\n",
+  ".venv/ignored.md": "# Environment\n\nEnvironmentbeacon must never appear.\n",
+  ".git/forbidden.md": "# Metadata\n\nGitbeacon must never appear.\n",
+  ".env": "CLEAN_ROOM_SENTINEL=fixture-only-no-credential\n",
+  "private.key": "Fixture-only private-key filename sentinel; not a credential.\n",
+  ".tessera/index/forbidden.md": "# Derived\n\nDerivedbeacon must never appear.\n",
+  ".tessera-ignore": "# Frozen ignore subset\ndocs/decisions.md\ndocs/nested/\n!docs/nested/keep.md\n!.git/forbidden.md\n!.env\n!private.key\n!.tessera/index/forbidden.md\n"
+}
