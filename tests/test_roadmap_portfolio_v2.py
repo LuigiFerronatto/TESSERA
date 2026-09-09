@@ -29,7 +29,7 @@ def test_productization_v2_critical_path_is_explicit() -> None:
     for issue in ("#153", "#154"):
         assert "`VALIDATED`" in _row(text, issue)
     assert "`VALIDATED`" in _row(text, "#155")
-    assert "`IN_PROGRESS`" in _row(text, "#118")
+    assert "`VALIDATED`" in _row(text, "#118")
     for issue in ("#134",):
         assert "`BLOCKED`" in _row(text, issue)
 
@@ -76,7 +76,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
         "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
         "#25", "#26", "#27", "#28", "#32", "#67", "#69", "#70", "#71", "#72",
         "#73", "#78", "#80", "#87", "#103", "#104", "#105", "#106",
-        "#118", "#119", "#120", "#121", "#134",
+        "#119", "#120", "#121", "#134",
         "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
         "#157", "#158", "#159", "#160", "#161",
@@ -86,7 +86,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#135", "#153", "#154", "#155", "#172"):
+    for issue in ("#118", "#135", "#153", "#154", "#155", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -151,7 +151,7 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "no active blocker remains" in issue_155
 
     assert "#116/#117/#153/#154/#155 satisfied" in _row(text, "#118")
-    assert "#153/#154 are satisfied" in _row(text, "#134")
+    assert "Only remaining blocker: #87" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
     now_section = text.split("## Completed NOW positions", 1)[1].split("## NEXT", 1)[0]
@@ -170,9 +170,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 1
+    assert len(now_executable) == 0
 
-    assert "NOW executable                 1" in text
+    assert "NOW executable                 0" in text
     assert "READY                          6 total / 3 executable" in text
     assert "BLOCKED                        38 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

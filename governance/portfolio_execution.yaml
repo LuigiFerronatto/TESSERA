@@ -35,17 +35,17 @@ now:
     note: "Decomposer fallback integrity. Parallel Technical Integrity lane; fixes documented LLM failure -> heuristic fallback vs actual runtime LLM failure -> []."
   - issue: 118
     queue: 4
-    note: "Clean-room onboarding/CI bootstrap IN_PROGRESS; #155 canonically validated."
+    note: "Completed historical Queue 4: #118 VALIDATED/KEEP via #225 canonical 0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d. Closed; not active NOW WIP."
 next:
   - issue: 120
     queue: 5
-    note: "MCP transport/runtime robustness. Can run in parallel."
+    note: "MCP transport/runtime robustness. READY; next implementation after #118 post-merge lifecycle reconciliation."
   - issue: 87
     queue: 6
     note: "LICENSE/CONTRIBUTING owner decision. Can run in parallel; blocked on owner, not engineering."
   - issue: 134
     queue: 7
-    note: "PyPI release, after #118 + #87."
+    note: "PyPI release. #118 canonically VALIDATED; only #87 owner/legal decision remains blocking."
   - issue: 67
     queue: 8
   - issue: 12

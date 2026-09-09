@@ -124,7 +124,7 @@ tessera query "what is this project?" --json
 Para repetir `init --global NAME`, informe o mesmo store explicitamente; esse
 plano continua global mesmo dentro de um projeto configurado. Um symlink não
 selecionado continua excluído e não torna seu destino uma fonte proibida.
-Veja a evidência do candidato na [Test Card #118](test-cards/118-clean-room-onboarding.md).
+Veja a evidência validada após o merge na [Test Card #118](test-cards/118-clean-room-onboarding.md).
 
 `python -m pip uninstall tessera` remove o pacote e os comandos, preservando
 fontes, configuração, `.tessera-ignore` e memórias geradas. O índice derivado
