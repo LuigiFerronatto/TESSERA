@@ -66,13 +66,17 @@ checks; the earlier focused configuration/write/evidence matrix passed 144 tests
 Six historical static routing assertions were updated because #120 is now
 IN_PROGRESS / NOW, with one active executable card and two ready executable cards.
 
-The standalone stdio experiment passed **17 grouped protocol scenarios**, both
+The standalone stdio experiment passed **18 grouped protocol scenarios**, both
 in development and from the clean installed wheel outside the checkout. It
 covers handshake/negotiation, all ten tools, resources, strict arguments, evidence
 parity, provider absence/failure/invalid output/timeout/cancellation, concurrent
 queued/started writes and EOF during provider preparation/commit. Testing exposed
 a duplicate-response failure after a cancelled shielded write; delivering pending
 cancellation after the worker drains prevents the SDK from responding twice.
+A second real protocol regression reproduced the same failure when that writer
+raises `OSError`; the checkpoint now runs after lock release in `finally`,
+covering worker success and failure. The full suite was rerun: 542 passed,
+5 skipped, and all 18 scenarios passed in a newly created installed environment.
 
 `python -m build` produced a 34-entry wheel and 44-entry sdist. The wheel's runtime
 bytes match the checkout; the fresh MCP environment imports only installed
@@ -88,6 +92,13 @@ Project #9 dry-run after selecting #120 reported **changes = 0**.
 artifact inventories, installed location, protocol scenarios and quality metrics.
 Exact-head CI, independent Maintainer Audit and Merge Governor evidence belongs
 to the PR; none is inferred from the local checks.
+
+The predecessor `02a411a30621593bfd4c17fb620b9499a79bc892` passed all six
+[CI jobs](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596857),
+[Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596875)
+and [independent KEEP](https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606666989).
+The additional cancelled-writer-error regression and fix require fresh gates;
+that predecessor audit does not carry to the new head.
 
 ## Remaining boundary
 

@@ -67,10 +67,11 @@
       "queue/serialized-write/queued-cancel-or-timeout/started-write-completes",
       "write/serialized-write/queued-cancel-or-timeout/started-write-completes",
       "started-write-cancellation-is-not-rollback/lock-released",
+      "cancelled-failing-write/no-duplicate-response/session-survives",
       "EOF-cancels-assisted-preparation/no-late-write",
       "EOF-drains-started-write/clean-shutdown"
     ],
-    "check_count": 17,
+    "check_count": 18,
     "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
     "sdk": "1.30.0",
     "package_path": "/tmp/tessera-120-installed/lib/python3.12/site-packages/tessera/__init__.py",
@@ -84,13 +85,13 @@
     "public_exports": 42,
     "artifacts": {
       "tessera-3.4.0-py3-none-any.whl": {
-        "sha256": "86201004d560d2d35a143f3166252753da8b0c2663912c54c9907f1f7990c4eb",
-        "bytes": 130282,
+        "sha256": "96f317a4f073c08ac93ce95cec711319ecb87d9ae6edc57dff4751f70ca468ab",
+        "bytes": 130297,
         "entries": 34
       },
       "tessera-3.4.0.tar.gz": {
-        "sha256": "280f8a35191ebf83688c5a207f380b4ee8ac210fe235d2fea24fc5b719466081",
-        "bytes": 125789,
+        "sha256": "cc6d1036f9f82feba040d4a95ca17c87220096f88a23ba1424716b70dc683834",
+        "bytes": 125833,
         "entries": 44
       }
     },
@@ -122,10 +123,10 @@
   "file_sha256": {
     "tessera/__init__.py": "8f4965eb97a99ecba2cf626982534f9efdab7854d77224ffc332d3e26b7ee0e5",
     "tessera/mcp_server.py": "6e611d59c9d9111d2c72978e0f80c1bcaf28de219492e17bc8b407ee565db731",
-    "tessera/mcp_runtime.py": "42542670a43d66f4198afceef73c9c411631297e8fd6d47249991bbddf641b16",
+    "tessera/mcp_runtime.py": "3e10988f2d3a8db5ab2a7f5bfd20aad9a0e1b35ac981fb8b4a379ea1f3170e68",
     "tessera/mcp_transport.py": "bf745c59d8a313d575945b9ef760276846f146c45a342e6d898253f40e44fb90",
     "pyproject.toml": "4168bee4eea4ca0f356699c047e17dc82f98a4fd20d1ab94dc9177679c8c5376",
-    "scripts/clean_room/check_mcp.py": "603741bd22951125d4c439ff4845916342dcde0b158e5bb0f9c99f782129021e",
+    "scripts/clean_room/check_mcp.py": "1e0ad872efced191d668bf43e9aa50c5bcae27f7df1536b4c06a9107d0e4795f",
     ".github/workflows/tessera-ci.yml": "50924f4303593d8bb545829a549ae7a64868b3a4b6b1799bbc31415e1c3e6731"
   },
   "limitations": [
@@ -134,5 +135,19 @@
     "multi-note commits are not transactions",
     "provider threads are bounded but not forcibly killed",
     "human merge and post-merge reconciliation pending"
-  ]
+  ],
+  "cancellation_error_regression": {
+    "before": "Cancelling a writer that subsequently raises OSError triggers SDK Request already responded to and kills the session.",
+    "after": "Release the lock and deliver cancellation in finally for both worker success and failure.",
+    "real_stdio_reproduced": true,
+    "installed_wheel_regression_passed": true
+  },
+  "predecessor_remote_evidence": {
+    "head": "02a411a30621593bfd4c17fb620b9499a79bc892",
+    "ci": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596857",
+    "benchmark": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596875",
+    "audit": "https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606666989",
+    "audit_decision": "KEEP",
+    "carries_to_new_head": false
+  }
 }

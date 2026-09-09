@@ -5,7 +5,7 @@
 | Issue | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` / MCP transport |
-| Pull request | Implementation PR linked from #120; exact head in PR evidence |
+| Pull request | [#229](https://github.com/LuigiFerronatto/TESSERA/pull/229); exact head in PR evidence |
 | Merge commit | Not merged |
 | Decision | Pending exact-head validation and independent audit |
 | Benchmark applicability | `SMOKE_ONLY`; retrieval remains unchanged |
@@ -74,7 +74,7 @@ Required acceptance gates, fixed before final validation:
   protocol experiment against installed `site-packages`.
 - Base Python 3.9/3.12 regression suite and unchanged deterministic sanity metrics.
 
-Local candidate: 542 passed, 5 skipped; 17 real protocol scenarios passed from
+Local candidate: 542 passed, 5 skipped; 18 real protocol scenarios passed from
 a clean installed MCP wheel. Sanity quality metrics are unchanged.
 
 Evidence and final counts are recorded in [PR Evolution Audit](../PR_EVOLUTION_120.md).

@@ -144,7 +144,7 @@ server = create_server(
     ConfigurationResolver(environ={}).resolve(project=root), provider=provider,
     request_timeout=float(os.environ["TESSERA_MCP_FIXTURE_TIMEOUT"]),
 )
-if mode in ("write", "queue"):
+if mode in ("write", "queue", "write-error"):
     # Keep the actual wire schema; delay only the committed Engine write.
     original_start = server.runtime.get_engine
     def start():
@@ -155,6 +155,8 @@ if mode in ("write", "queue"):
             def slow_write(*args, **kwargs):
                 (root / "write-started").touch()
                 time.sleep(0.4)
+                if mode == "write-error":
+                    raise OSError("fixture-write-error")
                 return write(*args, **kwargs)
             engine.write_memory_note_result = slow_write
         return engine
@@ -338,6 +340,15 @@ def run(root):
         assert payload(client.call("query_memories", {"query": "SQLite"}))
     checks.append("started-write-cancellation-is-not-rollback/lock-released")
 
+    (root / "write-started").unlink(missing_ok=True)
+    with server(root, mode="write-error") as client:
+        client.initialize()
+        rid = client.send("tools/call", write_args("cancel-failed-write"))
+        wait_marker(root / "write-started")
+        client.send("notifications/cancelled", {"requestId": rid}, notification=True)
+        time.sleep(0.5)
+        assert payload(client.call("query_memories", {"query": "SQLite"}))
+    checks.append("cancelled-failing-write/no-duplicate-response/session-survives")
     before = fingerprint(root)
     (root / "provider-started").unlink(missing_ok=True)
     with server(root, mode="cancel") as client:

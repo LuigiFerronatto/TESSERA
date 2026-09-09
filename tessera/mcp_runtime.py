@@ -153,10 +153,6 @@ class MCPRuntime:
                     return self._bound_call(function)
 
                 result = await anyio.to_thread.run_sync(run_owned)
-                # The SDK already acknowledges cancellation. Deliver pending
-                # cancellation after draining the worker, before it can emit a
-                # second response for the same request.
-                await anyio.lowlevel.checkpoint()
                 return result
             except _QueueTimeout:
                 raise TimeoutError from None
@@ -168,6 +164,10 @@ class MCPRuntime:
                 raise
         finally:
             self._lock.release()
+            # Deliver pending cancellation after success OR failure. The SDK
+            # already acknowledged it; emitting another response kills the
+            # session. Release the Engine lock before this checkpoint can raise.
+            await anyio.lowlevel.checkpoint()
 
     async def _assisted(self, function, deadline, engine=None):
         import anyio
