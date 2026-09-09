@@ -29,11 +29,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Build wheel and sdist
         run: |
-          python -m pip install --upgrade pip build twine
-          python -m build
-          python -m twine check dist/*
+          uv build
+          uvx twine check dist/*
       - name: Verify release metadata and artifact boundary
         env:
           RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
