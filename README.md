@@ -489,9 +489,13 @@ Repository changes follow an Issue/Test Card → PR → evaluation → decision 
 
 ## Contributing
 
-Issues and pull requests are welcome. Behavior changes should be linked to an Issue/Test Card and include reproducible evidence rather than relying only on “tests passed.”
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests, the Issue/Test Card and PR
+workflow, evaluation requirements and review expectations.
 
-A dedicated `CONTRIBUTING.md` is tracked separately; until it is versioned, the PR contract above is the repository contribution baseline.
+## License
+
+TESSERA is licensed under the [MIT License](LICENSE). Preserve the separate
+copyright and license notices supplied with third-party code and assets.
 
 ## Contributors
 

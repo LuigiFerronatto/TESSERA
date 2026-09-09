@@ -41,6 +41,9 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   runtime behavior changed).
 
 ### Added
+- The standalone MIT license now accompanies wheel and source distributions;
+  the repository includes a contribution guide linked from the README.
+  ([#87](https://github.com/LuigiFerronatto/TESSERA/issues/87))
 - `tessera init` now provides one safe initialization plan across interactive,
   non-interactive, dry-run and JSON modes: generated-memory location, validated
   source discovery and recommended/custom/memory-only selection, explicit

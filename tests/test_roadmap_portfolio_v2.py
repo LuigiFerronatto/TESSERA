@@ -102,7 +102,9 @@ def test_trackers_and_owner_decision_cannot_masquerade_as_ready_execution() -> N
 
     issue_87 = _row(text, "#87")
     assert "| ADMIN |" in issue_87
-    assert "`BLOCKED`" in issue_87
+    assert "`IN_PROGRESS`" in issue_87
+    assert "owner-confirmed candidate" in issue_87
+    assert "direct #134 blocker" in issue_87
 
 
 def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
@@ -176,6 +178,6 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "NOW executable                 0" in text
     assert "READY                          6 total / 3 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
-    assert len(blocked_full_cards) == 35
-    assert "BLOCKED                        35 full cards + #16 full phase" in text
+    assert len(blocked_full_cards) == 34
+    assert "BLOCKED                        34 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

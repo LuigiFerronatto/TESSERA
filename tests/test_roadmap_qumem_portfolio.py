@@ -27,7 +27,7 @@ def test_roadmap_tracks_productization_v2_and_release_routing() -> None:
     assert "`READY`" in _markdown_table_row(text, "#121")
     assert "`BLOCKED`" in _markdown_table_row(text, "#134")
     assert "#117/#118 are satisfied; #153/#154/#155 are canonically validated" in _markdown_table_row(text, "#134")
-    assert "`BLOCKED`" in _markdown_table_row(text, "#87")
+    assert "`IN_PROGRESS`" in _markdown_table_row(text, "#87")
 
 
 def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery() -> None:

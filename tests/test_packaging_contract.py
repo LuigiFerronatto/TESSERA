@@ -48,6 +48,8 @@ def test_metadata_and_entry_points_match_the_public_contract() -> None:
     assert project["name"] == "tessera"
     assert project["version"] == "3.4.0"
     assert project["license"] == "MIT"
+    assert project["license-files"] == ["LICENSE"]
+    assert (ROOT / "LICENSE").is_file()
     assert project["scripts"] == {
         "tessera": "tessera.cli:main",
         "tessera-mcp": "tessera.mcp_server:main",

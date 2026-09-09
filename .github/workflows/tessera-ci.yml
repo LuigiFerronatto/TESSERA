@@ -66,6 +66,10 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import glob
+          import hashlib
+          import json
+          from email.parser import BytesParser
+          from pathlib import Path
           import tarfile
           import zipfile
 
@@ -76,8 +80,29 @@ jobs:
 
           with zipfile.ZipFile(wheel[0]) as archive:
               wheel_names = archive.namelist()
+              metadata_name = next(name for name in wheel_names if name.endswith(".dist-info/METADATA"))
+              wheel_metadata = BytesParser().parsebytes(archive.read(metadata_name))
+              license_name = metadata_name.removesuffix("METADATA") + "licenses/LICENSE"
+              assert archive.read(license_name) == Path("LICENSE").read_bytes()
           with tarfile.open(sdist[0]) as archive:
               sdist_names = [name.split("/", 1)[-1] for name in archive.getnames()]
+              root = archive.getnames()[0].split("/", 1)[0]
+              sdist_metadata = BytesParser().parsebytes(archive.extractfile(f"{root}/PKG-INFO").read())
+              assert archive.extractfile(f"{root}/LICENSE").read() == Path("LICENSE").read_bytes()
+              assert archive.extractfile(f"{root}/CONTRIBUTING.md").read() == Path("CONTRIBUTING.md").read_bytes()
+
+          for metadata in (wheel_metadata, sdist_metadata):
+              assert metadata["License-Expression"] == "MIT"
+              assert metadata.get_all("License-File") == ["LICENSE"]
+          Path("artifacts/clean-room/license.json").write_text(json.dumps({
+              "expression": wheel_metadata["License-Expression"],
+              "license_files": wheel_metadata.get_all("License-File"),
+              "license_sha256": hashlib.sha256(Path("LICENSE").read_bytes()).hexdigest(),
+              "wheel_path": license_name,
+              "sdist_path": "LICENSE",
+              "sdist_contribution_guide_matches": True,
+              "license_bytes_match": True,
+          }, indent=2) + "\n")
 
           for label, names in (("wheel", wheel_names), ("sdist", sdist_names)):
               leaked = [name for name in names if name.startswith(forbidden)]
@@ -142,6 +167,12 @@ jobs:
           package_path = pathlib.Path(tessera.__file__).resolve()
           assert "site-packages" in package_path.parts
           assert importlib.metadata.version("tessera") == tessera.__version__ == "3.4.0"
+          distribution = importlib.metadata.distribution("tessera")
+          assert distribution.metadata["License-Expression"] == "MIT"
+          assert distribution.metadata.get_all("License-File") == ["LICENSE"]
+          assert distribution.read_text("licenses/LICENSE") == (
+              pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "LICENSE"
+          ).read_text(encoding="utf-8")
           assert TesseraEngine.__module__ == "tessera.engine"
           for public_name in tessera.__all__:
               assert getattr(tessera, public_name) is not None
