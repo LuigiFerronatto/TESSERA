@@ -479,7 +479,7 @@ def main():
     try:
         moved = exp.exercise()
         preserved = snapshot(args.root)
-        uninstall = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "tessera"],
+        uninstall = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "tessera-agent-memory"],
                                    capture_output=True, text=True, check=True, timeout=60)
         assert not Path(exp.cli).exists()
         assert not (Path(exp.cli).parent / ("tessera-mcp.exe" if os.name == "nt" else "tessera-mcp")).exists()
