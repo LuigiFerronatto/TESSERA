@@ -2,9 +2,9 @@
 
 ## Candidate lifecycle
 
-- Issue #87: OPEN / IN_PROGRESS, NOW / Queue 6, selected by the owner's request.
+- Issue #87: OPEN / IMPLEMENTED, NOW / Queue 6; PR merged, issue closure by maintainer still pending.
 - Starting main: `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` (#232 merged; #231 closed).
-- Branch: `test-card/87-license-contribution`; review candidate in PR #233, not merged.
+- Branch: `test-card/87-license-contribution`; final candidate head `c27ede1b6552e9a2b3a0f51a41185c558186e895`, merged in PR #233 as canonical commit `d473f230b914908fcaad3a46291b5046bde6b918`.
 - Classification: repository governance and packaging metadata.
 - Benchmark: `NOT_APPLICABLE`; no runtime, retrieval, corpus or benchmark change.
 - Owner confirmation: **CONFIRMED** on 2026-09-09. The owner answered
@@ -12,7 +12,7 @@
   `Copyright (c) 2026 Luigi Ferronatto`. The agent recorded that conversation
   [decision](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368);
   it is not inferred from Git history, package authors, or account identity.
-- #134 remains BLOCKED by #87. No legal completion or release authorization is claimed.
+- #134 remains BLOCKED by #87's outstanding lifecycle closure (issue still open). No legal completion or release authorization is claimed.
 
 ## Relevant delivery history
 
@@ -43,9 +43,9 @@ site/vendor content are preserved; no submodule or vendor license is rewritten.
 - CI: check wheel/sdist metadata and exact license bytes, retain archive ownership
   and installed runtime smoke checks, and verify the installed license outside
   the checkout. The existing Python 3.9/3.12 matrix is unchanged.
-- Lifecycle: #87 is IN_PROGRESS / ADMIN / NOW / Queue 6; no executable runtime WIP
-  is added. The blocked matrix count drops by one because this owner-requested
-  card is now in progress; #134 stays blocked, and #121 stays LATER / Queue 43.
+- Lifecycle: #87 is IMPLEMENTED / ADMIN / NOW / Queue 6; PR #233 merged as
+  `d473f230b914908fcaad3a46291b5046bde6b918`; no executable runtime WIP was
+  added. #134 stays blocked pending #87's issue closure, and #121 stays LATER / Queue 43.
 
 ## Technical evidence
 
@@ -86,8 +86,13 @@ exact-head checks are required and recorded in PR #233.
 
 ## Remaining decisions
 
-The owner prerequisite is satisfied. Required human review and canonical merge
-remain pending. If the notice changes, rebuild the artifact proof and rerun
-exact-head CI and audit. After approved merge, record the canonical SHA and reconcile #87;
-only then reassess #134 under its separate release gates. No publication, legal
-ownership determination, CLA/DCO policy or downstream implementation is included.
+The owner prerequisite is satisfied. PR #233 was merged as canonical commit
+`d473f230b914908fcaad3a46291b5046bde6b918` (final candidate head
+`c27ede1b6552e9a2b3a0f51a41185c558186e895`); pre-merge CI/Benchmark Ledger and
+the Maintainer Audit (`KEEP`, no P0/P1) passed on that head, and the Merge
+Governor authorized the merge. Issue #87 itself remains open in GitHub
+metadata pending maintainer closure — this reconciliation records the
+canonical merge SHA but does not itself close the issue. #134's release gates
+are reassessed separately and remain BLOCKED until #87's lifecycle closure. No
+publication, legal ownership determination, CLA/DCO policy or downstream
+implementation is included.

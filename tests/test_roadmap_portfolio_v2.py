@@ -102,7 +102,7 @@ def test_trackers_and_owner_decision_cannot_masquerade_as_ready_execution() -> N
 
     issue_87 = _row(text, "#87")
     assert "| ADMIN |" in issue_87
-    assert "`IN_PROGRESS`" in issue_87
+    assert "`IMPLEMENTED`" in issue_87
     assert "owner-confirmed candidate" in issue_87
     assert "direct #134 blocker" in issue_87
 

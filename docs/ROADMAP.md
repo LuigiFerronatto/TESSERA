@@ -10,6 +10,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #120 post-merge reconciliation (2026-09-09): PR #229 merged as `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; canonical CI and Benchmark Ledger passed. #120 is `VALIDATED / KEEP`, historical Queue 5. #121 is READY / LATER / Queue 43; no implementation is selected by dependency readiness.
 
+> #87 post-merge reconciliation (2026-09-09): PR #233 merged as `d473f230b914908fcaad3a46291b5046bde6b918` (final candidate head `c27ede1b6552e9a2b3a0f51a41185c558186e895`); pre-merge CI/Benchmark Ledger and Maintainer Audit (`KEEP`, no P0/P1) passed on that head, and the Merge Governor authorized the merge. #87 moves `IN_PROGRESS -> IMPLEMENTED`. Issue #87 itself remains open in GitHub metadata pending maintainer closure, so this is not yet `VALIDATED` (no canonical-SHA CI/Benchmark Ledger run has been recorded against `d473f230...` on `main`). #134 stays `BLOCKED`: its sole blocker's PR is merged, but formal lifecycle closure of #87 (issue closure) has not occurred, so #134 is not promoted to `READY` by this reconciliation.
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
@@ -140,10 +142,11 @@ full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NOW
 
-#87 LICENSE / CONTRIBUTING is IN_PROGRESS at Queue 6, selected by the owner
-for the repository/legal entrypoint. The owner [confirmed MIT and the notice](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368)
-on 2026-09-09; required human review and canonical merge remain pending.
-This ADMIN task adds no executable runtime WIP. #134 remains blocked by #87.
+#87 LICENSE / CONTRIBUTING is IMPLEMENTED at Queue 6. The owner [confirmed MIT and the notice](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368)
+on 2026-09-09; PR #233 merged as `d473f230b914908fcaad3a46291b5046bde6b918`, satisfying
+the required human review/merge gate. Issue #87 itself remains open pending maintainer
+closure, so this is `IMPLEMENTED`, not yet `VALIDATED`. This ADMIN task adds no
+executable runtime WIP. #134 remains blocked by #87's outstanding lifecycle closure.
 
 #120 has completed historical Queue 5. #121 remains READY / LATER / Queue 43,
 unselected. No release or downstream implementation is selected by this work.
@@ -169,7 +172,7 @@ NOW — Product foundation
 3  #16  Conflict resolver containment       VALIDATED (`KEEP`; `708c973e...`)
 4  #118 Clean-room onboarding                  VALIDATED (`KEEP`; `0ee5bbfe...`)
 5  #120 MCP transport/runtime robustness    VALIDATED (`KEEP`; `b4ead4d...`)
-6  #87  LICENSE / CONTRIBUTING              IN_PROGRESS (human review and merge pending)
+6  #87  LICENSE / CONTRIBUTING              IMPLEMENTED (`d473f230...`; issue closure pending)
 7  #134 PyPI release
 -> TESSERA can be installed, configured, index a real project, and be used via MCP.
 
@@ -270,7 +273,7 @@ FIRST PUBLIC RELEASE
           -> #118 clean onboarding VALIDATED
               -> #134 PyPI release BLOCKED
 
-#87 owner-approved LICENSE/contribution decision
+#87 owner-approved LICENSE/contribution decision, merged `d473f230b914908fcaad3a46291b5046bde6b918`
   -------------------------------------> #134
 
 
@@ -373,8 +376,9 @@ evidence — they are not scheduled as a terminal "phase 15".
 #87 LICENSE / copyright ownership / CONTRIBUTING
 ```
 
-`#87` is the remaining direct release blocker (queue #6; #120 is complete) and must not
-be solved by an agent inventing legal ownership.
+`#87` merged as `d473f230b914908fcaad3a46291b5046bde6b918` (queue #6; #120 is complete). Issue
+#87 itself remains open pending maintainer closure; this reconciliation must not
+be treated as an independent legal ownership determination.
 
 ## Automation noise (`[aw]`)
 
@@ -463,7 +467,7 @@ Parallel product surfaces:
 #116/#117/#153/#154/#155/#118 are canonically satisfied. #118 validated the
 installed-artifact contract on Python 3.9/3.12 and merged as
 `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`. Its #134 prerequisite is satisfied;
-#87 is the only remaining release blocker.
+#87 is the last blocker requiring formal lifecycle closure.
 
 The first PyPI release does not require #119/#120/#121 unless those cards discover a release-contract blocker before publication.
 
@@ -685,8 +689,8 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) | open | `DEFERRED` | EXECUTABLE | CLI | Previous/live `READY` umbrella intentionally parked while #155 semantics stabilize; #166 owns presentation architecture. |
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | closed | `VALIDATED` | FOUNDATION | Agent Integration | `KEEP`; historical Queue 5. PR #229 candidate `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211`, canonical squash merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; one runtime delivery. [Test Card](test-cards/120-mcp-runtime-robustness.md). Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `READY` | EXECUTABLE | Agent Integration | #116/#117/#120/#68/#92 satisfied; official Skills only. LATER / Queue 43, unselected; dependent implementation waits for lifecycle reconciliation to merge. |
-| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `IN_PROGRESS` | ADMIN | Release | NOW / Queue 6; owner-confirmed candidate LICENSE/CONTRIBUTING and artifact checks. Required human review and canonical merge remain pending; direct #134 blocker. [Test Card](test-cards/87-license-contribution.md). |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Only remaining blocker: #87 canonical merge and lifecycle; owner decision confirmed. #117/#118 are satisfied; #153/#154/#155 are canonically validated. No publication starts from this reconciliation. |
+| [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | open | `IMPLEMENTED` | ADMIN | Release | NOW / Queue 6; owner-confirmed candidate LICENSE/CONTRIBUTING and artifact checks merged as PR #233, canonical merge `d473f230b914908fcaad3a46291b5046bde6b918`. Issue #87 remains open pending maintainer closure; direct #134 blocker until closed. [Test Card](test-cards/87-license-contribution.md). |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `BLOCKED` | RELEASE_GATE | Productization | Only remaining blocker: #87's lifecycle closure (PR merged `d473f230b914908fcaad3a46291b5046bde6b918`, issue still open). #117/#118 are satisfied; #153/#154/#155 are canonically validated. No publication starts from this reconciliation. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
 | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) dependency satisfied; source episode/supporting turns/temporal position. |
@@ -967,16 +971,16 @@ After #155, #135, the #16 P0 containment, #118 onboarding and #120 MCP deliverie
 #118 Clean-room onboarding / CI bootstrap       VALIDATED / KEEP — historical Queue 4
 #120 MCP transport/runtime robustness           VALIDATED / KEEP — historical Queue 5
 #121 Official Skills                            READY / LATER — Queue 43 (unselected)
-#87  LICENSE / CONTRIBUTING                     IN_PROGRESS — Queue 6; human review and merge pending
-#134 PyPI release                              BLOCKED only on #87
+#87  LICENSE / CONTRIBUTING                     IMPLEMENTED — Queue 6; merged `d473f230...`, issue closure pending
+#134 PyPI release                              BLOCKED only on #87's lifecycle closure
 ```
 
 #118 proved the installed configuration/discovery/init contract; its canonical
 merge and green post-merge gates satisfy #134's #118 prerequisite. #120 is also
 canonically validated, satisfying #121's remaining capability prerequisite. #121
-retains Queue 43; #87 now has owner confirmation, while this record does not bypass
-its human review and canonical merge,
-promote #134, select new NOW work or implement Skills.
+retains Queue 43; #87 is now merged as `d473f230b914908fcaad3a46291b5046bde6b918`, while
+Issue #87 itself remains open pending maintainer closure. This record does not bypass
+that lifecycle closure to promote #134, select new NOW work or implement Skills.
 
 Keep #157 deliberately deferred. #119/#121, enrichment, model/intelligence,
 hooks, setup and conversation import retain their separate ownership.
@@ -1000,7 +1004,7 @@ PRODUCTIZATION / RELEASE
                  -> #155 VALIDATED
                      -> #118 VALIDATED
                          -> #134 BLOCKED
-#87 ADMIN IN_PROGRESS (human review and merge pending) --^
+#87 ADMIN IMPLEMENTED (`d473f230...`; issue closure pending) --^
 
 #120 VALIDATED -> #121 READY (LATER / Queue 43)
 #119/#166 DEFERRED

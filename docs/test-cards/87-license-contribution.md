@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) |
-| Record status | `IN_PROGRESS`; owner confirmed, human review and merge pending |
+| Record status | `IMPLEMENTED`; owner confirmed, PR merged; issue closure by maintainer pending |
 | Capability type | Repository governance / packaging metadata |
-| Pull request | [#233](https://github.com/LuigiFerronatto/TESSERA/pull/233); exact head recorded in PR evidence |
-| Merge commit | Not merged |
-| Decision | MIT and notice confirmed by owner; exact-head review and merge pending |
+| Pull request | [#233](https://github.com/LuigiFerronatto/TESSERA/pull/233); final candidate head `c27ede1b6552e9a2b3a0f51a41185c558186e895` |
+| Merge commit | `d473f230b914908fcaad3a46291b5046bde6b918` (canonical, on `main`) |
+| Decision | MIT and notice confirmed by owner; PR merged 2026-09-09 |
 | Benchmark applicability | `NOT_APPLICABLE`; runtime and retrieval unchanged |
-| Last audited | 2026-09-09; main `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` |
+| Last audited | 2026-09-09; main `d473f230b914908fcaad3a46291b5046bde6b918` |
 
 ## In one sentence
 
@@ -81,8 +81,9 @@ selection of #121. Existing third-party notices remain with their files.
 
 ## What is unlocked next?
 
-#134 stays BLOCKED until the owner-approved #87 candidate is merged and reconciled
-canonically. Release engineering and publication then follow #134's own gates.
+#134 stays BLOCKED until #87's lifecycle is closed (issue closure); PR #233 is merged
+canonically as `d473f230b914908fcaad3a46291b5046bde6b918`. Release engineering and
+publication then follow #134's own gates.
 
 ## Technical provenance
 
@@ -100,6 +101,6 @@ canonically. Release engineering and publication then follow #134's own gates.
 MIT metadata, missing repository/distribution license and contribution guide
 -> #87 owner-requested proposal, IN_PROGRESS / NOW / Queue 6
 -> explicit owner confirmation recorded on 2026-09-09
--> exact-head review -> canonical merge -> lifecycle
--> reassess #134; no release or downstream work starts in this candidate
+-> exact-head review passed -> PR #233 merged as `d473f230b914908fcaad3a46291b5046bde6b918`
+-> reassess #134; no release or downstream work starts in this candidate; issue #87 closure by maintainer still pending
 ```
