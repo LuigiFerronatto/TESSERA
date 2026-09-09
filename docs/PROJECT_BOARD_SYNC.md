@@ -74,6 +74,12 @@ experiment; the manifest therefore routes that single open Project item to
 `LATER` / Queue `24`, while lifecycle documentation preserves the completed
 historical Queue `3` delivery.
 
+#120 is now closed / VALIDATED via #229, so its Project item is Done and historical
+NOW / Queue 5 does not consume active WIP. #121 is READY after that prerequisite
+was satisfied, while the manifest retains LATER / Queue 43. Dependency readiness
+alone never selects an implementation; dependent work waits for the lifecycle
+reconciliation to merge before branching from fresh main.
+
 ## Sources of truth (architecture decision)
 
 Two independent sources feed the classifier, deliberately kept separate to

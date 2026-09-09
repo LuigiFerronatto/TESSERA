@@ -373,7 +373,7 @@ raiz do projeto e imprime o bloco JSON com `TESSERA_STORAGE_DIR` pronto para `.m
 
 ## MCP — Tools disponíveis (servidor `tessera`)
 
-A candidata #120 usa o envelope `1.0`: leia resultados em `data` e falhas em
+A implementação validada da #120 usa o envelope `1.0`: leia resultados em `data` e falhas em
 `error` (`isError=true`). Inicie com `tessera-mcp --project /caminho/absoluto`.
 Configuração, seleção de provedor e cancelamento: [contrato MCP](MCP_RUNTIME.md).
 

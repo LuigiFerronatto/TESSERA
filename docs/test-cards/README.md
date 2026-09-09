@@ -38,7 +38,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
-| #120 MCP transport/runtime | `IN_PROGRESS` | [120-mcp-runtime-robustness.md](120-mcp-runtime-robustness.md) | [Issue #120](https://github.com/LuigiFerronatto/TESSERA/issues/120), [PR Evolution Audit](../PR_EVOLUTION_120.md), Queue 5; not merged |
+| #120 MCP transport/runtime | `VALIDATED` | [120-mcp-runtime-robustness.md](120-mcp-runtime-robustness.md) | [Issue #120](https://github.com/LuigiFerronatto/TESSERA/issues/120), [PR Evolution Audit](../PR_EVOLUTION_120.md), historical Queue 5; [PR #229](https://github.com/LuigiFerronatto/TESSERA/pull/229), canonical merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`, `KEEP` |
 | #118 Clean installed-artifact onboarding | `VALIDATED` | [118-clean-room-onboarding.md](118-clean-room-onboarding.md) | [Issue #118](https://github.com/LuigiFerronatto/TESSERA/issues/118), [PR Evolution Audit](../PR_EVOLUTION_118.md), historical Queue 4; [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225), canonical merge `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`, `KEEP` |
 | #68 Engine/CLI/MCP retrieval parity | `VALIDATED` | [68-retrieval-contract-parity.md](68-retrieval-contract-parity.md) | [Issue #68](https://github.com/LuigiFerronatto/TESSERA/issues/68), [PR #98](https://github.com/LuigiFerronatto/TESSERA/pull/98) |
 | #74 Core vs optional LLM boundary | `VALIDATED` architecture decision | [74-core-vs-optional-llm-boundary.md](74-core-vs-optional-llm-boundary.md) | [Issue #74](https://github.com/LuigiFerronatto/TESSERA/issues/74), [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [ADR 0001](../adr/0001-core-vs-optional-llm-boundary.md) |

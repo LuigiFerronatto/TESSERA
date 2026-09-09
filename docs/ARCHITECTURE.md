@@ -445,8 +445,8 @@ Two additional Foundation gaps are explicit rather than implied:
 The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
 
 Direct Engine retrieval, CLI JSON query output and MCP `query_memories()` use
-the same lossless evidence contract; #68 closed that parity gap. The #120
-candidate also preserves the full typed-store `query_store()` result, including
+the same lossless evidence contract; #68 closed that parity gap. The validated #120
+implementation also preserves the full typed-store `query_store()` result, including
 evidence/provenance, inside its versioned transport envelope. See
 [MCP runtime contract](MCP_RUNTIME.md) for the migration to `data`.
 
@@ -480,7 +480,8 @@ CLI start / MCP pipeline / task hook
 → LLM-generated context + raw_memories
 ```
 
-The #120 candidate starts an explicitly configured Engine in its MCP lifespan,
+The validated #120 implementation starts an explicitly configured Engine in its
+MCP lifespan,
 selects optional providers at server construction and runs assisted work over
 disposable inputs before commit. Import is free of configuration/index activity.
 Generic startup performs no provider probing; generated context still has no

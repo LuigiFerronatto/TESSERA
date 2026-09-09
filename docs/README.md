@@ -213,5 +213,5 @@ update research decision trace if an external idea materially influenced the cha
 
 Do not let a feature become “implemented” only in a PR description. If it changes the product contract, current documentation and product history should move with it.
 
-- [MCP runtime contract](MCP_RUNTIME.md): #120 candidate startup, stdio, schema, errors and cancellation.
+- [MCP runtime contract](MCP_RUNTIME.md): #120 validated startup, stdio, schema, errors and cancellation.
 - [#120 Test Card](test-cards/120-mcp-runtime-robustness.md) and [evolution audit](PR_EVOLUTION_120.md).
