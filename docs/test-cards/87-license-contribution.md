@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) |
-| Record status | `IN_PROGRESS`; owner confirmation pending |
+| Record status | `IN_PROGRESS`; owner confirmed, human review and merge pending |
 | Capability type | Repository governance / packaging metadata |
-| Pull request | Draft candidate; exact PR/head recorded in issue evidence |
+| Pull request | [#233](https://github.com/LuigiFerronatto/TESSERA/pull/233); exact head recorded in PR evidence |
 | Merge commit | Not merged |
-| Decision | Pending explicit owner confirmation of license text and copyright, then review/merge |
+| Decision | MIT and notice confirmed by owner; exact-head review and merge pending |
 | Benchmark applicability | `NOT_APPLICABLE`; runtime and retrieval unchanged |
 | Last audited | 2026-09-09; main `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` |
 
@@ -35,9 +35,11 @@ an explicit `project.license-files = ["LICENSE"]` declaration and distribution
 checks for byte-identical license payloads and metadata. The sdist includes the
 contribution guide; the wheel contains the runtime plus its license metadata.
 
-The proposed notice is **Copyright (c) 2026 Luigi Ferronatto**. This is a draft
-for owner review, not a finding of legal ownership. The owner must confirm or
-correct both the license and notice before merge, as required by issue #87.
+The owner confirmed the presented MIT proposal and notice
+**Copyright (c) 2026 Luigi Ferronatto** on 2026-09-09 with “Confirmo a adocao!”.
+The [recorded decision](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368)
+satisfies #87's explicit owner prerequisite. The license bytes are unchanged;
+this records the owner's decision, not an independent ownership determination.
 
 ## How does it work now?
 
@@ -72,7 +74,8 @@ to existing repository contracts instead of duplicating them.
 
 ## What remains unimplemented?
 
-Owner approval is still pending. There is no PyPI publication, release workflow,
+Required human review and canonical merge are still pending. There is no PyPI
+publication, release workflow,
 package rename, version bump, CLA/DCO introduction, runtime change or automatic
 selection of #121. Existing third-party notices remain with their files.
 
@@ -96,6 +99,7 @@ canonically. Release engineering and publication then follow #134's own gates.
 ```text
 MIT metadata, missing repository/distribution license and contribution guide
 -> #87 owner-requested proposal, IN_PROGRESS / NOW / Queue 6
--> explicit owner decision -> review -> canonical merge -> lifecycle
+-> explicit owner confirmation recorded on 2026-09-09
+-> exact-head review -> canonical merge -> lifecycle
 -> reassess #134; no release or downstream work starts in this candidate
 ```

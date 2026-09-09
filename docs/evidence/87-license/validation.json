@@ -3,8 +3,7 @@
   "baseline_sha": "31df35e2885bcb81efbe3b9f87fdf8b15a858a4b",
   "classification": "GOVERNANCE / PACKAGING_METADATA",
   "benchmark_applicability": "NOT_APPLICABLE",
-  "owner_confirmation": "PENDING",
-  "proposed_copyright_notice": "Copyright (c) 2026 Luigi Ferronatto",
+  "owner_confirmation": "CONFIRMED",
   "build_method": "python -m build; isolated wheel rebuilt from sdist",
   "artifacts": {
     "baseline": {
@@ -83,5 +82,13 @@
     "installed_metadata": "passed",
     "relative_document_links": "passed",
     "git_diff_check": "passed"
+  },
+  "copyright_notice": "Copyright (c) 2026 Luigi Ferronatto",
+  "owner_confirmation_evidence": {
+    "date": "2026-09-09",
+    "source": "https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368",
+    "response": "Confirmo a adocao!",
+    "scope": "Presented standard MIT license and Copyright (c) 2026 Luigi Ferronatto; unchanged license bytes",
+    "recorded_by": "Implementation agent from the owner conversation; not a formal GitHub review"
   }
 }

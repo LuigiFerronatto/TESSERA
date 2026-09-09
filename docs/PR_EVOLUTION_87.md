@@ -4,12 +4,14 @@
 
 - Issue #87: OPEN / IN_PROGRESS, NOW / Queue 6, selected by the owner's request.
 - Starting main: `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` (#232 merged; #231 closed).
-- Branch: `test-card/87-license-contribution`; draft, not merged.
+- Branch: `test-card/87-license-contribution`; review candidate in PR #233, not merged.
 - Classification: repository governance and packaging metadata.
 - Benchmark: `NOT_APPLICABLE`; no runtime, retrieval, corpus or benchmark change.
-- Owner confirmation: **PENDING**. Proposed MIT notice:
-  `Copyright (c) 2026 Luigi Ferronatto`. It is a review proposal, not ownership
-  inferred from Git history, package authors, or account identity.
+- Owner confirmation: **CONFIRMED** on 2026-09-09. The owner answered
+  “Confirmo a adocao!” to the presented MIT proposal and
+  `Copyright (c) 2026 Luigi Ferronatto`. The agent recorded that conversation
+  [decision](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368);
+  it is not inferred from Git history, package authors, or account identity.
 - #134 remains BLOCKED by #87. No legal completion or release authorization is claimed.
 
 ## Relevant delivery history
@@ -30,7 +32,7 @@ site/vendor content are preserved; no submodule or vendor license is rewritten.
 ## Scope and implementation
 
 - LICENSE: standard [MIT text](https://opensource.org/license/mit), with the notice
-  proposed above for explicit confirmation before merge.
+  confirmed above by the owner; the approved file bytes are unchanged.
 - CONTRIBUTING.md: setup, tests, Issue/Test Card, PR, benchmark, change policy and
   existing lifecycle/review links; no new contributor agreement or duplicated
   architecture contract.
@@ -59,7 +61,7 @@ archives and installed metadata to the license hash. Both builds use
 | Wheel inventory | 34 entries | 35 entries |
 | Sdist inventory | 44 entries | 46 entries |
 | Runtime/package-data payload | 29 files | All 29 byte-identical |
-| Owner confirmation | Missing | Still pending; not inferred from technical success |
+| Owner confirmation | Missing | Confirmed by owner conversation; linked decision above |
 
 The actual CI archive-inspection block passes against the isolated candidate
 build. A fresh venv installs the wheel with `--no-deps` for metadata-only
@@ -71,10 +73,21 @@ Local packaging, documentation, governance and routing checks passed: **157 pass
 passed. Technical results and exact-head remote gates are attached to the PR. They do not
 constitute legal approval, final KEEP, canonical delivery or #134 readiness.
 
+## Owner confirmation follow-up
+
+The confirmation follow-up changes only documentation, routing notes and the
+matching static assertion. LICENSE, CONTRIBUTING.md, distribution metadata, CI
+implementation and all runtime files retain their previously tested bytes.
+The license SHA-256 remains
+`38eec562894f2a06058f36ea90d29cd09c36e03b65a1c62403674b76f47e45ed`.
+CI/ledger and the independent KEEP audit on predecessor
+`8ff52517b4fad86904fce357962492bec11ca0b9` remain historical evidence; fresh
+exact-head checks are required and recorded in PR #233.
+
 ## Remaining decisions
 
-The owner must confirm the license text and exact copyright holder/year before
-merge. If the notice changes, rebuild the artifact proof and rerun exact-head CI
-and audit. After approved merge, record the canonical SHA and reconcile #87;
+The owner prerequisite is satisfied. Required human review and canonical merge
+remain pending. If the notice changes, rebuild the artifact proof and rerun
+exact-head CI and audit. After approved merge, record the canonical SHA and reconcile #87;
 only then reassess #134 under its separate release gates. No publication, legal
 ownership determination, CLA/DCO policy or downstream implementation is included.
