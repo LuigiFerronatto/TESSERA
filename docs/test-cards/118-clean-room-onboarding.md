@@ -5,10 +5,10 @@
 | Issue | [#118](https://github.com/LuigiFerronatto/TESSERA/issues/118) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` / distribution validation |
-| Pull request | Candidate publication pending |
+| Pull request | [#225](https://github.com/LuigiFerronatto/TESSERA/pull/225) |
 | Head commit | Exact candidate and CI evidence recorded in the PR |
 | Merge commit | Not merged |
-| Decision | `PENDING` |
+| Decision | `KEEP` candidate; exact-head audit/merge gate remains independent |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-09-09 |
 
@@ -129,8 +129,18 @@ filesystem obstruction at `graph.pkl` forces failure after config persistence;
 the experiment observes partial state and removes only the obstruction before
 retrying. No runtime function is replaced to create that failure.
 
-Final test counts, measured metrics, artifacts and exact-head CI/audit links are
-recorded in the PR and [PR Evolution Audit](../PR_EVOLUTION_118.md).
+The completed local matrix used Python 3.9.25 and 3.12.13; each passed 67 installed
+CLI commands plus observation probes, including successful uninstall. The clean
+full suite passed **538 tests, 5 skipped**. Canonical sanity stayed Hit@1 0.75,
+Hit@3/5 1.00, MRR 0.875 and evidence hit 1.00. The predecessor CI matrix also
+passed on Python 3.9.25/3.12.14. The strengthened final gate additionally compares
+filesystem mtimes, exercises read-only source files and checks human partial-failure
+output.
+
+[Versioned measurements, inventories, hashes and TTY transcripts](../evidence/118-clean-room/validation.json)
+identify their measured candidate explicitly. The final PR body and CI artifact
+links bind the final exact head; neither predecessor evidence nor candidate KEEP
+substitutes for its independent audit or canonical merge.
 
 ## What improved?
 

@@ -306,9 +306,11 @@ extras do not change ownership of reasoning or final-answer policy.
 
 Storage resolution is deterministic: an explicit command/API path wins, then
 `TESSERA_STORAGE_DIR`, then the deprecated `LAO_MEM_DIR` compatibility alias,
-then `./memories`. The canonical variable always outranks the alias, alias use
-warns on the human-facing channel, and no project-specific directory is
-auto-discovered. An explicitly supplied path remains valid regardless of name.
+then the nearest project config, then an explicitly named global store. The CLI
+fails with an actionable error if none is selected. The direct Python
+compatibility resolver retains its historical `./memories` fallback. The
+canonical variable outranks the alias, which emits a deprecation warning;
+discovery never scans an ancestor's source corpus or merges global knowledge.
 
 Existing project-specific assisted users can migrate through the deprecated
 explicit boundary while moving to an application-owned `llm_fn`:

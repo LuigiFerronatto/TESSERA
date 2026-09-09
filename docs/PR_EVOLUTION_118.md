@@ -8,7 +8,8 @@
 - Canonical merge: none. Final candidate SHA is bound by the PR's head and its
   exact-head CI/Maintainer Audit, not a claim of merged delivery.
 - Benchmark applicability: `SMOKE_ONLY`.
-- Decision: `PENDING` until installed experiments and independent audit finish.
+- Candidate decision: `KEEP`. Final exact-head CI and independent Maintainer Audit
+  remain mandatory review gates; see [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225).
 
 ## Relevant delivery history
 
@@ -57,6 +58,21 @@ experiments use the wheel directly and prove imports originate in the temporary
 venv's `site-packages`. Neither editable installs nor checkout imports count as
 installed-artifact evidence.
 
+Candidate validation: **538 passed, 5 skipped** in the clean full suite; **62**
+focused init/discovery regressions, **96** routing/documentation checks, and **54
+passed, 5 skipped** packaging/governance checks. Both local installed environments
+passed 67 console commands plus probes and uninstall. TESSERA CI
+[34362352380](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34362352380)
+passed its Python 3.9/3.12 distributions, full suites, CLI smoke and sanity for
+candidate `3f0088a45c991ba6a39c36b2d90c599d351b44d3`. This is predecessor evidence:
+the final artifact checkout now explicitly uses the PR head rather than the
+synthetic merge ref.
+
+[Versioned evidence](evidence/118-clean-room/validation.json) includes artifact
+inventories/hashes, local Python/installer versions, all fixture source hashes,
+config, counts, timings, TTY/cancel transcripts, partial-state and uninstall
+results. Baseline and after sanity quality metrics are identical.
+
 See the PR's final evidence record for final source SHA, distribution inventory,
 hashes/sizes, Python/build/installer versions, source fixture hashes, durations,
 query/rebuild comparisons, test counts, sanity after and exact-head CI links.
@@ -90,9 +106,12 @@ query/rebuild comparisons, test counts, sanity after and exact-head CI links.
 
 ## Decision
 
-Pending final installed experiments and independent exact-head audit. KEEP is
-permitted only when the complete clean-room contract passes. An open green PR
-still remains IN_PROGRESS and requires independent maintainer review.
+**KEEP the candidate**: the installed-artifact contract passed on Python 3.9 and
+3.12, both reproduced runtime defects have focused regressions, and the held-
+constant sanity corpus is unchanged. The inherited checkout defect is repaired
+without moving/deleting site files or changing its gitlink commit. Independent
+Maintainer Audit and CI must bind the final head before review readiness is
+reported. The PR remains IN_PROGRESS and unmerged; KEEP does not authorize merge.
 
 ## Scope and downstream routing
 

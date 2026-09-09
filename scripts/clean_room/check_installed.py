@@ -396,9 +396,16 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         assert not failure["partial_state"]["index_applied"]
         assert (p / ".tessera/config.yaml").is_file()
         assert (p / "memories/generated").is_dir()
+        partial_files = snapshot(p / ".tessera/index")
+        human = self.run(p, ["init", "--project", ".", "--store", "memories/generated",
+                             "--sources", "recommended", "--non-interactive", "--plain"], code=3)
+        assert "Next:" not in human and "✔ TESSERA configured" not in human
+        assert "Initialization incomplete:" in self.commands[-1]["stderr"]
         obstruction.rmdir()
         recovered = self.init(p)
-        self.cases["failures"] = {"preflight": reports, "partial": failure, "recovered": recovered}
+        self.cases["failures"] = {"preflight": reports, "partial": failure,
+                                  "index_directory_preexisted": True,
+                                  "partial_index_files": partial_files, "recovered": recovered}
 
     def tty_cases(self):
         p = self.fixture("tty")
