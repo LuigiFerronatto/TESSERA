@@ -24,3 +24,4 @@ def test_release_workflow_scopes_oidc_to_publish_job() -> None:
     assert "pull_request" not in text
     assert "RELEASE_TAG" in build
     assert "tessera-agent-memory" in build
+    assert "0.0.1" in build
