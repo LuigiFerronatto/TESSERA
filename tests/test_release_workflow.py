@@ -6,7 +6,7 @@ WORKFLOW = Path(__file__).parents[1] / ".github" / "workflows" / "release.yml"
 
 def test_release_workflow_is_tagged_and_separates_build_from_publish() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert 'tags: ["v[0-9]+.[0-9]+.[0-9]+"]' in text
+    assert 'tags: ["v*"]' in text
     assert "name: Build and attest release artifacts" in text
     assert "name: Publish to PyPI through Trusted Publishing" in text
     assert "needs: build" in text

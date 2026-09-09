@@ -2,7 +2,7 @@ name: TESSERA Release
 
 on:
   push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       tag:
@@ -39,12 +39,13 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           python - <<'PY'
-          import hashlib, os, pathlib, tarfile, zipfile
+          import hashlib, os, pathlib, re, tarfile, zipfile
           import tomllib
           root = pathlib.Path(".")
           project = tomllib.loads((root / "pyproject.toml").read_text())['project']
           assert project['name'] == 'tessera-agent-memory'
           version = project['version']
+          assert re.fullmatch(r'v\d+\.\d+\.\d+', os.environ['RELEASE_TAG'])
           assert os.environ['RELEASE_TAG'] == f'v{version}'
           artifacts = sorted(pathlib.Path('dist').iterdir())
           assert len(artifacts) == 2
