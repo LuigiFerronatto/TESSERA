@@ -1,6 +1,6 @@
 # MCP runtime contract 1.0
 
-The #120 candidate exposes the existing TESSERA tools over **stdio**. The Python
+The validated #120 implementation (PR #229) exposes the existing TESSERA tools over **stdio**. The Python
 Engine remains the source of retrieval, evidence and write admission. Semantic
 agent-memory API #171 is separate. This candidate is not yet canonically merged.
 

@@ -1,0 +1,122 @@
+{
+  "issue": 120,
+  "implementation_pr": 229,
+  "status": "VALIDATED",
+  "decision": "KEEP",
+  "final_candidate_sha": "09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211",
+  "canonical_merge_sha": "b4ead4d7407b8caa2571e1e366616a468f2ef74f",
+  "candidate_and_merge_tree": "ba83c25de97b9b0fe9d0ff6b5bdc44a335be7ea0",
+  "runtime_deliveries": 1,
+  "merged_at": "2026-09-09T18:33:43Z",
+  "benchmark_applicability": "SMOKE_ONLY",
+  "canonical_ci": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760629",
+  "canonical_benchmark": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760516",
+  "candidate_audit": "https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606803789",
+  "candidate_governor": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389456722",
+  "installed_matrix": {
+    "3.9": {
+      "python": "3.9.25 (main, Nov  3 2025, 15:16:36) \n[GCC 13.3.0]",
+      "source_sha": "b4ead4d7407b8caa2571e1e366616a468f2ef74f",
+      "passed": true,
+      "installed_cli_commands": 68,
+      "source_integrity_checkpoints": 69,
+      "source_files_modified": 0,
+      "uninstall": {
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "temporary_state_removed": true,
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "b12ec38199c9c898dd22811b410fa910d292295deecaede5fe5843012434088e",
+          "bytes": 130297,
+          "inventory_entries": 34
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "d1aca300024a2edda2f58035a19279f550c3a1487bd1113a867ccf1fcc3cc900",
+          "bytes": 125398,
+          "inventory_entries": 44
+        }
+      },
+      "report_sha256": {
+        "build.json": "0975b19a5391d9143e277de53b21c3eea853f760db7fab2ef988dca449bc4009",
+        "environment.json": "1a603edc933a7bb96234502a23dd3e53351118cd5ce5bd988e4809c3fb0bf144",
+        "installed.json": "bdb1ecbe3e2ca1e1fd0cb4be055eb68d839b4a2ef6d00cb9d5e361138511cc94"
+      }
+    },
+    "3.12": {
+      "python": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+      "source_sha": "b4ead4d7407b8caa2571e1e366616a468f2ef74f",
+      "passed": true,
+      "installed_cli_commands": 68,
+      "source_integrity_checkpoints": 69,
+      "source_files_modified": 0,
+      "uninstall": {
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "temporary_state_removed": true,
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "8ba5184e9017752e824387159a1da3a3e9a19e50c023279a6b80fe2ccf372623",
+          "bytes": 130297,
+          "inventory_entries": 34
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "3b0cb62c9ada47c52789661a45ba424eac480ff2eb2ea82c94a95baa938bd09d",
+          "bytes": 125435,
+          "inventory_entries": 44
+        }
+      },
+      "report_sha256": {
+        "build.json": "ef7dffd1e53622396c418d91225f422f22fe13f5078c947dddc66d1aa95661e7",
+        "environment.json": "65caa90257009698553769524c939e3c4083cc8a9c9ce95c3a7e3020160c850a",
+        "installed.json": "c7aba101df1444e732cff169daa53407e8bb2f0e5e5615c0af1795e602994660"
+      }
+    }
+  },
+  "installed_mcp": {
+    "passed": true,
+    "checks": [
+      "initialize/version/capabilities/ping",
+      "lossless/full-and-typed-retrieval/evidence/order/provenance",
+      "strict-request-validation/unknown-tool/missing-provider/protocol-error",
+      "health/configuration-v2/composition/rebuild/doctor/quickstart-dry-run",
+      "resources/raw-markdown/versioned-json/structured-not-found",
+      "canonical-write/gate-rejection/index-refresh",
+      "provider-failure/nonmutation/retrieval-survives",
+      "provider-invalid/nonmutation/retrieval-survives",
+      "provider-slow/nonmutation/retrieval-survives",
+      "real-cancellation/no-late-provider-write/continued-session",
+      "explicit-provider/successful-gated-decomposition/pipeline-evidence",
+      "empty-provider-output-is-not-generated-success",
+      "queue/serialized-write/queued-cancel-or-timeout/started-write-completes",
+      "write/serialized-write/queued-cancel-or-timeout/started-write-completes",
+      "started-write-cancellation-is-not-rollback/lock-released",
+      "cancelled-failing-write/no-duplicate-response/session-survives",
+      "EOF-cancels-assisted-preparation/no-late-write",
+      "EOF-drains-started-write/clean-shutdown"
+    ],
+    "check_count": 18,
+    "python": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "sdk": "1.30.0",
+    "package_path": "/tmp/tmp.AsqbC75jzw/venv/lib/python3.12/site-packages/tessera/__init__.py",
+    "source_sha256": "091bec1f68e60df8ada3e16d7b5b676277d2cca7058ac7e27aacb150671f4918",
+    "report_sha256": "c76fa5a835893bc682c857f6ab7445b09b134f9cb3c5dc53d1a1347d756ce95b"
+  },
+  "canonical_sanity": {
+    "dataset": "tessera-sanity-ci-v2-project-agnostic",
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "average_latency_ms": 10.57388225000011,
+    "average_returned_chars": 417.75,
+    "missing_evidence_check": "passed",
+    "report_sha256": "f2a32ff363f74c9cd7d34dbb44ed50fccfd9246b12814b8d6b6bcae0d060178d"
+  }
+}

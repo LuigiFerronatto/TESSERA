@@ -38,7 +38,7 @@ now:
     note: "Completed historical Queue 4: #118 VALIDATED/KEEP via #225 canonical 0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d. Closed; not active NOW WIP."
   - issue: 120
     queue: 5
-    note: "MCP transport/runtime robustness. IN_PROGRESS from canonical lifecycle a88600b4; active Queue 5."
+    note: "Completed historical Queue 5: #120 VALIDATED/KEEP via #229 canonical b4ead4d7407b8caa2571e1e366616a468f2ef74f. Closed; not active NOW WIP."
 next:
   - issue: 87
     queue: 6
@@ -124,6 +124,7 @@ later:
     queue: 42
   - issue: 121
     queue: 43
+    note: "READY after #120 canonical validation; dependency readiness does not select NOW or change Queue 43. Start only from main after lifecycle reconciliation merges."
   - issue: 193
     queue: 44
   - issue: 19

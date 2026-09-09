@@ -5,11 +5,13 @@
 - **Decision owner:** TESSERA architecture governance / issue #74
 - **Benchmark applicability:** `NOT_APPLICABLE`
 
-## Implementation reconciliation — #120 candidate, 2026-09-09
+## Implementation reconciliation — #120 canonical merge, 2026-09-09
 
 The historical observations below retain the accepted decision's provenance.
-The unmerged #120 candidate supersedes its MCP startup/reduced-projection
-observations: import is lazy, an explicit configured Engine starts in lifespan,
+PR #229 merged as `b4ead4d7407b8caa2571e1e366616a468f2ef74f` with KEEP and
+green canonical CI/ledger. This validated #120 implementation supersedes the
+historical MCP startup/reduced-projection observations: import is lazy, an explicit
+configured Engine starts in lifespan,
 `query_store` preserves full evidence, and stdio responses/errors have contract
 `1.0`. Optional provider preparation is separate from persistence; remote assisted
 failure cannot write heuristic fallback notes. Python/CLI #135 fallback remains.

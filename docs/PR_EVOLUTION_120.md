@@ -2,7 +2,7 @@
 
 ## Canonical lifecycle
 
-- Issue #120: OPEN / IN_PROGRESS, Queue 5.
+- Issue #120: CLOSED / VALIDATED, historical Queue 5.
 - Branch: `test-card/120-mcp-runtime-robustness`.
 - Starting main: `a88600b491528cddb746bf909a303aefabf01e45`.
 - #227/#228 merged and #227 closed before this branch started. Main
@@ -10,9 +10,11 @@
   [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34383633763)
   succeeded on that SHA.
 - Classification: runtime implementation; benchmark `SMOKE_ONLY`.
-- Candidate: the implementation PR head; exact SHA is recorded in PR evidence.
-  Canonical merge: not merged.
-- Decision: pending exact-head validation and independent audit.
+- Final candidate: `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211`.
+- Canonical squash merge: `b4ead4d7407b8caa2571e1e366616a468f2ef74f`, PR #229,
+  merged 2026-09-09. Both commits have tree
+  `ba83c25de97b9b0fe9d0ff6b5bdc44a335be7ea0`: one runtime delivery.
+- Decision: `KEEP`; exact-head independent audit and green canonical CI/ledger.
 
 ## Delivery history consumed
 
@@ -63,8 +65,12 @@ typed retrieval drops eight existing evidence/traceability fields.
 
 Candidate: **542 passed, 5 skipped**, including four new ownership/real-protocol
 checks; the earlier focused configuration/write/evidence matrix passed 144 tests.
-Six historical static routing assertions were updated because #120 is now
-IN_PROGRESS / NOW, with one active executable card and two ready executable cards.
+The implementation updated historical routing assertions for its then-current
+IN_PROGRESS / NOW state. The post-merge correction records zero active executable
+cards and three ready executable cards, including #121 at its existing Queue 43.
+The blocked summary is recomputed from the matrix: 35 full cards plus #16 full
+phase. The prior header said 38 although its rows contained 36; #121 accounts
+for the only blocked-to-ready transition, and no other issue is promoted.
 
 The standalone stdio experiment passed **18 grouped protocol scenarios**, both
 in development and from the clean installed wheel outside the checkout. It
@@ -97,14 +103,40 @@ The predecessor `02a411a30621593bfd4c17fb620b9499a79bc892` passed all six
 [CI jobs](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596857),
 [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34387596875)
 and [independent KEEP](https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606666989).
-The additional cancelled-writer-error regression and fix require fresh gates;
-that predecessor audit does not carry to the new head.
+The additional cancelled-writer-error regression and fix required fresh gates;
+that predecessor audit did not carry to the final head.
+
+## Final candidate and canonical validation
+
+The final candidate `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211` passed
+[all six CI jobs](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34388445296),
+[Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34388445277),
+[independent KEEP with no supported P0/P1 findings](https://github.com/LuigiFerronatto/TESSERA/pull/229#issuecomment-5606803789)
+and [Merge Governor](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389456722)
+before the human merge. #120 closed automatically.
+
+After merge, [canonical CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760629)
+and [canonical Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760516)
+passed on `b4ead4d7407b8caa2571e1e366616a468f2ef74f`. Downloaded reports prove
+the installed Python 3.9/3.12 artifact paths, 68 CLI commands and 69 unchanged-source
+checkpoints per version, successful uninstall, and 18 installed MCP stdio
+scenarios. [Canonical evidence](evidence/120-mcp/canonical-merge.json) binds those
+reports to the merge SHA. Sanity metrics remain unchanged; no new LongMemEval
+experiment is claimed.
+
+This lifecycle correction is `DOCUMENTATION_CORRECTION`, benchmark
+`NOT_APPLICABLE`. It updates records, current documentation, the ordering manifest
+and existing static assertions. It does not deliver runtime behavior a second time.
+#121 becomes READY / LATER / Queue 43, with no NOW selection. #171's #120
+prerequisite is satisfied while #167/#169 and durable-remember semantics remain
+separate. #87 stays an owner/legal decision at Queue 6; #134 remains blocked only
+by #87. Dependent implementation waits for this lifecycle PR to merge.
 
 ## Remaining boundary
 
 No #171 semantic API, #167 packet, #169 compiler, #121 Skills, release or owner/legal
 decision is absorbed. No provider failure can schedule a late memory commit.
 Started writes are not cancellable transactions; multi-note storage failures may
-leave earlier admitted notes. No lifecycle record is marked VALIDATED until human
-merge and canonical reconciliation. Candidate and canonical merge will count as
-one delivery.
+leave earlier admitted notes. The completed #120 scope is VALIDATED after human
+merge and canonical checks. Candidate and canonical merge count as one delivery;
+this documentation correction neither selects nor implements downstream work.

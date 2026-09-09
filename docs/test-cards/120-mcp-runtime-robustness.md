@@ -3,13 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime` / MCP transport |
-| Pull request | [#229](https://github.com/LuigiFerronatto/TESSERA/pull/229); exact head in PR evidence |
-| Merge commit | Not merged |
-| Decision | Pending exact-head validation and independent audit |
+| Pull request | [#229](https://github.com/LuigiFerronatto/TESSERA/pull/229), merged 2026-09-09 |
+| Final candidate | `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211` |
+| Merge commit | `b4ead4d7407b8caa2571e1e366616a468f2ef74f` |
+| Decision | `KEEP`; independent exact-head audit and green canonical CI/ledger |
 | Benchmark applicability | `SMOKE_ONLY`; retrieval remains unchanged |
-| Last audited | 2026-09-09; starting main `a88600b491528cddb746bf909a303aefabf01e45` |
+| Last audited | 2026-09-09; canonical merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f` |
 
 ## In one sentence
 
@@ -79,6 +80,12 @@ a clean installed MCP wheel. Sanity quality metrics are unchanged.
 
 Evidence and final counts are recorded in [PR Evolution Audit](../PR_EVOLUTION_120.md).
 
+The candidate and canonical merge have the same tree and count as one runtime
+delivery. [Canonical CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760629)
+and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34389760516)
+passed after merge. Downloaded installed-artifact/protocol reports are summarized
+in [canonical evidence](../evidence/120-mcp/canonical-merge.json).
+
 ## What improved?
 
 Startup, errors and persistence ownership become explicit, while typed retrieval
@@ -93,8 +100,10 @@ threads, and semantic API #171 remain unimplemented. This card does not implemen
 
 ## What is unlocked next?
 
-After human merge and lifecycle reconciliation, #121 can be reassessed. #171 still
-requires its own semantic prerequisites. #134 remains blocked only by #87.
+#121 is READY with all its declared dependencies satisfied. It remains LATER /
+Queue 43, unselected; implementation starts only from fresh main after this
+lifecycle reconciliation merges. #171's MCP prerequisite is satisfied, but its
+semantic prerequisites remain unresolved. #134 remains blocked only by #87.
 
 ## Technical provenance
 
@@ -112,6 +121,8 @@ requires its own semantic prerequisites. #134 remains blocked only by #87.
 ```text
 #116 packaging + #117/#153 configuration + #118 clean installed onboarding
 -> #227/#228 lifecycle merged, gate satisfied
--> #120 IN_PROGRESS, Queue 5, isolated branch from current main
--> exact-head validation/audit -> human merge -> lifecycle reconciliation
+-> #120 candidate 09dff4d... validated/audited KEEP
+-> #229 human merge b4ead4d... -> canonical CI/ledger passed
+-> #120 VALIDATED / KEEP, historical Queue 5 (one runtime delivery)
+-> #121 READY / LATER / Queue 43; no downstream implementation selected
 ```

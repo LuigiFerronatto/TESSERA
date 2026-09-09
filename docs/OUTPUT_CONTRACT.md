@@ -364,7 +364,7 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
 - `frontmatter` remains a compatibility surface; canonical semantics should be preferred internally.
 - Human CLI formatting is not a formal machine serialization protocol.
 - MCP `query_memories()` and `query_store()` preserve their complete Engine
-  results. The #120 candidate wraps wire results as contract `1.0` with
+  results. The validated #120 implementation wraps wire results as contract `1.0` with
   `schema_version`, `operation`, `data`, and `error`; clients read results from
   `data`. See [MCP runtime contract](MCP_RUNTIME.md).
 - Generated context from the legacy assisted orchestrator is derived output,
