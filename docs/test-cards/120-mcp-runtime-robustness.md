@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (VALIDATED pending canonical post-merge CI/Benchmark Ledger confirmation) |
 | Capability type | `runtime` / MCP transport |
-| Pull request | [#229](https://github.com/LuigiFerronatto/TESSERA/pull/229); exact head in PR evidence |
-| Merge commit | Not merged |
-| Decision | Pending exact-head validation and independent audit |
+| Pull request | [#229](https://github.com/LuigiFerronatto/TESSERA/pull/229); candidate head `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211` |
+| Merge commit | `b4ead4d7407b8caa2571e1e366616a468f2ef74f` (merged into `main`) |
+| Decision | `KEEP`, from the independent Maintainer Audit on the exact candidate; no supported P0/P1 findings |
 | Benchmark applicability | `SMOKE_ONLY`; retrieval remains unchanged |
-| Last audited | 2026-09-09; starting main `a88600b491528cddb746bf909a303aefabf01e45` |
+| Last audited | 2026-09-09; merged onto main base `a88600b491528cddb746bf909a303aefabf01e45` |
 
 ## In one sentence
 
@@ -93,7 +93,9 @@ threads, and semantic API #171 remain unimplemented. This card does not implemen
 
 ## What is unlocked next?
 
-After human merge and lifecycle reconciliation, #121 can be reassessed. #171 still
+#120 merged as PR #229 (`b4ead4d7407b8caa2571e1e366616a468f2ef74f`). #121 remains
+`BLOCKED` until #120's canonical post-merge CI/Benchmark Ledger evidence confirms
+`VALIDATED` status; this record does not promote #121 on merge alone. #171 still
 requires its own semantic prerequisites. #134 remains blocked only by #87.
 
 ## Technical provenance
@@ -102,6 +104,7 @@ requires its own semantic prerequisites. #134 remains blocked only by #87.
 |---|---|
 | Canonical prerequisite | #118/#225 `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d` |
 | Lifecycle gate | #227/#228 `a88600b491528cddb746bf909a303aefabf01e45`, green main CI/ledger |
+| Canonical merge | #120/#229 `b4ead4d7407b8caa2571e1e366616a468f2ef74f` |
 | Runtime | `tessera/mcp_server.py`, `mcp_runtime.py`, `mcp_transport.py` |
 | Transport contract | [MCP runtime](../MCP_RUNTIME.md) |
 | Protocol experiment | `scripts/clean_room/check_mcp.py` |
@@ -112,6 +115,7 @@ requires its own semantic prerequisites. #134 remains blocked only by #87.
 ```text
 #116 packaging + #117/#153 configuration + #118 clean installed onboarding
 -> #227/#228 lifecycle merged, gate satisfied
--> #120 IN_PROGRESS, Queue 5, isolated branch from current main
--> exact-head validation/audit -> human merge -> lifecycle reconciliation
+-> #120 exact-head validation/audit, independent KEEP, Merge Governor SUCCESS
+-> merged as PR #229 (`b4ead4d7407b8caa2571e1e366616a468f2ef74f`)
+-> canonical post-merge CI/Benchmark Ledger confirmation -> VALIDATED -> #121 reassessed
 ```

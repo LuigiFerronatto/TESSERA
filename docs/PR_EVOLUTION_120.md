@@ -2,7 +2,7 @@
 
 ## Canonical lifecycle
 
-- Issue #120: OPEN / IN_PROGRESS, Queue 5.
+- Issue #120: CLOSED / IMPLEMENTED (VALIDATED pending canonical post-merge CI/Benchmark Ledger confirmation).
 - Branch: `test-card/120-mcp-runtime-robustness`.
 - Starting main: `a88600b491528cddb746bf909a303aefabf01e45`.
 - #227/#228 merged and #227 closed before this branch started. Main
@@ -10,9 +10,11 @@
   [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/34383633763)
   succeeded on that SHA.
 - Classification: runtime implementation; benchmark `SMOKE_ONLY`.
-- Candidate: the implementation PR head; exact SHA is recorded in PR evidence.
-  Canonical merge: not merged.
-- Decision: pending exact-head validation and independent audit.
+- Candidate: PR #229 head `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211`.
+- Canonical merge: `b4ead4d7407b8caa2571e1e366616a468f2ef74f` (PR #229, merged into `main`).
+- Decision: `KEEP`, from the independent Maintainer Audit on the exact candidate above,
+  with no supported P0/P1 findings. Exact-head CI, Benchmark Ledger and Merge
+  Governor all passed prior to merge.
 
 ## Delivery history consumed
 
@@ -105,6 +107,7 @@ that predecessor audit does not carry to the new head.
 No #171 semantic API, #167 packet, #169 compiler, #121 Skills, release or owner/legal
 decision is absorbed. No provider failure can schedule a late memory commit.
 Started writes are not cancellable transactions; multi-note storage failures may
-leave earlier admitted notes. No lifecycle record is marked VALIDATED until human
-merge and canonical reconciliation. Candidate and canonical merge will count as
-one delivery.
+leave earlier admitted notes. #120 is `IMPLEMENTED` as of the canonical merge
+`b4ead4d7407b8caa2571e1e366616a468f2ef74f`; it is not marked `VALIDATED` until
+canonical post-merge CI/Benchmark Ledger evidence on that merge commit is
+confirmed. Candidate and canonical merge count as one delivery.
