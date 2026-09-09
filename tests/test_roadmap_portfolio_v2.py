@@ -28,8 +28,9 @@ def test_productization_v2_critical_path_is_explicit() -> None:
 
     for issue in ("#153", "#154"):
         assert "`VALIDATED`" in _row(text, issue)
-    assert "`READY`" in _row(text, "#155")
-    for issue in ("#118", "#134"):
+    assert "`VALIDATED`" in _row(text, "#155")
+    assert "`IN_PROGRESS`" in _row(text, "#118")
+    for issue in ("#134",):
         assert "`BLOCKED`" in _row(text, issue)
 
 
@@ -78,14 +79,14 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
         "#118", "#119", "#120", "#121", "#134",
         "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
-        "#155", "#157", "#158", "#159", "#160", "#161",
+        "#157", "#158", "#159", "#160", "#161",
         "#162", "#163", "#164", "#165", "#166", "#167", "#168", "#169",
         "#170", "#171",
     )
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#135", "#153", "#154", "#172"):
+    for issue in ("#135", "#153", "#154", "#155", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -118,9 +119,9 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 4, ready_executable
+    assert len(ready_executable) == 3, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
-    assert any("[#155]" in line for line in ready_executable)
+    assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
     assert any("[#136]" in line for line in ready_executable)
     assert any("[#137]" in line for line in ready_executable)
@@ -146,10 +147,10 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "`IN_PROGRESS`" not in issue_154
 
     issue_155 = _row(text, "#155")
-    assert "`READY`" in issue_155
+    assert "`VALIDATED`" in issue_155
     assert "no active blocker remains" in issue_155
 
-    assert "remaining blocker is #155" in _row(text, "#118")
+    assert "#116/#117/#153/#154/#155 satisfied" in _row(text, "#118")
     assert "#153/#154 are satisfied" in _row(text, "#134")
     assert "#153 and #74 are satisfied" in _row(text, "#157")
 
@@ -169,9 +170,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 0
+    assert len(now_executable) == 1
 
-    assert "NOW executable                 0" in text
-    assert "READY                          7 total / 4 executable" in text
-    assert "BLOCKED                        39 full cards + #16 full phase" in text
+    assert "NOW executable                 1" in text
+    assert "READY                          6 total / 3 executable" in text
+    assert "BLOCKED                        38 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text

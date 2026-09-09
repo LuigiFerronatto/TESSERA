@@ -337,7 +337,7 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#116")
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
-    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#118")
     assert "`DEFERRED`" in _markdown_table_row(roadmap, "#119")
     assert "`READY`" in _markdown_table_row(roadmap, "#120")
     assert "`BLOCKED`" in _markdown_table_row(roadmap, "#121")
@@ -375,7 +375,7 @@ def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
     ).read_text(encoding="utf-8")
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
-    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#118")
     assert "`DEFERRED`" in _markdown_table_row(roadmap, "#119")
     assert "`READY`" in _markdown_table_row(roadmap, "#120")
     for issue in ("#121", "#134", "#67"):
@@ -454,8 +454,8 @@ def test_issue_154_validated_lifecycle_preserves_discovery_boundaries() -> None:
     assert "closed" in issue_154
     assert "`VALIDATED`" in issue_154
     assert "`IN_PROGRESS`" not in issue_154
-    assert "`READY`" in issue_155
-    assert "`BLOCKED`" in _markdown_table_row(roadmap, "#118")
+    assert "`VALIDATED`" in issue_155
+    assert "`IN_PROGRESS`" in _markdown_table_row(roadmap, "#118")
     assert "`BLOCKED`" in _markdown_table_row(roadmap, "#134")
 
     for marker in (

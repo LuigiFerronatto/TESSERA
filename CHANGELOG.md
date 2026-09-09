@@ -82,6 +82,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 - Pull requests now use PR Contract v2 with explicit change classification, contract-surface impact, Evaluation Card, changelog decision, public-surface invariants and known-regression disclosure. ([#66](https://github.com/LuigiFerronatto/TESSERA/issues/66))
 
 ### Fixed
+- Repeating explicit named-global initialization inside a configured project
+  now preserves the accepted global store, and unselected symlinks to selected
+  files no longer cause false config-doctor or repeat-init failures. Symlinks
+  remain excluded from the source corpus.
+  ([#118](https://github.com/LuigiFerronatto/TESSERA/issues/118))
 - Default Engine, CLI, MCP and assisted retrieval no longer discard older
   factual/preference candidates through the coarse `first entity + first tag`
   newest-only heuristic. Possible-conflict evidence now remains ranked and

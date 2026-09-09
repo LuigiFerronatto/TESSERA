@@ -113,6 +113,24 @@ O formato posicional antigo (`tessera init ./memories`) continua como alias de
 compatibilidade, conservador e store-only. Para novos scripts, prefira as flags
 explícitas acima.
 
+Com uma configuração local, os próximos comandos não precisam de caminho:
+
+```bash
+tessera doctor --plain
+tessera index --plain
+tessera query "what is this project?" --json
+```
+
+Para repetir `init --global NAME`, informe o mesmo store explicitamente; esse
+plano continua global mesmo dentro de um projeto configurado. Um symlink não
+selecionado continua excluído e não torna seu destino uma fonte proibida.
+Veja a evidência do candidato na [Test Card #118](test-cards/118-clean-room-onboarding.md).
+
+`python -m pip uninstall tessera` remove o pacote e os comandos, preservando
+fontes, configuração, `.tessera-ignore` e memórias geradas. O índice derivado
+também permanece; sua remoção opcional deve atingir apenas o `index.path`
+configurado. Depois de reinstalar, `tessera index` o reconstrói.
+
 ---
 
 ### `tessera write <dir> [flags]` — gravar uma nova nota (write-gated)

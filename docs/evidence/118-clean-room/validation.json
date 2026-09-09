@@ -1,0 +1,534 @@
+{
+  "audited_main": "112ae63c9ba1d8ffbe6ed3f2edf439d7dbe5b3a0",
+  "measured_candidate": "3f0088a45c991ba6a39c36b2d90c599d351b44d3",
+  "note": "Final exact-head CI artifacts and audit are linked from PR #225. Measurements here record the completed predecessor experiment; final evidence must independently pass the same or stronger gate.",
+  "ci_reference": "https://github.com/LuigiFerronatto/TESSERA/actions/runs/34362352380",
+  "build": {
+    "source_sha": "3f0088a45c991ba6a39c36b2d90c599d351b44d3",
+    "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
+    "build": "1.6.0",
+    "seconds": 5.652293864999592
+  },
+  "matrix": {
+    "3.9": {
+      "passed": true,
+      "python": "3.9.25 (main, Oct 31 2025, 23:00:23) \n[Clang 21.1.4 ]",
+      "installer": "pip 23.0.1 from /tmp/tessera-118-oej32n0u/venv/lib/python3.9/site-packages/pip (python 3.9)",
+      "import_origin": "/tmp/tessera-118-oej32n0u/venv/lib/python3.9/site-packages/tessera/__init__.py",
+      "version": "3.4.0",
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "6e6a80212a63403590e813781fdb2dce3e4e94b61979bff09dd6d88ca678adca",
+          "bytes": 123130,
+          "inventory": [
+            "tessera/__init__.py",
+            "tessera/canonical.py",
+            "tessera/cli.py",
+            "tessera/config.py",
+            "tessera/conflict.py",
+            "tessera/decomposer.py",
+            "tessera/diagnostics.py",
+            "tessera/display.py",
+            "tessera/engine.py",
+            "tessera/engine_core.py",
+            "tessera/episode_boundary.py",
+            "tessera/evidence.py",
+            "tessera/hooks.py",
+            "tessera/init_flow.py",
+            "tessera/legacy_compat.py",
+            "tessera/llm_bridge.py",
+            "tessera/mcp_server.py",
+            "tessera/models.py",
+            "tessera/orchestrator.py",
+            "tessera/security.py",
+            "tessera/skills.py",
+            "tessera/source_discovery.py",
+            "tessera/skills_library/sk_docker_environment.md",
+            "tessera/skills_library/sk_runtime_verification.md",
+            "tessera/skills_library/sk_schema_compliance.md",
+            "tessera/skills_library/sk_service_lifecycle.md",
+            "tessera/skills_library/sk_shell_execution.md",
+            "tessera-3.4.0.dist-info/METADATA",
+            "tessera-3.4.0.dist-info/WHEEL",
+            "tessera-3.4.0.dist-info/entry_points.txt",
+            "tessera-3.4.0.dist-info/top_level.txt",
+            "tessera-3.4.0.dist-info/RECORD"
+          ]
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "e62f0fd2aa68968af69dc10a2ca9abb4873f377c66dc9a3e9fda27aa7b026a2f",
+          "bytes": 119757,
+          "inventory": [
+            "tessera-3.4.0",
+            "MANIFEST.in",
+            "PKG-INFO",
+            "README.md",
+            "pyproject.toml",
+            "setup.cfg",
+            "tessera",
+            "tessera/__init__.py",
+            "tessera/canonical.py",
+            "tessera/cli.py",
+            "tessera/config.py",
+            "tessera/conflict.py",
+            "tessera/decomposer.py",
+            "tessera/diagnostics.py",
+            "tessera/display.py",
+            "tessera/engine.py",
+            "tessera/engine_core.py",
+            "tessera/episode_boundary.py",
+            "tessera/evidence.py",
+            "tessera/hooks.py",
+            "tessera/init_flow.py",
+            "tessera/legacy_compat.py",
+            "tessera/llm_bridge.py",
+            "tessera/mcp_server.py",
+            "tessera/models.py",
+            "tessera/orchestrator.py",
+            "tessera/security.py",
+            "tessera/skills.py",
+            "tessera/skills_library",
+            "tessera/skills_library/sk_docker_environment.md",
+            "tessera/skills_library/sk_runtime_verification.md",
+            "tessera/skills_library/sk_schema_compliance.md",
+            "tessera/skills_library/sk_service_lifecycle.md",
+            "tessera/skills_library/sk_shell_execution.md",
+            "tessera/source_discovery.py",
+            "tessera.egg-info",
+            "tessera.egg-info/PKG-INFO",
+            "tessera.egg-info/SOURCES.txt",
+            "tessera.egg-info/dependency_links.txt",
+            "tessera.egg-info/entry_points.txt",
+            "tessera.egg-info/requires.txt",
+            "tessera.egg-info/top_level.txt"
+          ]
+        }
+      },
+      "environment_creation_seconds": 6.39327565900021,
+      "install_seconds": 18.132005491999735,
+      "discovery": {
+        "seconds": 0.004423104999659699,
+        "metrics": {
+          "directories_visited": 10,
+          "entries_stat": 29,
+          "supported_candidates": 1,
+          "recommended_candidates": 6,
+          "ignored_candidates": 10,
+          "forbidden_candidates": 7
+        },
+        "totals": {
+          "SUPPORTED": 1,
+          "RECOMMENDED": 6,
+          "IGNORED": 10,
+          "FORBIDDEN": 7
+        }
+      },
+      "init_seconds": 1.368586788000357,
+      "index_seconds": 1.18324261700036,
+      "rebuild_seconds": 1.2286589450004612,
+      "counts": {
+        "forbidden_count": 7,
+        "generated_memory_store_included": true,
+        "ignored_count": 10,
+        "optional_count": 1,
+        "recommended_count": 6,
+        "roots": [
+          {
+            "include": [
+              "**/*.md"
+            ],
+            "path": "/tmp/tessera-118-oej32n0u/experiment/fixture-project/memories/generated"
+          },
+          {
+            "include": [
+              "AGENTS.md",
+              "docs/architecture.md",
+              "docs/nested/keep.md",
+              "memories/existing-learning.md",
+              "README.md",
+              "research/market-notes.md"
+            ],
+            "path": "/tmp/tessera-118-oej32n0u/experiment/fixture-project"
+          }
+        ],
+        "selected": [
+          "AGENTS.md",
+          "docs/architecture.md",
+          "docs/nested/keep.md",
+          "memories/existing-learning.md",
+          "README.md",
+          "research/market-notes.md"
+        ],
+        "selected_count": 6,
+        "selected_count_kind": "project_sources_outside_generated_store"
+      },
+      "nodes": 6,
+      "relations": 0,
+      "query_ids": [
+        "README"
+      ],
+      "query_evidence": [
+        "This project is the Aster Observatory, a local observatory documenting cedar telescope calibration."
+      ],
+      "fixture_sha256": "91cfa4df3a1ca4069f9f4d8de029dfce7216dbe015bb2de00aa6291e73e3ada4",
+      "source_hashes": {
+        "README.md": "34d7b5dd084e300fca3e13263b05f7fb1e6771bc1eb3d80fd2f0acd79d0f1c0f",
+        "AGENTS.md": "8f7c2d04611753d9bf66106b9197edef5b9a747cfbffce22fd544e7fc52064fd",
+        "docs/architecture.md": "4ac7181338ad7f1c733131e7d33dedb424ccc661da59caaa79a5e3edd4aeb3f5",
+        "docs/decisions.md": "621dfe917ce25b61c86489d80d985b04ac8945b58564a3fcdb9a881211b19281",
+        "docs/nested/ignored.md": "1ab76e518c612aab9ec01dad859aa00e269e5af666610c37db562238eb1d266b",
+        "docs/nested/keep.md": "760cf3812b914050833d7b690af3ca5b16d56a5ed93c4c8213fdce96465361ae",
+        "research/market-notes.md": "50637693601bbc4c2763492350cb8924242eafed3c9d112e31208868dbe041c3",
+        "memories/existing-learning.md": "75353d8606e8d371d56185e78c3a943ecdd9aa5325d11a8463497a0e93c3715b",
+        "examples/optional.md": "d0cd2bb3dbe3369d50cce7272f1cad10b6a2269f202f95669ff024453d9a85e7",
+        "archive/old-note.md": "c80e3fb2666cd66e95ea63e5ea8333490af5295312aea49dfaa5257b1e15e1db",
+        "node_modules/ignored.md": "30bb8ad13c22ac3e15ffadafc2662f312d16c35fd6475ceba9ee795f76cf3544",
+        ".venv/ignored.md": "4af4a148adfe8c1a6ccbc15b2bc2efd382673dd0c21bd6f2a7376740cf7149b3",
+        ".git/forbidden.md": "9eb86e67c58c4dbaacf981b9581cc0fced10229a33fc10327677bc914f4bc3b1",
+        ".env": "0c7802233e30231eea786a47ec7021d4ccd3381c1eb3539a18df470c3b184791",
+        "private.key": "174f4af2ec99f0d001f9c4745e8e6c720606b005f8883214397430b2833c2e5e"
+      },
+      "commands_verified": 67,
+      "source_integrity_checkpoints": 68,
+      "source_files_modified": 0,
+      "passed_cases": [
+        "installation",
+        "discovery_metrics",
+        "dry_run",
+        "noninteractive",
+        "idempotency",
+        "rebuild",
+        "diagnostics",
+        "custom",
+        "memory-only",
+        "security",
+        "migration",
+        "ignore",
+        "failures",
+        "tty",
+        "global_isolation",
+        "moved"
+      ],
+      "uninstall": {
+        "stdout": "Found existing installation: tessera 3.4.0\nUninstalling tessera-3.4.0:\n  Successfully uninstalled tessera-3.4.0\n",
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "tty_transcript": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 1\r\n\r\nInitialization plan:\r\n  Scope: project\r\n  Project: /tmp/tessera-118-oej32n0u/experiment/tty\r\n  Configuration: /tmp/tessera-118-oej32n0u/experiment/tty/.tessera/config.yaml\r\n  Store id: 5990a6ca-b4ef-5413-a7d6-654d84d08385\r\n  Generated memories: /tmp/tessera-118-oej32n0u/experiment/tty/memories/generated\r\n  Source mode: recommended\r\n  Selected project sources: 6 files\r\n  Derived index: /tmp/tessera-118-oej32n0u/experiment/tty/.tessera/index\r\n  Ignored: 10\r\n  Forbidden: 7\r\n  Source files modified: 0\r\n  Configuration changes: create project configuration\r\n  Ignore changes: none\r\n  Indexing: will start after confirmation\r\n  Warnings:\r\n    - outside_root: external-link: symlinks are not traversed\r\n    - unsafe_symlink: internal-link.md: symlinks are not traversed\r\nProceed? [y/N]: y\r\n\u2714 TESSERA configured /tmp/tessera-118-oej32n0u/experiment/tty/memories/generated\r\n\u2714 6 nodes indexed from 6 selected files\r\n\u2714 source files modified: 0\r\nNext: `tessera doctor`, `tessera index`, or `tessera query \"...\"`\r\n",
+      "cancel_transcripts": {
+        "negative": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 1\r\n\r\nInitialization plan:\r\n  Scope: project\r\n  Project: /tmp/tessera-118-oej32n0u/experiment/tty-negative\r\n  Configuration: /tmp/tessera-118-oej32n0u/experiment/tty-negative/.tessera/config.yaml\r\n  Store id: 1427fe5e-e356-5d01-bb24-0d525a82968c\r\n  Generated memories: /tmp/tessera-118-oej32n0u/experiment/tty-negative/memories/generated\r\n  Source mode: recommended\r\n  Selected project sources: 6 files\r\n  Derived index: /tmp/tessera-118-oej32n0u/experiment/tty-negative/.tessera/index\r\n  Ignored: 10\r\n  Forbidden: 7\r\n  Source files modified: 0\r\n  Configuration changes: create project configuration\r\n  Ignore changes: none\r\n  Indexing: will start after confirmation\r\n  Warnings:\r\n    - outside_root: external-link: symlinks are not traversed\r\n    - unsafe_symlink: internal-link.md: symlinks are not traversed\r\nProceed? [y/N]: n\r\nInitialization cancelled; no files were changed.\r\n",
+        "cancel": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 3\r\nInitialization cancelled; no files were changed.\r\n",
+        "selection-cancel": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 4\r\nInitialization cancelled; no files were changed.\r\n",
+        "eof": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: Initialization cancelled; no files were changed.\r\n",
+        "interrupt": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: ^CInitialization cancelled; no files were changed.\r\n"
+      },
+      "v2_config": {
+        "schema_version": 2,
+        "store": {
+          "id": "d039d88f-6fb7-5049-8863-7f87d3cfffaf",
+          "path": "memories/generated"
+        },
+        "sources": {
+          "roots": [
+            {
+              "path": "memories/generated",
+              "include": [
+                "**/*.md"
+              ]
+            },
+            {
+              "path": ".",
+              "include": [
+                "AGENTS.md",
+                "docs/architecture.md",
+                "docs/nested/keep.md",
+                "memories/existing-learning.md",
+                "README.md",
+                "research/market-notes.md"
+              ]
+            }
+          ]
+        },
+        "index": {
+          "path": ".tessera/index"
+        }
+      },
+      "partial_failure_state": {
+        "config_applied": true,
+        "ignore_applied": false,
+        "index_applied": false,
+        "source_files_modified": 0,
+        "store_prepared": true
+      }
+    },
+    "3.12": {
+      "passed": true,
+      "python": "3.12.13 (main, Mar 10 2026, 18:17:25) [Clang 21.1.4 ]",
+      "installer": "pip 25.0.1 from /tmp/tessera-118-4g5p2cgd/venv/lib/python3.12/site-packages/pip (python 3.12)",
+      "import_origin": "/tmp/tessera-118-4g5p2cgd/venv/lib/python3.12/site-packages/tessera/__init__.py",
+      "version": "3.4.0",
+      "artifacts": {
+        "tessera-3.4.0-py3-none-any.whl": {
+          "sha256": "6e6a80212a63403590e813781fdb2dce3e4e94b61979bff09dd6d88ca678adca",
+          "bytes": 123130,
+          "inventory": [
+            "tessera/__init__.py",
+            "tessera/canonical.py",
+            "tessera/cli.py",
+            "tessera/config.py",
+            "tessera/conflict.py",
+            "tessera/decomposer.py",
+            "tessera/diagnostics.py",
+            "tessera/display.py",
+            "tessera/engine.py",
+            "tessera/engine_core.py",
+            "tessera/episode_boundary.py",
+            "tessera/evidence.py",
+            "tessera/hooks.py",
+            "tessera/init_flow.py",
+            "tessera/legacy_compat.py",
+            "tessera/llm_bridge.py",
+            "tessera/mcp_server.py",
+            "tessera/models.py",
+            "tessera/orchestrator.py",
+            "tessera/security.py",
+            "tessera/skills.py",
+            "tessera/source_discovery.py",
+            "tessera/skills_library/sk_docker_environment.md",
+            "tessera/skills_library/sk_runtime_verification.md",
+            "tessera/skills_library/sk_schema_compliance.md",
+            "tessera/skills_library/sk_service_lifecycle.md",
+            "tessera/skills_library/sk_shell_execution.md",
+            "tessera-3.4.0.dist-info/METADATA",
+            "tessera-3.4.0.dist-info/WHEEL",
+            "tessera-3.4.0.dist-info/entry_points.txt",
+            "tessera-3.4.0.dist-info/top_level.txt",
+            "tessera-3.4.0.dist-info/RECORD"
+          ]
+        },
+        "tessera-3.4.0.tar.gz": {
+          "sha256": "e62f0fd2aa68968af69dc10a2ca9abb4873f377c66dc9a3e9fda27aa7b026a2f",
+          "bytes": 119757,
+          "inventory": [
+            "tessera-3.4.0",
+            "MANIFEST.in",
+            "PKG-INFO",
+            "README.md",
+            "pyproject.toml",
+            "setup.cfg",
+            "tessera",
+            "tessera/__init__.py",
+            "tessera/canonical.py",
+            "tessera/cli.py",
+            "tessera/config.py",
+            "tessera/conflict.py",
+            "tessera/decomposer.py",
+            "tessera/diagnostics.py",
+            "tessera/display.py",
+            "tessera/engine.py",
+            "tessera/engine_core.py",
+            "tessera/episode_boundary.py",
+            "tessera/evidence.py",
+            "tessera/hooks.py",
+            "tessera/init_flow.py",
+            "tessera/legacy_compat.py",
+            "tessera/llm_bridge.py",
+            "tessera/mcp_server.py",
+            "tessera/models.py",
+            "tessera/orchestrator.py",
+            "tessera/security.py",
+            "tessera/skills.py",
+            "tessera/skills_library",
+            "tessera/skills_library/sk_docker_environment.md",
+            "tessera/skills_library/sk_runtime_verification.md",
+            "tessera/skills_library/sk_schema_compliance.md",
+            "tessera/skills_library/sk_service_lifecycle.md",
+            "tessera/skills_library/sk_shell_execution.md",
+            "tessera/source_discovery.py",
+            "tessera.egg-info",
+            "tessera.egg-info/PKG-INFO",
+            "tessera.egg-info/SOURCES.txt",
+            "tessera.egg-info/dependency_links.txt",
+            "tessera.egg-info/entry_points.txt",
+            "tessera.egg-info/requires.txt",
+            "tessera.egg-info/top_level.txt"
+          ]
+        }
+      },
+      "environment_creation_seconds": 3.267024360000505,
+      "install_seconds": 16.070330403999833,
+      "discovery": {
+        "seconds": 0.0045400819999485975,
+        "metrics": {
+          "directories_visited": 10,
+          "entries_stat": 29,
+          "supported_candidates": 1,
+          "recommended_candidates": 6,
+          "ignored_candidates": 10,
+          "forbidden_candidates": 7
+        },
+        "totals": {
+          "SUPPORTED": 1,
+          "RECOMMENDED": 6,
+          "IGNORED": 10,
+          "FORBIDDEN": 7
+        }
+      },
+      "init_seconds": 1.6784284699997443,
+      "index_seconds": 1.5980341700005738,
+      "rebuild_seconds": 1.5205214879997584,
+      "counts": {
+        "forbidden_count": 7,
+        "generated_memory_store_included": true,
+        "ignored_count": 10,
+        "optional_count": 1,
+        "recommended_count": 6,
+        "roots": [
+          {
+            "include": [
+              "**/*.md"
+            ],
+            "path": "/tmp/tessera-118-4g5p2cgd/experiment/fixture-project/memories/generated"
+          },
+          {
+            "include": [
+              "AGENTS.md",
+              "docs/architecture.md",
+              "docs/nested/keep.md",
+              "memories/existing-learning.md",
+              "README.md",
+              "research/market-notes.md"
+            ],
+            "path": "/tmp/tessera-118-4g5p2cgd/experiment/fixture-project"
+          }
+        ],
+        "selected": [
+          "AGENTS.md",
+          "docs/architecture.md",
+          "docs/nested/keep.md",
+          "memories/existing-learning.md",
+          "README.md",
+          "research/market-notes.md"
+        ],
+        "selected_count": 6,
+        "selected_count_kind": "project_sources_outside_generated_store"
+      },
+      "nodes": 6,
+      "relations": 0,
+      "query_ids": [
+        "README"
+      ],
+      "query_evidence": [
+        "This project is the Aster Observatory, a local observatory documenting cedar telescope calibration."
+      ],
+      "fixture_sha256": "91cfa4df3a1ca4069f9f4d8de029dfce7216dbe015bb2de00aa6291e73e3ada4",
+      "source_hashes": {
+        "README.md": "34d7b5dd084e300fca3e13263b05f7fb1e6771bc1eb3d80fd2f0acd79d0f1c0f",
+        "AGENTS.md": "8f7c2d04611753d9bf66106b9197edef5b9a747cfbffce22fd544e7fc52064fd",
+        "docs/architecture.md": "4ac7181338ad7f1c733131e7d33dedb424ccc661da59caaa79a5e3edd4aeb3f5",
+        "docs/decisions.md": "621dfe917ce25b61c86489d80d985b04ac8945b58564a3fcdb9a881211b19281",
+        "docs/nested/ignored.md": "1ab76e518c612aab9ec01dad859aa00e269e5af666610c37db562238eb1d266b",
+        "docs/nested/keep.md": "760cf3812b914050833d7b690af3ca5b16d56a5ed93c4c8213fdce96465361ae",
+        "research/market-notes.md": "50637693601bbc4c2763492350cb8924242eafed3c9d112e31208868dbe041c3",
+        "memories/existing-learning.md": "75353d8606e8d371d56185e78c3a943ecdd9aa5325d11a8463497a0e93c3715b",
+        "examples/optional.md": "d0cd2bb3dbe3369d50cce7272f1cad10b6a2269f202f95669ff024453d9a85e7",
+        "archive/old-note.md": "c80e3fb2666cd66e95ea63e5ea8333490af5295312aea49dfaa5257b1e15e1db",
+        "node_modules/ignored.md": "30bb8ad13c22ac3e15ffadafc2662f312d16c35fd6475ceba9ee795f76cf3544",
+        ".venv/ignored.md": "4af4a148adfe8c1a6ccbc15b2bc2efd382673dd0c21bd6f2a7376740cf7149b3",
+        ".git/forbidden.md": "9eb86e67c58c4dbaacf981b9581cc0fced10229a33fc10327677bc914f4bc3b1",
+        ".env": "0c7802233e30231eea786a47ec7021d4ccd3381c1eb3539a18df470c3b184791",
+        "private.key": "174f4af2ec99f0d001f9c4745e8e6c720606b005f8883214397430b2833c2e5e"
+      },
+      "commands_verified": 67,
+      "source_integrity_checkpoints": 68,
+      "source_files_modified": 0,
+      "passed_cases": [
+        "installation",
+        "discovery_metrics",
+        "dry_run",
+        "noninteractive",
+        "idempotency",
+        "rebuild",
+        "diagnostics",
+        "custom",
+        "memory-only",
+        "security",
+        "migration",
+        "ignore",
+        "failures",
+        "tty",
+        "global_isolation",
+        "moved"
+      ],
+      "uninstall": {
+        "stdout": "Found existing installation: tessera 3.4.0\nUninstalling tessera-3.4.0:\n  Successfully uninstalled tessera-3.4.0\n",
+        "module_and_entrypoint_removed": true,
+        "user_files_preserved": true,
+        "derived_index_retained": true
+      },
+      "tty_transcript": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 1\r\n\r\nInitialization plan:\r\n  Scope: project\r\n  Project: /tmp/tessera-118-4g5p2cgd/experiment/tty\r\n  Configuration: /tmp/tessera-118-4g5p2cgd/experiment/tty/.tessera/config.yaml\r\n  Store id: b4da2ead-91bd-5830-8a80-cb018cfe093f\r\n  Generated memories: /tmp/tessera-118-4g5p2cgd/experiment/tty/memories/generated\r\n  Source mode: recommended\r\n  Selected project sources: 6 files\r\n  Derived index: /tmp/tessera-118-4g5p2cgd/experiment/tty/.tessera/index\r\n  Ignored: 10\r\n  Forbidden: 7\r\n  Source files modified: 0\r\n  Configuration changes: create project configuration\r\n  Ignore changes: none\r\n  Indexing: will start after confirmation\r\n  Warnings:\r\n    - outside_root: external-link: symlinks are not traversed\r\n    - unsafe_symlink: internal-link.md: symlinks are not traversed\r\nProceed? [y/N]: y\r\n\u2714 TESSERA configured /tmp/tessera-118-4g5p2cgd/experiment/tty/memories/generated\r\n\u2714 6 nodes indexed from 6 selected files\r\n\u2714 source files modified: 0\r\nNext: `tessera doctor`, `tessera index`, or `tessera query \"...\"`\r\n",
+      "cancel_transcripts": {
+        "negative": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 1\r\n\r\nInitialization plan:\r\n  Scope: project\r\n  Project: /tmp/tessera-118-4g5p2cgd/experiment/tty-negative\r\n  Configuration: /tmp/tessera-118-4g5p2cgd/experiment/tty-negative/.tessera/config.yaml\r\n  Store id: 2aebd969-f830-5823-acfe-df0f331ff287\r\n  Generated memories: /tmp/tessera-118-4g5p2cgd/experiment/tty-negative/memories/generated\r\n  Source mode: recommended\r\n  Selected project sources: 6 files\r\n  Derived index: /tmp/tessera-118-4g5p2cgd/experiment/tty-negative/.tessera/index\r\n  Ignored: 10\r\n  Forbidden: 7\r\n  Source files modified: 0\r\n  Configuration changes: create project configuration\r\n  Ignore changes: none\r\n  Indexing: will start after confirmation\r\n  Warnings:\r\n    - outside_root: external-link: symlinks are not traversed\r\n    - unsafe_symlink: internal-link.md: symlinks are not traversed\r\nProceed? [y/N]: n\r\nInitialization cancelled; no files were changed.\r\n",
+        "cancel": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 3\r\nInitialization cancelled; no files were changed.\r\n",
+        "selection-cancel": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: 1\r\nWhere should newly generated TESSERA memories be stored? [memories]: memories/generated\r\n\r\nKnowledge sources found\r\n  [x] docs/                        2 selectable\r\n  [x] memories/                    1 selectable\r\n  [x] research/                    1 selectable\r\n  [ ] examples/                    1 selectable\r\n  [!] .venv/                       0 selectable\r\n  [!] archive/                     0 selectable\r\n  [!] node_modules/                0 selectable\r\n  [!] .tessera/                    0 selectable, 1 forbidden\r\n  [x] AGENTS.md                    recommended\r\n  [x] README.md                    recommended\r\n  [-] .tessera-ignore              ignored\r\n  [!] .env                         forbidden\r\n  [!] external-link                forbidden\r\n  [!] internal-link.md             forbidden\r\n  [!] private.key                  forbidden\r\n  [!] special.md                   forbidden\r\n\r\nWhat should TESSERA use?\r\n1. Recommended sources\r\n2. Choose files/folders\r\n3. Generated-memory store only\r\n4. Cancel\r\nSelection [1]: 4\r\nInitialization cancelled; no files were changed.\r\n",
+        "eof": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: Initialization cancelled; no files were changed.\r\n",
+        "interrupt": "TESSERA\r\nPersistent memory for this project\r\n\r\nHow would you like to configure TESSERA?\r\n1. This project (recommended)\r\n2. Named global store\r\n3. Cancel\r\nSelection [1]: ^CInitialization cancelled; no files were changed.\r\n"
+      },
+      "v2_config": {
+        "schema_version": 2,
+        "store": {
+          "id": "b874e219-e3cd-590e-a69c-f360ac70fc20",
+          "path": "memories/generated"
+        },
+        "sources": {
+          "roots": [
+            {
+              "path": "memories/generated",
+              "include": [
+                "**/*.md"
+              ]
+            },
+            {
+              "path": ".",
+              "include": [
+                "AGENTS.md",
+                "docs/architecture.md",
+                "docs/nested/keep.md",
+                "memories/existing-learning.md",
+                "README.md",
+                "research/market-notes.md"
+              ]
+            }
+          ]
+        },
+        "index": {
+          "path": ".tessera/index"
+        }
+      },
+      "partial_failure_state": {
+        "config_applied": true,
+        "ignore_applied": false,
+        "index_applied": false,
+        "source_files_modified": 0,
+        "store_prepared": true
+      }
+    }
+  },
+  "sanity_before": {
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "missing_evidence_check": "passed"
+  },
+  "sanity_after": {
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "missing_evidence_check": "passed"
+  }
+}

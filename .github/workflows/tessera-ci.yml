@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,7 +39,26 @@ jobs:
       - name: Build isolated wheel and sdist
         run: |
           python -m pip install --upgrade pip build
-          python -m build
+          python - <<'PY'
+          import importlib.metadata
+          import json
+          from pathlib import Path
+          import subprocess
+          import sys
+          import time
+
+          start = time.perf_counter()
+          subprocess.run([sys.executable, "-m", "build"], check=True)
+          output = Path("artifacts/clean-room")
+          output.mkdir(parents=True, exist_ok=True)
+          (output / "build.json").write_text(json.dumps({
+              "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "python": sys.version,
+              "frontend": importlib.metadata.version("build"),
+              "seconds": time.perf_counter() - start,
+              "method": "python -m build (wheel rebuilt from sdist)",
+          }, indent=2) + "\n")
+          PY
 
       - name: Inspect artifact ownership
         shell: bash
@@ -76,6 +97,23 @@ jobs:
           }
           assert wheel_skills == expected_skills
           PY
+
+      - name: Verify clean-room onboarding from the installed wheel
+        shell: bash
+        run: |
+          python scripts/clean_room/run_clean_room.py \
+            --wheel dist/tessera-3.4.0-py3-none-any.whl \
+            --sdist dist/tessera-3.4.0.tar.gz \
+            --source-sha "$(git rev-parse HEAD)" \
+            --output artifacts/clean-room --tty
+
+      - name: Upload clean-room evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-room-python-${{ matrix.python-version }}
+          path: artifacts/clean-room/
+          if-no-files-found: error
 
       - name: Install and smoke the built wheel outside the checkout
         shell: bash

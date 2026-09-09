@@ -667,7 +667,11 @@ def discover_sources(
     for item in ordered:
         if item.classification != SourceClassification.FORBIDDEN.value or not configured:
             continue
-        candidate_path = (root / item.path.rstrip("/")).resolve(strict=False)
+        # Match the discovered entry, not the target of a forbidden symlink.
+        # Otherwise an unselected alias to a selected README falsely conflicts
+        # with the configuration and prevents doctor/repeated initialization.
+        # The scanner already uses a physical root and never follows symlinks.
+        candidate_path = root / item.path.rstrip("/")
         if item.kind == "directory":
             configured_conflict = any(
                 source_root == candidate_path or _is_relative_to(source_root, candidate_path)

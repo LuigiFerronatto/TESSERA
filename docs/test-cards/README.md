@@ -38,6 +38,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #118 Clean installed-artifact onboarding | `IN_PROGRESS` | [118-clean-room-onboarding.md](118-clean-room-onboarding.md) | [Issue #118](https://github.com/LuigiFerronatto/TESSERA/issues/118), [PR Evolution Audit](../PR_EVOLUTION_118.md), Queue 4; canonical validation pending merge |
 | #68 Engine/CLI/MCP retrieval parity | `VALIDATED` | [68-retrieval-contract-parity.md](68-retrieval-contract-parity.md) | [Issue #68](https://github.com/LuigiFerronatto/TESSERA/issues/68), [PR #98](https://github.com/LuigiFerronatto/TESSERA/pull/98) |
 | #74 Core vs optional LLM boundary | `VALIDATED` architecture decision | [74-core-vs-optional-llm-boundary.md](74-core-vs-optional-llm-boundary.md) | [Issue #74](https://github.com/LuigiFerronatto/TESSERA/issues/74), [PR #107](https://github.com/LuigiFerronatto/TESSERA/pull/107), [ADR 0001](../adr/0001-core-vs-optional-llm-boundary.md) |
 | #94 Markdown-only persistence | `VALIDATED` | [94-markdown-only-persistence.md](94-markdown-only-persistence.md) | [Issue #94](https://github.com/LuigiFerronatto/TESSERA/issues/94), [PR #101](https://github.com/LuigiFerronatto/TESSERA/pull/101) |
