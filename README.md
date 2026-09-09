@@ -53,7 +53,7 @@ python -m pip install ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
 python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[mcp]"  # optional MCP transport
 python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
 python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
-python -m pip uninstall tessera
+python -m pip uninstall tessera-agent-memory
 ```
 
 Uninstall removes the installed package and console commands. Project sources,
