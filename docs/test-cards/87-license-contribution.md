@@ -3,13 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) |
-| Record status | `IN_PROGRESS`; owner confirmed, human review and merge pending |
+| Record status | `VALIDATED` |
 | Capability type | Repository governance / packaging metadata |
-| Pull request | [#233](https://github.com/LuigiFerronatto/TESSERA/pull/233); exact head recorded in PR evidence |
-| Merge commit | Not merged |
-| Decision | MIT and notice confirmed by owner; exact-head review and merge pending |
+| Pull request | [#233](https://github.com/LuigiFerronatto/TESSERA/pull/233), merged 2026-09-09 |
+| Final candidate | `c27ede1b6552e9a2b3a0f51a41185c558186e895` |
+| Merge commit | `d473f230b914908fcaad3a46291b5046bde6b918` |
+| Decision | `KEEP`; owner confirmation, exact-head audit and canonical CI/Benchmark passed |
 | Benchmark applicability | `NOT_APPLICABLE`; runtime and retrieval unchanged |
-| Last audited | 2026-09-09; main `31df35e2885bcb81efbe3b9f87fdf8b15a858a4b` |
+| Last audited | 2026-09-09; canonical main `d473f230b914908fcaad3a46291b5046bde6b918` |
 
 ## In one sentence
 
@@ -74,15 +75,15 @@ to existing repository contracts instead of duplicating them.
 
 ## What remains unimplemented?
 
-Required human review and canonical merge are still pending. There is no PyPI
+The canonical merge and lifecycle validation are complete. There is no PyPI
 publication, release workflow,
 package rename, version bump, CLA/DCO introduction, runtime change or automatic
 selection of #121. Existing third-party notices remain with their files.
 
 ## What is unlocked next?
 
-#134 stays BLOCKED until the owner-approved #87 candidate is merged and reconciled
-canonically. Release engineering and publication then follow #134's own gates.
+#134 is now the next release gate. Release engineering and publication follow
+#134's own gates; no publication is authorized by this card.
 
 ## Technical provenance
 
@@ -98,8 +99,7 @@ canonically. Release engineering and publication then follow #134's own gates.
 
 ```text
 MIT metadata, missing repository/distribution license and contribution guide
--> #87 owner-requested proposal, IN_PROGRESS / NOW / Queue 6
--> explicit owner confirmation recorded on 2026-09-09
--> exact-head review -> canonical merge -> lifecycle
--> reassess #134; no release or downstream work starts in this candidate
+-> #87 owner-confirmed proposal, IN_PROGRESS / NOW / Queue 6
+-> exact-head review -> canonical merge `d473f230...` -> VALIDATED / KEEP
+-> #134 release gate becomes eligible for its own validation
 ```
