@@ -128,7 +128,7 @@ jobs:
         run: |
           python scripts/clean_room/run_clean_room.py \
             --wheel dist/tessera_agent_memory-3.4.0-py3-none-any.whl \
-            --sdist dist/tessera-agent-memory-3.4.0.tar.gz \
+            --sdist dist/tessera_agent_memory-3.4.0.tar.gz \
             --source-sha "$(git rev-parse HEAD)" \
             --output artifacts/clean-room --tty
 
