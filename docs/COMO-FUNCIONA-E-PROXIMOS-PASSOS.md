@@ -210,12 +210,18 @@ tessera init ./meu-projeto/memory
 tessera-mcp   # registra o MCP server, aponta pro storage_dir do projeto
 ```
 
+Com `uv`, use um ambiente virtual existente (ou crie um com `uv venv`):
+
+```bash
+uv pip install tessera-agent-memory
+```
+
 ...e ter o mesmo sistema de memória com episódios, typed stores e o
 pipeline de 3 agentes funcionando imediatamente, sem precisar saber nada
 sobre LAO ou sobre a Blip.
 
 ### O que já existe a favor disso:
-- O pacote já é instalável via `pip install -e .` (tem `pyproject.toml`
+- O pacote já é instalável via `pip install -e .` ou `uv pip install -e .` (tem `pyproject.toml`
   próprio, entry points `tessera` e `tessera-mcp`) **ou via `./Tessera/install.sh`**
   (venv opcional, extras, `tessera doctor` automático — instalador de um
   comando só, adicionado 2026-08-26).
@@ -225,8 +231,9 @@ sobre LAO ou sobre a Blip.
   projeto é só mudar essa variável.
 
 ### O que falta para o "plug-and-play" de verdade (próximas evoluções):
-1. **Publicar no PyPI** (`pip install tessera-agent-memory` de qualquer lugar, sem
-   clonar o repo). *(ainda pendente)*
+1. ✅ **Publicar no PyPI** (`pip install tessera-agent-memory` ou `uv pip install
+   tessera-agent-memory` de qualquer lugar, sem clonar o repo). Publicado como
+   `tessera-agent-memory==0.0.1` em 2026-09-10.
 2. ✅ **Um wizard de setup** (`tessera quickstart`) — implementado
    2026-08-25: detecta o projeto atual (node/python/rust/go/genérico),
    reaproveita um `.claude/memory` existente ou sugere `./memories`, gera

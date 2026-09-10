@@ -30,6 +30,14 @@ Install the released package with:
 python -m pip install "tessera-agent-memory==0.0.1"
 ```
 
+Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
+
+```bash
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.1"
+```
+
+If you do not have an environment yet, create one first with `uv venv`.
+
 Install the current repository version with `pip`:
 
 ```bash
@@ -48,7 +56,7 @@ For a locally built release artifact, use a clean wheel rather than an editable
 checkout:
 
 ```bash
-python -m build
+uv build
 python -m pip install ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
 python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[mcp]"  # optional MCP transport
 python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
@@ -69,7 +77,7 @@ The project version is currently `0.0.1`; `pyproject.toml`, `tessera.__version__
 and installed distribution metadata must agree. Version changes are release
 decisions, not automatic consequences of individual Test Cards.
 
-TESSERA is not documented here as a PyPI package or release binary until those distribution channels are actually published.
+The first public PyPI release is `tessera-agent-memory==0.0.1`.
 
 ## Quickstart
 

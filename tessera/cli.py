@@ -92,6 +92,11 @@ def cmd_init(args):
     compatibility_positional = args.storage_dir
     store_path = args.store or compatibility_positional
     interactive = not args.non_interactive and not args.json and sys.stdin.isatty()
+    console = None
+    if interactive:
+        from .display import get_console, print_banner
+        console = get_console(getattr(args, "plain", False))
+        print_banner(console)
     if mode is None and compatibility_positional:
         mode = "project"  # documented compatibility for `tessera init PATH`
     if mode is None:
@@ -154,7 +159,10 @@ def cmd_init(args):
                 store_path = _init_input(
                     f"Where should newly generated TESSERA memories be stored? [{default_store}]: "
                 ).strip() or default_store
-            discovery = _interactive_discovery(root)
+            # The interactive path is deliberately richer than the stable
+            # non-interactive/JSON paths: show a live discovery status while
+            # walking the project.
+            discovery = _interactive_discovery(root, console=console)
             if args.sources is None:
                 args.sources, custom = _interactive_source_choice(discovery)
                 args.source = custom
@@ -273,15 +281,22 @@ def _init_input(prompt: str) -> str:
         raise InitializationCancelled("initialization cancelled") from exc
 
 
-def _interactive_discovery(root: Path):
+def _interactive_discovery(root: Path, *, console=None):
     from .source_discovery import discover_sources, discover_sources_for_configuration
 
     config_path = root / ".tessera" / "config.yaml"
-    if config_path.exists():
-        selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
-        discovery = discover_sources_for_configuration(selection)
-    else:
-        discovery = discover_sources(root)
+    status = console.status("[bold #ff9966]Carregando fontes do projeto...[/]") if console else None
+    if status:
+        status.start()
+    try:
+        if config_path.exists():
+            selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
+            discovery = discover_sources_for_configuration(selection)
+        else:
+            discovery = discover_sources(root)
+    finally:
+        if status:
+            status.stop()
     print("\nKnowledge sources found")
     for cluster in discovery.clusters:
         marker = "x" if cluster.recommended else (" " if cluster.selectable else "!")
@@ -352,7 +367,7 @@ def _render_initialization_plan(plan: InitializationPlan, *, dry_run: bool) -> N
     print(f"  Source mode: {plan.source_mode}")
     print(f"  Selected project sources: {sources['selected_count']} files")
     print(f"  Derived index: {plan.index_path}")
-    print(f"  Ignored: {sources['ignored_count']}")
+    print(f"  Ignored: {sources['ignored_count']} (discovery only; no files changed)")
     print(f"  Forbidden: {sources['forbidden_count']}")
     print("  Source files modified: 0")
     print(f"  Configuration changes: {', '.join(plan.config_changes) or 'none'}")
@@ -367,6 +382,15 @@ def _render_initialization_plan(plan: InitializationPlan, *, dry_run: bool) -> N
         print("  Warnings:")
         for warning in plan.warnings:
             print(f"    - {warning}")
+        symlink_warnings = [
+            warning for warning in plan.warnings
+            if warning.startswith(("unsafe_symlink:", "outside_root:"))
+        ]
+        if symlink_warnings:
+            print(
+                "  Symlink policy: these entries were ignored during discovery; "
+                "they are not selected, followed, written to configuration, or added to .tessera-ignore."
+            )
     if plan.preflight_problems:
         print("  Preflight problems:")
         for problem in plan.preflight_problems:
