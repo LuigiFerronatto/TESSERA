@@ -228,19 +228,19 @@ def render_start_result(result, console) -> None:
     from rich.text import Text
 
     meta = Text()
-    meta.append("🧠 Necessidade de informação: ", style="bold")
+    meta.append("🧠 Information need: ", style="bold")
     meta.append(f"{result.information_need}\n")
     meta.append("🔎 Consulta de busca planejada: ", style="bold")
     meta.append(f"{result.retrieval_query}\n")
     meta.append("🗂️  Gavetas consultadas: ", style="bold")
     meta.append(f"{', '.join(result.stores_queried)}\n")
-    meta.append("📚 Memórias brutas recuperadas: ", style="bold")
+    meta.append("📚 Raw memories retrieved: ", style="bold")
     meta.append(str(len(result.raw_memories)))
     console.print(Panel(meta, border_style="dim", title="Pipeline", title_align="left"))
 
     if result.raw_memories:
         console.print()
-        console.rule("[bold]Memórias usadas como evidência[/bold]", style="dim")
+        console.rule("[bold]Memories used as evidence[/bold]", style="dim")
         render_query_results(
             result.raw_memories, console, show_related=True, show_body=False
         )
@@ -263,7 +263,7 @@ def print_list_plain(rows: List[tuple]) -> None:
 
 # ---------------------------------------------------------------------------
 # `tessera init` / `tessera write` / `tessera index` / `tessera skills` — small commands,
-# but still following the "arquivo é sempre dim/📄, resultado é sempre
+# but still following the "files are always dim/📄, results are always
 # destacado" convention so every Tessera output reads consistently.
 # ---------------------------------------------------------------------------
 
@@ -274,8 +274,8 @@ def render_init_result(console, storage_dir: str, node_count: int) -> None:
     body = Text()
     body.append("📄 ", style="dim")
     body.append(f"{storage_dir}\n", style="dim italic")
-    body.append(f"{node_count} nó(s) já encontrado(s)/indexado(s)", style="bold green")
-    console.print(Panel(body, title="✔ Diretório inicializado", border_style="green", title_align="left"))
+    body.append(f"{node_count} node(s) already found/indexed", style="bold green")
+    console.print(Panel(body, title="✔ Directory initialized", border_style="green", title_align="left"))
 
 
 def render_write_result(console, filepath: str, node_id: str, node_type: str, connections: List[str]) -> None:
@@ -288,9 +288,9 @@ def render_write_result(console, filepath: str, node_id: str, node_type: str, co
     body.append("\n📄 ", style="dim")
     body.append(f"{filepath}\n", style="dim italic")
     if connections:
-        body.append("🔗 conexões explícitas: ", style="cyan")
+        body.append("🔗 explicit connections: ", style="cyan")
         body.append(", ".join(connections), style="dim cyan")
-    console.print(Panel(body, title="✔ Nota gravada", border_style=_type_style(node_type), title_align="left"))
+    console.print(Panel(body, title="✔ Note written", border_style=_type_style(node_type), title_align="left"))
 
 
 def render_index_result(console, storage_dir: str, node_count: int, edge_count: int,
@@ -302,14 +302,14 @@ def render_index_result(console, storage_dir: str, node_count: int, edge_count: 
     body.append("📄 ", style="dim")
     body.append(f"{storage_dir}\n\n", style="dim italic")
     body.append(f"{node_count}", style="bold cyan")
-    body.append(" nós, ")
+    body.append(" nodes, ")
     body.append(f"{edge_count}", style="bold cyan")
-    body.append(" arestas\n")
+    body.append(" edges\n")
     body.append("📄 cache: ", style="dim")
     body.append(f"{cache_pkl}\n", style="dim italic")
-    body.append("📄 cache (legível): ", style="dim")
+    body.append("📄 readable cache: ", style="dim")
     body.append(f"{cache_json}", style="dim italic")
-    console.print(Panel(body, title="✔ Índice reconstruído", border_style="cyan", title_align="left"))
+    console.print(Panel(body, title="✔ Index rebuilt", border_style="cyan", title_align="left"))
 
 
 def render_skills_install_result(console, paths: List[str], storage_dir: str) -> None:
@@ -317,19 +317,19 @@ def render_skills_install_result(console, paths: List[str], storage_dir: str) ->
     from rich.text import Text
 
     body = Text()
-    body.append(f"{len(paths)} âncora(s) procedimental(is) instalada(s) em ", style="bold green")
+    body.append(f"{len(paths)} procedural anchor(s) installed at ", style="bold green")
     body.append(f"{storage_dir}\n\n", style="dim italic")
     for p in paths:
         body.append("📄 ", style="dim")
         body.append(f"{p}\n", style="dim italic")
-    console.print(Panel(body, title="✔ Skills instaladas", border_style="green", title_align="left"))
+    console.print(Panel(body, title="✔ Skills installed", border_style="green", title_align="left"))
 
 
 def render_skills_list_result(console, skill_ids: List[str]) -> None:
     from rich.table import Table
 
     table = Table(show_lines=False, header_style="bold", box=None, pad_edge=False)
-    table.add_column("SKILL (âncora procedimental)", style=_type_style("procedural_anchor"))
+    table.add_column("SKILL (procedural anchor)", style=_type_style("procedural_anchor"))
     for skill_id in skill_ids:
         table.add_row(skill_id)
     console.print(table)
@@ -363,7 +363,7 @@ def render_doctor_report(console, report) -> None:
         table.add_row(icon, f"[{name_style}]{check.name}[/{name_style}]" if name_style else check.name, detail)
 
     summary_style = "bold green" if report.all_ok else "bold red"
-    summary_text = "✔ tudo OK" if report.all_ok else "✘ alguma checagem falhou — veja as dicas acima"
+    summary_text = "✔ all checks passed" if report.all_ok else "✘ alguma checagem falhou — veja as dicas acima"
     border = "green" if report.all_ok else "red"
 
     console.print(Panel(
@@ -386,7 +386,7 @@ def print_doctor_report_plain(report) -> None:
         print(f"  [{mark}] {check.name}: {check.detail}")
         if not check.ok and check.hint:
             print(f"         hint: {check.hint}")
-    print("\nRESULTADO:", "tudo OK" if report.all_ok else "alguma checagem obrigatória falhou")
+    print("\nRESULT:", "all checks passed" if report.all_ok else "a required check failed")
 
 
 def render_quickstart_plan(console, plan, applied: bool) -> None:
@@ -398,9 +398,9 @@ def render_quickstart_plan(console, plan, applied: bool) -> None:
     from rich.text import Text
 
     body = Text()
-    body.append("📄 projeto: ", style="dim")
+    body.append("📄 project: ", style="dim")
     body.append(f"{plan.project_root}\n", style="dim italic")
-    body.append("🔍 tipo detectado: ", style="dim")
+    body.append("🔍 detected type: ", style="dim")
     body.append(f"{plan.detected_project_type}\n", style="cyan")
     body.append("📄 storage_dir proposto: ", style="dim")
     body.append(f"{plan.storage_dir}\n", style="bold green")
@@ -411,30 +411,30 @@ def render_quickstart_plan(console, plan, applied: bool) -> None:
     console.print(Syntax(_json.dumps(plan.mcp_config_block, indent=2, ensure_ascii=False), "json", theme="ansi_dark"))
 
     if applied:
-        console.print("\n[bold green]Ações executadas:[/bold green]")
+        console.print("\n[bold green]Actions performed:[/bold green]")
         for action in plan.actions_taken:
             console.print(f"  [green]✔[/green] {action}")
     else:
         console.print(
-            "\n[dim yellow]💡 Isso foi só um plano — nada foi criado no disco ainda. "
-            "Rode de novo com --apply para criar storage_dir e indexar.[/dim yellow]"
+            "\n[dim yellow]💡 This was only a plan — nothing has been written to disk yet. "
+            "Run again with --apply to create storage_dir and index.[/dim yellow]"
         )
 
 
 def print_quickstart_plan_plain(plan, applied: bool) -> None:
     import json as _json
 
-    print(f"tessera quickstart — projeto: {plan.project_root}")
-    print(f"tipo detectado: {plan.detected_project_type}")
+    print(f"tessera quickstart — project: {plan.project_root}")
+    print(f"detected type: {plan.detected_project_type}")
     print(f"storage_dir proposto: {plan.storage_dir}\n")
     print("Cole isso no seu config MCP (.mcp.json / .gemini/settings.json / Claude Desktop):")
     print(_json.dumps(plan.mcp_config_block, indent=2, ensure_ascii=False))
     if applied:
-        print("\nAções executadas:")
+        print("\nActions performed:")
         for action in plan.actions_taken:
             print(f"  - {action}")
     else:
-        print("\n(plano apenas — nada foi criado no disco; rode com --apply para aplicar)")
+        print("\n(plan only — nothing was written to disk; rerun with --apply to apply)")
 
 
 # ---------------------------------------------------------------------------
@@ -458,32 +458,32 @@ def render_stats_result(console, storage_dir: str, type_counts: Dict[str, int],
     header.append("📄 ", style="dim")
     header.append(f"{storage_dir}\n\n", style="dim italic")
     header.append(f"{note_count}", style="bold green")
-    header.append(" notas de memória reais  ", style="green")
+    header.append(" notas de memory reais  ", style="green")
     header.append(f"+ {internal_count}", style="bold dim")
-    header.append(" nós internos (tag/entity, usados pelo DW-PR)  ", style="dim")
+    header.append(" nodes internos (tag/entity, usados pelo DW-PR)  ", style="dim")
     header.append(f"= {total}", style="bold cyan")
-    header.append(" nós no grafo, ")
+    header.append(" nodes no grafo, ")
     header.append(f"{edge_count}", style="bold cyan")
-    header.append(" arestas")
-    console.print(Panel(header, title="📊 Estatísticas do índice", border_style="cyan", title_align="left"))
+    header.append(" edges")
+    console.print(Panel(header, title="📊 Estatísticas do index", border_style="cyan", title_align="left"))
 
     table = Table(show_lines=False, header_style="bold", box=None, pad_edge=False)
-    table.add_column("TIPO DE NÓ")
+    table.add_column("NODE TYPE")
     table.add_column("QTD", justify="right")
-    table.add_column("O QUE É")
+    table.add_column("WHAT IT IS")
     explain = {
-        "factual": "nota real (.md) — fato/decisão",
-        "preference": "nota real (.md) — preferência/feedback",
-        "procedural_anchor": "nota real (.md) — procedimento/anti-padrão",
-        "tag": "nó sintético — agrupa notas com a mesma tag (não é um arquivo)",
-        "entity": "nó sintético — agrupa notas que citam a mesma entidade (não é um arquivo)",
+        "factual": "real note (.md) — fact/decision",
+        "preference": "real note (.md) — preference/feedback",
+        "procedural_anchor": "real note (.md) — procedure/anti-pattern",
+        "tag": "synthetic node — groups notes with the same tag (not a file)",
+        "entity": "synthetic node — groups notes that mention the same entity (not a file)",
     }
     for node_type, count in sorted(type_counts.items(), key=lambda kv: -kv[1]):
         style = _type_style(node_type) if node_type in TYPE_STYLE else "dim white"
         table.add_row(
             f"[{style}]{_type_label(node_type)}[/{style}]",
             str(count),
-            explain.get(node_type, "nó auxiliar do grafo"),
+            explain.get(node_type, "auxiliary graph node"),
         )
     console.print(table)
 
@@ -494,6 +494,6 @@ def print_stats_plain(storage_dir: str, type_counts: Dict[str, int], edge_count:
     internal_count = sum(n for t, n in type_counts.items() if t not in note_types)
     total = note_count + internal_count
     print(f"storage_dir: {storage_dir}")
-    print(f"{note_count} notas reais + {internal_count} nós internos = {total} nós no grafo, {edge_count} arestas")
+    print(f"{note_count} notas reais + {internal_count} nodes internos = {total} nodes no grafo, {edge_count} edges")
     for node_type, count in sorted(type_counts.items(), key=lambda kv: -kv[1]):
         print(f"  {node_type}\t{count}")

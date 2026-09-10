@@ -85,8 +85,8 @@ def run_doctor(
         exists = os.path.isdir(abspath)
         if not exists:
             report.checks.append(CheckResult(
-                "storage_dir existe", False, f"'{abspath}' não existe ainda.",
-                hint=f"Rode 'tessera init {storage_dir}' para criá-lo.",
+                "storage_dir existe", False, f"'{abspath}' does not exist yet.",
+                hint=f"Run 'tessera init {storage_dir}' to create it.",
             ))
         else:
             probe = os.path.join(abspath, f".tessera_doctor_probe_{uuid.uuid4().hex[:8]}.tmp")
@@ -94,12 +94,12 @@ def run_doctor(
                 f.write("tessera doctor write probe")
             os.remove(probe)
             report.checks.append(CheckResult(
-                "storage_dir existe e é gravável", True, abspath,
+                "storage_dir exists and is writable", True, abspath,
             ))
     except Exception as exc:  # noqa: BLE001 - deliberately broad, this is a diagnostic
         report.checks.append(CheckResult(
-            "storage_dir existe e é gravável", False, str(exc),
-            hint="Verifique permissões do diretório (chmod/chown) ou o caminho passado.",
+            "storage_dir exists and is writable", False, str(exc),
+            hint="Check directory permissions (chmod/chown) or the supplied path.",
         ))
 
     # 2. index builds without raising
@@ -114,12 +114,12 @@ def run_doctor(
         )
         engine.build_index()
         report.checks.append(CheckResult(
-            "índice constrói sem erro", True,
-            f"{engine.graph.number_of_nodes()} nós, {engine.graph.number_of_edges()} arestas",
+            "index builds without errors", True,
+            f"{engine.graph.number_of_nodes()} nodes, {engine.graph.number_of_edges()} edges",
         ))
     except Exception as exc:  # noqa: BLE001
         report.checks.append(CheckResult(
-            "índice constrói sem erro", False, str(exc),
+            "index builds without errors", False, str(exc),
             hint="Verifique se algum .md tem frontmatter YAML malformado.",
         ))
 
@@ -144,8 +144,8 @@ def run_doctor(
         found = any(r["id"] == probe_id for r in results)
         report.checks.append(CheckResult(
             "escrita + leitura (round-trip) funciona", os.path.exists(filepath) and found,
-            f"gravado em {filepath}, recuperável via query: {found}",
-            hint=None if found else "write_memory_note gravou mas retrieve_context não achou a nota de volta.",
+            f"written to {filepath}, recoverable via query: {found}",
+            hint=None if found else "write_memory_note wrote the note but retrieve_context could not find it.",
         ))
     except Exception as exc:  # noqa: BLE001
         report.checks.append(CheckResult(
@@ -160,10 +160,10 @@ def run_doctor(
         import importlib.metadata
 
         rich_version = importlib.metadata.version("rich")
-        report.checks.append(CheckResult("rich instalado (saída colorida)", True, rich_version))
+        report.checks.append(CheckResult("rich installed (colored output)", True, rich_version))
     except Exception:
         report.checks.append(CheckResult(
-            "rich instalado (saída colorida)", False, "não instalado",
+            "rich installed (colored output)", False, "not installed",
             hint="pip install 'rich>=13.0' (ou reinstale com 'pip install -e .')",
         ))
 
@@ -171,10 +171,10 @@ def run_doctor(
     try:
         import mcp  # noqa: F401
 
-        report.checks.append(CheckResult("extra 'mcp' instalado", True, "mcp.server.fastmcp disponível", required=False))
+        report.checks.append(CheckResult("extra 'mcp' installed", True, "mcp.server.fastmcp available", required=False))
     except ImportError:
         report.checks.append(CheckResult(
-            "extra 'mcp' instalado", False, "não instalado",
+            "extra 'mcp' installed", False, "not installed",
             hint="pip install 'tessera[mcp]' se quiser rodar 'tessera-mcp'.",
             required=False,
         ))
@@ -183,7 +183,7 @@ def run_doctor(
     #    does not inspect provider-specific credentials or project files.
     report.checks.append(CheckResult(
         "backend assistido opcional", True,
-        "nenhum backend é sondado ou ativado pelo doctor; configure um llm_fn explicitamente",
+        "no backend is probed or activated by doctor; configure an llm_fn explicitly",
         required=False,
     ))
 
@@ -214,7 +214,7 @@ def _detect_project_type(project_root: str) -> str:
         "pyproject.toml": "python",
         "Cargo.toml": "rust",
         "go.mod": "go",
-        ".git": "git repo (tipo genérico)",
+        ".git": "git repo (type generic)",
     }
     for marker, label in markers.items():
         if os.path.exists(os.path.join(project_root, marker)):
@@ -277,7 +277,7 @@ def apply_quickstart_plan(plan: QuickstartPlan) -> QuickstartPlan:
     engine = TesseraEngine(storage_dir=plan.storage_dir)
     engine.build_index()
     plan.actions_taken.append(
-        f"tessera index {plan.storage_dir}  ({engine.graph.number_of_nodes()} nós indexados)"
+        f"tessera index {plan.storage_dir}  ({engine.graph.number_of_nodes()} nodes indexados)"
     )
     return plan
 

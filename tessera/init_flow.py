@@ -620,7 +620,7 @@ def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> Init
         from .engine import TesseraEngine
 
         engine = TesseraEngine(configuration=selection)
-        status = console.status("[bold #ff9966]Indexando fontes selecionadas...[/]") if console else None
+        status = console.status("[bold #ff9966]Indexing selected sources...[/]") if console else None
         if status:
             status.start()
         try:

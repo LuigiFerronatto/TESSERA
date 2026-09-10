@@ -49,7 +49,7 @@ DECOMPOSER_SYSTEM_PROMPT = (
     "Você é o Agente Decompositor de Memória Tipada do Tessera. Dado um episódio "
     "(início/meio/fim de uma execução de tarefa), extraia TODAS as memórias "
     "atômicas independentes que valem a pena persistir, classificando cada "
-    "uma em exatamente um dos 3 tipos: 'factual' (informação concreta e "
+    "uma em exatamente um dos 3 types: 'factual' (informação concreta and "
     "imutável), 'preference' (comportamento/gosto/feedback de um humano), ou "
     "'procedural_anchor' (aprendizado transferível, aplicável a situações "
     "futuras diferentes desta). Responda APENAS com um array JSON de objetos "
@@ -208,11 +208,11 @@ def _decompose_via_llm(
     episode: Episode, llm_fn: Optional[LlmFn]
 ) -> _AssistedOutcome:
     user_prompt = (
-        "Episódio:\n"
-        f"## Início (contexto/gatilho)\n{episode.beginning.strip()}\n\n"
+        "Episode:\n"
+        f"## Beginning (context/trigger)\n{episode.beginning.strip()}\n\n"
         f"## Meio (o que aconteceu)\n{episode.middle.strip()}\n\n"
         f"## Fim (resultado/aprendizado)\n{episode.end.strip()}\n\n"
-        "Responda apenas com o array JSON de memórias atômicas."
+        "Return only the JSON array of atomic memories."
     )
     if llm_fn is None:
         return _AssistedOutcome(None, "provider_unavailable")

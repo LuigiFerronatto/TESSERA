@@ -195,7 +195,7 @@ class TesseraTaskHook:
         }.get(store)
         if write_fn is None:
             raise ValueError(
-                f"store inválida: {store!r}. Use 'facts', 'preferences' ou 'insights'."
+                f"invalid store: {store!r}. Use 'facts', 'preferences' ou 'insights'."
             )
 
         return write_fn(

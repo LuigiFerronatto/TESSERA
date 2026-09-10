@@ -299,7 +299,7 @@ def _interactive_discovery(root: Path, *, console=None):
     from .source_discovery import discover_sources, discover_sources_for_configuration
 
     config_path = root / ".tessera" / "config.yaml"
-    status = console.status("[bold #ff9966]Carregando fontes do projeto...[/]") if console else None
+    status = console.status("[bold #ff9966]Loading project sources...[/]") if console else None
     if status:
         status.start()
     try:
@@ -454,7 +454,7 @@ def cmd_write(args):
     if not result.persisted:
         decision = result.decision
         print(
-            f"✘ Nota não gravada: admission={decision.admission.value}; "
+            f"✘ Note not written: admission={decision.admission.value}; "
             f"reasons={','.join(decision.reasons)}",
             file=sys.stderr,
         )
@@ -469,14 +469,14 @@ def cmd_write(args):
     if console is not None:
         render_write_result(console, filepath, args.id, args.type, conn_ids)
         return 0
-    print(f"✔ Nota de memória gravada em: {filepath}")
+    print(f"✔ Memory note written to: {filepath}")
     print(
         f"  security: admission={result.decision.admission.value}; "
         f"content_changed={str(result.decision.content_changed).lower()}; "
         f"is_sanitized={str(result.decision.is_sanitized).lower()}"
     )
     if active_connections:
-        print(f"  ({len(active_connections)} conexão(ões) explícita(s) registrada(s): "
+        print(f"  ({len(active_connections)} explicit connection(s) recorded: "
               f"{', '.join(conn_ids)})")
     return 0
 
@@ -488,11 +488,11 @@ def cmd_index(args):
     from .display import get_console, render_index_result
 
     console = get_console(force_plain=getattr(args, "plain", False))
-    status = console.status("[bold #ff9966]Indexando fontes...[/]") if console else None
+    status = console.status("[bold #ff9966]Indexing sources...[/]") if console else None
     if status:
         status.start()
     else:
-        print(f"[tessera] Indexando: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
+        print(f"[tessera] Indexing: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
     try:
         engine.build_index(use_cache=False)
     finally:
@@ -503,15 +503,26 @@ def cmd_index(args):
             console, args.storage_dir, engine.graph.number_of_nodes(), engine.graph.number_of_edges(),
             str(engine.index_cache_pkl), str(engine.index_cache_json),
         )
+        if engine.processing_warnings:
+            console.print(
+                f"[yellow]⚠ {len(engine.processing_warnings)} source note(s) skipped due to parse errors; "
+                "fix them and run `tessera index` again.[/yellow]"
+            )
         return
     print(
-        f"✔ Índice reconstruído: {engine.graph.number_of_nodes()} nós, "
-        f"{engine.graph.number_of_edges()} arestas. (fonte: {args.storage_dir})"
+        f"✔ Index rebuilt: {engine.graph.number_of_nodes()} nodes, "
+        f"{engine.graph.number_of_edges()} edges. (fonte: {args.storage_dir})"
     )
     print(
-        f"  Persistido em: {engine.index_cache_pkl} (binário) e {engine.index_cache_json} (legível)",
+        f"  Persisted at: {engine.index_cache_pkl} (binary) and {engine.index_cache_json} (readable)",
         file=sys.stderr,
     )
+    if engine.processing_warnings:
+        print(
+            f"⚠ {len(engine.processing_warnings)} source note(s) skipped due to parse errors; "
+            "fix them and run `tessera index` again.",
+            file=sys.stderr,
+        )
 
 
 def cmd_query(args):
@@ -520,8 +531,8 @@ def cmd_query(args):
     engine.build_index()
     if engine.graph.number_of_nodes() == 0:
         print(
-            f"Nenhuma nota de memória indexada em '{args.storage_dir}'. "
-            "Verifique o caminho (ou defina TESSERA_STORAGE_DIR)."
+            f"No memory notes indexed em '{args.storage_dir}'. "
+            "Check the path (ou defina TESSERA_STORAGE_DIR)."
         )
         return
     results = engine.retrieve_context(
@@ -533,7 +544,7 @@ def cmd_query(args):
         print(json.dumps(results, ensure_ascii=False, indent=2, default=str))
         return
     if not results:
-        print("Nenhuma memória relevante encontrada para essa consulta.")
+        print("No relevant memories found for this query.")
         return
 
     if args.paths_only:
@@ -579,8 +590,8 @@ def cmd_list(args):
 
     if not rows:
         print(
-            f"Nenhuma nota de memória encontrada em '{args.storage_dir}'. "
-            "Verifique se o caminho está correto ou rode `tessera init <dir>` primeiro."
+            f"No memory note found in '{args.storage_dir}'. "
+            "Check that the path is correct or run `tessera init <dir>` primeiro."
         )
         return
 
@@ -613,7 +624,7 @@ def cmd_skills_install(args):
     if console is not None:
         render_skills_install_result(console, [str(p) for p in paths], os.path.abspath(args.storage_dir))
         return
-    print(f"✔ {len(paths)} âncoras procedimentais instaladas em {os.path.abspath(args.storage_dir)}:")
+    print(f"✔ {len(paths)} procedural anchors installed at {os.path.abspath(args.storage_dir)}:")
     for p in paths:
         print(f"  - {p}")
 
@@ -668,16 +679,16 @@ def cmd_start(args):
     def step_callback(step_name, data):
         if console is not None:
             if step_name == "information_need":
-                console.print(f"[bold]🧠 Necessidade de informação:[/bold] {data}")
+                console.print(f"[bold]🧠 Information need:[/bold] {data}")
             elif step_name == "retrieval_query":
                 console.print(f"[bold]🔎 Consulta de busca planejada:[/bold] {data}")
             elif step_name == "target_stores":
                 console.print(f"[bold]🗂️  Gavetas consultadas:[/bold] {', '.join(data)}")
             elif step_name == "raw_memories":
-                console.print(f"[bold]📚 Memórias brutas recuperadas:[/bold] {len(data)}")
+                console.print(f"[bold]📚 Raw memories retrieved:[/bold] {len(data)}")
                 if data:
                     console.print()
-                    console.rule("[bold]Memórias usadas como evidência[/bold]", style="dim")
+                    console.rule("[bold]Memories used as evidence[/bold]", style="dim")
                     render_query_results(data, console, show_related=True, show_body=False)
             elif step_name == "consolidated_context":
                 from rich.panel import Panel
@@ -686,13 +697,13 @@ def cmd_start(args):
                 console.print(Panel(data, border_style="yellow"))
         else:
             if step_name == "information_need":
-                print(f"🧠 Necessidade de informação: {data}")
+                print(f"🧠 Information need: {data}")
             elif step_name == "retrieval_query":
                 print(f"🔎 Consulta de busca planejada: {data}")
             elif step_name == "target_stores":
                 print(f"🗂️  Gavetas consultadas: {', '.join(data)}")
             elif step_name == "raw_memories":
-                print(f"📚 Memórias brutas recuperadas: {len(data)}")
+                print(f"📚 Raw memories retrieved: {len(data)}")
                 for i, m in enumerate(data, 1):
                     filepath = m.get("filepath") or m.get("filename") or ""
                     print(f"  [{i}] {m['id']} ({m['type']}) score={m['score']:.4f}  [{filepath}]")
@@ -756,18 +767,18 @@ def cmd_decompose(args):
 
     console = get_console(force_plain=getattr(args, "plain", False))
     if console is not None and filepaths:
-        console.print(f"[bold green]✔[/bold green] {len(filepaths)} memória(s) atômica(s) extraída(s) e gravada(s):")
+        console.print(f"[bold green]✔[/bold green] {len(filepaths)} atomic memory/memories extracted and written:")
         for p in filepaths:
             console.print(f"  [dim]-[/dim] {p}")
         return
     if console is not None:
-        console.print("[yellow]![/yellow] Nenhuma memória extraída deste episódio (nada julgado digno de persistir).")
+        console.print("[yellow]![/yellow] No memory was extracted from this episode (nothing judged worth persisting).")
         return
 
     if not filepaths:
-        print("Nenhuma memória extraída deste episódio (nada julgado digno de persistir).")
+        print("No memory was extracted from this episode (nothing judged worth persisting).")
         return
-    print(f"✔ {len(filepaths)} memória(s) atômica(s) extraída(s) e gravada(s):")
+    print(f"✔ {len(filepaths)} atomic memory/memories extracted and written:")
     for p in filepaths:
         print(f"  - {p}")
 

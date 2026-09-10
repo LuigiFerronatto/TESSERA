@@ -525,7 +525,7 @@ class TesseraEngine:
         """
         if store not in STORE_TO_NODE_TYPE:
             raise ValueError(
-                f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
+                f"invalid store: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
             )
         mem_type = STORE_TO_NODE_TYPE[store]
         return self.write_memory_note(
@@ -606,7 +606,7 @@ class TesseraEngine:
         """
         if store not in STORE_TO_NODE_TYPE:
             raise ValueError(
-                f"store inválida: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
+                f"invalid store: {store!r}. Use STORE_FACTS, STORE_PREFERENCES ou STORE_INSIGHTS."
             )
         target_node_type = STORE_TO_NODE_TYPE[store]
         # Over-fetch then filter: DW-PR ranks across the whole graph, so we
@@ -678,8 +678,8 @@ class TesseraEngine:
                 if canonical_meta.metadata_origin.get("id") == "explicit":
                     if mem_id in explicit_ids_indexed:
                         raise ValueError(
-                            f"Collision de IDs Explícitos Detectada: O ID '{mem_id}' foi declarado explicitamente "
-                            f"em múltiplos arquivos: '{filepath}' e '{explicit_ids_indexed[mem_id]}'."
+                            f"Explicit ID collision detected: O ID '{mem_id}' was declared explicitly "
+                            f"in multiple files: '{filepath}' and '{explicit_ids_indexed[mem_id]}'."
                         )
                     explicit_ids_indexed[mem_id] = filepath
 
@@ -771,7 +771,7 @@ class TesseraEngine:
                 if isinstance(e, ValueError) and "Collision de IDs Explícitos" in str(e):
                     raise e
                 print(
-                    f"[Aviso] Falha ao processar a nota física {filename}: {e}",
+                    f"[Warning] Failed to process physical note {filename}: {e}",
                     file=sys.stderr,
                 )
                 self.processing_warnings.append(f"{filename}: {e}")
@@ -1215,8 +1215,8 @@ class TesseraEngine:
                 # E. Intent Type Boost (F3 - matching with query tokens and phrase matching to avoid substring trap)
                 type_boost = 1.0
                 is_procedural_intent = any(tk in query_tokens for tk in ("como", "procedimento", "fluxo", "passo", "tutorial", "deploy", "configurar", "setup", "erro", "bug", "how")) or "como fazer" in query_clean or "how to" in query_clean
-                is_preference_intent = any(tk in query_tokens for tk in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preferência", "preferencia")) or "comportamento do" in query_clean
-                is_factual_intent = any(tk in query_tokens for tk in ("fato", "fact", "quem", "quando", "onde", "valor", "endpoint", "versão", "versao", "id", "nome", "name"))
+                is_preference_intent = any(tk in query_tokens for tk in ("prefere", "gosto", "comportamento", "estilo", "feedback", "tom", "preference", "preferencia")) or "comportamento do" in query_clean
+                is_factual_intent = any(tk in query_tokens for tk in ("fato", "fact", "quem", "when", "where", "value", "endpoint", "version", "versao", "id", "name", "name"))
                 
                 if node_type == "procedural_anchor" and is_procedural_intent:
                     type_boost = 1.3
