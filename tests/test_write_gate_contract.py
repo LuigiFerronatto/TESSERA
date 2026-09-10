@@ -462,7 +462,7 @@ def test_human_cli_invalid_path_is_actionable_and_does_not_leak_path(tmp_path):
     completed = _cli_write(storage, "/tmp/tessera-unauthorized", SAFE, json_output=False)
     assert completed.returncode == 2
     assert "invalid_memory_id_or_path" in completed.stderr
-    assert "Nota não gravada" in completed.stderr
+    assert "Note not written" in completed.stderr
     assert not outside.exists()
     assert _tree_snapshot(storage) == ()
 

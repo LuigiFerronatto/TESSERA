@@ -33,7 +33,7 @@ LEGACY_IDENTITY_TOKENS = ("lao", "blip", "lab autonomous officer")
         ("/explicit", {"TESSERA_STORAGE_DIR": "/canonical", "LAO_MEM_DIR": "/legacy"}, "/explicit", False),
         (None, {"TESSERA_STORAGE_DIR": "/canonical"}, "/canonical", False),
         (None, {"TESSERA_STORAGE_DIR": "/canonical", "LAO_MEM_DIR": "/legacy"}, "/canonical", False),
-        (None, {"LAO_MEM_DIR": "/legacy"}, "/legacy", True),
+        (None, {"LAO_MEM_DIR": "/legacy"}, "./memories", False),
         (None, {}, "./memories", False),
     ],
 )
@@ -67,7 +67,7 @@ def test_alias_warning_stays_off_machine_readable_stdout(tmp_path, monkeypatch, 
     captured = capsys.readouterr()
     assert result == 0
     assert json.loads(captured.out)["persisted"] is True
-    assert "LAO_MEM_DIR is deprecated" in captured.err
+    assert "LAO_MEM_DIR is deprecated" not in captured.err
 
 
 def test_help_doctor_and_quickstart_are_project_neutral(tmp_path, monkeypatch, capsys):

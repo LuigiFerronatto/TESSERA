@@ -34,7 +34,9 @@ def latest_version(*, timeout: float = 1.5) -> Optional[str]:
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             return str(json.load(response)["info"]["version"])
-    except (OSError, ValueError, KeyError, urllib.error.URLError):
+    # Update checks are advisory and must never make a normal command fail.
+    # This also covers intentionally network-isolated clean-room runs.
+    except Exception:
         return None
 
 
