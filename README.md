@@ -27,13 +27,13 @@ CLI remain `tessera`.
 Install the released package with:
 
 ```bash
-python -m pip install "tessera-agent-memory==0.0.1"
+python -m pip install "tessera-agent-memory==0.0.2"
 ```
 
 Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 
 ```bash
-uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.1"
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.2"
 ```
 
 If you do not have an environment yet, create one first with `uv venv`.
@@ -57,10 +57,10 @@ checkout:
 
 ```bash
 uv build
-python -m pip install ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
-python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
+python -m pip install ./dist/tessera_agent_memory-0.0.2-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.2-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.2-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.2-py3-none-any.whl
 python -m pip uninstall tessera-agent-memory
 ```
 
@@ -73,11 +73,11 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 The [#118 clean-room Test Card](docs/test-cards/118-clean-room-onboarding.md)
 records the installed-wheel Python 3.9/3.12 onboarding candidate and CI evidence.
 
-The project version is currently `0.0.1`; `pyproject.toml`, `tessera.__version__`
+The project version is currently `0.0.2`; `pyproject.toml`, `tessera.__version__`
 and installed distribution metadata must agree. Version changes are release
 decisions, not automatic consequences of individual Test Cards.
 
-The first public PyPI release is `tessera-agent-memory==0.0.1`.
+The current release target is `tessera-agent-memory==0.0.2`; `0.0.1` is already published.
 
 ## Quickstart
 

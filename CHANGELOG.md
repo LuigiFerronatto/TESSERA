@@ -8,6 +8,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Changed
+
+- Prepare the next public release as `tessera-agent-memory==0.0.2`, including the interactive init banner, color feedback, and clearer symlink policy output.
+
 ### MCP runtime (#120)
 - Added lazy, explicitly configured stdio startup, operational health and
   versioned request/result/error contracts with serialized Engine access.

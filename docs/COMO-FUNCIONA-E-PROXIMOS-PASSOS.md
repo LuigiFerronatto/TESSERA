@@ -232,8 +232,8 @@ sobre LAO ou sobre a Blip.
 
 ### O que falta para o "plug-and-play" de verdade (próximas evoluções):
 1. ✅ **Publicar no PyPI** (`pip install tessera-agent-memory` ou `uv pip install
-   tessera-agent-memory` de qualquer lugar, sem clonar o repo). Publicado como
-   `tessera-agent-memory==0.0.1` em 2026-09-10.
+   tessera-agent-memory` de qualquer lugar, sem clonar o repo). O próximo release planejado é
+   `tessera-agent-memory==0.0.2`; `0.0.1` já está publicado.
 2. ✅ **Um wizard de setup** (`tessera quickstart`) — implementado
    2026-08-25: detecta o projeto atual (node/python/rust/go/genérico),
    reaproveita um `.claude/memory` existente ou sugere `./memories`, gera
