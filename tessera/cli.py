@@ -1286,10 +1286,7 @@ def main(argv=None):
             if args.command == "doctor":
                 if args.storage_dir is None:
                     configured_project = discover_project_config(os.getcwd())
-                    configured_environment = any(
-                        os.environ.get(name)
-                        for name in (CANONICAL_STORAGE_ENV, LEGACY_STORAGE_ENV)
-                    )
+                    configured_environment = bool(os.environ.get(CANONICAL_STORAGE_ENV))
                     if configured_project or configured_environment:
                         selection = _selection_from_args(args)
                         args.storage_selection = selection
