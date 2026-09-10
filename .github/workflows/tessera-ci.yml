@@ -126,9 +126,12 @@ jobs:
       - name: Verify clean-room onboarding from the installed wheel
         shell: bash
         run: |
+          wheel="$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          sdist="$(find dist -maxdepth 1 -name '*.tar.gz' -print -quit)"
+          test -n "$wheel" && test -n "$sdist"
           python scripts/clean_room/run_clean_room.py \
-            --wheel dist/tessera_agent_memory-0.0.1-py3-none-any.whl \
-            --sdist dist/tessera_agent_memory-0.0.1.tar.gz \
+            --wheel "$wheel" \
+            --sdist "$sdist" \
             --source-sha "$(git rev-parse HEAD)" \
             --output artifacts/clean-room --tty
 
@@ -166,7 +169,7 @@ jobs:
 
           package_path = pathlib.Path(tessera.__file__).resolve()
           assert "site-packages" in package_path.parts
-          assert importlib.metadata.version("tessera-agent-memory") == tessera.__version__ == "0.0.1"
+          assert importlib.metadata.version("tessera-agent-memory") == tessera.__version__
           distribution = importlib.metadata.distribution("tessera-agent-memory")
           assert distribution.metadata["License-Expression"] == "MIT"
           assert distribution.metadata.get_all("License-File") == ["LICENSE"]
