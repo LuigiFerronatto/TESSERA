@@ -1,0 +1,88 @@
+name: TESSERA Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and attest release artifacts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout immutable tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+      - name: Build wheel and sdist
+        run: |
+          uv build
+          uvx twine check dist/*
+      - name: Verify release metadata and artifact boundary
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          python - <<'PY'
+          import hashlib, os, pathlib, re, tarfile, zipfile
+          import tomllib
+          root = pathlib.Path(".")
+          project = tomllib.loads((root / "pyproject.toml").read_text())['project']
+          assert project['name'] == 'tessera-agent-memory'
+          version = project['version']
+          assert re.fullmatch(r'v\d+\.\d+\.\d+', os.environ['RELEASE_TAG'])
+          assert os.environ['RELEASE_TAG'] == f'v{version}'
+          artifacts = sorted(pathlib.Path('dist').iterdir())
+          assert len(artifacts) == 2
+          forbidden = ('tests/', 'docs/', '.github/', 'benchmarks/', 'examples/')
+          with zipfile.ZipFile(next(p for p in artifacts if p.suffix == '.whl')) as z:
+              assert not any(n.startswith(forbidden) for n in z.namelist())
+          with tarfile.open(next(p for p in artifacts if p.suffixes[-2:] == ['.tar', '.gz'])) as t:
+              assert not any(n.split('/', 1)[-1].startswith(forbidden) for n in t.getnames())
+          for p in artifacts:
+              print(f'{p.name} sha256={hashlib.sha256(p.read_bytes()).hexdigest()}')
+          PY
+      - name: Upload immutable artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tessera-release-${{ github.event.inputs.tag || github.ref_name }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI through Trusted Publishing
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/tessera-agent-memory/
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download immutable artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: tessera-release-${{ github.ref_name }}
+          path: dist
+      - name: Publish exact artifacts
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/

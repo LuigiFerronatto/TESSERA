@@ -3,8 +3,8 @@ requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tessera"
-version = "3.4.0"
+name = "tessera-agent-memory"
+version = "0.0.1"
 description = "TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories: a text-first, auditable memory and evidence layer for AI agents."
 readme = "README.md"
 requires-python = ">=3.9"

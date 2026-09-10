@@ -185,18 +185,18 @@ print(json.dumps({'files': sorted(e.file_registry.values()), 'nodes': e.graph.nu
         origin = Path(tessera.__file__).resolve()
         assert "site-packages" in origin.parts
         assert origin.is_relative_to(Path(sys.prefix))
-        assert importlib.metadata.version("tessera") == tessera.__version__
+        assert importlib.metadata.version("tessera-agent-memory") == tessera.__version__
         for name in ("openai", "anthropic", "google.generativeai", "requests", "mcp"):
             try:
                 spec = importlib.util.find_spec(name)
             except ModuleNotFoundError:
                 spec = None
             assert spec is None, name
-        scripts = {e.name: e.value for e in importlib.metadata.distribution("tessera").entry_points}
+        scripts = {e.name: e.value for e in importlib.metadata.distribution("tessera-agent-memory").entry_points}
         assert scripts == {"tessera": "tessera.cli:main", "tessera-mcp": "tessera.mcp_server:main"}
         self.cases["installation"] = {
             "origin": str(origin), "version": tessera.__version__, "python": sys.version,
-            "entry_points": scripts, "requires": importlib.metadata.requires("tessera"),
+            "entry_points": scripts, "requires": importlib.metadata.requires("tessera-agent-memory"),
             "package_data": sorted(x.name for x in resources.files("tessera").joinpath("skills_library").iterdir()),
         }
         project = self.fixture("fixture-project")
@@ -479,7 +479,7 @@ def main():
     try:
         moved = exp.exercise()
         preserved = snapshot(args.root)
-        uninstall = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "tessera"],
+        uninstall = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "tessera-agent-memory"],
                                    capture_output=True, text=True, check=True, timeout=60)
         assert not Path(exp.cli).exists()
         assert not (Path(exp.cli).parent / ("tessera-mcp.exe" if os.name == "nt" else "tessera-mcp")).exists()

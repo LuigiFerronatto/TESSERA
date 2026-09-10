@@ -41,6 +41,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   runtime behavior changed).
 
 ### Added
+- Prepared the first public release line as distribution
+  `tessera-agent-memory==0.0.1`; the Python import and `tessera` CLI remain
+  unchanged. Release artifacts are built immutably and published through the
+  protected Trusted Publishing workflow. ([#134](https://github.com/LuigiFerronatto/TESSERA/issues/134))
 - The standalone MIT license now accompanies wheel and source distributions;
   the repository includes a contribution guide linked from the README.
   ([#87](https://github.com/LuigiFerronatto/TESSERA/issues/87))

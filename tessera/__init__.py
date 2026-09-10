@@ -70,7 +70,7 @@ from .evidence import (
     verify_evidence_freshness,
 )
 
-__version__ = "3.4.0"
+__version__ = "0.0.1"
 
 __all__ = [
     "TesseraEngine",

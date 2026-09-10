@@ -21,6 +21,15 @@ TESSERA turns project knowledge into structured evidence an agent can query with
 
 TESSERA requires Python 3.9+.
 
+The public distribution name is `tessera-agent-memory`; the Python import and
+CLI remain `tessera`.
+
+Install the released package with:
+
+```bash
+python -m pip install "tessera-agent-memory==0.0.1"
+```
+
 Install the current repository version with `pip`:
 
 ```bash
@@ -40,11 +49,11 @@ checkout:
 
 ```bash
 python -m build
-python -m pip install ./dist/tessera-3.4.0-py3-none-any.whl
-python -m pip install "./dist/tessera-3.4.0-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera-3.4.0-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera-3.4.0-py3-none-any.whl
-python -m pip uninstall tessera
+python -m pip install ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.1-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.1-py3-none-any.whl
+python -m pip uninstall tessera-agent-memory
 ```
 
 Uninstall removes the installed package and console commands. Project sources,
@@ -56,7 +65,7 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 The [#118 clean-room Test Card](docs/test-cards/118-clean-room-onboarding.md)
 records the installed-wheel Python 3.9/3.12 onboarding candidate and CI evidence.
 
-The project version is currently `3.4.0`; `pyproject.toml`, `tessera.__version__`
+The project version is currently `0.0.1`; `pyproject.toml`, `tessera.__version__`
 and installed distribution metadata must agree. Version changes are release
 decisions, not automatic consequences of individual Test Cards.
 

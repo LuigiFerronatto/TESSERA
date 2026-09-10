@@ -12,7 +12,7 @@ The adapter requires MCP Python SDK `>=1.30.0,<2.0.0`; version 1.30.0 is the tes
 minimum for the structured-result and lifecycle integration.
 
 ```sh
-python -m pip install './dist/tessera-3.4.0-py3-none-any.whl[mcp]'
+python -m pip install './dist/tessera_agent_memory-0.0.1-py3-none-any.whl[mcp]'
 tessera-mcp --project /absolute/project --request-timeout 60
 # Or an explicit writable store (takes precedence over environment):
 tessera-mcp --store /absolute/memories
