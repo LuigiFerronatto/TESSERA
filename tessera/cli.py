@@ -483,8 +483,7 @@ def cmd_write(args):
 
 def cmd_index(args):
     engine = _engine_for_args(args)
-    # `tessera index` means "rebuild now" — always force a fresh scan, ignoring
-    # any existing cache, then persist the new result to .tessera_index/.
+    # Reuse unchanged source contributions and rebuild only changed sources.
     from .display import get_console, render_index_result
 
     console = get_console(force_plain=getattr(args, "plain", False))
@@ -494,7 +493,7 @@ def cmd_index(args):
     else:
         print(f"[tessera] Indexing: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
     try:
-        engine.build_index(use_cache=False)
+        engine.build_index(use_cache=True)
     finally:
         if status:
             status.stop()
@@ -511,8 +510,17 @@ def cmd_index(args):
         return
     print(
         f"✔ Index rebuilt: {engine.graph.number_of_nodes()} nodes, "
-        f"{engine.graph.number_of_edges()} edges. (fonte: {args.storage_dir})"
+        f"{engine.graph.number_of_edges()} edges. (source: {args.storage_dir})"
     )
+    stats = getattr(engine, "last_index_stats", {})
+    if stats:
+        print(
+            "  sources: "
+            f"scanned={stats.get('scanned', 0)}, parsed={stats.get('parsed', 0)}, "
+            f"unchanged={stats.get('unchanged', 0)}, added={stats.get('added', 0)}, "
+            f"updated={stats.get('updated', 0)}, moved={stats.get('moved', 0)}, "
+            f"removed={stats.get('removed', 0)} ({stats.get('mode', 'unknown')})"
+        )
     print(
         f"  Persisted at: {engine.index_cache_pkl} (binary) and {engine.index_cache_json} (readable)",
         file=sys.stderr,
