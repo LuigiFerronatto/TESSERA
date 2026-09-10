@@ -46,7 +46,7 @@ def test_metadata_and_entry_points_match_the_public_contract() -> None:
     project = config["project"]
 
     assert project["name"] == "tessera-agent-memory"
-    assert project["version"] == "0.0.2"
+    assert project["version"] == "0.0.3"
     assert project["license"] == "MIT"
     assert project["license-files"] == ["LICENSE"]
     assert (ROOT / "LICENSE").is_file()

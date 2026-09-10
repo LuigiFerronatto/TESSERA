@@ -104,6 +104,7 @@ class TesseraEngine:
         )
         self.graph = nx.DiGraph()
         self.file_registry: Dict[str, str] = {}
+        self.processing_warnings: List[str] = []
         self.node_corpus: Dict[str, str] = {}
         self.node_ids: List[str] = []
         self.tfidf_matrix = None
@@ -645,6 +646,7 @@ class TesseraEngine:
         self.graph.clear()
         self.file_registry.clear()
         self.node_corpus.clear()
+        self.processing_warnings.clear()
         pending_connections = []
 
         if not os.path.exists(self.storage_dir):
@@ -772,6 +774,7 @@ class TesseraEngine:
                     f"[Aviso] Falha ao processar a nota física {filename}: {e}",
                     file=sys.stderr,
                 )
+                self.processing_warnings.append(f"{filename}: {e}")
                 continue
 
         for src, dest, rel in pending_connections:

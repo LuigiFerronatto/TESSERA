@@ -227,13 +227,13 @@ sobre LAO ou sobre a Blip.
   comando só, adicionado 2026-08-26).
 - O `storage_dir` já é um argumento explícito em todo comando — nada está
   hardcoded para `.claude/memory/`.
-- O MCP server já lê `LAO_MEM_DIR` via env var, então plugar em outro
-  projeto é só mudar essa variável.
+- O MCP server usa `TESSERA_STORAGE_DIR` via env var, então plugar em outro
+  projeto é só apontar essa variável para o store desejado.
 
 ### O que falta para o "plug-and-play" de verdade (próximas evoluções):
 1. ✅ **Publicar no PyPI** (`pip install tessera-agent-memory` ou `uv pip install
    tessera-agent-memory` de qualquer lugar, sem clonar o repo). O próximo release planejado é
-   `tessera-agent-memory==0.0.2`; `0.0.1` já está publicado.
+   `tessera-agent-memory==0.0.3`; `0.0.1` já está publicado.
 2. ✅ **Um wizard de setup** (`tessera quickstart`) — implementado
    2026-08-25: detecta o projeto atual (node/python/rust/go/genérico),
    reaproveita um `.claude/memory` existente ou sugere `./memories`, gera

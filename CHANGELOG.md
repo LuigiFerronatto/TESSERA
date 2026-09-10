@@ -10,6 +10,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Changed
 
+- Prepare `tessera-agent-memory==0.0.3` with interactive init feedback, update checks, canonical storage configuration, and the corrected TESSERA wordmark.
+
+### Changed
+
 - Prepare the next public release as `tessera-agent-memory==0.0.2`, including the interactive init banner, color feedback, and clearer symlink policy output.
 
 ### MCP runtime (#120)

@@ -106,6 +106,9 @@ def print_banner(console=None) -> None:
 
     gradient = ["#ff9966", "#ff8b61", "#ff805d", "#ff7458", "#ff6a5f", "#ffa34e"]
     text = Text()
+    # Keep the generated glyph art, but include an unambiguous wordmark so
+    # terminals with narrow glyph rendering never lose the second E.
+    text.append("TESSERA\n", style="bold #ff9966")
     for line, color in zip(TESSERA_BANNER_LINES, gradient):
         text.append(line + "\n", style=color)
     text.append(TESSERA_TAGLINE + "\n", style="dim italic")

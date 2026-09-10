@@ -27,13 +27,13 @@ CLI remain `tessera`.
 Install the released package with:
 
 ```bash
-python -m pip install "tessera-agent-memory==0.0.2"
+python -m pip install "tessera-agent-memory==0.0.3"
 ```
 
 Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 
 ```bash
-uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.2"
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.3"
 ```
 
 If you do not have an environment yet, create one first with `uv venv`.
@@ -57,10 +57,10 @@ checkout:
 
 ```bash
 uv build
-python -m pip install ./dist/tessera_agent_memory-0.0.2-py3-none-any.whl
-python -m pip install "./dist/tessera_agent_memory-0.0.2-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera_agent_memory-0.0.2-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.2-py3-none-any.whl
+python -m pip install ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
 python -m pip uninstall tessera-agent-memory
 ```
 
@@ -73,11 +73,11 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 The [#118 clean-room Test Card](docs/test-cards/118-clean-room-onboarding.md)
 records the installed-wheel Python 3.9/3.12 onboarding candidate and CI evidence.
 
-The project version is currently `0.0.2`; `pyproject.toml`, `tessera.__version__`
+The project version is currently `0.0.3`; `pyproject.toml`, `tessera.__version__`
 and installed distribution metadata must agree. Version changes are release
 decisions, not automatic consequences of individual Test Cards.
 
-The current release target is `tessera-agent-memory==0.0.2`; `0.0.1` is already published.
+The current release target is `tessera-agent-memory==0.0.3`; `0.0.1` and `0.0.2` are already published.
 
 ## Quickstart
 
@@ -116,7 +116,7 @@ tessera config unregister research  # metadata only; never deletes the store
 ```
 
 Selection precedence is explicit `--store`/positional path,
-`TESSERA_STORAGE_DIR`, deprecated warning-emitting `LAO_MEM_DIR`, nearest
+`TESSERA_STORAGE_DIR`, nearest
 project config, then an explicitly named global entry. Otherwise product CLI
 operations fail with an actionable configuration error. The direct Python
 compatibility resolver and no-configuration MCP fallback retain historical
@@ -322,8 +322,7 @@ MCP transport (SDK v1.30+, Python 3.10+; certified on 3.12) and `tessera[llm]` a
 extras do not change ownership of reasoning or final-answer policy.
 
 Storage resolution is deterministic: an explicit command/API path wins, then
-`TESSERA_STORAGE_DIR`, then the deprecated `LAO_MEM_DIR` compatibility alias,
-then the nearest project config, then an explicitly named global store. The CLI
+`TESSERA_STORAGE_DIR`, then the nearest project config, then an explicitly named global store. The CLI
 fails with an actionable error if none is selected. The direct Python
 compatibility resolver retains its historical `./memories` fallback. The
 canonical variable outranks the alias, which emits a deprecation warning;

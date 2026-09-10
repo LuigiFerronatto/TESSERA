@@ -41,6 +41,7 @@ from .engine import TesseraEngine
 from .models import Connection, Entity
 from .orchestrator import TesseraOrchestrator
 from .skills import install_default_skills, list_default_skill_files
+from . import __version__
 
 STORAGE_HELP = (
     "Path to memory storage (default precedence: explicit argument, "
@@ -230,7 +231,7 @@ def cmd_init(args):
             print("Initialization cancelled; no files were changed.")
             return 1
     try:
-        result = apply_initialization_plan(plan)
+        result = apply_initialization_plan(plan, console=console if interactive else None)
     except InitializationApplyError as exc:
         if args.json:
             print(json.dumps({
@@ -269,6 +270,19 @@ def cmd_init(args):
     else:
         print(f"✔ TESSERA configured {result.configuration.storage_dir}")
         print(f"✔ {result.indexed_nodes} nodes indexed from {len(result.indexed_sources)} selected files")
+        source_counts = plan.to_dict()["sources"]
+        print(
+            "✔ source discovery: "
+            f"{source_counts['selected_count']} selected, "
+            f"{source_counts['ignored_count']} ignored, "
+            f"{source_counts['forbidden_count']} forbidden"
+        )
+        if result.processing_warnings:
+            print(
+                f"⚠ {len(result.processing_warnings)} source note(s) were skipped due to parse errors; "
+                "fix them and run `tessera index` again.",
+                file=sys.stderr,
+            )
         print("✔ source files modified: 0")
         print("Next: `tessera doctor`, `tessera index`, or `tessera query \"...\"`")
     return 0
@@ -304,7 +318,11 @@ def _interactive_discovery(root: Path, *, console=None):
         detail = f"{count} selectable"
         if cluster.forbidden_count:
             detail += f", {cluster.forbidden_count} forbidden"
-        print(f"  [{marker}] {cluster.path:<28} {detail}")
+        if console is not None:
+            style = {"x": "green", "!": "yellow", "-": "red"}.get(marker, "white")
+            console.print(f"  [{style}]{marker}[/] {cluster.path:<28} {detail}")
+        else:
+            print(f"  [{marker}] {cluster.path:<28} {detail}")
     clustered = {item.path.split('/', 1)[0] for item in discovery.files if "/" in item.path}
     for item in discovery.files:
         if "/" in item.path and item.path.split('/', 1)[0] in clustered:
@@ -315,7 +333,11 @@ def _interactive_discovery(root: Path, *, console=None):
             else "!" if item.classification == "FORBIDDEN"
             else "-"
         )
-        print(f"  [{marker}] {item.path:<28} {item.classification.lower()}")
+        if console is not None:
+            style = {"x": "green", "!": "yellow", "-": "red"}.get(marker, "white")
+            console.print(f"  [{style}]{marker}[/] {item.path:<28} {item.classification.lower()}")
+        else:
+            print(f"  [{marker}] {item.path:<28} {item.classification.lower()}")
     return discovery
 
 
@@ -460,15 +482,22 @@ def cmd_write(args):
 
 
 def cmd_index(args):
-    print(f"[tessera] Indexando: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
     engine = _engine_for_args(args)
     # `tessera index` means "rebuild now" — always force a fresh scan, ignoring
     # any existing cache, then persist the new result to .tessera_index/.
-    engine.build_index(use_cache=False)
-
     from .display import get_console, render_index_result
 
     console = get_console(force_plain=getattr(args, "plain", False))
+    status = console.status("[bold #ff9966]Indexando fontes...[/]") if console else None
+    if status:
+        status.start()
+    else:
+        print(f"[tessera] Indexando: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
+    try:
+        engine.build_index(use_cache=False)
+    finally:
+        if status:
+            status.stop()
     if console is not None:
         render_index_result(
             console, args.storage_dir, engine.graph.number_of_nodes(), engine.graph.number_of_edges(),
@@ -974,6 +1003,27 @@ def cmd_banner(args):
     print_banner(console)
 
 
+def cmd_update(args):
+    from .update import check_for_update, install_latest
+
+    found = check_for_update(force=True)
+    if not found:
+        print("TESSERA is up to date.")
+        return 0
+    installed, latest = found
+    print(f"Update available: {installed} -> {latest}")
+    if getattr(args, "check", False):
+        return 0
+    if not sys.stdin.isatty():
+        print("Run interactively or pass --check to inspect updates.", file=sys.stderr)
+        return 2
+    answer = _init_input("Install this update? [y/N]: ").strip().lower()
+    if answer not in {"y", "yes"}:
+        print("Update cancelled.")
+        return 0
+    return install_latest()
+
+
 def _add_optional_backend_arguments(parser):
     parser.add_argument(
         "--llm-backend",
@@ -997,7 +1047,8 @@ def _add_store_selection_arguments(parser):
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="tessera", description="Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories CLI")
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser.add_argument("--version", "--v", action="store_true", help="Show the installed TESSERA version")
+    sub = parser.add_subparsers(dest="command", required=False)
 
     # Shared --plain flag for the 3 commands with colorized Rich output
     # (query/list/start) — forces plain-text rendering even on a TTY (color
@@ -1131,6 +1182,10 @@ def build_parser():
     p_banner = sub.add_parser("banner", help="Print the Tessera ASCII logo/banner", parents=[plain_parent])
     p_banner.set_defaults(func=cmd_banner)
 
+    p_update = sub.add_parser("update", help="Check for and install a newer TESSERA release")
+    p_update.add_argument("--check", action="store_true", help="Only check; do not prompt or install")
+    p_update.set_defaults(func=cmd_update)
+
     p_stats = sub.add_parser(
         "stats", help="Show index composition: real notes vs. internal tag/entity graph nodes",
         parents=[plain_parent],
@@ -1186,6 +1241,20 @@ def build_parser():
 def main(argv=None):
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.version:
+        from .update import check_for_update
+        found = check_for_update()
+        print(f"tessera {__version__}")
+        if found:
+            print(f"Update available: {found[0]} -> {found[1]}", file=sys.stderr)
+        return 0
+    if args.command is None:
+        parser.error("a command is required (or use --version)")
+    if args.command in {"init", "index", "query", "doctor"}:
+        from .update import check_for_update
+        found = check_for_update()
+        if found and not getattr(args, "json", False):
+            print(f"[tessera] update available: {found[0]} -> {found[1]} (run `tessera update`)", file=sys.stderr)
     if args.command in {"query", "start"}:
         text_field = "query" if args.command == "query" else "task"
         if getattr(args, text_field) is None:

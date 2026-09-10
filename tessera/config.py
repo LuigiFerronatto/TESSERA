@@ -556,17 +556,6 @@ class ConfigurationResolver:
         canonical = self.environ.get(CANONICAL_STORAGE_ENV)
         if canonical:
             return _legacy_configuration(str(_canonical_path(canonical)), "environment")
-        legacy = self.environ.get(LEGACY_STORAGE_ENV)
-        if legacy:
-            if warn_legacy:
-                warnings.warn(
-                    f"{LEGACY_STORAGE_ENV} is deprecated; set {CANONICAL_STORAGE_ENV} "
-                    "instead. The compatibility alias will be removed in a future release.",
-                    LegacyStorageConfigurationWarning,
-                    stacklevel=2,
-                )
-            return _legacy_configuration(str(_canonical_path(legacy)), "environment")
-
         project_start = self.cwd if project is None else Path(project).expanduser().resolve(strict=False)
         config_path = discover_project_config(project_start, home=self.home)
         if config_path is not None:
@@ -871,24 +860,13 @@ def resolve_storage_dir(
     environ: Optional[Mapping[str, str]] = None,
     warn_legacy: bool = True,
 ) -> str:
-    """Legacy direct-library resolver: explicit/env/deprecated-env/./memories."""
+    """Resolve an explicit path, canonical environment path, or ./memories."""
     if explicit:
         return explicit
     env = os.environ if environ is None else environ
     canonical = env.get(CANONICAL_STORAGE_ENV)
     if canonical:
         return canonical
-    legacy = env.get(LEGACY_STORAGE_ENV)
-    if legacy:
-        if warn_legacy:
-            warnings.warn(
-                f"{LEGACY_STORAGE_ENV} is deprecated; set "
-                f"{CANONICAL_STORAGE_ENV} instead. The compatibility alias "
-                "will be removed in a future release.",
-                LegacyStorageConfigurationWarning,
-                stacklevel=2,
-            )
-        return legacy
     return DEFAULT_STORAGE_DIR
 
 
@@ -907,7 +885,6 @@ def resolve_runtime_configuration(
     resolver = ConfigurationResolver(environ=active_environment, cwd=cwd)
     has_environment_selection = bool(
         active_environment.get(CANONICAL_STORAGE_ENV)
-        or active_environment.get(LEGACY_STORAGE_ENV)
     )
     has_project_selection = discover_project_config(
         resolver.cwd, home=resolver.home

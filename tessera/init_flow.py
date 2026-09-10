@@ -140,6 +140,7 @@ class InitializationResult:
     indexed_sources: Tuple[str, ...]
     config_applied: bool = True
     ignore_applied: bool = False
+    processing_warnings: Tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -150,6 +151,7 @@ class InitializationResult:
             "source_files_modified": 0,
             "config_applied": self.config_applied,
             "ignore_applied": self.ignore_applied,
+            "processing_warnings": list(self.processing_warnings),
         }
 
 
@@ -554,7 +556,7 @@ def build_initialization_plan(request: InitRequest) -> InitializationPlan:
     )
 
 
-def apply_initialization_plan(plan: InitializationPlan) -> InitializationResult:
+def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> InitializationResult:
     if plan.preflight_problems:
         raise ConfigurationError("preflight failed: " + "; ".join(plan.preflight_problems))
     base = build_init_plan(
@@ -618,7 +620,14 @@ def apply_initialization_plan(plan: InitializationPlan) -> InitializationResult:
         from .engine import TesseraEngine
 
         engine = TesseraEngine(configuration=selection)
-        engine.build_index(use_cache=True)
+        status = console.status("[bold #ff9966]Indexando fontes selecionadas...[/]") if console else None
+        if status:
+            status.start()
+        try:
+            engine.build_index(use_cache=True)
+        finally:
+            if status:
+                status.stop()
         indexed = tuple(sorted(engine.file_registry.values()))
         allowed = {
             str(path.resolve(strict=False))
@@ -632,6 +641,7 @@ def apply_initialization_plan(plan: InitializationPlan) -> InitializationResult:
         return InitializationResult(
             selection, engine.graph.number_of_nodes(), engine.graph.number_of_edges(), indexed,
             config_applied=config_applied, ignore_applied=ignore_applied,
+            processing_warnings=tuple(engine.processing_warnings),
         )
     except Exception as exc:
         if apply_started or config_applied:
