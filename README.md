@@ -422,33 +422,6 @@ For implementation details, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 ## Project status
 
 TESSERA is an evolving Foundation. The current implementation is usable, but several long-term-memory capabilities are still being tested.
-
-### Available today
-
-- canonical metadata and document classification;
-- stable memory and source-document identity;
-- explainable local retrieval;
-- query-aware relevant evidence;
-- Evidence Ledger and provenance;
-- explicit relation parsing/navigation;
-- Python, CLI, and MCP surfaces;
-- deterministic CI and sanity evaluation.
-- lossless Engine/CLI/MCP direct-query contract parity.
-
-### Being tested next
-
-- incremental and idempotent indexing;
-- broader text ingestion and structural segmentation;
-- LongMemEval baseline;
-- query-aware graph expansion and relation confidence;
-- temporal state and state keys;
-- authority, precedence, conflict, and evidence arbitration;
-- adaptive retrieval and evidence sufficiency.
-
-The deterministic-core/optional-LLM responsibility boundary is accepted in
-[`ADR 0001`](docs/adr/0001-core-vs-optional-llm-boundary.md). Its migration and
-experimental follow-ups remain separate Test Cards.
-
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the experimental sequence and linked Test Cards.
 
 ## Research references
@@ -528,7 +501,3 @@ copyright and license notices supplied with third-party code and assets.
 TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
 
 See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
-
-The #120 MCP candidate adds `tessera-mcp --project /absolute/project`, isolated
-startup and versioned `data`/`error` responses. See [MCP runtime contract](docs/MCP_RUNTIME.md)
-for configuration precedence, provider injection, deadlines and migration.
