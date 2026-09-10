@@ -9,6 +9,11 @@ on:
         description: Existing version tag to release
         required: true
         type: string
+      publish:
+        description: Publish the built artifacts to PyPI
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -48,7 +53,7 @@ jobs:
           version = project['version']
           assert re.fullmatch(r'v\d+\.\d+\.\d+', os.environ['RELEASE_TAG'])
           assert os.environ['RELEASE_TAG'] == f'v{version}'
-          artifacts = sorted(pathlib.Path('dist').iterdir())
+          artifacts = sorted(p for p in pathlib.Path('dist').iterdir() if p.is_file())
           assert len(artifacts) == 2
           forbidden = ('tests/', 'docs/', '.github/', 'benchmarks/', 'examples/')
           with zipfile.ZipFile(next(p for p in artifacts if p.suffix == '.whl')) as z:
@@ -68,7 +73,7 @@ jobs:
   publish:
     name: Publish to PyPI through Trusted Publishing
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || inputs.publish == true
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -80,7 +85,7 @@ jobs:
       - name: Download immutable artifacts
         uses: actions/download-artifact@v4
         with:
-          name: tessera-release-${{ github.ref_name }}
+          name: tessera-release-${{ github.event.inputs.tag || github.ref_name }}
           path: dist
       - name: Publish exact artifacts
         uses: pypa/gh-action-pypi-publish@release/v1
