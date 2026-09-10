@@ -80,14 +80,6 @@ The derived `.tessera/index/` also remains; remove only that configured index
 directory if you want to discard the cache, then use `tessera index` after
 reinstalling to rebuild it. Keep the config, source files and generated store.
 
-The [#118 clean-room Test Card](docs/test-cards/118-clean-room-onboarding.md)
-records the installed-wheel Python 3.9/3.12 onboarding candidate and CI evidence.
-
-The project version is currently `0.0.3`; `pyproject.toml`, `tessera.__version__`
-and installed distribution metadata must agree. Version changes are release
-decisions, not automatic consequences of individual Test Cards.
-
-The current release target is `tessera-agent-memory==0.0.3`; `0.0.1` and `0.0.2` are already published.
 
 ## Quickstart
 
