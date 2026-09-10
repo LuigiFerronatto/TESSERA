@@ -36,7 +36,7 @@ Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.3"
 ```
 
-To upgrade from PyPI while bypassing a configured corporate mirror:
+To upgrade from PyPI:
 
 ```bash
 uv pip install \
