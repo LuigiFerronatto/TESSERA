@@ -10,6 +10,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #120 post-merge reconciliation (2026-09-09): PR #229 merged as `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; canonical CI and Benchmark Ledger passed. #120 is `VALIDATED / KEEP`, historical Queue 5. #121 is READY / LATER / Queue 43; no implementation is selected by dependency readiness.
 
+> #134 post-merge reconciliation (2026-09-10): PR #237 merged as canonical `bcc371045c226dde13138eadd451c4e14de5b33e`. This delivers R0/R1 release engineering only (frozen distribution `tessera-agent-memory`, frozen version `0.0.1`, protected `.github/workflows/release.yml` with Trusted Publishing, updated docs/CHANGELOG). #134 is `IMPLEMENTED`, not `VALIDATED`: TestPyPI publication, production PyPI publication and post-publication smoke (R2–R5) remain outstanding, so the issue was reopened by the maintainer rather than closed. #134 is no longer `BLOCKED`/`READY`; it is `IN_PROGRESS` pending its own remaining release gates.
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
@@ -151,7 +153,7 @@ unselected. No release or downstream implementation is selected by this work.
 ## NEXT
 
 ```text
-#134 PyPI release                                READY / NEXT — #87 satisfied
+#134 PyPI release                                IN_PROGRESS — R0/R1 merged (#237), TestPyPI/production publication pending
 ```
 
 ## Full execution queue
@@ -268,7 +270,7 @@ FIRST PUBLIC RELEASE
   -> #154 source discovery VALIDATED
       -> #155 init UX VALIDATED
           -> #118 clean onboarding VALIDATED
-              -> #134 PyPI release READY / NEXT
+              -> #134 PyPI release IN_PROGRESS (R0/R1 merged, publication pending)
 
 #87 owner-approved LICENSE/contribution decision
   -------------------------------------> #134
@@ -448,7 +450,7 @@ Status: architecture, packaging and Configuration v1 are validated. Productizati
                  -> #154 sources     VALIDATED
                       -> #155 init UX VALIDATED
                            -> #118 clean onboarding VALIDATED
-                                -> #134 first PyPI release READY / NEXT
+                                -> #134 first PyPI release IN_PROGRESS (R0/R1 merged, publication pending)
 
 #87 legal/repository entrypoint -------------------------------> #134
 
@@ -686,7 +688,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#120](https://github.com/LuigiFerronatto/TESSERA/issues/120) | closed | `VALIDATED` | FOUNDATION | Agent Integration | `KEEP`; historical Queue 5. PR #229 candidate `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211`, canonical squash merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; one runtime delivery. [Test Card](test-cards/120-mcp-runtime-robustness.md). Semantic memory intents belong #171. |
 | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) | open | `READY` | EXECUTABLE | Agent Integration | #116/#117/#120/#68/#92 satisfied; official Skills only. LATER / Queue 43, unselected; dependent implementation waits for lifecycle reconciliation to merge. |
 | [#87](https://github.com/LuigiFerronatto/TESSERA/issues/87) | closed | `VALIDATED` | ADMIN | Release | Historical NOW / Queue 6; `KEEP`; PR #233 canonical merge `d473f230b914908fcaad3a46291b5046bde6b918`. [Test Card](test-cards/87-license-contribution.md). |
-| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `READY` | RELEASE_GATE | Productization | #87 legal prerequisite satisfied; next release gate. #117/#118 are satisfied; #153/#154/#155 are canonically validated. Publication still requires #134's own checks. |
+| [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `IN_PROGRESS` | RELEASE_GATE | Productization | PR #237 canonical merge `bcc371045c226dde13138eadd451c4e14de5b33e` delivers R0/R1 release engineering (frozen name/version, `release.yml` Trusted Publishing). Reopened by maintainer; TestPyPI proof, production PyPI publication and post-publication smoke (R2–R5) remain outstanding. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
 | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) dependency satisfied; source episode/supporting turns/temporal position. |
@@ -968,7 +970,7 @@ After #155, #135, the #16 P0 containment, #118 onboarding and #120 MCP deliverie
 #120 MCP transport/runtime robustness           VALIDATED / KEEP — historical Queue 5
 #121 Official Skills                            READY / LATER — Queue 43 (unselected)
 #87  LICENSE / CONTRIBUTING                     VALIDATED / KEEP — historical Queue 6
-#134 PyPI release                              READY — #87 prerequisite satisfied
+#134 PyPI release                              IN_PROGRESS — R0/R1 merged (#237); TestPyPI/production publication pending
 ```
 
 #118 proved the installed configuration/discovery/init contract; its canonical
@@ -998,7 +1000,7 @@ PRODUCTIZATION / RELEASE
              -> #154 VALIDATED
                  -> #155 VALIDATED
                      -> #118 VALIDATED
-                         -> #134 BLOCKED
+                         -> #134 IN_PROGRESS (R0/R1 merged, publication pending)
 #87 ADMIN VALIDATED / KEEP (historical) --^
 
 #120 VALIDATED -> #121 READY (LATER / Queue 43)
