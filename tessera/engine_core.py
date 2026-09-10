@@ -676,6 +676,13 @@ class TesseraEngine:
             except Exception:
                 previous_registry = {}
 
+        # The identity manifest is only a change index. It cannot recreate
+        # graph nodes by itself. If the graph snapshot is unavailable for a
+        # fresh engine, discard the manifest as an incremental source and
+        # perform a complete rebuild instead.
+        if not previous_registry and self.graph.number_of_nodes() == 0:
+            previous_manifest = {}
+
         current_paths = {
             self._relative_identity_path(path): path
             for path in self._iter_markdown_files(recursive=recursive)

@@ -22,6 +22,20 @@ def test_noop_index_parses_zero_sources(tmp_path):
     assert engine.last_index_stats["mode"] == "incremental"
 
 
+def test_manifest_without_graph_snapshot_forces_full_rebuild(tmp_path):
+    _note(tmp_path / "one.md", "# One\nalpha")
+    first = TesseraEngine(storage_dir=str(tmp_path))
+    first.build_index(use_cache=False)
+    Path(first.index_cache_pkl).unlink()
+
+    second = TesseraEngine(storage_dir=str(tmp_path))
+    second.build_index(use_cache=False)
+
+    assert second.last_index_stats["mode"] == "clean_rebuild"
+    assert second.last_index_stats["parsed"] == 1
+    assert len(second.graph.nodes) == 1
+
+
 def test_add_edit_move_delete_preserves_identity_and_removes_stale_nodes(tmp_path):
     original = tmp_path / "one.md"
     _note(original, "# One\nalpha")

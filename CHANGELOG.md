@@ -11,6 +11,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ### Changed
 
 - Prepare `tessera-agent-memory==0.0.3` with interactive init feedback, update checks, canonical storage configuration, and the corrected TESSERA wordmark.
+- `tessera index` now reuses unchanged source contributions, reports add/edit/move/delete statistics, preserves stable identities across moves, and removes stale derived nodes when sources are deleted. (#12)
 
 ### Changed
 
