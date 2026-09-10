@@ -48,7 +48,7 @@ jobs:
           version = project['version']
           assert re.fullmatch(r'v\d+\.\d+\.\d+', os.environ['RELEASE_TAG'])
           assert os.environ['RELEASE_TAG'] == f'v{version}'
-          artifacts = sorted(pathlib.Path('dist').iterdir())
+          artifacts = sorted(p for p in pathlib.Path('dist').iterdir() if p.is_file())
           assert len(artifacts) == 2
           forbidden = ('tests/', 'docs/', '.github/', 'benchmarks/', 'examples/')
           with zipfile.ZipFile(next(p for p in artifacts if p.suffix == '.whl')) as z:
