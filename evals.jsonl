@@ -213,3 +213,8 @@
 {"id":"contract_fidelity","question":"Did every blocking finding identify a concrete contract or implementation mismatch?","answer":"UNKNOWN","model":"evals","timestamp":"2026-09-10T18:12:06.669Z","runid":"34512053938"}
 {"id":"false_positive_control","question":"Did the audit avoid unsupported or purely stylistic blocking findings?","answer":"YES","model":"evals","timestamp":"2026-09-10T18:12:06.669Z","runid":"34512053938"}
 {"id":"downstream_boundary","question":"Did the audit avoid demanding implementation of unrelated downstream work?","answer":"YES","model":"evals","timestamp":"2026-09-10T18:12:06.669Z","runid":"34512053938"}
+{"id":"operational_value","question":"Did the audit determine whether the exact current PR head is safe to merge against its linked Test Card and TESSERA repository contracts?","answer":"YES","model":"evals","timestamp":"2026-09-10T19:48:48.703Z","runid":"34521961455"}
+{"id":"final_head","question":"Did the audit explicitly identify the exact PR head SHA reviewed?","answer":"YES","model":"evals","timestamp":"2026-09-10T19:48:48.703Z","runid":"34521961455"}
+{"id":"contract_fidelity","question":"Did every blocking finding identify a concrete contract or implementation mismatch?","answer":"YES","model":"evals","timestamp":"2026-09-10T19:48:48.703Z","runid":"34521961455"}
+{"id":"false_positive_control","question":"Did the audit avoid unsupported or purely stylistic blocking findings?","answer":"YES","model":"evals","timestamp":"2026-09-10T19:48:48.703Z","runid":"34521961455"}
+{"id":"downstream_boundary","question":"Did the audit avoid demanding implementation of unrelated downstream work?","answer":"YES","model":"evals","timestamp":"2026-09-10T19:48:48.703Z","runid":"34521961455"}
