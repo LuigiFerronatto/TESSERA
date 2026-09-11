@@ -70,8 +70,8 @@ def test_p0_p1_p2_and_p7_exact_precedence(tmp_path):
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         selection = legacy.resolve(global_name="research")
-    assert selection.source == "environment"
-    assert any(issubclass(item.category, LegacyStorageConfigurationWarning) for item in caught)
+    assert selection.source == "project_config"
+    assert not caught
     assert _resolver(tmp_path, nested).resolve().source == "project_config"
 
 

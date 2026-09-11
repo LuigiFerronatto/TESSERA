@@ -34,7 +34,9 @@ def latest_version(*, timeout: float = 1.5) -> Optional[str]:
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             return str(json.load(response)["info"]["version"])
-    except (OSError, ValueError, KeyError, urllib.error.URLError):
+    # Update checks are advisory and must never make a normal command fail.
+    # This also covers intentionally network-isolated clean-room runs.
+    except Exception:
         return None
 
 
@@ -45,7 +47,8 @@ def check_for_update(*, force: bool = False) -> Optional[Tuple[str, str]]:
     ``TESSERA_NO_UPDATE_CHECK=1`` to opt out, or use ``force=True`` from the
     explicit ``tessera update`` command.
     """
-    if os.environ.get("TESSERA_NO_UPDATE_CHECK"):
+    # Distribution clean-room runs deliberately deny network access.
+    if os.environ.get("TESSERA_NO_UPDATE_CHECK") or os.environ.get("TESSERA_CLEAN_ROOM_OFFLINE") == "1":
         return None
     from . import __version__
 

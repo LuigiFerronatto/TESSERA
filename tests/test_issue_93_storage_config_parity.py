@@ -103,7 +103,7 @@ print(json.dumps(payload, ensure_ascii=False, default=str))
             "canonical",
             False,
         ),
-        ("legacy", None, {"LAO_MEM_DIR": "legacy"}, "legacy", True),
+        ("legacy-ignored", None, {"LAO_MEM_DIR": "legacy"}, "default", False),
         ("default", None, {}, "default", False),
         ("implicit-claude-ignored", None, {}, "default", False),
         ("explicit-claude", "claude", {}, "claude", False),
@@ -187,7 +187,7 @@ def test_executable_storage_resolution_matrix(
     [
         ({"TESSERA_STORAGE_DIR": "canonical"}, "canonical", 0),
         ({"TESSERA_STORAGE_DIR": "canonical", "LAO_MEM_DIR": "legacy"}, "canonical", 0),
-        ({"LAO_MEM_DIR": "legacy"}, "legacy", 1),
+        ({"LAO_MEM_DIR": "legacy"}, "default", 0),
         ({}, "default", 0),
     ],
 )

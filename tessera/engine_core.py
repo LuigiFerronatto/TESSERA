@@ -107,6 +107,7 @@ class TesseraEngine:
         self.processing_warnings: List[str] = []
         self.node_corpus: Dict[str, str] = {}
         self.node_ids: List[str] = []
+        self.last_index_stats: Dict[str, Any] = {}
         self.tfidf_matrix = None
         self.vectorizer = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b")
         self.gating_engine = WriteGatingEngine()
@@ -225,7 +226,7 @@ class TesseraEngine:
         doc_id = f"doc_{compute_sha256(rel_path)[:12]}"
         return mem_id, doc_id
 
-    def _update_identity_manifest(self, filepath: str, canonical_meta: Any) -> None:
+    def _update_identity_manifest(self, filepath: str, canonical_meta: Any, raw_text: str = "") -> None:
         """Updates the stable identity manifest with a parsed document's metadata."""
         rel_path = self._relative_identity_path(filepath)
         stable_id = canonical_meta.identity.id
@@ -240,6 +241,7 @@ class TesseraEngine:
             "id": stable_id,
             "document_id": doc_id,
             "content_hash": canonical_meta.source.content_hash,
+            "file_hash": __import__("hashlib").sha256(raw_text.encode("utf-8")).hexdigest(),
             "updated_at": datetime.datetime.now().isoformat()
         }
 
@@ -641,21 +643,119 @@ class TesseraEngine:
                 JSON summary) once the scan finishes.
         """
         if use_cache and self._load_index_if_fresh():
+            self.last_index_stats = {
+                "scanned": len(list(self._iter_markdown_files(recursive=recursive))),
+                "hashed": 0,
+                "parsed": 0,
+                "unchanged": len(self.file_registry),
+                "added": 0,
+                "updated": 0,
+                "moved": 0,
+                "removed": 0,
+                "mode": "cache_hit",
+            }
             return
 
-        self.graph.clear()
-        self.file_registry.clear()
-        self.node_corpus.clear()
+        # Reuse the previous graph when a persisted snapshot exists. Source
+        # nodes whose content/path changed are removed and reparsed below;
+        # unchanged nodes remain in place. TF-IDF is still refit globally.
+        previous_manifest = dict(self.identity_manifest)
+        previous_registry = dict(self.file_registry)
+        if not previous_registry and os.path.exists(self.index_cache_pkl):
+            try:
+                import pickle
+                with open(self.index_cache_pkl, "rb") as handle:
+                    previous = pickle.load(handle)
+                self.graph = previous.get("graph", self.graph)
+                self.file_registry = previous.get("file_registry", {})
+                self.node_corpus = previous.get("node_corpus", {})
+                self.node_ids = previous.get("node_ids", [])
+                self.tfidf_matrix = previous.get("tfidf_matrix")
+                self.vectorizer = previous.get("vectorizer", self.vectorizer)
+                previous_registry = dict(self.file_registry)
+            except Exception:
+                previous_registry = {}
+
+        # The identity manifest is only a change index. It cannot recreate
+        # graph nodes by itself. If the graph snapshot is unavailable for a
+        # fresh engine, discard the manifest as an incremental source and
+        # perform a complete rebuild instead.
+        if not previous_registry and self.graph.number_of_nodes() == 0:
+            previous_manifest = {}
+
+        current_paths = {
+            self._relative_identity_path(path): path
+            for path in self._iter_markdown_files(recursive=recursive)
+        }
+        import hashlib
+        current_hashes = {}
+        for rel_path, path in current_paths.items():
+            try:
+                with open(path, "rb") as handle:
+                    current_hashes[rel_path] = hashlib.sha256(handle.read()).hexdigest()
+            except OSError:
+                continue
+        unchanged_paths = {
+            path for path, entry in previous_manifest.items()
+            if path in current_hashes and entry.get("file_hash", entry.get("content_hash")) == current_hashes[path]
+        }
+        # A project may have been moved since the snapshot was written. The
+        # old graph still points at the previous absolute paths, so retaining
+        # its nodes while skipping hash-equal sources would silently drop all
+        # relocated content. Reparse every current source while preserving the
+        # identity manifest for stable IDs.
+        if previous_registry and any(not os.path.exists(path) for path in previous_registry.values()):
+            self.graph.clear()
+            self.file_registry.clear()
+            self.node_corpus.clear()
+            self.node_ids.clear()
+            previous_registry = {}
+            unchanged_paths = set()
+        changed_paths = set(current_paths) - unchanged_paths
+        removed_paths = set(previous_manifest) - set(current_paths)
+        added_paths = set(current_paths) - set(previous_manifest)
+        moved_paths = {
+            path for path in changed_paths
+            if path in current_hashes and any(
+                entry.get("file_hash", entry.get("content_hash")) == current_hashes[path]
+                for old_path, entry in previous_manifest.items()
+                if old_path not in current_paths
+            )
+        }
+        incremental = bool(previous_registry or previous_manifest) and bool(
+            unchanged_paths or changed_paths or removed_paths
+        )
+
+        if incremental:
+            stale_ids = []
+            for mem_id, filepath in list(previous_registry.items()):
+                old_rel = self._relative_identity_path(filepath)
+                if old_rel not in unchanged_paths:
+                    stale_ids.append(mem_id)
+            for mem_id in stale_ids:
+                self.file_registry.pop(mem_id, None)
+                self.node_corpus.pop(mem_id, None)
+                if mem_id in self.graph:
+                    self.graph.remove_node(mem_id)
+            self.identity_manifest = previous_manifest
+        else:
+            self.graph.clear()
+            self.file_registry.clear()
+            self.node_corpus.clear()
+            self.processing_warnings.clear()
+
         self.processing_warnings.clear()
         pending_connections = []
 
-        if not os.path.exists(self.storage_dir):
+        if not os.path.exists(self.storage_dir) and not self.source_roots:
             return
 
         explicit_ids_indexed = {}
 
         for filepath in self._iter_markdown_files(recursive=recursive):
             filename = self._relative_identity_path(filepath)
+            if incremental and filename in unchanged_paths:
+                continue
             try:
                 with open(filepath, "r", encoding="utf-8") as f:
                     raw_text = f.read()
@@ -668,7 +768,7 @@ class TesseraEngine:
                     raw_text, filepath, self._identity_base_for(filepath),
                     persistent_id=persistent_id, persistent_doc_id=persistent_doc_id
                 )
-                self._update_identity_manifest(filepath, canonical_meta)
+                self._update_identity_manifest(filepath, canonical_meta, raw_text)
 
                 mem_id = canonical_meta.identity.id
                 if not mem_id:
@@ -678,7 +778,7 @@ class TesseraEngine:
                 if canonical_meta.metadata_origin.get("id") == "explicit":
                     if mem_id in explicit_ids_indexed:
                         raise ValueError(
-                            f"Explicit ID collision detected: O ID '{mem_id}' was declared explicitly "
+                            f"Collision de IDs Explícitos Detectada: O ID '{mem_id}' was declared explicitly "
                             f"in multiple files: '{filepath}' and '{explicit_ids_indexed[mem_id]}'."
                         )
                     explicit_ids_indexed[mem_id] = filepath
@@ -768,7 +868,10 @@ class TesseraEngine:
 
             except Exception as e:
                 # Re-raise explicit collisions to fail build_index properly
-                if isinstance(e, ValueError) and "Collision de IDs Explícitos" in str(e):
+                if isinstance(e, ValueError) and (
+                    "Collision de IDs Explícitos" in str(e)
+                    or "Explicit ID collision" in str(e)
+                ):
                     raise e
                 print(
                     f"[Warning] Failed to process physical note {filename}: {e}",
@@ -776,6 +879,16 @@ class TesseraEngine:
                 )
                 self.processing_warnings.append(f"{filename}: {e}")
                 continue
+
+        if incremental:
+            # Entity/tag nodes are derived from source nodes. Remove only
+            # those no longer referenced after changed/deleted sources.
+            for node_id, data in list(self.graph.nodes(data=True)):
+                if data.get("node_type") in {"entity", "tag"} and self.graph.degree(node_id) == 0:
+                    self.graph.remove_node(node_id)
+                    self.node_corpus.pop(node_id, None)
+            for old_rel in set(self.identity_manifest) - set(current_paths):
+                self.identity_manifest.pop(old_rel, None)
 
         for src, dest, rel in pending_connections:
             if src in self.graph and dest in self.graph:
@@ -788,6 +901,18 @@ class TesseraEngine:
 
         if persist:
             self.save_index()
+
+        self.last_index_stats = {
+            "scanned": len(current_paths),
+            "hashed": len(current_hashes),
+            "parsed": len(changed_paths),
+            "unchanged": len(unchanged_paths),
+            "added": len(added_paths - moved_paths),
+            "updated": len(changed_paths - moved_paths),
+            "moved": len(moved_paths),
+            "removed": len(removed_paths),
+            "mode": "incremental" if incremental else "clean_rebuild",
+        }
 
     # ------------------------------------------------------------------
     # Index persistence (disk cache)

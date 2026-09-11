@@ -18,7 +18,7 @@ def test_release_workflow_is_tagged_and_separates_build_from_publish() -> None:
 
 def test_release_workflow_scopes_oidc_to_publish_job() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
-    build, publish = text.split("  publish:", 1)
+    build, publish = text.split("\n  publish:\n    name: Publish", 1)
     assert "id-token: write" not in build
     assert "id-token: write" in publish
     assert "pull_request" not in text

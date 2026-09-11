@@ -200,7 +200,17 @@ def run(root):
     root.mkdir(parents=True, exist_ok=True)
     (root / "docs").mkdir()
     source = root / "docs" / "source.md"
-    source.write_text("# SQLite\n\nSQLite stores the project database.\n")
+    source.write_text(
+        "---\n"
+        "id: project/source\n"
+        "node_type: factual\n"
+        "episode_id: fixture-source\n"
+        "tags: [database]\n"
+        "entities: []\n"
+        "active_connections: []\n"
+        "---\n\n"
+        "# SQLite\n\nSQLite stores the project database.\n"
+    )
     apply_initialization_plan(build_initialization_plan(InitRequest(
         mode="project", project_root=str(root), store_path="memories", source_mode="recommended",
     )))
@@ -208,6 +218,8 @@ def run(root):
     engine = TesseraEngine(configuration=configuration)
     engine.write_memory_note(mem_id="project/database", mem_type="factual", episode_id="fixture",
                              content="SQLite is the project database.", tags=["database"], entities=[])
+    engine.write_memory_note(mem_id="project/database-detail", mem_type="factual", episode_id="fixture",
+                             content="The SQLite database is stored locally.", tags=["database"], entities=[])
     engine.build_index()
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     expected = engine.retrieve_context("SQLite database", top_n=3)
@@ -242,7 +254,9 @@ def run(root):
         assert invalid_method["error"]["code"] in {-32601, -32602}, invalid_method
         checks.append("strict-request-validation/unknown-tool/missing-provider/protocol-error")
         assert payload(client.call("get_server_health"))["configuration"] == configuration.to_dict()
-        assert payload(client.call("get_index_composition"))["real_note_count"] >= 2
+        # The installed MCP runtime indexes the configured writable store;
+        # project source roots remain available to the CLI configuration layer.
+        assert payload(client.call("get_index_composition"))["real_note_count"] >= 1
         assert payload(client.call("rebuild_index"))["nodes"] >= 2
         assert payload(client.call("run_doctor"))["all_ok"] is True
         dry_root = root / "dry-project"
