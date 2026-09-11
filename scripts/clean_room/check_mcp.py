@@ -218,6 +218,8 @@ def run(root):
     engine = TesseraEngine(configuration=configuration)
     engine.write_memory_note(mem_id="project/database", mem_type="factual", episode_id="fixture",
                              content="SQLite is the project database.", tags=["database"], entities=[])
+    engine.write_memory_note(mem_id="project/database-detail", mem_type="factual", episode_id="fixture",
+                             content="The SQLite database is stored locally.", tags=["database"], entities=[])
     engine.build_index()
     source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     expected = engine.retrieve_context("SQLite database", top_n=3)
