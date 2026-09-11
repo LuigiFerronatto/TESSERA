@@ -699,6 +699,18 @@ class TesseraEngine:
             path for path, entry in previous_manifest.items()
             if path in current_hashes and entry.get("file_hash", entry.get("content_hash")) == current_hashes[path]
         }
+        # A project may have been moved since the snapshot was written. The
+        # old graph still points at the previous absolute paths, so retaining
+        # its nodes while skipping hash-equal sources would silently drop all
+        # relocated content. Reparse every current source while preserving the
+        # identity manifest for stable IDs.
+        if previous_registry and any(not os.path.exists(path) for path in previous_registry.values()):
+            self.graph.clear()
+            self.file_registry.clear()
+            self.node_corpus.clear()
+            self.node_ids.clear()
+            previous_registry = {}
+            unchanged_paths = set()
         changed_paths = set(current_paths) - unchanged_paths
         removed_paths = set(previous_manifest) - set(current_paths)
         added_paths = set(current_paths) - set(previous_manifest)
