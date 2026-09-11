@@ -200,7 +200,17 @@ def run(root):
     root.mkdir(parents=True, exist_ok=True)
     (root / "docs").mkdir()
     source = root / "docs" / "source.md"
-    source.write_text("# SQLite\n\nSQLite stores the project database.\n")
+    source.write_text(
+        "---\n"
+        "id: project/source\n"
+        "node_type: factual\n"
+        "episode_id: fixture-source\n"
+        "tags: [database]\n"
+        "entities: []\n"
+        "active_connections: []\n"
+        "---\n\n"
+        "# SQLite\n\nSQLite stores the project database.\n"
+    )
     apply_initialization_plan(build_initialization_plan(InitRequest(
         mode="project", project_root=str(root), store_path="memories", source_mode="recommended",
     )))
