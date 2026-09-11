@@ -10,6 +10,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Changed
 
+- Removed the deprecated `LAO_MEM_DIR` compatibility path; configure storage with `TESSERA_STORAGE_DIR`.
 - Prepare `tessera-agent-memory==0.0.3` with interactive init feedback, update checks, canonical storage configuration, and the corrected TESSERA wordmark.
 - `tessera index` now reuses unchanged source contributions, reports add/edit/move/delete statistics, preserves stable identities across moves, and removes stale derived nodes when sources are deleted. (#12)
 
