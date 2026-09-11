@@ -10,6 +10,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #120 post-merge reconciliation (2026-09-09): PR #229 merged as `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; canonical CI and Benchmark Ledger passed. #120 is `VALIDATED / KEEP`, historical Queue 5. #121 is READY / LATER / Queue 43; no implementation is selected by dependency readiness.
 
+> #12 post-merge reconciliation (2026-09-11): PR #246 merged as canonical squash commit `971801cd89b6ce7b890df9ceb43b6afff9fa0964` (final candidate head `def1c43c069f616e63fdea7e384e15af4ecfef44`). CI on the final candidate head (`test`, `distribution` for Python 3.9/3.12, `smoke`, `sanity-eval`, `benchmark-reporting`) passed; Benchmark Ledger declared `SMOKE_ONLY` and `longmemeval-v1-dev-50` correctly skipped. Maintainer audit recorded `KEEP`. #12 is `VALIDATED / KEEP`. Its `#69` and `#73` dependents had their only remaining hard blocker (`#12`) satisfied and move to `READY`; `#70`/`#13`/`#15` remain `BLOCKED` on their own unmet dependencies (`#69`, `#94`+`#73`, and `#73`+`#96` respectively).
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
@@ -45,8 +47,8 @@ Current reconciliation-matrix counts:
 
 ```text
 NOW executable                 0
-READY                          7 total / 3 executable
-BLOCKED                        33 full cards + #16 full phase
+READY                          9 total / 5 executable
+BLOCKED                        30 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
 
@@ -175,7 +177,7 @@ NOW — Product foundation
 
 NEXT — Real memory system
 8  #67  Quality Gate v2
-9  #12  Incremental/idempotent indexing
+9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
 10 #69  Text ingestion beyond Markdown
 11 #70  Structural segmentation
 12 #13  Corpus/metadata doctor
@@ -474,13 +476,13 @@ Status: multiple experimental families exist, but they are dependency-routed and
 ### Durable-memory lifecycle
 
 ```text
-#67
- -> #12 incremental/idempotent indexing
-     -> #73 revision history
+#67 (VALIDATED; PR #245)
+ -> #12 incremental/idempotent indexing (VALIDATED; PR #246, `971801cd...`)
+     -> #73 revision history (READY)
          -> #15 temporal/state semantics
              -> #16 full supersession
 
-#69 broader text ingestion
+#69 broader text ingestion (READY)
  -> #70 structural segmentation
      -> #13 corpus doctor
 
@@ -658,11 +660,11 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#147](https://github.com/LuigiFerronatto/TESSERA/issues/147) | closed | `VALIDATED` | GOVERNANCE | Docs | Roadmap/QUMem reconciliation #149 canonical `a13abbbba2138e48e237f14a182dd6746e3ec7d4`; lifecycle #156 canonical `0880ef3ec417735c105898039cc202450407af2b`. |
 | [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `VALIDATED` containment / `BLOCKED` full | EXECUTABLE | Safety | P0 containment merged (`708c973e...`, `KEEP`); preserves all possible-conflict evidence; full supersession waits on #15/#73/#96. |
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | EXECUTABLE | Safety | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
-| [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | open | `BLOCKED` | EXECUTABLE | Storage | Depends on #67/#94; incremental/idempotent indexing. |
-| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#94; text ingestion beyond Markdown. |
-| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69; structural segmentation. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69/#70; corpus doctor, distinct from config/model doctor. |
-| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `BLOCKED` | EXECUTABLE | Storage | Depends on #12/#94; source/memory revision history. |
+| [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
+| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `READY` | EXECUTABLE | Sources | #12 and #94 dependencies now satisfied; text ingestion beyond Markdown. |
+| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69; #12 satisfied, still blocked on #69. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69/#70; #12 satisfied, still blocked on #69/#70. |
+| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
 | [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Utility/experience learning after admission/state become trustworthy. |
