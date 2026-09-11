@@ -735,7 +735,7 @@ class TesseraEngine:
         self.processing_warnings.clear()
         pending_connections = []
 
-        if not os.path.exists(self.storage_dir):
+        if not os.path.exists(self.storage_dir) and not self.source_roots:
             return
 
         explicit_ids_indexed = {}
