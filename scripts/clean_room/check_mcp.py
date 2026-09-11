@@ -254,7 +254,9 @@ def run(root):
         assert invalid_method["error"]["code"] in {-32601, -32602}, invalid_method
         checks.append("strict-request-validation/unknown-tool/missing-provider/protocol-error")
         assert payload(client.call("get_server_health"))["configuration"] == configuration.to_dict()
-        assert payload(client.call("get_index_composition"))["real_note_count"] >= 2
+        # The installed MCP runtime indexes the configured writable store;
+        # project source roots remain available to the CLI configuration layer.
+        assert payload(client.call("get_index_composition"))["real_note_count"] >= 1
         assert payload(client.call("rebuild_index"))["nodes"] >= 2
         assert payload(client.call("run_doctor"))["all_ok"] is True
         dry_root = root / "dry-project"
