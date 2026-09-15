@@ -1,49 +1,58 @@
-## Executive takeaway
-<!-- In 2–4 lines: what changed, why does it matter, and what is the decision impact? -->
+<!--
+Language contract: write the PR title and authored prose in English.
+Quoted source material, logs, commands, identifiers, and localized product
+output may remain in their original language.
 
-## Em linguagem simples
-<!-- Explain the task conversationally before implementation detail. -->
+Lead with the delivered behavior and its purpose. Keep plans, verified results,
+and post-merge work clearly separated.
+-->
 
-## Objective
-<!-- One concrete problem this PR is trying to solve. -->
+## Summary
+<!-- In 2-4 lines: what changed? Describe the delivered behavior, not the work history. -->
+
+## Purpose
+<!-- Why is this change needed, and what user/product/maintenance outcome does it create? -->
 
 ## Issue / Test Card
 Closes #
 
-**Hypothesis:**
+**Decision question:**
 
-**Baseline:**
+**Hypothesis:**
 
 **Success gate:**
 
 **Decision:** `PENDING | KEEP | ITERATE | REVERT | DROP | DEFER`
 
-## PR Evolution Audit
+## Behavior change
 
-<!--
-Before implementation, reconstruct the repository evolution relevant to this
-contract. Inspect merged PRs, canonical merge commits, changed files, linked
-issues/decisions, benchmark records, review-time P0 fixes and current main.
-Include closed-unmerged PRs when superseded. Do not infer delivery from titles.
-Do not count identical heads or merge commits as separate deliveries.
--->
+### Before
+<!-- Concrete trigger and previous output/behavior. -->
+```text
 
-| PR | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
-|---|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |  |
+```
 
-**Primary delivery type:** `runtime implementation | benchmark infrastructure | documentation correction | governance | architecture decision | superseded operational PR`
+### After
+<!-- The same trigger and the resulting output/behavior. -->
+```text
 
-## Capability-state reconciliation
+```
 
-1. **Previous capability state:**
-2. **PRs/commits that established it:**
-3. **Change introduced by this PR:**
-4. **Candidate/current capability state:**
-5. **What remains unimplemented:**
-6. **Benchmark before/after:**
-7. **Newly unlocked work:**
-8. **Roadmap evolution entry:**
+### User-visible impact
+<!-- State what a user, integrator, or maintainer will notice. Use N/A with a reason when nothing is visible. -->
+
+## Scope
+
+### In scope
+-
+
+### Out of scope
+<!-- Name adjacent work intentionally excluded from this PR. -->
+-
+
+## Technical implementation
+<!-- Explain how the final change works. Keep chronological debugging history out unless it affects review. -->
+-
 
 ## Change classification
 
@@ -59,57 +68,73 @@ Do not count identical heads or merge commits as separate deliveries.
 - [ ] None
 
 **Documentation impact:** `YES | NO`
-<!-- Link docs changed or explain why none are needed. -->
+<!-- Link changed docs or explain why no documentation is needed. -->
 
 **Plain-language stage record:** `docs/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
-<!-- Update status, PR/head evidence, before/after, validation and limitations. -->
+<!-- Update status, PR/head evidence, before/after behavior, validation, and limitations. -->
+
+## PR Evolution Audit
+<!--
+Reconstruct only the history needed to review this contract. Verify merged PRs,
+canonical commits, changed surfaces, decisions, and superseded attempts. Do not
+infer delivery from titles. Do not count identical heads or merge commits as
+separate deliveries.
+-->
+
+| PR | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
+|---|---|---|---|---|---|---|---|
+|  |  |  |  |  |  |  |  |
+
+**Primary delivery type:** `runtime implementation | benchmark infrastructure | documentation correction | governance | architecture decision | superseded operational PR`
+
+### Capability-state reconciliation
+1. **Previous capability state:**
+2. **Change introduced by this PR:**
+3. **Candidate capability state:**
+4. **What remains unimplemented:**
+5. **Benchmark before/after:**
+6. **Newly unlocked work:**
+7. **Roadmap evolution entry:**
+
+## Validation
+
+### Reproducible tests
+```bash
+# Exact commands, or the exact CI jobs that cover this PR.
+```
+
+### Evaluation evidence
+<!-- Evaluate observable behavior beyond “tests passed.” Link exact-head CI and benchmark artifacts. -->
+
+| Metric / invariant | Baseline | This PR | Decision impact |
+| --- | ---: | ---: | --- |
+|  |  |  |  |
+
+### Output examples
+<!-- Real CLI/API/MCP output when behavior changes. For docs-only work, show the resulting contract. -->
+```text
+
+```
 
 ## Benchmark applicability
-
-<!-- Replace the choices below with exactly one value. A rationale is mandatory for SMOKE_ONLY and NOT_APPLICABLE. -->
+<!-- Replace the choices with exactly one value. Rationale is mandatory for SMOKE_ONLY and NOT_APPLICABLE. -->
 Benchmark applicability: REQUIRED | SMOKE_ONLY | NOT_APPLICABLE
 <!-- REQUIRED must name exactly one numeric Test Card issue, for example: Benchmark issue: #123 -->
 Benchmark issue: #
 Benchmark rationale:
 
-## Technical implementation
-<!-- What changed in code/data/docs? Keep this implementation-oriented. -->
-- 
+## Risks, regressions, and limitations
 
-# Evaluation Card
+### Known regressions
+<!-- “None observed” requires evidence from the relevant gates. -->
+-
 
-## Tests
-```bash
-# Exact reproducible commands, or explain which existing CI jobs cover this PR.
-```
+### Risks and rollback
+<!-- State migration/rebuild impact, rollback trigger, and exact revert path. -->
+-
 
-## Evaluation
-<!-- What behavior did you evaluate beyond “tests passed”? Include benchmark/sanity evidence when relevant. -->
-
-| Metric | Baseline | This PR | Delta |
-| --- | ---: | ---: | ---: |
-|  |  |  |  |
-
-## Before vs After
-### Before
-```text
-
-```
-
-### After
-```text
-
-```
-
-## Output examples
-<!-- Real CLI/API/MCP/output snippets when behavior changes. For docs-only work, show the resulting public contract/structure. -->
-```text
-
-```
-
-## Known regressions
-<!-- Be explicit. “None observed” is acceptable only after checking the relevant gates. -->
-- 
+### Known limitations
+-
 
 ## Changelog
 - [ ] `CHANGELOG.md` updated
@@ -121,54 +146,52 @@ Benchmark rationale:
 <!-- Required even for N/A. Follow docs/CHANGE_POLICY.md. -->
 
 ## Learnings
+
 ### What worked
-- 
+-
 
-### What failed / surprised us
-- 
-
-### Known limitations
-- 
+### What failed or changed the approach
+-
 
 ## Public-surface / architecture invariants
-- [ ] Public docs, examples, fixtures, benchmark data and runtime-facing configuration remain project-agnostic.
-- [ ] Source files remain the source of truth; indexes/artifacts are derived and rebuildable.
-- [ ] TESSERA returns structured evidence rather than silently replacing consuming-agent cognition.
-- [ ] Exactly 3 semantic drawers remain: `facts`, `preferences`, `insights`.
-- [ ] New concepts remain facets/metadata unless a separate Test Card explicitly changes that contract.
+- [ ] Public docs, examples, fixtures, benchmark data, and runtime configuration remain project-agnostic.
+- [ ] Source files remain authoritative; indexes and artifacts remain derived and rebuildable.
+- [ ] TESSERA returns structured evidence without replacing consuming-agent cognition.
+- [ ] Exactly three semantic drawers remain: `facts`, `preferences`, `insights`.
+- [ ] New concepts remain facets/metadata unless a separate Test Card changes that contract.
 - [ ] No mandatory generative LLM was introduced in the basic path.
-- [ ] Retrieval relevance was not conflated with confidence, authority, temporal validity, relation confidence or utility.
-- [ ] No silent mutation of user source files.
-- [ ] Current capabilities and target/experimental architecture are not presented as the same thing.
+- [ ] Retrieval relevance remains distinct from confidence, authority, temporal validity, relation confidence, and utility.
+- [ ] User source files are never silently mutated.
+- [ ] Current and target/experimental capabilities are not presented as the same state.
 
 ## Post-merge lifecycle sync
 <!--
-Before claiming completion, replace candidate/head evidence with the canonical
-merge commit; update Evidence/Learnings/Decision, docs/ROADMAP.md and the
-plain-language stage record. If this cannot happen in the implementation PR,
-open a minimal lifecycle-sync PR and link it here.
+After merge, replace candidate/head evidence with the canonical merge commit and
+reconcile the Issue decision, ROADMAP, dependencies, and stage record. If this
+cannot happen in this PR, open and link one minimal lifecycle-sync PR.
 -->
 
 - [ ] Canonical merge commit recorded after merge
 - [ ] Issue state and Decision reconciled
-- [ ] Roadmap status/dependencies reconciled
+- [ ] Roadmap status and dependencies reconciled
 - [ ] Plain-language record moved from IN_PROGRESS to final state only after merge
 - [ ] Closed-unmerged/superseded operational PRs preserved in the audit
 
 ## Follow-ups
-<!-- Unrelated/new work becomes a new Issue/Test Card. -->
+<!-- Unrelated work becomes a separate Issue/Test Card. -->
 - [ ] None
 
 ## Merge gate
 - [ ] Issue/Test Card linked
-- [ ] PR category + contract surfaces declared
+- [ ] Purpose and before/after behavior are explicit
+- [ ] In-scope and out-of-scope boundaries are explicit
+- [ ] PR category and contract surfaces declared
 - [ ] Changelog updated or explicitly N/A with rationale
 - [ ] Tests green
-- [ ] Relevant contract/smoke/sanity/benchmark gate green or explicitly waived with rationale
-- [ ] Evidence & Learnings updated in the Issue/Test Card
+- [ ] Relevant contract, smoke, sanity, and benchmark gates green or explicitly waived with rationale
+- [ ] Evidence and Learnings updated in the Issue/Test Card
 - [ ] Plain-language stage record created/updated or explicitly NOT_APPLICABLE
-- [ ] Known regressions recorded
+- [ ] Regressions, risks, rollback, and limitations recorded
 - [ ] Final decision recorded
-- [ ] PR Evolution Audit verified against canonical merge commits and changed files
-- [ ] Capability-state reconciliation and roadmap evolution completed
-- [ ] Post-merge lifecycle sync path declared
+- [ ] Repository evolution verified against canonical commits and changed files
+- [ ] Post-merge lifecycle path declared

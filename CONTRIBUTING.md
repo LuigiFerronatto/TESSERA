@@ -4,6 +4,13 @@ Start with an [issue](https://github.com/LuigiFerronatto/TESSERA/issues/new/choo
 For a bug, include the version, a minimal reproduction, expected behavior and
 actual output. Remove credentials and private source content from examples.
 
+Write new issue and pull request titles and authored prose in English. Quoted
+source material, logs, commands, identifiers and localized product output may
+remain in their original language. Lead with what will change, why it matters,
+the verified current behavior, the target behavior and explicit scope
+boundaries. Keep proposed work separate from results already supported by
+evidence.
+
 For a behavior change, use the [Test Card template](.github/ISSUE_TEMPLATE/test-card.md)
 to define one hypothesis, its baseline and its success criteria. Check the
 [roadmap](docs/ROADMAP.md) for existing ownership, dependencies and selected work;
@@ -34,8 +41,9 @@ credentials. Follow the [architecture](docs/ARCHITECTURE.md) and
 ## Submit a pull request
 
 Use the [PR template](.github/pull_request_template.md). Link the owning issue,
-describe the user-visible change and provide reproducible evidence, limitations
-and the proposed decision. Keep unrelated changes in separate issues.
+state the purpose, describe the user-visible before/after behavior and provide
+reproducible evidence, limitations and the proposed decision. Keep unrelated
+changes in separate issues.
 
 Declare `Benchmark applicability: REQUIRED`, `SMOKE_ONLY` or `NOT_APPLICABLE`
 with a rationale under the [Benchmark Ledger contract](docs/BENCHMARK_CI.md).
