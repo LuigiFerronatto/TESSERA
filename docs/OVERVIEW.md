@@ -154,7 +154,7 @@ Optional generative components may exist for higher-level workflows, but the bas
 | Engine/CLI/MCP contract parity | Validated direct-query contract | Issue #68 |
 | Incremental/idempotent indexing | Planned Foundation experiment | Issue #12 |
 | Plain-text ingestion beyond Markdown | Planned experiment | Issue #69 |
-| Structural segmentation | Planned experiment | Issue #70 |
+| Structural segmentation | Validated (`KEEP`) | Issue #70 / PR #270 |
 | Metadata Doctor | Planned | Issue #13 |
 | Temporal state / state keys | Planned experiment | Issue #15 |
 | Evidence Arbitration | Planned experiment | Issues #16 / #27 |

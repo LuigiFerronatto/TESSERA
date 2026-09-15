@@ -550,7 +550,7 @@ Planned / experimental:
 #68 Engine / CLI / MCP direct-query contract parity (implemented)
 #12 incremental/idempotent indexing
 #69 text ingestion coverage
-#70 structural segmentation
+#70 structural segmentation (implemented)
 #13 metadata doctor
 #14/#25/#26 controlled relations/graph intelligence
 #15 temporal model + state keys

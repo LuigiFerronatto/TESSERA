@@ -14,6 +14,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #69 post-merge reconciliation (2026-09-15): PR #264 merged as canonical merge commit `c815a684e4c8cbd426a0d717e243a7dfb0f04395` (final candidate head `ddc1ff3a4394c89c7732357fc66168d6d599a2ac`). CI on the exact candidate head passed for Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer audit recorded `KEEP`. #69 is `VALIDATED / KEEP`; #70 had its final blocker satisfied and moves to `READY`. #13 and #71 remain `BLOCKED` on #70.
 
+> #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). CI on the exact candidate head passed for Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate (KEEP against immediate parent, identical aggregate/per-query rankings). Maintainer audit recorded `KEEP`. #70 is `VALIDATED / KEEP`. #13 had its only remaining hard blocker satisfied and moves to `READY`; #71 remains `BLOCKED` on its harness-adapter-registry dependency on #70's segmentation surface (still needs its own implementation work).
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
@@ -181,7 +183,7 @@ NEXT — Real memory system
 8  #67  Quality Gate v2
 9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
 10 #69  Text ingestion beyond Markdown          VALIDATED (`KEEP`; `c815a684...`)
-11 #70  Structural segmentation
+11 #70  Structural segmentation          VALIDATED (`KEEP`; `8ca854f...`)
 12 #13  Corpus/metadata doctor
 13 #157 Typed model profiles
 14 #163 Local model lifecycle
@@ -485,8 +487,8 @@ Status: multiple experimental families exist, but they are dependency-routed and
              -> #16 full supersession
 
 #69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
- -> #70 structural segmentation (READY)
-     -> #13 corpus doctor
+ -> #70 structural segmentation (VALIDATED; PR #270, `8ca854f...`)
+     -> #13 corpus doctor (READY)
 
 #19 admission and #21 utility remain later layers.
 ```
@@ -664,8 +666,8 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | EXECUTABLE | Safety | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
-| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `READY` | EXECUTABLE | Sources | #12 and #69 dependencies satisfied; structure-aware document segmentation is next. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | #12/#69 satisfied; still blocked on #70. |
+| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; document + addressable segment (D3) structural segmentation. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `READY` | EXECUTABLE | Sources | #12/#69/#70 dependencies satisfied; corpus/metadata doctor is next. |
 | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
