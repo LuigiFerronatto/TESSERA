@@ -2,6 +2,18 @@
 
 TESSERA uses Test Cards to make one auditable decision at a time. A paper is a research signal, an implementation is a candidate, and only reproducible evidence can produce a KEEP decision.
 
+## Authoring language and clarity
+
+Write new issue and pull request titles and authored prose in English. Quoted
+source material, logs, commands, identifiers and localized product output may
+remain in their original language.
+
+Lead each issue with a summary, its purpose, verified current behavior, target
+behavior and explicit in-scope and out-of-scope boundaries. Lead each pull
+request with the delivered change, its purpose and a concrete before/after
+description. Describe planned targets as plans until canonical merge and
+post-merge validation establish them as current behavior.
+
 ## Portfolio structure
 
 | Type | Purpose | Produces a direct implementation PR? |

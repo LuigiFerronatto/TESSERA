@@ -87,6 +87,41 @@ def test_issue_and_pr_templates_require_stage_record() -> None:
     assert "Plain-language stage record created/updated" in pr_template
 
 
+def test_issue_and_pr_templates_require_clear_english_authoring() -> None:
+    issue_template = (
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "test-card.md"
+    ).read_text(encoding="utf-8")
+    pr_template = (
+        ROOT / ".github" / "pull_request_template.md"
+    ).read_text(encoding="utf-8")
+    contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    operating_model = (ROOT / "docs" / "TEST_CARD_OPERATING_MODEL.md").read_text(
+        encoding="utf-8"
+    )
+
+    for template in (issue_template, pr_template):
+        assert "Language contract: write" in template
+        assert "authored prose in English" in template
+        assert "## Summary" in template
+        assert "## Purpose" in template
+        assert "## Scope" in template
+        assert "## Em linguagem simples" not in template
+        assert "## Objetivo" not in template
+
+    assert "## Problem and current behavior" in issue_template
+    assert "## Target behavior" in issue_template
+    assert "## Behavior change" in pr_template
+    for marker in ("### Before", "### After", "### User-visible impact"):
+        assert marker in pr_template
+    for marker in ("### In scope", "### Out of scope"):
+        assert marker in issue_template
+        assert marker in pr_template
+
+    for guidance in (contributing, operating_model):
+        assert "authored prose in English" in guidance
+        assert "localized product output" in guidance
+
+
 def test_documentation_map_and_roadmap_link_stage_records() -> None:
     docs_map = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
     roadmap = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
