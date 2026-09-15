@@ -88,3 +88,8 @@
 {"id":"readiness_truth","question":"Did the output distinguish an open issue from a READY executable Test Card?","answer":"YES","model":"evals","timestamp":"2026-09-15T03:32:43.673Z","runid":"34925056981"}
 {"id":"actionable_next_step","question":"Did the output provide one evidence-backed next routing action?","answer":"NO","model":"evals","timestamp":"2026-09-15T03:32:43.673Z","runid":"34925056981"}
 {"id":"missing_information","question":"When essential information was missing, did the output ask focused questions instead of guessing?","answer":"UNKNOWN","model":"evals","timestamp":"2026-09-15T03:32:43.673Z","runid":"34925056981"}
+{"id":"operational_value","question":"Did the triage route the issue to the correct existing TESSERA ownership and readiness state without creating unsupported implementation work?","answer":"YES","model":"evals","timestamp":"2026-09-15T04:41:13.779Z","runid":"34929413561"}
+{"id":"duplicate_precision","question":"Did the output avoid declaring a duplicate without strong evidence?","answer":"YES","model":"evals","timestamp":"2026-09-15T04:41:13.779Z","runid":"34929413561"}
+{"id":"readiness_truth","question":"Did the output distinguish an open issue from a READY executable Test Card?","answer":"YES","model":"evals","timestamp":"2026-09-15T04:41:13.779Z","runid":"34929413561"}
+{"id":"actionable_next_step","question":"Did the output provide one evidence-backed next routing action?","answer":"YES","model":"evals","timestamp":"2026-09-15T04:41:13.779Z","runid":"34929413561"}
+{"id":"missing_information","question":"When essential information was missing, did the output ask focused questions instead of guessing?","answer":"YES","model":"evals","timestamp":"2026-09-15T04:41:13.779Z","runid":"34929413561"}
