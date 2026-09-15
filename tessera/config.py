@@ -18,6 +18,8 @@ from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
 import yaml
 
+from .source_formats import RECURSIVE_SOURCE_PATTERNS
+
 
 # JSON command envelopes and the global registry remain on their established
 # v1 contracts.  Project configuration is the boundary changed by Issue #153.
@@ -162,7 +164,7 @@ class SourceRootRecord:
     """One explicit read-only source root and its allow-list patterns."""
 
     path: str
-    include: Tuple[str, ...] = ("**/*.md",)
+    include: Tuple[str, ...] = RECURSIVE_SOURCE_PATTERNS
 
     @classmethod
     def from_mapping(
@@ -279,7 +281,7 @@ class ProjectConfig:
         if version == 1:
             # Migration compatibility is deliberately conservative: the old
             # store remains the complete readable corpus.
-            sources = (SourceRootRecord(store.path, ("**/*.md",)),)
+            sources = (SourceRootRecord(store.path, RECURSIVE_SOURCE_PATTERNS),)
             index = IndexRecord(str((project_root / ".tessera" / "index").resolve(strict=False)))
         else:
             sources_raw = raw.get("sources")
@@ -306,12 +308,12 @@ class ProjectConfig:
             if any(
                 Path(source.path).resolve(strict=False)
                 != Path(store.path).resolve(strict=False)
-                or source.include != ("**/*.md",)
+                or source.include not in {("**/*.md",), RECURSIVE_SOURCE_PATTERNS}
                 for source in external_sources
             ):
                 raise ConfigurationError(
                     "an external source root is allowed only when it is the exact "
-                    "generated-memory store with the conservative Markdown pattern"
+                    "generated-memory store with supported text patterns"
                 )
             index = IndexRecord.from_mapping(
                 raw.get("index"), project_root=project_root,
@@ -331,7 +333,7 @@ class ProjectConfig:
         )
 
     def resolved_sources(self) -> Tuple[SourceRootRecord, ...]:
-        return self.sources or (SourceRootRecord(self.store.path, ("**/*.md",)),)
+        return self.sources or (SourceRootRecord(self.store.path, RECURSIVE_SOURCE_PATTERNS),)
 
     def resolved_index(self) -> IndexRecord:
         return self.index or IndexRecord(
@@ -430,7 +432,7 @@ class ResolvedConfiguration:
 
     def __post_init__(self) -> None:
         store = str(Path(self.storage_dir).expanduser().resolve(strict=False))
-        roots = self.source_roots or (SourceRootRecord(store, ("**/*.md",)),)
+        roots = self.source_roots or (SourceRootRecord(store, RECURSIVE_SOURCE_PATTERNS),)
         index = self.index_dir or str((Path(store) / ".tessera_index").resolve(strict=False))
         identity = self.identity_root or store
         object.__setattr__(self, "storage_dir", store)
@@ -476,7 +478,7 @@ def _legacy_configuration(
         source,
         registry_name=registry_name,
         registry_path=registry_path,
-        source_roots=(SourceRootRecord(store, ("**/*.md",)),),
+        source_roots=(SourceRootRecord(store, RECURSIVE_SOURCE_PATTERNS),),
         index_dir=str((Path(store) / ".tessera_index").resolve(strict=False)),
         identity_root=store,
         config_schema_version=1,
@@ -750,7 +752,7 @@ def build_init_plan(
         store_id = existing.store.id if existing else str(id_factory())
         if existing:
             source_roots = (
-                (SourceRootRecord(str(storage), ("**/*.md",)),)
+                (SourceRootRecord(str(storage), RECURSIVE_SOURCE_PATTERNS),)
                 if existing.loaded_schema_version == 1
                 else existing.resolved_sources()
             )
@@ -761,7 +763,7 @@ def build_init_plan(
                 else str(storage)
             )
         else:
-            source_roots = (SourceRootRecord(str(storage), ("**/*.md",)),)
+            source_roots = (SourceRootRecord(str(storage), RECURSIVE_SOURCE_PATTERNS),)
             index_dir = str((root / ".tessera" / "index").resolve(strict=False))
             identity_root = str(storage)
     else:
@@ -774,7 +776,7 @@ def build_init_plan(
         existing = registry.stores.get(registry_name)
         store_id = existing.id if existing else str(id_factory())
         storage = _canonical_path(store_path)
-        source_roots = (SourceRootRecord(str(storage), ("**/*.md",)),)
+        source_roots = (SourceRootRecord(str(storage), RECURSIVE_SOURCE_PATTERNS),)
         index_dir = str((storage / ".tessera_index").resolve(strict=False))
         identity_root = str(storage)
     store_id = _validate_store_id(store_id)
@@ -807,7 +809,7 @@ def apply_init_plan(plan: InitPlan) -> ResolvedConfiguration:
             project_root,
             config_path,
             record,
-            plan.source_roots or (SourceRootRecord(record.path, ("**/*.md",)),),
+            plan.source_roots or (SourceRootRecord(record.path, RECURSIVE_SOURCE_PATTERNS),),
             IndexRecord(plan.index_dir or str(project_root / ".tessera" / "index")),
             PROJECT_SCHEMA_VERSION,
         )

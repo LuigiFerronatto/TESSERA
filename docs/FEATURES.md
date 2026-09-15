@@ -6,15 +6,19 @@
 
 TESSERA already provides the core substrate required for auditable agent memory: canonical text normalization, stable identities, explainable retrieval, query-relevant evidence, graph-linked context, provenance, and a basic deterministic write-side sanitization gate.
 
-The current Foundation is intentionally conservative. Incremental indexing, evidence-aware memory admission, temporal-state reasoning, confidence-aware relations, source arbitration and abstention remain experiments in the roadmap.
+The current Foundation is intentionally conservative. Evidence-aware memory
+admission, temporal-state reasoning, confidence-aware relations, source
+arbitration and abstention remain experiments in the roadmap.
 
 ---
 
 ## 1. Canonical text ingestion
 
-**Tracking:** Issue #9 / PR #3
+**Tracking:** Issues #9 and #69 / PR #3 and the #69 implementation
 
-Projects rarely have one perfect Markdown schema. Some files have complete frontmatter, some partial metadata and some none at all.
+Projects rarely have one perfect text schema. Markdown files may have complete,
+partial or absent frontmatter. Plain `.txt` files are canonical body-only
+sources and are never interpreted as YAML or rewritten during indexing.
 
 TESSERA normalizes supported text documents into Canonical Metadata while preserving the source file as the source of truth. It understands memory documents as well as non-memory knowledge such as harness instructions and project context.
 

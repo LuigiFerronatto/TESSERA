@@ -88,7 +88,7 @@ Project source discovery is a separate read-only proposal layer:
 physical project root
   -> mandatory safety exclusions
   -> .tessera-ignore subset
-  -> Markdown-only classification
+  -> Markdown and plain-text classification
   -> recommendation policy
   -> top-level location clusters
   -> SourceDiscoveryPlan
@@ -431,12 +431,12 @@ SOURCE FILES
    └─ evidence ledger
 ```
 
-Derived state must be reconstructible from source files. Current indexing still uses coarse cache/rebuild semantics; **incremental/idempotent indexing remains #12**.
+Derived state must be reconstructible from source files. Indexing reuses
+unchanged source nodes and reparses changed Markdown or plain-text sources.
 
-Two additional Foundation gaps are explicit rather than implied:
+One additional Foundation gap remains explicit rather than implied:
 
 ```text
-#69 plain-text ingestion beyond Markdown
 #70 structure-aware segmentation of long documents
 ```
 

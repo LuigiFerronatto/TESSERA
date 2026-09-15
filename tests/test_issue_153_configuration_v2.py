@@ -265,7 +265,9 @@ def test_schema_v1_migrates_conservatively_without_broadening(tmp_path, monkeypa
     apply_init_plan(plan)
     migrated = ProjectConfig.load(config)
     assert migrated.loaded_schema_version == 2
-    assert migrated.resolved_sources() == (SourceRootRecord(str(store.resolve()), ("**/*.md",)),)
+    assert migrated.resolved_sources() == (
+        SourceRootRecord(str(store.resolve()), ("**/*.md", "**/*.txt")),
+    )
     reloaded = TesseraEngine(configuration=ConfigurationResolver(cwd=project).resolve())
     reloaded.build_index(use_cache=False)
     assert reloaded.retrieve_context_contract(QUERY, top_n=3) == before

@@ -1,7 +1,8 @@
 """
 TesseraEngine — the core of the Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories system.
 
-Integrates physical note persistence (Markdown + YAML frontmatter), the
+Integrates physical note persistence (Markdown + YAML frontmatter), plain-text
+source ingestion, the
 heterogeneous knowledge graph index, Dynamic Weighted PageRank (DW-PR)
 subgraph retrieval, and non-destructive conflict containment.
 """
@@ -34,6 +35,13 @@ from .models import (
     WriteGatingViolationError,
 )
 from .security import WriteAdmission, WriteGatingEngine, WriteResult, validate_memory_path
+from .source_formats import (
+    NON_RECURSIVE_SOURCE_PATTERNS,
+    RECURSIVE_SOURCE_PATTERNS,
+    is_supported_source_path,
+    source_format_for_path,
+    split_source,
+)
 
 
 _BUILTIN_EXCLUDED_SOURCE_DIRS = {
@@ -180,8 +188,8 @@ class TesseraEngine:
         rel_path = self._relative_identity_path(filepath)
         
         # 1. First, check if there is an explicit ID in the frontmatter
-        from .canonical import _split_markdown, compute_sha256
-        frontmatter, body = _split_markdown(raw_text)
+        from .canonical import compute_sha256
+        frontmatter, body = split_source(raw_text, path=filepath)
         explicit_id = frontmatter.get("id") or frontmatter.get("memory_id")
         
         # 2. Extract content hash
@@ -644,7 +652,7 @@ class TesseraEngine:
         """
         if use_cache and self._load_index_if_fresh():
             self.last_index_stats = {
-                "scanned": len(list(self._iter_markdown_files(recursive=recursive))),
+                "scanned": len(list(self._iter_source_files(recursive=recursive))),
                 "hashed": 0,
                 "parsed": 0,
                 "unchanged": len(self.file_registry),
@@ -685,7 +693,7 @@ class TesseraEngine:
 
         current_paths = {
             self._relative_identity_path(path): path
-            for path in self._iter_markdown_files(recursive=recursive)
+            for path in self._iter_source_files(recursive=recursive)
         }
         import hashlib
         current_hashes = {}
@@ -752,7 +760,7 @@ class TesseraEngine:
 
         explicit_ids_indexed = {}
 
-        for filepath in self._iter_markdown_files(recursive=recursive):
+        for filepath in self._iter_source_files(recursive=recursive):
             filename = self._relative_identity_path(filepath)
             if incremental and filename in unchanged_paths:
                 continue
@@ -768,8 +776,6 @@ class TesseraEngine:
                     raw_text, filepath, self._identity_base_for(filepath),
                     persistent_id=persistent_id, persistent_doc_id=persistent_doc_id
                 )
-                self._update_identity_manifest(filepath, canonical_meta, raw_text)
-
                 mem_id = canonical_meta.identity.id
                 if not mem_id:
                     continue
@@ -783,10 +789,18 @@ class TesseraEngine:
                         )
                     explicit_ids_indexed[mem_id] = filepath
 
+                if mem_id in self.graph and canonical_meta.metadata_origin.get("id") == "explicit":
+                    raise ValueError(
+                        f"Explicit ID collision: '{mem_id}' is already indexed from "
+                        f"'{self.file_registry.get(mem_id, 'another source')}'."
+                    )
                 if mem_id in self.graph:
                     # Inferred collision suffix must be 100% deterministic (F3)
                     suffix = compute_sha256(filename.replace(os.sep, "/"))[:6]
                     mem_id = f"{mem_id}__{suffix}"
+
+                canonical_meta.identity.id = mem_id
+                self._update_identity_manifest(filepath, canonical_meta, raw_text)
 
                 self.file_registry[mem_id] = filepath
                 
@@ -815,7 +829,9 @@ class TesseraEngine:
                         })
                 frontmatter_compat["active_connections"] = active_connections_compat
 
-                body = canonical_meta.raw_frontmatter.get("body", raw_text.split("---", 2)[2] if raw_text.startswith("---") and len(raw_text.split("---", 2)) >= 3 else raw_text)
+                _source_metadata, body = split_source(
+                    raw_text, source_format=canonical_meta.source.format
+                )
                 body = body.strip()
 
                 tags_str = " ".join(frontmatter_compat["tags"])
@@ -920,12 +936,12 @@ class TesseraEngine:
     def _source_fingerprint(self) -> Tuple[int, float]:
         """
         Cheap signature of the current corpus state: (file count, max mtime)
-        across every ``.md`` file under ``storage_dir``. Used to decide
+        across every supported text source under ``storage_dir``. Used to decide
         whether a cached index is still valid without re-parsing anything.
         """
         count = 0
         latest_mtime = 0.0
-        for filepath in self._iter_markdown_files(recursive=True):
+        for filepath in self._iter_source_files(recursive=True):
             count += 1
             try:
                 mtime = os.path.getmtime(filepath)
@@ -1014,8 +1030,8 @@ class TesseraEngine:
         self.vectorizer = snapshot["vectorizer"]
         return True
 
-    def _iter_markdown_files(self, recursive: bool):
-        """Yield Markdown from explicit sources or the legacy store-only corpus.
+    def _iter_source_files(self, recursive: bool):
+        """Yield supported text sources from explicit or legacy store corpora.
 
         No implicit project-wide discovery occurs. Multiple read roots are
         active only when the resolved v2 configuration names them.
@@ -1028,10 +1044,10 @@ class TesseraEngine:
                 root = Path(source.path).expanduser().resolve(strict=False)
                 if not root.exists():
                     continue
-                patterns = tuple(source.include) if recursive else ("*.md",)
+                patterns = tuple(source.include) if recursive else NON_RECURSIVE_SOURCE_PATTERNS
                 for pattern in patterns:
                     for candidate in root.glob(pattern):
-                        if not candidate.is_file() or candidate.suffix.lower() != ".md":
+                        if not candidate.is_file() or not is_supported_source_path(candidate):
                             continue
                         resolved = candidate.resolve(strict=False)
                         try:
@@ -1072,13 +1088,13 @@ class TesseraEngine:
                     if directory not in _BUILTIN_EXCLUDED_SOURCE_DIRS
                 ]
                 for filename in files:
-                    if filename.endswith(".md"):
+                    if is_supported_source_path(filename):
                         yield os.path.join(root, filename)
             return
 
         try:
             for filename in os.listdir(self.storage_dir):
-                if filename.endswith(".md"):
+                if is_supported_source_path(filename):
                     yield os.path.join(self.storage_dir, filename)
         except OSError:
             return
@@ -1091,7 +1107,7 @@ class TesseraEngine:
                 for item in self.source_roots
             )
         else:
-            roots = ((self.storage_dir, ("**/*.md",)),)
+            roots = ((self.storage_dir, RECURSIVE_SOURCE_PATTERNS),)
         return (
             roots,
             self.index_cache_dir,

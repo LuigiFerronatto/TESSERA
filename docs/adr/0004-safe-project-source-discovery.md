@@ -22,8 +22,8 @@ classification totals, diagnostics, and scan counters.
 The explicit classification vocabulary is:
 
 ```text
-RECOMMENDED  supported Markdown suggested by default
-SUPPORTED    selectable Markdown not suggested by default
+RECOMMENDED  supported text source suggested by default
+SUPPORTED    selectable text source not suggested by default
 IGNORED      excluded by ignore/default/format/size/readability policy
 FORBIDDEN    security or containment boundary; never ordinarily selectable
 ```
@@ -66,6 +66,10 @@ does not mutate `store.path`, `sources`, `index.path`, source bytes, config,
 `.tessera-ignore`, or index files. Existing v1/v2 selected corpora therefore
 remain unchanged until a separate future #155 confirmation persists an
 explicit plan.
+
+Issue #69 later extended the supported classification set to Markdown and
+body-only `.txt` files. The containment, size, symlink, ignore and read-only
+rules in this decision remain unchanged.
 
 `tessera config doctor --json` may expose the structured plan and reject an
 invalid/unreadable ignore contract. It does not become a picker or general

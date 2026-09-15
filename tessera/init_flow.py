@@ -230,7 +230,7 @@ def _select_custom(
         if not selectable:
             if forbidden_descendants:
                 raise ConfigurationError(f"source contains no selectable files: {path}")
-            raise ConfigurationError(f"source was not found as a safe Markdown candidate: {path}")
+            raise ConfigurationError(f"source was not found as a safe supported text candidate: {path}")
         selected.update(item.path for item in selectable)
     return tuple(sorted(selected, key=lambda item: (item.casefold(), item)))
 
@@ -254,7 +254,9 @@ def _selected_paths(
 def _source_roots(
     root: Path, store: Path, selected: Sequence[str]
 ) -> Tuple[SourceRootRecord, ...]:
-    roots = [SourceRootRecord(str(store), ("**/*.md",))]
+    from .source_formats import RECURSIVE_SOURCE_PATTERNS
+
+    roots = [SourceRootRecord(str(store), RECURSIVE_SOURCE_PATTERNS)]
     selected_without_store = []
     for item in selected:
         physical = (root / item).resolve(strict=False)

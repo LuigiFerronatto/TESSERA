@@ -70,16 +70,19 @@ def test_configured_memory_source_is_recommended_without_config_mutation(tmp_pat
     assert memory.read_text(encoding="utf-8") == "# source\n"
 
 
-def test_only_current_markdown_ingestion_is_selectable(tmp_path):
+def test_supported_text_ingestion_is_selectable(tmp_path):
     _write(tmp_path / "notes.md")
     _write(tmp_path / "notes.txt", "text\n")
     (tmp_path / "blob.bin").write_bytes(b"\x00\x01")
     files = _by_path(discover_sources(tmp_path))
+    assert discover_sources(tmp_path).supported_formats == ("markdown", "text")
     assert files["notes.md"].selectable is True
-    for name in ("notes.txt", "blob.bin"):
-        assert files[name].classification == "IGNORED"
-        assert files[name].reason == "unsupported_format"
-        assert files[name].selectable is False
+    assert files["notes.md"].format == "markdown"
+    assert files["notes.txt"].selectable is True
+    assert files["notes.txt"].format == "text"
+    assert files["blob.bin"].classification == "IGNORED"
+    assert files["blob.bin"].reason == "unsupported_format"
+    assert files["blob.bin"].selectable is False
 
 
 def test_mandatory_exclusions_and_ignore_file_cannot_be_selected(tmp_path):

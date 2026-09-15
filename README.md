@@ -129,7 +129,7 @@ Source files remain the source of truth. New project configuration is schema v2:
 `store.path` is the generated-memory destination, `sources.roots` is an
 explicit read/index allow list, and `index.path` is disposable derived state.
 Interactive `tessera init` keeps those choices separate: it discovers safe
-Markdown through the validated source-discovery contract, presents recommended,
+Markdown and plain-text files through the validated source-discovery contract, presents recommended,
 optional, ignored and forbidden groups, asks for a source policy, shows the
 complete plan, then requires confirmation before configuration or indexing.
 Choose `memory-only` to retain the generated store as the sole source. Existing
@@ -149,8 +149,11 @@ sources:
       include:
         - README.md
         - docs/**/*.md
+        - docs/**/*.txt
         - research/**/*.md
+        - research/**/*.txt
         - memories/**/*.md
+        - memories/**/*.txt
 index:
   path: .tessera/index
 ```
@@ -186,8 +189,8 @@ plan = discover_sources_for_configuration(resolved_configuration)
 payload = plan.to_dict()  # stable, machine-readable candidates and clusters
 ```
 
-Discovery is Markdown-only because Markdown is the current canonical ingestion
-format. It returns `RECOMMENDED`, `SUPPORTED`, `IGNORED`, and `FORBIDDEN`
+Discovery supports Markdown (`.md`) and body-only plain text
+(`.txt`). It returns `RECOMMENDED`, `SUPPORTED`, `IGNORED`, and `FORBIDDEN`
 entries; standalone root files such as `README.md` remain visible while nested
 sources are grouped by top-level project location. It never writes config,
 `.tessera-ignore`, sources, or index state, and it never expands the configured
@@ -221,12 +224,14 @@ canonical persistence side effects. See
 
 ### Query existing project knowledge
 
-TESSERA can also index explicitly configured Markdown with complete, partial,
-or absent frontmatter. It recognizes textual artifacts such as:
+TESSERA can index explicitly configured Markdown with complete, partial, or
+absent frontmatter and plain-text files as body-only documents. It recognizes
+textual artifacts such as:
 
 ```text
 memories/*.md
 research/*.md
+research/*.txt
 AGENTS.md
 CLAUDE.md
 *.SKILL.md
@@ -287,7 +292,7 @@ TESSERA makes those concerns part of the memory layer instead of pushing them in
 
 | Capability | Current behavior |
 | --- | --- |
-| Text ingestion | Canonicalizes Markdown with complete, partial, or absent frontmatter |
+| Text ingestion | Canonicalizes Markdown with complete, partial, or absent frontmatter and `.txt` as body-only sources |
 | Memory model | Preserves exactly three semantic drawers: `facts`, `preferences`, `insights` |
 | Stable identity | Separates persistent memory/source identity from file path and content version |
 | Explainable retrieval | Combines inspectable lexical, metadata, title, relation, and type signals |
