@@ -3,11 +3,9 @@
 ## Canonical lifecycle state
 
 - **Issue:** #13
-- **Decision:** `PENDING` (exact-head CI, Maintainer Audit and Merge Governor
-  passed; no explicit maintainer `KEEP`/`ITERATE`/`REVERT` Decision is yet
-  recorded)
-- **Lifecycle status:** `IMPLEMENTED` (not `VALIDATED` — merge alone does not
-  constitute validation)
+- **Decision:** `KEEP` (the Maintainer Audit recorded no supported P0/P1
+  findings on the exact final candidate head)
+- **Lifecycle status:** `VALIDATED`
 - **Implementation PR:** [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277)
 - **Candidate branch:** `feat/13-corpus-doctor`
 - **Final candidate SHA:** `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`
@@ -55,19 +53,16 @@ tessera corpus doctor
 
 ## Downstream routing
 
-- #19 (evidence-aware memory admission) remains `DEFERRED` independent of
-  this merge; its blocker set is unrelated to #13's implementation state, so
-  it is not reconciled here.
+- #19 (evidence-aware memory admission) has its #13 prerequisite satisfied but
+  remains intentionally `DEFERRED` at Queue 45.
 - No other open issue lists #13 as its sole remaining blocker as of this
   merge.
-- Corpus-quality CI activation for downstream repositories remains
-  unstarted; it was explicitly out of scope for #13 and requires a separate
-  Test Card once #13 records `KEEP`.
+- Corpus-quality CI activation for downstream repositories remains unstarted;
+  it was explicitly out of scope for #13 and requires a separate Test Card.
 
-## Outstanding lifecycle step
+## Final decision
 
-A maintainer must record an explicit `KEEP` / `ITERATE` / `REVERT` /
-`DROP` / `DEFER` Decision on Issue #13 based on the canonical merge evidence
-above. Until that Decision is recorded, #13 remains `IMPLEMENTED` rather than
-`VALIDATED`, and no dependent capability should be treated as unblocked by
-#13 specifically.
+`KEEP`. The candidate passed exact-head CI, its declared `SMOKE_ONLY` benchmark
+gate, Maintainer Audit with no supported P0/P1 findings, and the deterministic
+Merge Governor before canonical merge. The merged capability is therefore
+`VALIDATED`.

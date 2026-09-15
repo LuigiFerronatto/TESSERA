@@ -16,7 +16,7 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer Audit recorded `KEEP` with no P0/P1 findings and the Merge Governor authorized the candidate. #70 is `VALIDATED / KEEP`; #13 and #71 had their final blocker satisfied and move to `READY`. Queue order selects #13 as the next implementation; #71 remains LATER / Queue 31.
 
-> #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. A recorded maintainer `KEEP`/`ITERATE`/`REVERT` Decision entry is not yet present in the Issue/Test Card, so #13 is `IMPLEMENTED`, not yet `VALIDATED`, pending that explicit Decision. #19 remains `DEFERRED` independent of this merge; no other issue was blocked solely on #13.
+> #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. The Maintainer Audit recorded `KEEP` with no supported P0/P1 findings and the Merge Governor authorized the exact candidate head. #13 is `VALIDATED / KEEP`. #19 has its #13 prerequisite satisfied but remains intentionally `DEFERRED` at Queue 45; no other issue was blocked solely on #13.
 
 ## Status contract
 
@@ -52,7 +52,7 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 1
+NOW executable                 0
 READY                          9 total / 5 executable
 BLOCKED                        27 full cards + #16 full phase
 TRACKER                        5 non-executable epics
@@ -126,14 +126,12 @@ noise (see the buckets after the queue).
 5  #120 MCP transport/runtime                   VALIDATED (`KEEP`; `b4ead4d...`)
 ```
 
-6  #13  Corpus Doctor                            IMPLEMENTED (PR #277 merged
-   `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI green; Decision
-   pending maintainer entry)
+6  #13  Corpus Doctor                            VALIDATED (`KEEP`; `20814a47...`)
 
 #13 Corpus Doctor merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`;
 exact-head CI, smoke/sanity/distribution and Maintainer Audit/Merge Governor
-passed. It is `IMPLEMENTED`, not yet `VALIDATED`, until the Issue/Test Card
-records an explicit `KEEP`/`ITERATE`/`REVERT` Decision.
+passed. The audit recorded `KEEP` with no supported P0/P1 findings, so the
+canonical delivery is `VALIDATED`.
 
 `#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
 canonical validated deliveries. `#135` (decomposer fallback integrity) merged
@@ -195,8 +193,7 @@ NEXT — Real memory system
 9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
 10 #69  Text ingestion beyond Markdown          VALIDATED (`KEEP`; `c815a684...`)
 11 #70  Structural segmentation               VALIDATED (`KEEP`; `8ca854f1...`)
-12 #13  Corpus/metadata doctor                 IMPLEMENTED (PR #277 merged
-   `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; Decision pending)
+12 #13  Corpus/metadata doctor                 VALIDATED (`KEEP`; `20814a47...`)
 13 #157 Typed model profiles
 14 #163 Local model lifecycle
 15 #160 Capability pipeline
@@ -500,7 +497,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 
 #69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
  -> #70 structural segmentation (VALIDATED; PR #270, `8ca854f1...`)
-     -> #13 corpus doctor (IMPLEMENTED; PR #277 merged `20814a47...`; Decision pending)
+     -> #13 corpus doctor (VALIDATED; `KEEP`; PR #277, `20814a47...`)
      -> #71 harness adapter registry (READY / LATER)
 
 #19 admission and #21 utility remain later layers.
@@ -680,7 +677,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
 | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; deterministic structural segmentation with parent-only retrieval. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | closed | `IMPLEMENTED` | FOUNDATION | Sources | PR #277 merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI green; `KEEP`/`ITERATE`/`REVERT` Decision not yet recorded. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; PR #277 merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI, Maintainer Audit, and Merge Governor passed. |
 | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
