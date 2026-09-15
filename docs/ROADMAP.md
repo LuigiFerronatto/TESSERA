@@ -50,8 +50,8 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 0
-READY                          10 total / 6 executable
+NOW executable                 1
+READY                          9 total / 5 executable
 BLOCKED                        27 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
@@ -124,6 +124,9 @@ noise (see the buckets after the queue).
 5  #120 MCP transport/runtime                   VALIDATED (`KEEP`; `b4ead4d...`)
 ```
 
+Active implementation: #13 Corpus Doctor is `IN_PROGRESS` in PR #277. It is
+the only current executable NOW card.
+
 `#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
 canonical validated deliveries. `#135` (decomposer fallback integrity) merged
 as `c324ac2f46d48f7b49769b2fea9df0a2a93b42de` with decision `KEEP`. `#16`,
@@ -184,7 +187,7 @@ NEXT — Real memory system
 9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
 10 #69  Text ingestion beyond Markdown          VALIDATED (`KEEP`; `c815a684...`)
 11 #70  Structural segmentation               VALIDATED (`KEEP`; `8ca854f1...`)
-12 #13  Corpus/metadata doctor                 READY / NEXT
+12 #13  Corpus/metadata doctor                 IN_PROGRESS (PR #277)
 13 #157 Typed model profiles
 14 #163 Local model lifecycle
 15 #160 Capability pipeline
@@ -488,7 +491,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 
 #69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
  -> #70 structural segmentation (VALIDATED; PR #270, `8ca854f1...`)
-     -> #13 corpus doctor (READY / NEXT)
+     -> #13 corpus doctor (IN_PROGRESS; PR #277)
      -> #71 harness adapter registry (READY / LATER)
 
 #19 admission and #21 utility remain later layers.
@@ -668,7 +671,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
 | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; deterministic structural segmentation with parent-only retrieval. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `READY` | EXECUTABLE | Sources | #12/#69/#70 dependencies satisfied; read-only Corpus Doctor is next at Queue 12. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `IN_PROGRESS` | EXECUTABLE | Sources | #12/#69/#70 dependencies satisfied; read-only Corpus Doctor candidate is PR #277 at Queue 12. |
 | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |

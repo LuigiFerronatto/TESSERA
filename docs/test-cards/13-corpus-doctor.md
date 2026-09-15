@@ -5,8 +5,8 @@
 | Issue | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Candidate branch `feat/13-corpus-doctor`; PR link pending |
-| Head commit | Current pull-request head after publication |
+| Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
+| Head commit | Current head of PR #277; exact SHA is supplied by GitHub checks |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -116,7 +116,7 @@ unlocked while this record remains `IN_PROGRESS`.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
-| Pull request | Candidate branch `feat/13-corpus-doctor`; link pending |
+| Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; decision pending |
 | Benchmark record | `SMOKE_ONLY`; rationale above |
