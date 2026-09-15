@@ -282,7 +282,8 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         self.cases["diagnostics"] = diagnostic
         for mode, extra, expected in [
             ("custom", ["--source", "examples", "--source", "docs"],
-             ["docs/architecture.md", "docs/nested/keep.md", "examples/optional.md"]),
+             ["docs/architecture.md", "docs/nested/keep.md", "docs/plain-notes.txt",
+              "examples/optional.md"]),
             ("memory-only", [], []),
         ]:
             p = self.fixture(mode)
