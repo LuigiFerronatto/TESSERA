@@ -15,6 +15,11 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from .config import ResolvedConfiguration, SourceRootRecord
+from .source_formats import (
+    SUPPORTED_SOURCE_FORMATS,
+    is_supported_source_path,
+    source_format_for_path,
+)
 
 
 DEFAULT_MAX_SOURCE_BYTES = 2 * 1024 * 1024
@@ -98,7 +103,7 @@ class SourceDiscoveryPlan:
     warnings: Tuple[SourceDiscoveryDiagnostic, ...]
     metrics: Dict[str, int]
     max_source_file_bytes: int
-    supported_formats: Tuple[str, ...] = ("markdown",)
+    supported_formats: Tuple[str, ...] = SUPPORTED_SOURCE_FORMATS
     schema_version: int = 1
 
     def to_dict(self) -> Dict[str, Any]:
@@ -593,7 +598,7 @@ def discover_sources(
                 continue
             if ignored:
                 candidates.append(SourceCandidate(
-                    path=relative, kind="file", format="markdown" if path.suffix.lower() == ".md" else None,
+                    path=relative, kind="file", format=source_format_for_path(path),
                     classification=SourceClassification.IGNORED.value,
                     selectable=False, selected_by_default=False,
                     reason=SourceReason.IGNORED_BY_TESSERA_IGNORE.value,
@@ -602,14 +607,15 @@ def discover_sources(
                 continue
             if convenience and not re_included:
                 candidates.append(SourceCandidate(
-                    path=relative, kind="file", format="markdown" if path.suffix.lower() == ".md" else None,
+                    path=relative, kind="file", format=source_format_for_path(path),
                     classification=SourceClassification.IGNORED.value,
                     selectable=False, selected_by_default=False,
                     reason=SourceReason.RECOMMENDED_EXCLUSION.value,
                     size_bytes=info.st_size,
                 ))
                 continue
-            if path.suffix.lower() != ".md":
+            source_format = source_format_for_path(path)
+            if not is_supported_source_path(path):
                 candidates.append(SourceCandidate(
                     path=relative, kind="file", format=None,
                     classification=SourceClassification.IGNORED.value,
@@ -620,7 +626,7 @@ def discover_sources(
                 continue
             if info.st_size > max_file_size:
                 candidates.append(SourceCandidate(
-                    path=relative, kind="file", format="markdown",
+                    path=relative, kind="file", format=source_format,
                     classification=SourceClassification.IGNORED.value,
                     selectable=False, selected_by_default=False,
                     reason=SourceReason.OVERSIZED.value,
@@ -630,7 +636,7 @@ def discover_sources(
             physical = path.resolve(strict=False)
             if not _is_relative_to(physical, root):
                 candidates.append(SourceCandidate(
-                    path=relative, kind="file", format="markdown",
+                    path=relative, kind="file", format=source_format,
                     classification=SourceClassification.FORBIDDEN.value,
                     selectable=False, selected_by_default=False,
                     reason=SourceReason.OUTSIDE_ROOT.value,
@@ -653,7 +659,7 @@ def discover_sources(
                 classification = SourceClassification.SUPPORTED
                 reason = SourceReason.SUPPORTED_PROJECT_SOURCE
             candidates.append(SourceCandidate(
-                path=relative, kind="file", format="markdown",
+                path=relative, kind="file", format=source_format,
                 classification=classification.value,
                 selectable=True,
                 selected_by_default=classification is SourceClassification.RECOMMENDED,

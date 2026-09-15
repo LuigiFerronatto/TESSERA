@@ -13,7 +13,7 @@ import posixpath
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-import yaml
+from .source_formats import source_format_for_path, split_markdown, split_source
 
 
 DRAWERS = {"facts", "preferences", "insights"}
@@ -247,31 +247,7 @@ def _split_markdown(raw_text: str) -> Tuple[Dict[str, Any], str]:
     is explicitly present but malformed, raise ValueError: silently treating it
     as absent can change identity, drawer and graph relations.
     """
-    # Preserve original body bytes/text as much as possible; do not strip the
-    # entire document before locating delimiters.
-    lines = raw_text.splitlines(keepends=True)
-    if not lines or lines[0].strip() != "---":
-        return {}, raw_text
-
-    closing = None
-    for idx in range(1, len(lines)):
-        if lines[idx].strip() == "---":
-            closing = idx
-            break
-    if closing is None:
-        raise ValueError("Malformed YAML frontmatter: opening '---' has no closing delimiter")
-
-    frontmatter_raw = "".join(lines[1:closing])
-    body = "".join(lines[closing + 1 :])
-    try:
-        parsed = yaml.safe_load(frontmatter_raw)
-    except yaml.YAMLError as exc:
-        raise ValueError(f"Malformed YAML frontmatter: {exc}") from exc
-    if parsed is None:
-        parsed = {}
-    if not isinstance(parsed, dict):
-        raise ValueError("Malformed YAML frontmatter: root must be a mapping")
-    return parsed, body
+    return split_markdown(raw_text)
 
 
 def _infer_document_type(filename_lower: str) -> str:
@@ -307,7 +283,8 @@ def parse_and_normalize(
     persistent_id: Optional[str] = None,
     persistent_doc_id: Optional[str] = None,
 ) -> CanonicalMetadata:
-    frontmatter, body = _split_markdown(raw_text)
+    source_format = source_format_for_path(filepath) or "text"
+    frontmatter, body = split_source(raw_text, source_format=source_format)
     nested = _nested_metadata(frontmatter)
 
     rel_path = os.path.relpath(filepath, storage_dir)
@@ -422,7 +399,7 @@ def parse_and_normalize(
     source = SourceMetadata(
         document_id=doc_id,
         path=rel_path_posix,
-        format="markdown" if filename_lower.endswith((".md", ".markdown")) else "text",
+        format=source_format,
         span=SourceSpan(1, max(1, len(raw_text.splitlines()))),
         document_hash=doc_hash,
         content_hash=body_hash,

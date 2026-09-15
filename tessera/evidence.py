@@ -251,11 +251,11 @@ def retrieval_results_contract(results: Iterable[Dict[str, Any]]) -> List[Dict[s
     return [retrieval_result_contract(result) for result in results]
 
 
-def _split_body_for_hash(raw_text: str) -> str:
+def _split_body_for_hash(raw_text: str, source_format: str = "markdown") -> str:
     """Use Canonical's parser so freshness checks follow exactly its semantics."""
-    from .canonical import _split_markdown
+    from .source_formats import split_source
 
-    _frontmatter, body = _split_markdown(raw_text)
+    _frontmatter, body = split_source(raw_text, source_format=source_format)
     return body
 
 
@@ -280,7 +280,7 @@ def verify_evidence_freshness(
 
     with open(full_path, "r", encoding="utf-8") as handle:
         raw_text = handle.read()
-    body = _split_body_for_hash(raw_text)
+    body = _split_body_for_hash(raw_text, record.source.format)
     current_document_hash = compute_sha256(raw_text)
     current_content_hash = compute_sha256(body)
     document_matches = current_document_hash == record.source.document_hash

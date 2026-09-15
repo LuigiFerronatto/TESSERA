@@ -230,7 +230,7 @@ def _select_custom(
         if not selectable:
             if forbidden_descendants:
                 raise ConfigurationError(f"source contains no selectable files: {path}")
-            raise ConfigurationError(f"source was not found as a safe Markdown candidate: {path}")
+            raise ConfigurationError(f"source was not found as a safe supported text candidate: {path}")
         selected.update(item.path for item in selectable)
     return tuple(sorted(selected, key=lambda item: (item.casefold(), item)))
 
@@ -254,7 +254,9 @@ def _selected_paths(
 def _source_roots(
     root: Path, store: Path, selected: Sequence[str]
 ) -> Tuple[SourceRootRecord, ...]:
-    roots = [SourceRootRecord(str(store), ("**/*.md",))]
+    from .source_formats import RECURSIVE_SOURCE_PATTERNS
+
+    roots = [SourceRootRecord(str(store), RECURSIVE_SOURCE_PATTERNS)]
     selected_without_store = []
     for item in selected:
         physical = (root / item).resolve(strict=False)
@@ -629,12 +631,14 @@ def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> Init
             if status:
                 status.stop()
         indexed = tuple(sorted(engine.file_registry.values()))
+        from .source_formats import is_supported_source_path
+
         allowed = {
             str(path.resolve(strict=False))
             for source in plan.source_roots
             for pattern in source.include
             for path in Path(source.path).glob(pattern)
-            if path.is_file() and path.suffix.lower() == ".md"
+            if path.is_file() and is_supported_source_path(path)
         }
         if any(str(Path(path).resolve(strict=False)) not in allowed for path in indexed):
             raise ConfigurationError("indexing escaped the selected source set")
