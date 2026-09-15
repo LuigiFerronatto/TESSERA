@@ -223,6 +223,7 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         applied = self.init(project)
         assert applied["applied"] and applied["plan"] == dry["plan"]
         selected = ["AGENTS.md", "README.md", "docs/architecture.md", "docs/nested/keep.md",
+                    "docs/plain-notes.txt",
                     "memories/existing-learning.md", "research/market-notes.md"]
         selected.sort(key=lambda x: (x.casefold(), x))
         assert applied["plan"]["sources"]["selected"] == selected
@@ -232,7 +233,7 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         assert cfg["store"]["path"] == "memories/generated"
         assert cfg["index"]["path"] == ".tessera/index"
         assert cfg["sources"]["roots"] == [
-            {"path": "memories/generated", "include": ["**/*.md"]},
+            {"path": "memories/generated", "include": ["**/*.md", "**/*.txt"]},
             {"path": ".", "include": selected}]
         self.cases["noninteractive"] = {"result": applied, "config": cfg}
         # Index/query/doctor read project sources but may write only declared
@@ -244,6 +245,13 @@ print(json.dumps({'seconds': time.perf_counter() - start, 'metrics': plan.metric
         diagnostic = self.run(project, ["config", "doctor", "--json"], parse=True)
         self.run(project, ["index", "--plain"])
         before_query = self.query(project)
+        text_results = self.run(
+            project,
+            ["query", "plain text beacon", "--json", "--top-n", "1"],
+            parse=True,
+        )
+        assert text_results[0]["provenance"]["source"]["format"] == "text"
+        assert text_results[0]["provenance"]["source"]["path"] == "docs/plain-notes.txt"
         before_config = (project / ".tessera/config.yaml").read_bytes()
         repeated = self.init(project)
         assert not repeated["plan"]["planned_mutations"]["config"]

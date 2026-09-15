@@ -631,12 +631,14 @@ def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> Init
             if status:
                 status.stop()
         indexed = tuple(sorted(engine.file_registry.values()))
+        from .source_formats import is_supported_source_path
+
         allowed = {
             str(path.resolve(strict=False))
             for source in plan.source_roots
             for pattern in source.include
             for path in Path(source.path).glob(pattern)
-            if path.is_file() and path.suffix.lower() == ".md"
+            if path.is_file() and is_supported_source_path(path)
         }
         if any(str(Path(path).resolve(strict=False)) not in allowed for path in indexed):
             raise ConfigurationError("indexing escaped the selected source set")

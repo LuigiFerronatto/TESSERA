@@ -2,6 +2,7 @@
   "README.md": "# Aster Observatory\n\nThis project is the Aster Observatory, a local observatory documenting cedar telescope calibration.\n",
   "AGENTS.md": "# Working agreement\n\nUse documented observatory measurements and preserve the source records.\n",
   "docs/architecture.md": "# Architecture\n\nThe cedar telescope uses an offline SQLite observation catalog.\n",
+  "docs/plain-notes.txt": "Plain text beacon records a body-only telescope observation.\n",
   "docs/decisions.md": "# Decisions\n\nCalibration is performed before every clear night observation.\n",
   "docs/nested/ignored.md": "# Ignored\n\nIgnoredrecursivebeacon must never appear.\n",
   "docs/nested/keep.md": "# Retained\n\nRecursivekeepbeacon describes safe calibration.\n",
