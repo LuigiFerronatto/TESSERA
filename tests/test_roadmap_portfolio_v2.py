@@ -74,7 +74,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
 
     open_issues = (
         "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
-        "#25", "#26", "#27", "#28", "#32", "#67", "#70", "#71", "#72",
+        "#25", "#26", "#27", "#28", "#32", "#67", "#71", "#72",
         "#73", "#78", "#80", "#103", "#104", "#105", "#106",
         "#119", "#121",
         "#136", "#137", "#138", "#139", "#140", "#141", "#142",
@@ -86,7 +86,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#69", "#118", "#120", "#135", "#153", "#154", "#155", "#172"):
+    for issue in ("#69", "#70", "#118", "#120", "#135", "#153", "#154", "#155", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -121,13 +121,15 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 5, ready_executable
+    assert len(ready_executable) == 6, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
     assert any("[#121]" in line for line in ready_executable)
     assert any("[#136]" in line for line in ready_executable)
     assert any("[#137]" in line for line in ready_executable)
+    assert any("[#13]" in line for line in ready_executable)
+    assert any("[#71]" in line for line in ready_executable)
 
     issue_16 = _row(text, "#16")
     assert "`VALIDATED` containment" in issue_16
@@ -163,8 +165,17 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "c815a684e4c8cbd426a0d717e243a7dfb0f04395" in issue_69
 
     issue_70 = _row(text, "#70")
-    assert "`READY`" in issue_70
-    assert "#12 and #69 dependencies satisfied" in issue_70
+    assert "closed" in issue_70
+    assert "`VALIDATED`" in issue_70
+    assert "8ca854f14f8f57443784e6cf3524419a953c2ce6" in issue_70
+
+    issue_13 = _row(text, "#13")
+    assert "`READY`" in issue_13
+    assert "#12/#69/#70 dependencies satisfied" in issue_13
+
+    issue_71 = _row(text, "#71")
+    assert "`READY`" in issue_71
+    assert "#69/#70 dependencies satisfied" in issue_71
 
     now_section = text.split("## Completed NOW positions", 1)[1].split("## NEXT", 1)[0]
     assert "historical delivery record" in text
@@ -185,8 +196,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
-    assert "READY                          9 total / 5 executable" in text
+    assert "READY                          10 total / 6 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
-    assert len(blocked_full_cards) == 29
-    assert "BLOCKED                        29 full cards + #16 full phase" in text
+    assert len(blocked_full_cards) == 27
+    assert "BLOCKED                        27 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text
