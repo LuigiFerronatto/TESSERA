@@ -644,10 +644,10 @@ class TesseraEngine:
                 ``storage_dir`` too — needed for corpora organized into
                 topic folders (for example ``memories/research/<topic>/``).
             use_cache: when True (default), first tries to load a previously
-                persisted index (``.tessera_index/graph.pkl``) if its fingerprint
-                (file count + latest mtime across the corpus) still matches
-                the notes on disk — this skips a full re-parse+re-vectorize
-                on every CLI invocation when nothing actually changed.
+                persisted index (``.tessera_index/graph.pkl``) after verifying
+                the exact configured source paths and SHA-256 values against
+                the identity manifest. This skips re-parse and re-vectorization
+                when the source set and bytes are unchanged.
             persist: when True (default), writes the freshly built index to
                 ``.tessera_index/`` (pickle for fast reload + a human-readable
                 JSON summary) once the scan finishes.
@@ -967,24 +967,6 @@ class TesseraEngine:
     # ------------------------------------------------------------------
     # Index persistence (disk cache)
     # ------------------------------------------------------------------
-    def _source_fingerprint(self) -> Tuple[int, float]:
-        """
-        Cheap signature of the current corpus state: (file count, max mtime)
-        across every supported text source under ``storage_dir``. Used to decide
-        whether a cached index is still valid without re-parsing anything.
-        """
-        count = 0
-        latest_mtime = 0.0
-        for filepath in self._iter_source_files(recursive=True):
-            count += 1
-            try:
-                mtime = os.path.getmtime(filepath)
-            except OSError:
-                continue
-            if mtime > latest_mtime:
-                latest_mtime = mtime
-        return count, latest_mtime
-
     def save_index(self) -> None:
         """
         Persists the current in-memory graph/index to
@@ -1001,12 +983,10 @@ class TesseraEngine:
         os.makedirs(self.index_cache_dir, exist_ok=True)
         self._save_identity_manifest()
 
-        fingerprint = self._source_fingerprint()
         snapshot = {
             "index_schema_version": INDEX_SCHEMA_VERSION,
             "storage_dir": os.path.abspath(self.storage_dir),
             "source_spec": self._source_spec(),
-            "fingerprint": fingerprint,
             "graph": self.graph,
             "file_registry": self.file_registry,
             "node_corpus": self.node_corpus,
