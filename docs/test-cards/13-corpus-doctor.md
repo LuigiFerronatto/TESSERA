@@ -121,7 +121,7 @@ still requires its own Test Card.
 | Issue/Test Card | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
 | Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
 | Merge commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
-| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; exact-head CI (test/distribution Python 3.9/3.12, smoke, sanity-eval, benchmark-reporting) green; Maintainer Audit recorded `KEEP`; Merge Governor succeeded |
+| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; exact-head CI (test/distribution Python 3.9/3.12, smoke, sanity-eval, benchmark-reporting) green; [Maintainer Audit](https://github.com/LuigiFerronatto/TESSERA/pull/277#issuecomment-5685536995) recorded `KEEP`; Merge Governor succeeded |
 | Benchmark record | `SMOKE_ONLY`; `longmemeval-v1-dev-50` correctly skipped |
 | PR Evolution Audit | `docs/PR_EVOLUTION_13.md` |
 

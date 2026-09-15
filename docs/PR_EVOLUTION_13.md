@@ -15,8 +15,9 @@
 - **Canonical merge date:** 2026-09-15
 
 Exact-head CI passed `test`/`distribution` (Python 3.9/3.12), `smoke`,
-`sanity-eval`, `benchmark-reporting (offline)`; `TESSERA Maintainer Audit` and
-`tessera-merge-governor` both succeeded. PR #277 merged to canonical `main`;
+`sanity-eval`, `benchmark-reporting (offline)`; the
+[Maintainer Audit](https://github.com/LuigiFerronatto/TESSERA/pull/277#issuecomment-5685536995)
+recorded `KEEP`, and `tessera-merge-governor` succeeded. PR #277 merged to canonical `main`;
 Issue #13 closed as completed by that merge. The final candidate SHA and the
 canonical merge SHA are recorded separately and must not be confused.
 
