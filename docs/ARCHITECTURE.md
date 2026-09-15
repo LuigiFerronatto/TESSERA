@@ -177,7 +177,7 @@ GRAPH / INDEX
    ├─ derived source-segment nodes for long/structured documents
    ├─ tag/entity structure
    ├─ explicit relations
-   └─ lexical corpus / TF-IDF
+   └─ parent-document lexical corpus / TF-IDF
    ↓
 RETRIEVAL
    ├─ lexical TF-IDF
@@ -189,6 +189,7 @@ RETRIEVAL
    ↓
 QUERY-AWARE EVIDENCE
    ├─ relevant structural segment or paragraph when supported
+   ├─ segment matching refines evidence without multiplying ranking weight
    ├─ segment -> parent document/source-version/span linkage
    └─ None instead of arbitrary evidence when unsupported
    ↓

@@ -68,6 +68,7 @@ def test_structured_document_keeps_parent_and_exact_addressable_spans(tmp_path: 
 
     assert len(segments) >= 3
     assert set(engine.file_registry) == {"docs/segmentation-reference"}
+    assert set(segments).isdisjoint(engine.node_ids)
     parent = engine.graph.nodes["docs/segmentation-reference"]
     assert "orichalcum" in parent["body"]
     assert source.read_text(encoding="utf-8") == raw
@@ -240,33 +241,3 @@ print(json.dumps([
         outputs.append(completed.stdout)
 
     assert outputs[0] == outputs[1]
-
-
-def test_segment_seeds_augment_the_document_seed_budget(
-    tmp_path: Path, monkeypatch,
-) -> None:
-    monkeypatch.setattr("tessera.engine_core.SEED_NODE_LIMIT", 1)
-    (tmp_path / "segmented.md").write_text(
-        "---\nid: docs/segmented\ndocument_type: reference\n---\n\n"
-        "# Large reference\n\n"
-        + _section("Background", "unrelated", lines=40)
-        + "\n\n## Target\n"
-        + ("needle quartz exact target.\n" * 12)
-        + "\n\n"
-        + _section("Appendix", "unrelated", lines=40),
-        encoding="utf-8",
-    )
-    (tmp_path / "atomic.md").write_text(
-        "---\nid: memory/atomic\nnode_type: factual\n---\n\n"
-        "Needle appears in this concise independent fact.",
-        encoding="utf-8",
-    )
-
-    engine = TesseraEngine(str(tmp_path))
-    engine.build_index(use_cache=False, persist=False)
-    results = engine.retrieve_context("needle quartz", top_n=2)
-
-    assert {result["id"] for result in results} == {
-        "docs/segmented",
-        "memory/atomic",
-    }

@@ -880,7 +880,6 @@ class TesseraEngine:
                         heading=segment.heading,
                         segmentation_schema_version=SEGMENTATION_SCHEMA_VERSION,
                     )
-                    self.node_corpus[segment.segment_id] = segment.text
                     self.graph.add_edge(mem_id, segment.segment_id, relation_type="has_segment")
                     self.graph.add_edge(segment.segment_id, mem_id, relation_type="segment_of")
 
@@ -1284,28 +1283,11 @@ class TesseraEngine:
 
         seed_nodes = []
         seed_similarities = {}
-        memory_seed_count = 0
-        segment_seed_count = 0
-        for idx in sorted_indices:
-            if similarities[idx] <= SEED_NODE_MIN_SIMILARITY:
-                break
-            nid = self.node_ids[idx]
-            is_segment = self.graph.nodes[nid].get("node_type") == SEGMENT_NODE_TYPE
-            if is_segment:
-                if segment_seed_count >= SEED_NODE_LIMIT:
-                    continue
-                segment_seed_count += 1
-            else:
-                # Derived segments augment the established document candidate
-                # pool. They must not consume its fixed seed budget and evict
-                # relevant parent documents from the retrieval subgraph.
-                if memory_seed_count >= SEED_NODE_LIMIT:
-                    continue
-                memory_seed_count += 1
-            seed_nodes.append(nid)
-            seed_similarities[nid] = similarities[idx]
-            if memory_seed_count >= SEED_NODE_LIMIT and segment_seed_count >= SEED_NODE_LIMIT:
-                break
+        for idx in sorted_indices[:SEED_NODE_LIMIT]:
+            if similarities[idx] > SEED_NODE_MIN_SIMILARITY:
+                nid = self.node_ids[idx]
+                seed_nodes.append(nid)
+                seed_similarities[nid] = similarities[idx]
 
         if not seed_nodes:
             return []
@@ -1313,8 +1295,14 @@ class TesseraEngine:
         # 2. 1-hop subgraph expansion (MemORAI).
         subgraph_nodes = set(seed_nodes)
         for seed in seed_nodes:
-            subgraph_nodes.update(self.graph.successors(seed))
-            subgraph_nodes.update(self.graph.predecessors(seed))
+            subgraph_nodes.update(
+                node_id for node_id in self.graph.successors(seed)
+                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+            )
+            subgraph_nodes.update(
+                node_id for node_id in self.graph.predecessors(seed)
+                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+            )
 
         # Rebuild the query subgraph in a stable order. NetworkX algorithms
         # iterate nodes and edges in insertion order, while ``set`` iteration
@@ -1337,12 +1325,23 @@ class TesseraEngine:
         sub_sims = cosine_similarity(query_vec, sub_vecs).flatten()
         node_sim_map = dict(zip(all_sub_nodes, sub_sims))
 
+        # Segment facets are queried separately from the parent-document TF-IDF
+        # and PageRank candidate pool. This lets them refine evidence selection
+        # without multiplying one source's ranking weight or evicting another
+        # document from the fixed seed budget.
+        segment_ids = sorted(
+            node_id for node_id, data in self.graph.nodes(data=True)
+            if data.get("node_type") == SEGMENT_NODE_TYPE
+            and data.get("parent_memory_id") in subgraph_nodes
+        )
+        segment_texts = [self.graph.nodes[node_id].get("body", "") for node_id in segment_ids]
+        segment_sims = (
+            cosine_similarity(query_vec, self.vectorizer.transform(segment_texts)).flatten()
+            if segment_texts else []
+        )
         best_segment_by_parent: Dict[str, Tuple[str, float]] = {}
-        for candidate_id, similarity in node_sim_map.items():
-            candidate_data = self.graph.nodes.get(candidate_id, {})
-            if candidate_data.get("node_type") != SEGMENT_NODE_TYPE:
-                continue
-            parent_id = candidate_data.get("parent_memory_id")
+        for candidate_id, similarity in zip(segment_ids, segment_sims):
+            parent_id = self.graph.nodes[candidate_id].get("parent_memory_id")
             current = best_segment_by_parent.get(parent_id)
             if parent_id and (current is None or similarity > current[1]):
                 best_segment_by_parent[parent_id] = (candidate_id, float(similarity))
@@ -1415,7 +1414,7 @@ class TesseraEngine:
                 # A. Lexical Similarity
                 document_tfidf = float(node_sim_map.get(node_id, 0.0))
                 segment_hit = best_segment_by_parent.get(node_id)
-                raw_tfidf = max(document_tfidf, segment_hit[1] if segment_hit else 0.0)
+                raw_tfidf = document_tfidf
                 
                 body_text = node_data.get("body", "")
                 body_tokens = set(re.findall(r"\b\w+\b", body_text.lower()))
