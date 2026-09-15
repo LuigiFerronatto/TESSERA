@@ -1,8 +1,11 @@
 """Acceptance coverage for Issue #70 structural source segmentation."""
 
 import json
+import os
 import pickle
 from pathlib import Path
+import subprocess
+import sys
 
 from tessera import SEGMENT_NODE_TYPE, TesseraEngine
 
@@ -187,3 +190,53 @@ def test_pre_segmentation_cache_schema_forces_rebuild(tmp_path: Path) -> None:
     assert rebuilt.last_index_stats["mode"] == "clean_rebuild"
     assert rebuilt.last_index_stats["parsed"] == 1
     assert _segments(rebuilt)
+
+
+def test_segment_ranking_is_stable_across_python_hash_seeds(tmp_path: Path) -> None:
+    for index, token in enumerate(("granite", "orichalcum", "cobalt", "titanium")):
+        (tmp_path / f"reference-{index}.md").write_text(
+            "---\n"
+            f"id: docs/reference-{index}\n"
+            "document_type: reference\n"
+            "---\n\n"
+            "# Reference\n\n"
+            + _section("Shared", token, lines=18)
+            + "\n\n"
+            + _section("Common", "durable", lines=18)
+            + "\n",
+            encoding="utf-8",
+        )
+
+    script = """
+import json
+import sys
+from tessera import TesseraEngine
+
+engine = TesseraEngine(sys.argv[1])
+engine.build_index(use_cache=False, persist=False)
+hits = engine.retrieve_context("durable reference sentence", top_n=4)
+print(json.dumps([
+    {
+        "id": hit["id"],
+        "score": hit["score"],
+        "score_explain": hit["score_explain"],
+        "evidence_info": hit["evidence_info"],
+    }
+    for hit in hits
+], sort_keys=True))
+"""
+
+    outputs = []
+    for hash_seed in ("1", "947"):
+        environment = os.environ.copy()
+        environment["PYTHONHASHSEED"] = hash_seed
+        completed = subprocess.run(
+            [sys.executable, "-c", script, str(tmp_path)],
+            check=True,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        outputs.append(completed.stdout)
+
+    assert outputs[0] == outputs[1]

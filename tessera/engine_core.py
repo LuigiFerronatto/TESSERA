@@ -73,6 +73,7 @@ SEED_NODE_MIN_SIMILARITY = 0.01
 
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
 INDEX_SCHEMA_VERSION = 2
+SCORE_DECIMAL_PLACES = 12
 
 # Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
 # Some external corpora use a different,
@@ -1298,7 +1299,19 @@ class TesseraEngine:
             subgraph_nodes.update(self.graph.successors(seed))
             subgraph_nodes.update(self.graph.predecessors(seed))
 
-        subgraph = self.graph.subgraph(subgraph_nodes).copy()
+        # Rebuild the query subgraph in a stable order. NetworkX algorithms
+        # iterate nodes and edges in insertion order, while ``set`` iteration
+        # varies with Python's hash seed. Segment nodes introduce many small,
+        # near-equal PageRank contributions, so preserving set order here can
+        # otherwise leak last-bit floating-point differences into public scores.
+        subgraph = nx.DiGraph()
+        for node_id in sorted(subgraph_nodes):
+            subgraph.add_node(node_id, **self.graph.nodes[node_id])
+        expanded = self.graph.subgraph(subgraph_nodes)
+        for source_id, target_id, edge_data in sorted(
+            expanded.edges(data=True), key=lambda item: (item[0], item[1])
+        ):
+            subgraph.add_edge(source_id, target_id, **edge_data)
 
         # 3. Dynamic edge weighting (DW-PR).
         all_sub_nodes = list(subgraph.nodes())
@@ -1317,7 +1330,7 @@ class TesseraEngine:
             if parent_id and (current is None or similarity > current[1]):
                 best_segment_by_parent[parent_id] = (candidate_id, float(similarity))
 
-        for u, v in list(subgraph.edges()):
+        for u, v in sorted(subgraph.edges()):
             target_similarity = node_sim_map.get(v, 0.0)
             relation_type = subgraph[u][v].get("relation_type", "")
 
@@ -1453,7 +1466,10 @@ class TesseraEngine:
                     weights_used.get("relations", 0.1) * normalized_relations
                 )
                 
-                final_score = base_relevance * type_boost * recency_boost
+                final_score = round(
+                    float(base_relevance * type_boost * recency_boost),
+                    SCORE_DECIMAL_PLACES,
+                )
                 
                 # Phase 2: Query-Aware Relevant Evidence Extraction (Deterministic, Local & Fast)
                 # Gated by overlap threshold to return None when evidence is insufficient (F5)
@@ -1472,7 +1488,7 @@ class TesseraEngine:
                         relevant_evidence = segment_text
                         evidence_info = {
                             "text": relevant_evidence,
-                            "score": float(segment_score),
+                            "score": round(float(segment_score), SCORE_DECIMAL_PLACES),
                             "strategy": "structural_segment",
                             "segment_id": segment_id,
                             "heading": segment_data.get("heading"),
@@ -1505,18 +1521,24 @@ class TesseraEngine:
                         "type": node_type,
                         "filepath": node_data.get("filepath"),
                         "filename": node_data.get("filename"),
-                        "score": float(final_score),
+                        "score": final_score,
                         "score_explain": {
-                            "lexical_tfidf": float(raw_tfidf),
-                            "lexical_overlap": float(term_overlap),
-                            "lexical_score": float(raw_tfidf * 0.7 + term_overlap * 0.3),
-                            "title": float(title_score),
-                            "metadata": float(metadata_score),
-                            "raw_pagerank": float(pr_score),
-                            "normalized_relations": float(normalized_relations),
-                            "relations_contribution": float(normalized_relations * weights_used.get("relations", 0.1)),
-                            "type_boost": float(type_boost),
-                            "recency_boost": float(recency_score if recency_score > 0 else 1.0),
+                            "lexical_tfidf": round(float(raw_tfidf), SCORE_DECIMAL_PLACES),
+                            "lexical_overlap": round(float(term_overlap), SCORE_DECIMAL_PLACES),
+                            "lexical_score": round(float(raw_tfidf * 0.7 + term_overlap * 0.3), SCORE_DECIMAL_PLACES),
+                            "title": round(float(title_score), SCORE_DECIMAL_PLACES),
+                            "metadata": round(float(metadata_score), SCORE_DECIMAL_PLACES),
+                            "raw_pagerank": round(float(pr_score), SCORE_DECIMAL_PLACES),
+                            "normalized_relations": round(float(normalized_relations), SCORE_DECIMAL_PLACES),
+                            "relations_contribution": round(
+                                float(normalized_relations * weights_used.get("relations", 0.1)),
+                                SCORE_DECIMAL_PLACES,
+                            ),
+                            "type_boost": round(float(type_boost), SCORE_DECIMAL_PLACES),
+                            "recency_boost": round(
+                                float(recency_score if recency_score > 0 else 1.0),
+                                SCORE_DECIMAL_PLACES,
+                            ),
                         },
                         "relevant_evidence": relevant_evidence,
                         "evidence_info": evidence_info,
@@ -1526,12 +1548,12 @@ class TesseraEngine:
                     }
                 )
 
-        retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
+        retrieved_memories.sort(key=lambda item: (-item["score"], item["id"]))
 
         # 6. Non-destructive possible-conflict containment (#16 P0).
         if resolve_conflicts:
             retrieved_memories = ConflictResolver.resolve_temporal_conflicts(retrieved_memories)
-            retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
+            retrieved_memories.sort(key=lambda item: (-item["score"], item["id"]))
 
         return retrieved_memories[:top_n]
 
