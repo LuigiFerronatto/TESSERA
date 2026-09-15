@@ -1284,11 +1284,28 @@ class TesseraEngine:
 
         seed_nodes = []
         seed_similarities = {}
-        for idx in sorted_indices[:SEED_NODE_LIMIT]:
-            if similarities[idx] > SEED_NODE_MIN_SIMILARITY:
-                nid = self.node_ids[idx]
-                seed_nodes.append(nid)
-                seed_similarities[nid] = similarities[idx]
+        memory_seed_count = 0
+        segment_seed_count = 0
+        for idx in sorted_indices:
+            if similarities[idx] <= SEED_NODE_MIN_SIMILARITY:
+                break
+            nid = self.node_ids[idx]
+            is_segment = self.graph.nodes[nid].get("node_type") == SEGMENT_NODE_TYPE
+            if is_segment:
+                if segment_seed_count >= SEED_NODE_LIMIT:
+                    continue
+                segment_seed_count += 1
+            else:
+                # Derived segments augment the established document candidate
+                # pool. They must not consume its fixed seed budget and evict
+                # relevant parent documents from the retrieval subgraph.
+                if memory_seed_count >= SEED_NODE_LIMIT:
+                    continue
+                memory_seed_count += 1
+            seed_nodes.append(nid)
+            seed_similarities[nid] = similarities[idx]
+            if memory_seed_count >= SEED_NODE_LIMIT and segment_seed_count >= SEED_NODE_LIMIT:
+                break
 
         if not seed_nodes:
             return []
