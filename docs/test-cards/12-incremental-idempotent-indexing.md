@@ -10,6 +10,7 @@
 | Merge commit | Canonical squash merge [`971801cd`](https://github.com/LuigiFerronatto/TESSERA/commit/971801cd89b6ce7b890df9ceb43b6afff9fa0964) |
 | Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
+| Benchmark rationale | Source lifecycle and cache behavior changed; ranking semantics remain unchanged, so deterministic smoke coverage is sufficient. |
 | Last audited | 2026-09-11 |
 
 ## In one sentence
