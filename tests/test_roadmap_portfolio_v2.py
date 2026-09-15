@@ -73,10 +73,10 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     text = ROADMAP.read_text(encoding="utf-8")
 
     open_issues = (
-        "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
+        "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
         "#25", "#26", "#27", "#28", "#32", "#67", "#69", "#70", "#71", "#72",
         "#73", "#78", "#80", "#103", "#104", "#105", "#106",
-        "#119", "#121", "#134",
+        "#119", "#121",
         "#136", "#137", "#138", "#139", "#140", "#141", "#142",
         "#143", "#144", "#145", "#146",
         "#157", "#158", "#159", "#160", "#161",
@@ -121,7 +121,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 3, ready_executable
+    assert len(ready_executable) == 5, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
@@ -176,8 +176,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
-    assert "READY                          7 total / 3 executable" in text
+    assert "READY                          9 total / 5 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
-    assert len(blocked_full_cards) == 33
-    assert "BLOCKED                        33 full cards + #16 full phase" in text
+    assert len(blocked_full_cards) == 30
+    assert "BLOCKED                        30 full cards + #16 full phase" in text
     assert "TRACKER                        5 non-executable epics" in text
