@@ -214,14 +214,24 @@ def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> 
             try:
                 with open(filepath, "r", encoding="utf-8") as handle:
                     raw_text = handle.read()
-                evidence = evidence_for_text(
-                    canonical,
-                    raw_text,
-                    evidence_text,
-                    extraction_method=(item.get("evidence_info") or {}).get(
-                        "strategy", "paragraph_lexical"
-                    ),
-                )
+                evidence_info = item.get("evidence_info") or {}
+                explicit_span = evidence_info.get("span") or {}
+                if explicit_span.get("start_line") is not None and explicit_span.get("end_line") is not None:
+                    evidence = evidence_from_canonical(
+                        canonical,
+                        extraction_method=evidence_info.get("strategy", "structural_segment"),
+                        span=EvidenceSpan(
+                            int(explicit_span["start_line"]),
+                            int(explicit_span["end_line"]),
+                        ),
+                    )
+                else:
+                    evidence = evidence_for_text(
+                        canonical,
+                        raw_text,
+                        evidence_text,
+                        extraction_method=evidence_info.get("strategy", "paragraph_lexical"),
+                    )
                 item["evidence"] = evidence.to_dict()
             except (OSError, UnicodeError):
                 item["evidence"] = evidence_from_canonical(

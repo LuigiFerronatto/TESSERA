@@ -10,6 +10,17 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Changed
 
+- Long or structurally headed Markdown/plain-text sources now retain their
+  complete document node while exposing deterministic, addressable segment
+  nodes with parent document, source-version and exact line-span provenance.
+  Retrieval uses segments to select precise evidence on a ranked parent and
+  returns the parent rather than noisy segment pseudo-memories. Segments stay
+  outside the document candidate/PageRank budget, preserving established
+  ranking behavior. Cache reuse now checks exact source paths and hashes so
+  moves and timestamp-preserving edits cannot leave derived segments stale.
+  Query subgraphs and serialized ranking scores are stabilized across Python
+  hash seeds for repeatable evaluation artifacts.
+  ([#70](https://github.com/LuigiFerronatto/TESSERA/issues/70))
 - Plain-text `.txt` files are now first-class, body-only knowledge sources in
   discovery, project initialization, indexing, incremental lifecycle handling,
   retrieval provenance and evidence freshness checks. Markdown parsing and the

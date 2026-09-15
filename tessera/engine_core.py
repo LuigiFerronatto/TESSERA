@@ -42,6 +42,7 @@ from .source_formats import (
     source_format_for_path,
     split_source,
 )
+from .segmentation import SEGMENT_NODE_TYPE, SEGMENTATION_SCHEMA_VERSION, segment_source_document
 
 
 _BUILTIN_EXCLUDED_SOURCE_DIRS = {
@@ -71,6 +72,8 @@ SEED_NODE_LIMIT = 30
 SEED_NODE_MIN_SIMILARITY = 0.01
 
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
+INDEX_SCHEMA_VERSION = 2
+SCORE_DECIMAL_PLACES = 12
 
 # Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
 # Some external corpora use a different,
@@ -642,24 +645,26 @@ class TesseraEngine:
                 ``storage_dir`` too — needed for corpora organized into
                 topic folders (for example ``memories/research/<topic>/``).
             use_cache: when True (default), first tries to load a previously
-                persisted index (``.tessera_index/graph.pkl``) if its fingerprint
-                (file count + latest mtime across the corpus) still matches
-                the notes on disk — this skips a full re-parse+re-vectorize
-                on every CLI invocation when nothing actually changed.
+                persisted index (``.tessera_index/graph.pkl``) after verifying
+                the exact configured source paths and SHA-256 values against
+                the identity manifest. This skips re-parse and re-vectorization
+                when the source set and bytes are unchanged.
             persist: when True (default), writes the freshly built index to
                 ``.tessera_index/`` (pickle for fast reload + a human-readable
                 JSON summary) once the scan finishes.
         """
         if use_cache and self._load_index_if_fresh():
+            scanned = len(list(self._iter_source_files(recursive=recursive)))
             self.last_index_stats = {
-                "scanned": len(list(self._iter_source_files(recursive=recursive))),
-                "hashed": 0,
+                "scanned": scanned,
+                "hashed": scanned,
                 "parsed": 0,
                 "unchanged": len(self.file_registry),
                 "added": 0,
                 "updated": 0,
                 "moved": 0,
                 "removed": 0,
+                "segments": self._segment_count(),
                 "mode": "cache_hit",
             }
             return
@@ -674,13 +679,14 @@ class TesseraEngine:
                 import pickle
                 with open(self.index_cache_pkl, "rb") as handle:
                     previous = pickle.load(handle)
-                self.graph = previous.get("graph", self.graph)
-                self.file_registry = previous.get("file_registry", {})
-                self.node_corpus = previous.get("node_corpus", {})
-                self.node_ids = previous.get("node_ids", [])
-                self.tfidf_matrix = previous.get("tfidf_matrix")
-                self.vectorizer = previous.get("vectorizer", self.vectorizer)
-                previous_registry = dict(self.file_registry)
+                if previous.get("index_schema_version") == INDEX_SCHEMA_VERSION:
+                    self.graph = previous.get("graph", self.graph)
+                    self.file_registry = previous.get("file_registry", {})
+                    self.node_corpus = previous.get("node_corpus", {})
+                    self.node_ids = previous.get("node_ids", [])
+                    self.tfidf_matrix = previous.get("tfidf_matrix")
+                    self.vectorizer = previous.get("vectorizer", self.vectorizer)
+                    previous_registry = dict(self.file_registry)
             except Exception:
                 previous_registry = {}
 
@@ -741,6 +747,10 @@ class TesseraEngine:
                 if old_rel not in unchanged_paths:
                     stale_ids.append(mem_id)
             for mem_id in stale_ids:
+                for segment_id, data in list(self.graph.nodes(data=True)):
+                    if data.get("node_type") == SEGMENT_NODE_TYPE and data.get("parent_memory_id") == mem_id:
+                        self.graph.remove_node(segment_id)
+                        self.node_corpus.pop(segment_id, None)
                 self.file_registry.pop(mem_id, None)
                 self.node_corpus.pop(mem_id, None)
                 if mem_id in self.graph:
@@ -850,6 +860,29 @@ class TesseraEngine:
                     canonical_metadata=canonical_meta,
                 )
 
+                for segment in segment_source_document(raw_text, body, canonical_meta):
+                    self.graph.add_node(
+                        segment.segment_id,
+                        node_type=SEGMENT_NODE_TYPE,
+                        filepath=filepath,
+                        filename=filename,
+                        body=segment.text,
+                        parent_memory_id=mem_id,
+                        document_id=segment.document_id,
+                        document_hash=segment.document_hash,
+                        source_path=segment.source_path,
+                        source_format=segment.source_format,
+                        segment_ordinal=segment.ordinal,
+                        source_span={
+                            "start_line": segment.start_line,
+                            "end_line": segment.end_line,
+                        },
+                        heading=segment.heading,
+                        segmentation_schema_version=SEGMENTATION_SCHEMA_VERSION,
+                    )
+                    self.graph.add_edge(mem_id, segment.segment_id, relation_type="has_segment")
+                    self.graph.add_edge(segment.segment_id, mem_id, relation_type="segment_of")
+
                 for ent in frontmatter_compat["entities"]:
                     if not isinstance(ent, dict):
                         continue
@@ -927,30 +960,13 @@ class TesseraEngine:
             "updated": len(changed_paths - moved_paths),
             "moved": len(moved_paths),
             "removed": len(removed_paths),
+            "segments": self._segment_count(),
             "mode": "incremental" if incremental else "clean_rebuild",
         }
 
     # ------------------------------------------------------------------
     # Index persistence (disk cache)
     # ------------------------------------------------------------------
-    def _source_fingerprint(self) -> Tuple[int, float]:
-        """
-        Cheap signature of the current corpus state: (file count, max mtime)
-        across every supported text source under ``storage_dir``. Used to decide
-        whether a cached index is still valid without re-parsing anything.
-        """
-        count = 0
-        latest_mtime = 0.0
-        for filepath in self._iter_source_files(recursive=True):
-            count += 1
-            try:
-                mtime = os.path.getmtime(filepath)
-            except OSError:
-                continue
-            if mtime > latest_mtime:
-                latest_mtime = mtime
-        return count, latest_mtime
-
     def save_index(self) -> None:
         """
         Persists the current in-memory graph/index to
@@ -967,11 +983,10 @@ class TesseraEngine:
         os.makedirs(self.index_cache_dir, exist_ok=True)
         self._save_identity_manifest()
 
-        fingerprint = self._source_fingerprint()
         snapshot = {
+            "index_schema_version": INDEX_SCHEMA_VERSION,
             "storage_dir": os.path.abspath(self.storage_dir),
             "source_spec": self._source_spec(),
-            "fingerprint": fingerprint,
             "graph": self.graph,
             "file_registry": self.file_registry,
             "node_corpus": self.node_corpus,
@@ -983,6 +998,8 @@ class TesseraEngine:
             pickle.dump(snapshot, f)
 
         readable = {
+            "index_schema_version": INDEX_SCHEMA_VERSION,
+            "segmentation_schema_version": SEGMENTATION_SCHEMA_VERSION,
             "storage_dir": os.path.abspath(self.storage_dir),
             "generated_at": datetime.datetime.now().astimezone().isoformat(),
             "num_nodes": self.graph.number_of_nodes(),
@@ -992,6 +1009,10 @@ class TesseraEngine:
                     "node_type": data.get("node_type"),
                     "filepath": data.get("filepath"),
                     "tags": data.get("frontmatter", {}).get("tags", []) if data.get("frontmatter") else None,
+                    "parent_memory_id": data.get("parent_memory_id"),
+                    "document_id": data.get("document_id"),
+                    "source_span": data.get("source_span"),
+                    "heading": data.get("heading"),
                 }
                 for node_id, data in self.graph.nodes(data=True)
             },
@@ -1001,10 +1022,9 @@ class TesseraEngine:
 
     def _load_index_if_fresh(self) -> bool:
         """
-        Attempts to load ``.tessera_index/graph.pkl`` and validates its stored
-        fingerprint against the corpus's current state. Returns True (and
-        populates self.graph/etc.) only if the cache is still valid; False
-        otherwise (caller should fall back to a full rebuild).
+        Load ``graph.pkl`` only when every current path and source hash matches
+        the identity manifest. The older count/latest-mtime shortcut could miss
+        a rename or a same-size edit with preserved timestamps.
         """
         import pickle
 
@@ -1017,10 +1037,28 @@ class TesseraEngine:
         except Exception:  # noqa: BLE001 - any corrupt/incompatible cache -> rebuild
             return False
 
-        if snapshot.get("fingerprint") != self._source_fingerprint():
+        if snapshot.get("index_schema_version") != INDEX_SCHEMA_VERSION:
             return False
         if snapshot.get("source_spec") != self._source_spec():
             return False
+        current_paths = {
+            self._relative_identity_path(path): path
+            for path in self._iter_source_files(recursive=True)
+        }
+        if set(current_paths) != set(self.identity_manifest):
+            return False
+        import hashlib
+        for relative, path in current_paths.items():
+            expected = self.identity_manifest[relative].get("file_hash")
+            if not expected:
+                return False
+            try:
+                with open(path, "rb") as handle:
+                    actual = hashlib.sha256(handle.read()).hexdigest()
+            except OSError:
+                return False
+            if actual != expected:
+                return False
 
         self.graph = snapshot["graph"]
         self.file_registry = snapshot["file_registry"]
@@ -1029,6 +1067,12 @@ class TesseraEngine:
         self.tfidf_matrix = snapshot["tfidf_matrix"]
         self.vectorizer = snapshot["vectorizer"]
         return True
+
+    def _segment_count(self) -> int:
+        return sum(
+            1 for _node_id, data in self.graph.nodes(data=True)
+            if data.get("node_type") == SEGMENT_NODE_TYPE
+        )
 
     def _iter_source_files(self, recursive: bool):
         """Yield supported text sources from explicit or legacy store corpora.
@@ -1251,10 +1295,28 @@ class TesseraEngine:
         # 2. 1-hop subgraph expansion (MemORAI).
         subgraph_nodes = set(seed_nodes)
         for seed in seed_nodes:
-            subgraph_nodes.update(self.graph.successors(seed))
-            subgraph_nodes.update(self.graph.predecessors(seed))
+            subgraph_nodes.update(
+                node_id for node_id in self.graph.successors(seed)
+                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+            )
+            subgraph_nodes.update(
+                node_id for node_id in self.graph.predecessors(seed)
+                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+            )
 
-        subgraph = self.graph.subgraph(subgraph_nodes).copy()
+        # Rebuild the query subgraph in a stable order. NetworkX algorithms
+        # iterate nodes and edges in insertion order, while ``set`` iteration
+        # varies with Python's hash seed. Segment nodes introduce many small,
+        # near-equal PageRank contributions, so preserving set order here can
+        # otherwise leak last-bit floating-point differences into public scores.
+        subgraph = nx.DiGraph()
+        for node_id in sorted(subgraph_nodes):
+            subgraph.add_node(node_id, **self.graph.nodes[node_id])
+        expanded = self.graph.subgraph(subgraph_nodes)
+        for source_id, target_id, edge_data in sorted(
+            expanded.edges(data=True), key=lambda item: (item[0], item[1])
+        ):
+            subgraph.add_edge(source_id, target_id, **edge_data)
 
         # 3. Dynamic edge weighting (DW-PR).
         all_sub_nodes = list(subgraph.nodes())
@@ -1263,7 +1325,28 @@ class TesseraEngine:
         sub_sims = cosine_similarity(query_vec, sub_vecs).flatten()
         node_sim_map = dict(zip(all_sub_nodes, sub_sims))
 
-        for u, v in list(subgraph.edges()):
+        # Segment facets are queried separately from the parent-document TF-IDF
+        # and PageRank candidate pool. This lets them refine evidence selection
+        # without multiplying one source's ranking weight or evicting another
+        # document from the fixed seed budget.
+        segment_ids = sorted(
+            node_id for node_id, data in self.graph.nodes(data=True)
+            if data.get("node_type") == SEGMENT_NODE_TYPE
+            and data.get("parent_memory_id") in subgraph_nodes
+        )
+        segment_texts = [self.graph.nodes[node_id].get("body", "") for node_id in segment_ids]
+        segment_sims = (
+            cosine_similarity(query_vec, self.vectorizer.transform(segment_texts)).flatten()
+            if segment_texts else []
+        )
+        best_segment_by_parent: Dict[str, Tuple[str, float]] = {}
+        for candidate_id, similarity in zip(segment_ids, segment_sims):
+            parent_id = self.graph.nodes[candidate_id].get("parent_memory_id")
+            current = best_segment_by_parent.get(parent_id)
+            if parent_id and (current is None or similarity > current[1]):
+                best_segment_by_parent[parent_id] = (candidate_id, float(similarity))
+
+        for u, v in sorted(subgraph.edges()):
             target_similarity = node_sim_map.get(v, 0.0)
             relation_type = subgraph[u][v].get("relation_type", "")
 
@@ -1329,7 +1412,9 @@ class TesseraEngine:
                 
                 # Compute Multi-Signal Score
                 # A. Lexical Similarity
-                raw_tfidf = float(node_sim_map.get(node_id, 0.0))
+                document_tfidf = float(node_sim_map.get(node_id, 0.0))
+                segment_hit = best_segment_by_parent.get(node_id)
+                raw_tfidf = document_tfidf
                 
                 body_text = node_data.get("body", "")
                 body_tokens = set(re.findall(r"\b\w+\b", body_text.lower()))
@@ -1397,7 +1482,10 @@ class TesseraEngine:
                     weights_used.get("relations", 0.1) * normalized_relations
                 )
                 
-                final_score = base_relevance * type_boost * recency_boost
+                final_score = round(
+                    float(base_relevance * type_boost * recency_boost),
+                    SCORE_DECIMAL_PLACES,
+                )
                 
                 # Phase 2: Query-Aware Relevant Evidence Extraction (Deterministic, Local & Fast)
                 # Gated by overlap threshold to return None when evidence is insufficient (F5)
@@ -1407,6 +1495,21 @@ class TesseraEngine:
                 
                 relevant_evidence = None
                 evidence_info = None
+                if segment_hit:
+                    segment_id, segment_score = segment_hit
+                    segment_data = self.graph.nodes[segment_id]
+                    segment_text = segment_data.get("body", "")
+                    segment_tokens = set(re.findall(r"\b\w+\b", segment_text.lower()))
+                    if query_tokens & segment_tokens:
+                        relevant_evidence = segment_text
+                        evidence_info = {
+                            "text": relevant_evidence,
+                            "score": round(float(segment_score), SCORE_DECIMAL_PLACES),
+                            "strategy": "structural_segment",
+                            "segment_id": segment_id,
+                            "heading": segment_data.get("heading"),
+                            "span": dict(segment_data.get("source_span") or {}),
+                        }
                 if paragraphs:
                     best_para_score = -1.0
                     best_para = None
@@ -1420,7 +1523,7 @@ class TesseraEngine:
                             best_para = p
                     
                     # Threshold check: requires at least 1 overlapping query token (best_para_score >= 1.0)
-                    if best_para and best_para_score >= 1.0:
+                    if relevant_evidence is None and best_para and best_para_score >= 1.0:
                         relevant_evidence = best_para
                         evidence_info = {
                             "text": relevant_evidence,
@@ -1434,18 +1537,24 @@ class TesseraEngine:
                         "type": node_type,
                         "filepath": node_data.get("filepath"),
                         "filename": node_data.get("filename"),
-                        "score": float(final_score),
+                        "score": final_score,
                         "score_explain": {
-                            "lexical_tfidf": float(raw_tfidf),
-                            "lexical_overlap": float(term_overlap),
-                            "lexical_score": float(raw_tfidf * 0.7 + term_overlap * 0.3),
-                            "title": float(title_score),
-                            "metadata": float(metadata_score),
-                            "raw_pagerank": float(pr_score),
-                            "normalized_relations": float(normalized_relations),
-                            "relations_contribution": float(normalized_relations * weights_used.get("relations", 0.1)),
-                            "type_boost": float(type_boost),
-                            "recency_boost": float(recency_score if recency_score > 0 else 1.0),
+                            "lexical_tfidf": round(float(raw_tfidf), SCORE_DECIMAL_PLACES),
+                            "lexical_overlap": round(float(term_overlap), SCORE_DECIMAL_PLACES),
+                            "lexical_score": round(float(raw_tfidf * 0.7 + term_overlap * 0.3), SCORE_DECIMAL_PLACES),
+                            "title": round(float(title_score), SCORE_DECIMAL_PLACES),
+                            "metadata": round(float(metadata_score), SCORE_DECIMAL_PLACES),
+                            "raw_pagerank": round(float(pr_score), SCORE_DECIMAL_PLACES),
+                            "normalized_relations": round(float(normalized_relations), SCORE_DECIMAL_PLACES),
+                            "relations_contribution": round(
+                                float(normalized_relations * weights_used.get("relations", 0.1)),
+                                SCORE_DECIMAL_PLACES,
+                            ),
+                            "type_boost": round(float(type_boost), SCORE_DECIMAL_PLACES),
+                            "recency_boost": round(
+                                float(recency_score if recency_score > 0 else 1.0),
+                                SCORE_DECIMAL_PLACES,
+                            ),
                         },
                         "relevant_evidence": relevant_evidence,
                         "evidence_info": evidence_info,
@@ -1455,12 +1564,12 @@ class TesseraEngine:
                     }
                 )
 
-        retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
+        retrieved_memories.sort(key=lambda item: (-item["score"], item["id"]))
 
         # 6. Non-destructive possible-conflict containment (#16 P0).
         if resolve_conflicts:
             retrieved_memories = ConflictResolver.resolve_temporal_conflicts(retrieved_memories)
-            retrieved_memories.sort(key=lambda x: x["score"], reverse=True)
+            retrieved_memories.sort(key=lambda item: (-item["score"], item["id"]))
 
         return retrieved_memories[:top_n]
 
