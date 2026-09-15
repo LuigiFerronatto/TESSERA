@@ -66,6 +66,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   runtime behavior changed).
 
 ### Added
+- Added `tessera corpus doctor`, a deterministic read-only audit for configured
+  source parsing, metadata completeness and validity, duplicate identities,
+  broken or ambiguous relations, stale identity-manifest entries, and stale
+  evidence records. Human and versioned JSON reports distinguish healthy,
+  warning, and error states; errors return exit code 1, while `--strict` makes
+  warning-only reports return exit code 2. ([#13](https://github.com/LuigiFerronatto/TESSERA/issues/13))
 - Prepared the first public release line as distribution
   `tessera-agent-memory==0.0.1`; the Python import and `tessera` CLI remain
   unchanged. Release artifacts are built immutably and published through the

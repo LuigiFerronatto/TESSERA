@@ -98,8 +98,19 @@ tessera write \
 
 tessera index
 
+# Audit source and derived-index health without changing files.
+tessera corpus doctor
+
 tessera query "what database does the project use?"
 ```
+
+`tessera corpus doctor` is separate from the installation-oriented
+`tessera doctor`. It checks configured source parsing, identity collisions,
+explicit metadata, relations, manifest freshness, and evidence freshness. The
+default command returns nonzero only for errors; use `--strict` when a
+warning-only report should return exit code 2 in CI, or `--json` for the
+versioned machine-readable report. Neither mode rebuilds the index or rewrites
+source files.
 
 From a nested directory TESSERA checks only the exact
 `.tessera/config.yaml` marker on each physical ancestor; the nearest config
@@ -294,6 +305,7 @@ TESSERA makes those concerns part of the memory layer instead of pushing them in
 | --- | --- |
 | Text ingestion | Canonicalizes Markdown with complete, partial, or absent frontmatter and `.txt` as body-only sources |
 | Structural segmentation | Keeps complete source documents while deriving addressable heading/paragraph spans for long sources |
+| Corpus Doctor | Audits configured sources, identities, metadata, relations, manifest state, and evidence freshness without mutation |
 | Memory model | Preserves exactly three semantic drawers: `facts`, `preferences`, `insights` |
 | Stable identity | Separates persistent memory/source identity from file path and content version |
 | Explainable retrieval | Combines inspectable lexical, metadata, title, relation, and type signals |

@@ -121,14 +121,14 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 6, ready_executable
+    assert len(ready_executable) == 5, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
     assert any("[#121]" in line for line in ready_executable)
     assert any("[#136]" in line for line in ready_executable)
     assert any("[#137]" in line for line in ready_executable)
-    assert any("[#13]" in line for line in ready_executable)
+    assert not any("[#13]" in line for line in ready_executable)
     assert any("[#71]" in line for line in ready_executable)
 
     issue_16 = _row(text, "#16")
@@ -170,8 +170,8 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "8ca854f14f8f57443784e6cf3524419a953c2ce6" in issue_70
 
     issue_13 = _row(text, "#13")
-    assert "`READY`" in issue_13
-    assert "#12/#69/#70 dependencies satisfied" in issue_13
+    assert "`IN_PROGRESS`" in issue_13
+    assert "PR #277" in issue_13
 
     issue_71 = _row(text, "#71")
     assert "`READY`" in issue_71
@@ -193,10 +193,11 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 0
+    assert len(now_executable) == 1
+    assert "[#13]" in now_executable[0]
 
-    assert "NOW executable                 0" in text
-    assert "READY                          10 total / 6 executable" in text
+    assert "NOW executable                 1" in text
+    assert "READY                          9 total / 5 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
     assert len(blocked_full_cards) == 27
     assert "BLOCKED                        27 full cards + #16 full phase" in text
