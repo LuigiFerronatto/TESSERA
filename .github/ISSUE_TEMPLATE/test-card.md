@@ -1,50 +1,97 @@
 ---
 name: TESSERA Test Card
-description: Propose and evaluate one TESSERA task as a testable hypothesis.
+description: Define one TESSERA change, its purpose, and its measurable decision gate.
 title: "[Phase] "
 labels: enhancement
 assignees: ''
 ---
 
-## Executive takeaway
-<!-- 2–4 lines: why this matters to TESSERA and what decision this card should enable. -->
+<!--
+Language contract: write the issue title and authored prose in English.
+Quoted source material, logs, commands, identifiers, and localized product
+output may remain in their original language.
+
+Describe current behavior as verified fact. Describe target behavior as a plan
+until a canonical merge and post-merge validation establish it.
+-->
+
+## Summary
+<!-- In 2-4 lines: what is being proposed or investigated? -->
+
+## Purpose
+<!-- Why does TESSERA or its users need this? What decision will this issue enable? -->
+
+## Problem and current behavior
+<!-- What happens on canonical main today? Include a concrete trigger and output when possible. -->
+
+## Target behavior
+<!-- What observable result should exist if this card earns KEEP? -->
+
+## User-visible example
+```text
+trigger/input -> current result -> expected result
+```
+
+## Scope
+
+### In scope
+-
+
+### Out of scope
+<!-- Name adjacent work this issue must not absorb. -->
+-
 
 ## Portfolio routing
-- **Type:** test-card | bug | benchmark | ADR | documentation
+- **Type:** test-card | bug | benchmark | ADR | documentation | governance
 - **Status:** triage | ready | running | blocked | decision
 - **Priority:** P0 | P1 | P2 | P3
 - **Phase:** M0 | M1 | M2 | M3 | M4 | M5
 - **Owner:**
 - **Parent epic:**
 - **Research source:**
-- **Depends on:** <!-- Closed Issues only when status=ready. -->
+- **Depends on:** <!-- Closed issues only when status=ready. -->
 - **Unlocks:**
 - **Timebox:**
 - **Compute budget:**
 
 ## Decision question
-<!-- One binary or explicit multi-option decision. If there are several decisions, split the card. -->
+<!-- Ask one binary or explicit multi-option question. Split multiple decisions into separate cards. -->
 
-## Em linguagem simples
-<!-- Explain the problem as if you were telling another engineer why we are trying this. -->
+## Success criteria
+<!-- Each item must be objectively observable. -->
+- [ ]
 
-## Plain-language stage record
-- **Path:** `docs/test-cards/<issue>-<slug>.md`
-- **Record status:** `PLANNED | IN_PROGRESS | IMPLEMENTED | VALIDATED | BLOCKED | SUPERSEDED`
+## Validation plan
 
-<!--
-Create the record from docs/test-cards/TEMPLATE.md. Keep current behavior,
-target behavior, evidence and limitations separate. An open PR is never
-IMPLEMENTED or VALIDATED.
--->
+### Baseline
+<!-- Record current behavior, metric, artifact, or reproducible command. -->
+
+### Hypothesis
+<!-- If we implement/change X, we expect Y because Z. -->
+
+### Experiment and controls
+<!-- State what changes and what stays fixed: fixture, dataset, seed, reader, candidate set, budget, and environment. -->
+
+### Metrics and guardrails
+- **Primary decision metric:**
+- **Quality/safety guardrails:**
+- **Cost:** <!-- p50/p95, tokens, storage growth, and write amplification when applicable. -->
+
+### Failure signals
+- [ ]
+
+### Stop criteria
+- [ ] A dependency, baseline, or metric becomes ambiguous.
+- [ ] The timebox or compute budget is exhausted without new evidence.
+- [ ] A high-risk silent behavior or source mutation is found.
 
 ## Capability state and repository evolution
 
 ### Previous capability state
-<!-- What exists on main now? Distinguish runtime, benchmark, documentation, governance and ADR state. -->
+<!-- What exists on canonical main? Separate runtime, benchmark, docs, governance, and ADR state. -->
 
 ### Deliveries that established the current state
-<!-- Audit relevant merged PRs and merge commits. Include closed-unmerged/superseded PRs. Do not infer delivery from titles alone. -->
+<!-- Verify merged PRs and commits; include closed-unmerged or superseded attempts. -->
 
 | PR | Merge status | Merge commit | Files/surfaces changed | Capability added | Contract changed | Evidence | Supersedes |
 |---|---|---|---|---|---|---|---|
@@ -53,59 +100,37 @@ IMPLEMENTED or VALIDATED.
 <!-- Do not count identical heads or merge commits as separate deliveries. -->
 
 ### Target capability state
-<!-- State the exact observable contract if this card earns KEEP. -->
+<!-- Restate the exact observable contract if this card earns KEEP. -->
 
 ### What will remain unimplemented
-<!-- Prevent this card from silently absorbing adjacent roadmap work. -->
+<!-- Keep this synchronized with Out of scope. -->
 
 ### Roadmap evolution
-<!-- Name the docs/ROADMAP.md entry/status/dependency change expected from this work. -->
+<!-- Name the expected ROADMAP status or dependency change. -->
 
-## Objetivo
-<!-- One concrete task. One Issue = one decisionable unit of work. -->
+## Plain-language stage record
+- **Path:** `docs/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
+- **Record status:** `PLANNED | IN_PROGRESS | IMPLEMENTED | VALIDATED | BLOCKED | SUPERSEDED`
 
-## Why now?
-<!-- Dependency, observed failure, benchmark gap or product need. -->
+<!--
+Create applicable records from docs/test-cards/TEMPLATE.md. Keep current and
+target behavior, evidence, and limitations separate. An open PR is never
+IMPLEMENTED or VALIDATED.
+-->
 
-## Test Card
+## Dependencies
+<!-- Link issues rather than recording hidden TODOs. -->
 
-### Hypothesis
-<!-- If we implement/change X, we expect Y because Z. -->
+## Risks and rollback
+<!-- State failure impact, feature flag/data rebuild needs, and the exact revert path. -->
 
-### Baseline
-<!-- What happens today? Include query/output/metric/artifact when possible. -->
+## Evidence
+<!-- Add CI runs, benchmark artifacts, outputs, screenshots, or reproducible commands during execution. -->
 
-### Experiment
-<!-- What will change, what stays fixed and what is the comparison/control? -->
+## Learnings
+<!-- Record surprises, failures, and limitations as well as successful results. -->
 
-### Controls and fixed variables
-<!-- Dataset/version, fixture, seed, reader, candidate set, token budget and environment. -->
-
-### Metrics
-<!-- Examples: Hit@k, MRR, nDCG, QA accuracy, evidence hit, tokens, latency, provenance correctness. -->
-
-- **Primary decision metric:**
-- **Quality/safety guardrails:**
-- **Cost:** p50/p95, tokens, storage growth and write amplification when applicable.
-
-### Success criteria
-- [ ]
-
-### Failure signals
-- [ ]
-
-### Stop criteria
-- [ ] Dependency, baseline or metric becomes ambiguous.
-- [ ] Timebox/compute budget is exhausted without new evidence.
-- [ ] A high-risk silent behavior or source mutation is found.
-
-### Evidence
-<!-- Links to CI runs, benchmark artifacts, query outputs, screenshots or reproducible commands. -->
-
-### Learnings
-<!-- Update during the task. Capture surprises, failures and limitations, not only successes. -->
-
-### Decision
+## Decision
 - [ ] KEEP
 - [ ] ITERATE
 - [ ] REVERT
@@ -113,25 +138,7 @@ IMPLEMENTED or VALIDATED.
 - [ ] DEFER
 
 ### Decision rationale
-<!-- Why did the evidence lead to this decision? -->
+<!-- Explain how the evidence supports the selected decision. -->
 
-## Technical scope
-### In scope
-- 
-
-### Out of scope
-- 
-
-## Dependencies
-<!-- Link Issues, not hidden TODOs. -->
-
-## Rollback
-<!-- Feature flag, data migration/rebuild and exact revert path. -->
-
-## Example / expected behavior
-```text
-query -> retrieval -> structured evidence
-```
-
-## PR
-<!-- Add PR link when implementation starts. PR should use `Closes #<issue>` when appropriate. -->
+## Pull request
+<!-- Add the PR when implementation starts. Use `Closes #<issue>` when appropriate. -->
