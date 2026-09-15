@@ -117,8 +117,8 @@ Exact numeric values above are illustrative. Field semantics below are based on 
 | `filename` | Source filename convenience field. | May be absent/`None`. |
 | `score` | Final query relevance score used for ordering. | Expected. Do not interpret as truth/confidence. |
 | `score_explain` | Inspectable component signals used by current ranking. | Expected for current ranked memory results. |
-| `relevant_evidence` | Query-specific paragraph selected by deterministic overlap logic. | `None` when no paragraph meets current support threshold. |
-| `evidence_info` | Extraction strategy and paragraph-level overlap score for `relevant_evidence`. | `None` when `relevant_evidence` is `None`. |
+| `relevant_evidence` | Query-specific structural segment or paragraph selected by deterministic lexical logic. | `None` when no supported unit meets the current threshold. |
+| `evidence_info` | Extraction strategy and score for `relevant_evidence`; structural matches also include `segment_id`, heading and exact source `span`. | `None` when `relevant_evidence` is `None`. |
 | `body` | Original indexed memory body/content. | Preserved even when evidence is foregrounded. |
 | `frontmatter` | Compatibility/frontmatter representation attached to the node. | Shape can vary by source schema. |
 | `related_ids` | Direct graph-neighbor IDs that are themselves memory-node types. | Usually an empty list when none exist. |
@@ -194,7 +194,10 @@ body
 
 This prevents a query-specific excerpt from replacing the source memory.
 
-Current evidence extraction is deterministic and lexical. It does not claim semantic entailment.
+Current evidence extraction is deterministic and lexical. Long or structurally
+headed sources can use an addressable segment; other sources use paragraph
+overlap. A segment remains derived evidence attached to its complete parent
+document, never a replacement memory. This does not claim semantic entailment.
 
 If no paragraph has at least the required query-token support:
 

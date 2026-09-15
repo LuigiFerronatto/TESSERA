@@ -519,7 +519,8 @@ def cmd_index(args):
             f"scanned={stats.get('scanned', 0)}, parsed={stats.get('parsed', 0)}, "
             f"unchanged={stats.get('unchanged', 0)}, added={stats.get('added', 0)}, "
             f"updated={stats.get('updated', 0)}, moved={stats.get('moved', 0)}, "
-            f"removed={stats.get('removed', 0)} ({stats.get('mode', 'unknown')})"
+            f"removed={stats.get('removed', 0)}, segments={stats.get('segments', 0)} "
+            f"({stats.get('mode', 'unknown')})"
         )
     print(
         f"  Persisted at: {engine.index_cache_pkl} (binary) and {engine.index_cache_json} (readable)",

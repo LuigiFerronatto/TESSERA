@@ -69,6 +69,12 @@ from .evidence import (
     locate_evidence_span,
     verify_evidence_freshness,
 )
+from .segmentation import (
+    SEGMENTATION_SCHEMA_VERSION,
+    SEGMENT_NODE_TYPE,
+    SourceSegment,
+    segment_source_document,
+)
 
 __version__ = "0.0.3"
 
@@ -114,6 +120,10 @@ __all__ = [
     "ledger_from_graph",
     "locate_evidence_span",
     "verify_evidence_freshness",
+    "SEGMENTATION_SCHEMA_VERSION",
+    "SEGMENT_NODE_TYPE",
+    "SourceSegment",
+    "segment_source_document",
     "__version__",
 ]
 

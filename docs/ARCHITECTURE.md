@@ -174,6 +174,7 @@ STABLE IDENTITY
    ↓
 GRAPH / INDEX
    ├─ memory/document nodes
+   ├─ derived source-segment nodes for long/structured documents
    ├─ tag/entity structure
    ├─ explicit relations
    └─ lexical corpus / TF-IDF
@@ -187,7 +188,8 @@ RETRIEVAL
    └─ deterministic intent/type boost
    ↓
 QUERY-AWARE EVIDENCE
-   ├─ relevant paragraph when supported
+   ├─ relevant structural segment or paragraph when supported
+   ├─ segment -> parent document/source-version/span linkage
    └─ None instead of arbitrary evidence when unsupported
    ↓
 EVIDENCE LEDGER / PROVENANCE
@@ -433,12 +435,15 @@ SOURCE FILES
 
 Derived state must be reconstructible from source files. Indexing reuses
 unchanged source nodes and reparses changed Markdown or plain-text sources.
-
-One additional Foundation gap remains explicit rather than implied:
-
-```text
-#70 structure-aware segmentation of long documents
-```
+Long or structurally headed documents retain their complete canonical parent
+node and can additionally produce deterministic `source_segment` nodes. Each
+segment records its parent memory ID, stable document ID, exact document hash,
+source path/format and line span. Short native memory cards remain whole.
+Segments participate in lexical seed selection, but retrieval collapses them
+back to the parent document and exposes the matched segment through
+`evidence_info`; they never become semantic drawer entries or standalone memory
+results. Changed/deleted sources retract their derived segments, and the index
+schema version forces older caches to rebuild.
 
 # 8. Interface boundary
 

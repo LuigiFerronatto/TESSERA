@@ -293,6 +293,7 @@ TESSERA makes those concerns part of the memory layer instead of pushing them in
 | Capability | Current behavior |
 | --- | --- |
 | Text ingestion | Canonicalizes Markdown with complete, partial, or absent frontmatter and `.txt` as body-only sources |
+| Structural segmentation | Keeps complete source documents while deriving addressable heading/paragraph spans for long sources |
 | Memory model | Preserves exactly three semantic drawers: `facts`, `preferences`, `insights` |
 | Stable identity | Separates persistent memory/source identity from file path and content version |
 | Explainable retrieval | Combines inspectable lexical, metadata, title, relation, and type signals |
@@ -386,6 +387,12 @@ Canonical metadata
     ├── stable memory identity
     ├── stable source identity
     └── explicit relations
+    │
+    ▼
+Document + derived source segments
+    │
+    ├── parent/source-version linkage
+    └── exact line spans
     │
     ▼
 Index + Evidence Ledger
