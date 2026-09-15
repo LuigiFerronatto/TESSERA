@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime` |
 | Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
-| Head commit | Current head of PR #277; exact SHA is supplied by GitHub checks |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Head commit | `dbcf5e737c4bd365f38915ae9e70a527713e6aa5` (final candidate head) |
+| Merge commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
+| Decision | `PENDING` — exact-head CI, Maintainer Audit and Merge Governor passed, but no explicit `KEEP`/`ITERATE`/`REVERT` maintainer Decision is recorded yet. Do not treat merge as validation. |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Benchmark rationale | The change adds a read-only diagnostic path and does not alter indexing, retrieval, ranking, evidence generation, or the frozen corpus. |
 | Last audited | 2026-09-15 |
@@ -108,8 +108,10 @@ Audit, and Merge Governor remain pending until the pull request is published.
 ## What is unlocked next?
 
 A canonical `KEEP` merge would satisfy the Corpus Doctor dependency for #19 and
-provide the diagnostic primitive needed by future corpus-quality CI. No work is
-unlocked while this record remains `IN_PROGRESS`.
+provide the diagnostic primitive needed by future corpus-quality CI. #277 is
+merged and CI-green, but #19 remains independently `DEFERRED` and no
+corpus-quality CI is activated until an explicit `KEEP` Decision is recorded
+for #13.
 
 ## Technical provenance
 
@@ -117,16 +119,17 @@ unlocked while this record remains `IN_PROGRESS`.
 |---|---|
 | Issue/Test Card | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
 | Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; decision pending |
-| Benchmark record | `SMOKE_ONLY`; rationale above |
-| PR Evolution Audit | To be recorded in the pull-request body |
+| Merge commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
+| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; exact-head CI (test/distribution Python 3.9/3.12, smoke, sanity-eval, benchmark-reporting) green; Maintainer Audit and Merge Governor succeeded; Decision pending |
+| Benchmark record | `SMOKE_ONLY`; `longmemeval-v1-dev-50` correctly skipped |
+| PR Evolution Audit | `docs/PR_EVOLUTION_13.md` |
 
 ## Evolution
 
 ```text
 index-time warnings and manual derived-state inspection
 -> #13 deterministic read-only Corpus Doctor candidate
--> current state: implementation under review, not yet on main
+-> current state: merged to main as 20814a47ec0f72d7bea0639e0b057df1ecf5cded,
+   IMPLEMENTED, Decision pending
 -> after canonical KEEP: #19 and corpus-quality CI prerequisites advance
 ```
