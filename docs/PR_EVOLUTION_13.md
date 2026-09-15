@@ -12,6 +12,8 @@
 - **Canonical merge SHA:** `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
 - **Benchmark applicability:** `SMOKE_ONLY` (`longmemeval-v1-dev-50` correctly
   skipped; no retrieval/ranking/evidence behavior changed)
+- **Lifecycle reconciliation applicability:** `NOT_APPLICABLE` (documentation
+  and lifecycle state only; no runtime or benchmark behavior changes)
 - **Canonical merge date:** 2026-09-15
 
 Exact-head CI passed `test`/`distribution` (Python 3.9/3.12), `smoke`,
