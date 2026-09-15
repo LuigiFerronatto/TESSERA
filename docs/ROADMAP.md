@@ -12,6 +12,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #12 post-merge reconciliation (2026-09-11): PR #246 merged as canonical squash commit `971801cd89b6ce7b890df9ceb43b6afff9fa0964` (final candidate head `def1c43c069f616e63fdea7e384e15af4ecfef44`). CI on the final candidate head (`test`, `distribution` for Python 3.9/3.12, `smoke`, `sanity-eval`, `benchmark-reporting`) passed; Benchmark Ledger declared `SMOKE_ONLY` and `longmemeval-v1-dev-50` correctly skipped. Maintainer audit recorded `KEEP`. #12 is `VALIDATED / KEEP`. Its `#69` and `#73` dependents had their only remaining hard blocker (`#12`) satisfied and move to `READY`; `#70`/`#13`/`#15` remain `BLOCKED` on their own unmet dependencies (`#69`, `#94`+`#73`, and `#73`+`#96` respectively).
 
+> #69 post-merge reconciliation (2026-09-15): PR #264 merged into `main` as canonical merge commit `c815a684e4c8cbd426a0d717e243a7dfb0f04395` (final candidate head `ddc1ff3a4394c89c7732357fc66168d6d599a2ac`). CI at the merge commit (`test`/`distribution` for Python 3.9/3.12, `smoke`, `sanity-eval`, `benchmark-reporting`, and `longmemeval-v1-dev-50`) passed; Benchmark Ledger declared `REQUIRED` because the default candidate-source set expands, and LongMemEval ran green. Maintainer audit recorded `KEEP`. #69 is `VALIDATED / KEEP`. Its `#70` dependent had its only remaining unmet hard blocker (`#69`) satisfied and moves to `READY`; `#13` remains `BLOCKED` on `#70`; `#71`/`#72` remain `BLOCKED` on `#70` (only `#69` of their `#69`/`#70` pair is satisfied).
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
@@ -178,7 +180,7 @@ NOW — Product foundation
 NEXT — Real memory system
 8  #67  Quality Gate v2
 9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
-10 #69  Text ingestion beyond Markdown
+10 #69  Text ingestion beyond Markdown            VALIDATED (`KEEP`; `c815a684...`)
 11 #70  Structural segmentation
 12 #13  Corpus/metadata doctor
 13 #157 Typed model profiles
@@ -482,8 +484,8 @@ Status: multiple experimental families exist, but they are dependency-routed and
          -> #15 temporal/state semantics
              -> #16 full supersession
 
-#69 broader text ingestion (READY)
- -> #70 structural segmentation
+#69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
+ -> #70 structural segmentation (READY)
      -> #13 corpus doctor
 
 #19 admission and #21 utility remain later layers.
@@ -661,9 +663,9 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) | open | `VALIDATED` containment / `BLOCKED` full | EXECUTABLE | Safety | P0 containment merged (`708c973e...`, `KEEP`); preserves all possible-conflict evidence; full supersession waits on #15/#73/#96. |
 | [#67](https://github.com/LuigiFerronatto/TESSERA/issues/67) | open | `BLOCKED` | EXECUTABLE | Safety | #92, #93 and #95 dependencies are satisfied; still blocked on regression-gate integration. |
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
-| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | open | `READY` | EXECUTABLE | Sources | #12 and #94 dependencies now satisfied; text ingestion beyond Markdown. |
-| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69; #12 satisfied, still blocked on #69. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69/#70; #12 satisfied, still blocked on #69/#70. |
+| [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; text ingestion beyond Markdown (`.txt` body-only sources). [PR Evolution Audit](PR_EVOLUTION_69.md). |
+| [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | open | `READY` | EXECUTABLE | Sources | #12 and #69 dependencies now satisfied; structural segmentation. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `BLOCKED` | EXECUTABLE | Sources | Depends on #12/#69/#70; #12/#69 satisfied, still blocked on #70. |
 | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
