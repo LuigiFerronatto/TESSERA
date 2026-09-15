@@ -829,6 +829,24 @@ def cmd_doctor(args):
     return 0 if report.all_ok else 1
 
 
+def cmd_corpus_doctor(args):
+    from .corpus_diagnostics import print_corpus_doctor_plain, run_corpus_doctor
+
+    configuration = getattr(args, "storage_selection", None)
+    if configuration is None:
+        configuration = _selection_from_args(args)
+    report = run_corpus_doctor(configuration)
+    if args.json:
+        print(json.dumps(report.to_dict(), sort_keys=True))
+    else:
+        print_corpus_doctor_plain(report, verbose=args.verbose)
+    if report.errors:
+        return 1
+    if args.strict and report.warnings:
+        return 2
+    return 0
+
+
 def _selection_from_args(args):
     if getattr(args, "store", None) and getattr(args, "storage_dir", None):
         raise ConfigurationError("pass either positional storage_dir or --store, not both")
@@ -1220,6 +1238,28 @@ def build_parser():
     )
     p_doctor.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
     p_doctor.set_defaults(func=cmd_doctor)
+
+    p_corpus = sub.add_parser("corpus", help="Inspect configured corpus and derived-index health")
+    corpus_sub = p_corpus.add_subparsers(dest="corpus_command", required=True)
+    p_corpus_doctor = corpus_sub.add_parser(
+        "doctor",
+        help="Run deterministic read-only source, identity, relation, and evidence diagnostics",
+        parents=[plain_parent],
+    )
+    p_corpus_doctor.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+    _add_store_selection_arguments(p_corpus_doctor)
+    p_corpus_doctor.add_argument("--json", action="store_true", help="Emit the versioned JSON report")
+    p_corpus_doctor.add_argument(
+        "--verbose",
+        action="store_true",
+        help="List every selected source and inferred field",
+    )
+    p_corpus_doctor.add_argument(
+        "--strict",
+        action="store_true",
+        help="Return exit code 2 for warning-only reports (errors always return 1)",
+    )
+    p_corpus_doctor.set_defaults(func=cmd_corpus_doctor)
 
     p_quickstart = sub.add_parser(
         "quickstart", help="Detect the current project and generate a ready-to-paste MCP config block",
