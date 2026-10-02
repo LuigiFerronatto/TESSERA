@@ -1,0 +1,189 @@
+{
+  "baselines": {
+    "E0_raw_source": {
+      "retrieval_quality": null,
+      "source_documents": 8
+    },
+    "E1_structural_only": {
+      "retrieval_quality": null,
+      "source_documents": 8,
+      "structural_segments": 2
+    },
+    "E2_aggressive_decomposition": {
+      "status": "synthetic capture only; no AI quality result"
+    },
+    "E3_admission_dedup": {
+      "status": "blocked on #19 and semantic dedup; exact duplicate check only"
+    },
+    "E4_source_fallback_relations": {
+      "status": "source preservation tested; validated-relation consumer blocked"
+    }
+  },
+  "decision": "ITERATE",
+  "evidence_class": "synthetic_protocol_only",
+  "fixture_sha256": "1a10b7b92189ce8e0a0d4a9af5bcc5563d7be40bdeac2acaea257e931e78b862",
+  "human_labels": null,
+  "issue": 176,
+  "missing_evidence": [
+    "reviewed legacy corpus and human labels",
+    "explicit source-content consent",
+    "chosen model route and funded budget",
+    "Recall/MRR/nDCG and context/state quality comparisons",
+    "semantic support and relation precision",
+    "#192 unchanged-source cache savings and interruption tests",
+    "#19 admission and canonical #137 lineage integration"
+  ],
+  "model_downloads": 0,
+  "provider_calls": 0,
+  "schema_version": 1,
+  "source_bytes_unchanged": true,
+  "variants": {
+    "A1": {
+      "counts": {
+        "exact_candidate_duplicates": 0,
+        "invalid_proposals": 0,
+        "memories_admitted": 0,
+        "memories_deduplicated": 0,
+        "memories_rejected": 0,
+        "memories_requiring_review": 0,
+        "memory_candidates_proposed": 0,
+        "relations_ai_proposed": 0,
+        "relations_deterministic": null,
+        "relations_explicit": null,
+        "relations_synthetic": 0,
+        "relations_validated": 0,
+        "semantic_claims_proposed": 0,
+        "sources_analyzed": 7,
+        "sources_discovered": 8,
+        "sources_failed": 0,
+        "sources_missing": 0,
+        "sources_selected": 8,
+        "structural_segments": 2
+      },
+      "metadata_candidates": 6,
+      "quality": {
+        "existing_relation_origin_counts": "not measured by capture replay",
+        "hallucination_rate": null,
+        "human_labels": "missing",
+        "retrieval_improvement": null,
+        "semantic_dedup": "not implemented",
+        "span_validation": "exact bytes-as-UTF8-lines, not entailment"
+      },
+      "relation_candidates": 0,
+      "usage": {
+        "capture_calls_reported": 7,
+        "cost_usd_reported": null,
+        "input_tokens_reported": 0,
+        "latency_ms_reported": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "model_calls_performed": 0,
+        "output_tokens_reported": 0
+      }
+    },
+    "A2": {
+      "counts": {
+        "exact_candidate_duplicates": 1,
+        "invalid_proposals": 1,
+        "memories_admitted": 0,
+        "memories_deduplicated": 0,
+        "memories_rejected": 0,
+        "memories_requiring_review": 9,
+        "memory_candidates_proposed": 9,
+        "relations_ai_proposed": 0,
+        "relations_deterministic": null,
+        "relations_explicit": null,
+        "relations_synthetic": 0,
+        "relations_validated": 0,
+        "semantic_claims_proposed": 11,
+        "sources_analyzed": 7,
+        "sources_discovered": 8,
+        "sources_failed": 0,
+        "sources_missing": 0,
+        "sources_selected": 8,
+        "structural_segments": 2
+      },
+      "metadata_candidates": 6,
+      "quality": {
+        "existing_relation_origin_counts": "not measured by capture replay",
+        "hallucination_rate": null,
+        "human_labels": "missing",
+        "retrieval_improvement": null,
+        "semantic_dedup": "not implemented",
+        "span_validation": "exact bytes-as-UTF8-lines, not entailment"
+      },
+      "relation_candidates": 0,
+      "usage": {
+        "capture_calls_reported": 7,
+        "cost_usd_reported": null,
+        "input_tokens_reported": 0,
+        "latency_ms_reported": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "model_calls_performed": 0,
+        "output_tokens_reported": 0
+      }
+    },
+    "A3": {
+      "counts": {
+        "exact_candidate_duplicates": 1,
+        "invalid_proposals": 1,
+        "memories_admitted": 0,
+        "memories_deduplicated": 0,
+        "memories_rejected": 0,
+        "memories_requiring_review": 9,
+        "memory_candidates_proposed": 9,
+        "relations_ai_proposed": 0,
+        "relations_deterministic": null,
+        "relations_explicit": null,
+        "relations_synthetic": 1,
+        "relations_validated": 0,
+        "semantic_claims_proposed": 11,
+        "sources_analyzed": 7,
+        "sources_discovered": 8,
+        "sources_failed": 0,
+        "sources_missing": 0,
+        "sources_selected": 8,
+        "structural_segments": 2
+      },
+      "metadata_candidates": 6,
+      "quality": {
+        "existing_relation_origin_counts": "not measured by capture replay",
+        "hallucination_rate": null,
+        "human_labels": "missing",
+        "retrieval_improvement": null,
+        "semantic_dedup": "not implemented",
+        "span_validation": "exact bytes-as-UTF8-lines, not entailment"
+      },
+      "relation_candidates": 1,
+      "usage": {
+        "capture_calls_reported": 7,
+        "cost_usd_reported": null,
+        "input_tokens_reported": 0,
+        "latency_ms_reported": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "model_calls_performed": 0,
+        "output_tokens_reported": 0
+      }
+    }
+  }
+}
