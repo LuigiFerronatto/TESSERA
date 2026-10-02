@@ -18,6 +18,7 @@ from .source_formats import source_format_for_path, split_markdown, split_source
 
 DRAWERS = {"facts", "preferences", "insights"}
 NON_MEMORY_TYPES = {
+    "conversation",
     "harness_instructions",
     "skill_instructions",
     "project_context",

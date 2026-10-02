@@ -8,6 +8,16 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Explicit historical conversation files can be previewed and imported into
+  inspectable, redacted source evidence, with ordered roles/timestamps/tool
+  references, stable session identity and idempotent retries. Generic JSONL v1
+  and a strict linear Claude Code JSONL subset are opt-in; no home scanning,
+  provider calls or durable-memory admission occurs. Indexing is a separate
+  explicit step. Full runtime discovery, live convergence and enrichment remain
+  unimplemented. ([#191](https://github.com/LuigiFerronatto/TESSERA/issues/191))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
