@@ -113,6 +113,7 @@ def write_memory(
     relation_type: str = "related_to",
     description: str = "",
     persist_format: Literal["md"] = "md",
+    operation_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Evaluates and, only when admitted, writes a memory note. The returned
@@ -157,13 +158,24 @@ def write_memory(
         active_connections=active_connections,
         description=description,
         persist_format=persist_format,
+        operation_id=operation_id,
     )
-    if result.persisted:
+    if result.persisted and result.write_receipt is None:
         _engine.build_index()
     payload = result.to_dict()
     payload["mem_id"] = mem_id  # compatibility alias for existing MCP clients
     payload["connected_to"] = [c.target_memory_id for c in active_connections]
     return payload
+
+
+def inspect_write_receipt(operation_id: str) -> Dict[str, Any]:
+    """Read a durable write outcome, checking current source and derived state."""
+    return _engine.inspect_write_receipt(operation_id).to_dict()
+
+
+def repair_write_receipt(operation_id: str) -> Dict[str, Any]:
+    """Rebuild a write's derived state locally, never rewriting canonical content."""
+    return _engine.repair_write_receipt(operation_id).to_dict()
 
 
 def get_memory(memory_id: str) -> str:
@@ -374,7 +386,7 @@ def get_server_health() -> Dict[str, Any]:
 TOOLS = (
     rebuild_index, query_memories, write_memory, query_store,
     query_memories_pipeline, get_index_composition, run_doctor, run_quickstart,
-    decompose_episode, get_server_health,
+    decompose_episode, get_server_health, inspect_write_receipt, repair_write_receipt,
 )
 RESOURCES = {"graph://index": get_index_stats, "server://health": get_server_health}
 

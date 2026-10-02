@@ -150,6 +150,16 @@ This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
 `insights`, and all candidates use the same existing write gate.
 
+## Opt-in single-write operational receipts
+
+The #263 candidate adds an explicit `operation_id` lifecycle around the existing
+canonical writer. Content-free intents/receipts live outside the disposable
+index, and source frontmatter carries an operation marker for crash recovery.
+A store lock serializes participating writers; index and Evidence Ledger
+outcomes are checkpointed separately. Repair rebuilds from source without
+rewriting it. See [WRITE_RECEIPTS.md](WRITE_RECEIPTS.md). Legacy calls, admission,
+retrieval relevance, optional hooks and future HTTP remain separate contracts.
+
 ## Current read / retrieval pipeline
 
 ```text

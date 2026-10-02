@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Added
+
+- Opt-in operation IDs provide versioned, content-free single-write receipts
+  across Python, CLI and MCP. Retries and crash recovery preserve canonical
+  bytes; deterministic local inspection/repair reports and rebuilds incomplete
+  index/graph/manifest and Evidence Ledger stages without provider calls.
+  Existing calls without operation IDs retain their behavior.
+  ([#263](https://github.com/LuigiFerronatto/TESSERA/issues/263))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
