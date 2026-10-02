@@ -597,3 +597,13 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Historical conversation source boundary (candidate #191)
+
+The experimental `conversations preview/import` workflow reads only declared,
+bounded JSONL paths into inspectable `conversation` sources with `drawer: null`.
+It never calls the memory writer, decomposition or provider adapters. Original
+source hashes and ordered turn/tool locators remain separate from the normalized
+Markdown's canonical Engine evidence spans. Indexing is an explicit subsequent
+step; revisions, supporting-turn derivations, live-history convergence and
+admission remain separate contracts. See [Conversation import](CONVERSATION_IMPORT.md).

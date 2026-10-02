@@ -829,6 +829,23 @@ def cmd_doctor(args):
     return 0 if report.all_ok else 1
 
 
+def cmd_conversations(args):
+    from .conversations import ConversationError, import_conversations, preview_conversations
+    try:
+        plan = preview_conversations(
+            args.root, args.path, adapter=args.adapter, project_scope=args.project_scope,
+        )
+        if args.conversation_command == "import" and not args.dry_run:
+            result = import_conversations(plan, args.output, expected_plan_hash=args.plan_hash)
+        else:
+            result = plan
+        print(json.dumps(result, sort_keys=True))
+        return 2 if plan["totals"]["unsupported"] else 0
+    except ConversationError as exc:
+        print(json.dumps({"error": {"code": str(exc)}, "durable_memories_created": 0}))
+        return 2
+
+
 def cmd_corpus_doctor(args):
     from .corpus_diagnostics import print_corpus_doctor_plain, run_corpus_doctor
 
@@ -1272,6 +1289,21 @@ def build_parser():
     p_quickstart.add_argument("--apply", action="store_true",
                                help="Actually create storage_dir and run the first index build (default: dry-run plan only)")
     p_quickstart.set_defaults(func=cmd_quickstart)
+
+    p_conversations = sub.add_parser("conversations", help="Preview/import explicit historical conversation files as source evidence")
+    conversation_sub = p_conversations.add_subparsers(dest="conversation_command", required=True)
+    from .conversations import ADAPTERS
+    for action in ("preview", "import"):
+        p_conversation = conversation_sub.add_parser(action)
+        p_conversation.add_argument("--root", required=True, help="Explicit input directory; never recursively scanned")
+        p_conversation.add_argument("--path", action="append", required=True, help="Exact root-relative JSONL file, repeatable")
+        p_conversation.add_argument("--adapter", choices=ADAPTERS, required=True)
+        p_conversation.add_argument("--project-scope", required=True)
+        if action == "import":
+            p_conversation.add_argument("--output", required=True, help="Separate evidence directory outside the input root")
+            p_conversation.add_argument("--plan-hash", required=True, help="plan_hash returned by the reviewed preview")
+            p_conversation.add_argument("--dry-run", action="store_true")
+        p_conversation.set_defaults(func=cmd_conversations)
 
     p_config = sub.add_parser("config", help="Inspect TESSERA project/global store configuration")
     config_sub = p_config.add_subparsers(dest="config_command", required=True)

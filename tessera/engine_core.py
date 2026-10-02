@@ -72,7 +72,7 @@ SEED_NODE_LIMIT = 30
 SEED_NODE_MIN_SIMILARITY = 0.01
 
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
-INDEX_SCHEMA_VERSION = 2
+INDEX_SCHEMA_VERSION = 3
 SCORE_DECIMAL_PLACES = 12
 
 # Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.

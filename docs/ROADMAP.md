@@ -1040,3 +1040,11 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+### #191 source-only candidate progress
+
+The explicit-path conversation source import candidate is IN_PROGRESS on top of
+canonical `20814a4`; it exposes generic JSONL v1 and a strict, fail-closed Claude
+linear subset. Preview/manifests, bounded reads, redaction and source identity are
+separate from episode construction, derivation/admission and live capture. This
+is not a full #191 KEEP or canonical delivery. See the [stage record](test-cards/191-conversation-source-import.md).
