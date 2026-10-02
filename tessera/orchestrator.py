@@ -32,6 +32,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
+from .information_needs import InformationNeeds, identify_information_needs
 from .engine import STORE_FACTS, STORE_INSIGHTS, STORE_PREFERENCES, TesseraEngine
 
 LlmFn = Callable[[str, str], str]
@@ -81,8 +82,10 @@ class OrchestratorResult:
     consolidated_context: str = ""
     stores_queried: List[str] = field(default_factory=lambda: list(ALL_STORES))
 
+    information_needs: Optional[InformationNeeds] = None
+
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        result = {
             "task_instruction": self.task_instruction,
             "information_need": self.information_need,
             "retrieval_query": self.retrieval_query,
@@ -90,6 +93,9 @@ class OrchestratorResult:
             "consolidated_context": self.consolidated_context,
             "stores_queried": self.stores_queried,
         }
+        if self.information_needs is not None:
+            result["information_needs"] = self.information_needs.to_dict()
+        return result
 
 
 class TesseraOrchestrator:
@@ -98,7 +104,16 @@ class TesseraOrchestrator:
     a given TesseraEngine. `llm_fn` is required to make each reasoning step actually "think".
     """
 
-    def __init__(self, engine: TesseraEngine, llm_fn: Optional[LlmFn] = None):
+    def __init__(
+        self, engine: TesseraEngine, llm_fn: Optional[LlmFn] = None, *,
+        information_need_variant: str = "N0", max_information_needs: int = 4,
+    ):
+        if information_need_variant not in ("N0", "N1", "N2"):
+            raise ValueError("information_need_variant must be N0, N1 or N2")
+        if type(max_information_needs) is not int or not 1 <= max_information_needs <= 4:
+            raise ValueError("max_information_needs must be an integer from 1 to 4")
+        self.information_need_variant = information_need_variant
+        self.max_information_needs = max_information_needs
         self.engine = engine
         
         if llm_fn is None:
@@ -187,7 +202,40 @@ class TesseraOrchestrator:
     # Full pipeline
     # ------------------------------------------------------------------
     def run(self, task_instruction: str, top_n: int = 7, resolve_conflicts: bool = True, step_callback: Optional[Callable[[str, Any], None]] = None) -> OrchestratorResult:
-        information_need = self.identify_information_need(task_instruction)
+        analysis = None
+        if self.information_need_variant == "N0":
+            information_need = self.identify_information_need(task_instruction)
+        else:
+            if type(top_n) is not int or not 1 <= top_n <= 50:
+                raise ValueError("Structured need runs require top_n from 1 to 50")
+            analysis = identify_information_needs(
+                task_instruction, self.llm_fn,
+                variant=self.information_need_variant,
+                max_needs=self.max_information_needs,
+            )
+            if step_callback:
+                step_callback("information_needs", analysis.to_dict())
+            information_need = analysis.planner_input()
+            if not analysis.needs:
+                # Explicit no-memory/ambiguity is not a failed search. In
+                # particular, never invoke the legacy original-query fallback.
+                context = (
+                    "(No historical memory needed for this task.)"
+                    if analysis.status == "no_memory_needed" else
+                    "(More task context is needed before identifying historical evidence.)"
+                )
+                result = OrchestratorResult(
+                    task_instruction, "", "", consolidated_context=context,
+                    stores_queried=[], information_needs=analysis,
+                )
+                if step_callback:
+                    for step, value in (
+                        ("information_need", ""), ("retrieval_query", ""),
+                        ("target_stores", []), ("raw_memories", []),
+                        ("consolidated_context", context),
+                    ):
+                        step_callback(step, value)
+                return result
         if step_callback:
             step_callback("information_need", information_need)
 
@@ -230,6 +278,7 @@ class TesseraOrchestrator:
 
         return OrchestratorResult(
             task_instruction=task_instruction,
+            information_needs=analysis,
             information_need=information_need,
             retrieval_query=retrieval_query,
             stores_queried=target_stores,
