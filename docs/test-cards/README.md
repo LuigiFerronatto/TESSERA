@@ -38,6 +38,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #263 Durable single-write receipts | `IN_PROGRESS` | [263-durable-write-receipts.md](263-durable-write-receipts.md) | [Issue #263](https://github.com/LuigiFerronatto/TESSERA/issues/263), [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290); opt-in candidate, not merged |
 | #87 License and contribution entrypoints | `IN_PROGRESS` | [87-license-contribution.md](87-license-contribution.md) | [Issue #87](https://github.com/LuigiFerronatto/TESSERA/issues/87), [PR Evolution Audit](../PR_EVOLUTION_87.md), Queue 6; owner confirmation and merge pending |
 | #120 MCP transport/runtime | `VALIDATED` | [120-mcp-runtime-robustness.md](120-mcp-runtime-robustness.md) | [Issue #120](https://github.com/LuigiFerronatto/TESSERA/issues/120), [PR Evolution Audit](../PR_EVOLUTION_120.md), historical Queue 5; [PR #229](https://github.com/LuigiFerronatto/TESSERA/pull/229), canonical merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`, `KEEP` |
 | #118 Clean installed-artifact onboarding | `VALIDATED` | [118-clean-room-onboarding.md](118-clean-room-onboarding.md) | [Issue #118](https://github.com/LuigiFerronatto/TESSERA/issues/118), [PR Evolution Audit](../PR_EVOLUTION_118.md), historical Queue 4; [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225), canonical merge `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`, `KEEP` |

@@ -44,6 +44,7 @@ from .security import (
     WriteResult,
     content_sha256,
 )
+from .write_receipts import WriteReceipt, RECEIPT_SCHEMA_VERSION
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
 from .skills import SKILL_IDS, install_default_skills, list_default_skill_files
@@ -92,6 +93,8 @@ __all__ = [
     "WriteAdmission",
     "WriteGateDecision",
     "WriteResult",
+    "WriteReceipt",
+    "RECEIPT_SCHEMA_VERSION",
     "content_sha256",
     "ConflictResolver",
     "InvalidFrontmatterError",

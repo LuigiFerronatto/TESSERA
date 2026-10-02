@@ -609,6 +609,29 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
             )
         )
 
+    # Receipt inventory is operational metadata only; keep doctor read-only.
+    from types import SimpleNamespace
+    from .write_receipts import inspect_write_receipts
+    receipt_view = SimpleNamespace(
+        storage_dir=configuration.storage_dir,
+        index_cache_pkl=str(Path(configuration.index_dir) / "graph.pkl"),
+        index_cache_json=str(Path(configuration.index_dir) / "graph.json"),
+        manifest_path=str(Path(configuration.index_dir) / "identity_manifest.json"),
+        evidence_cache_json=str(Path(configuration.index_dir) / "evidence.json"),
+        _iter_source_files=lambda recursive: source_paths,
+    )
+    try:
+        receipts = inspect_write_receipts(receipt_view)
+    except ValueError:
+        receipts = [{"status": "corrupt", "repair_required": True}]
+    for receipt in receipts:
+        if receipt.get("repair_required") or receipt.get("retry_required"):
+            report.findings.append(CorpusFinding(
+                "incomplete_write_receipt", "warning",
+                "A write has incomplete or unverifiable derived state.",
+                hint="Run `tessera receipt inspect`, then `tessera receipt repair --operation-id ID`.",
+            ))
+
     report.sources.sort(key=lambda item: item.path)
     report.findings.sort(
         key=lambda item: (

@@ -446,19 +446,25 @@ def cmd_write(args):
         tags=tags,
         entities=entities,
         active_connections=active_connections,
+        operation_id=getattr(args, "operation_id", None),
     )
     if getattr(args, "json", False):
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
-        return 0 if result.persisted else 2
+        return (3 if result.write_receipt and result.write_receipt.repair_required else 0) if result.persisted else 2
 
     if not result.persisted:
         decision = result.decision
         print(
             f"✘ Note not written: admission={decision.admission.value}; "
-            f"reasons={','.join(decision.reasons)}",
+            f"reasons={','.join(result.write_receipt.errors if result.write_receipt and result.write_receipt.errors else decision.reasons)}",
             file=sys.stderr,
         )
         return 2
+
+    if result.write_receipt and result.write_receipt.repair_required:
+        print("Memory persisted; derived state is incomplete. Run `tessera receipt repair` with the operation ID.", file=sys.stderr)
+        print(json.dumps(result.write_receipt.to_dict(), sort_keys=True))
+        return 3
 
     filepath = result.filepath or ""
     conn_ids = [c.target_memory_id for c in active_connections]
@@ -479,6 +485,20 @@ def cmd_write(args):
         print(f"  ({len(active_connections)} explicit connection(s) recorded: "
               f"{', '.join(conn_ids)})")
     return 0
+
+
+def cmd_receipt(args):
+    engine = _engine_for_args(args)
+    if args.receipt_action == "repair":
+        payload = engine.repair_write_receipt(args.operation_id).to_dict()
+    elif args.operation_id:
+        payload = engine.inspect_write_receipt(args.operation_id).to_dict()
+    else:
+        payload = {"schema_version": 1, "receipts": engine.inspect_write_receipts()}
+    print(json.dumps(payload, sort_keys=True))
+    incomplete = payload.get("repair_required", False) or payload.get("retry_required", False) or any(
+        item.get("repair_required") or item.get("retry_required") for item in payload.get("receipts", []))
+    return 3 if incomplete else 0
 
 
 def cmd_index(args):
@@ -1134,6 +1154,7 @@ def build_parser():
     p_write.add_argument("--episode", required=True)
     p_write.add_argument("--content", required=True)
     p_write.add_argument("--tags", default="")
+    p_write.add_argument("--operation-id", help="Enable durable receipts and idempotent retries with this unique ID")
     p_write.add_argument("--json", action="store_true", help="Emit the canonical write decision as JSON")
     p_write.add_argument("--entity", action="append", help='Format "Name:description", repeatable')
     p_write.add_argument("--related-to", action="append",
@@ -1141,6 +1162,16 @@ def build_parser():
                                '"related_to"), repeatable. Creates explicit graph edges, mirroring '
                                'the generic connection schema.')
     p_write.set_defaults(func=cmd_write)
+
+    p_receipt = sub.add_parser("receipt", help="Inspect or repair durable single-write outcomes")
+    receipt_sub = p_receipt.add_subparsers(dest="receipt_action", required=True)
+    for action in ("inspect", "repair"):
+        command = receipt_sub.add_parser(action)
+        command.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
+        _add_store_selection_arguments(command)
+        command.add_argument("--operation-id", required=action == "repair")
+        command.set_defaults(func=cmd_receipt)
+
 
     p_index = sub.add_parser("index", help="Rebuild the in-memory knowledge graph index", parents=[plain_parent])
     p_index.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)

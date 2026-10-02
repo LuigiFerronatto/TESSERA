@@ -271,6 +271,50 @@ class TesseraEngine:
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
+        operation_id: Optional[str] = None,
+    ) -> WriteResult:
+        """Write with an optional durable operation ID and shared outcome receipt.
+
+        Omitting operation_id preserves the legacy persistence-only contract.
+        """
+        arguments = dict(mem_id=mem_id, mem_type=mem_type, episode_id=episode_id,
+                         content=content, tags=tags, entities=entities, description=description,
+                         provenance_turns=provenance_turns, active_connections=active_connections,
+                         persist_format=persist_format)
+        if operation_id is None:
+            return self._write_memory_note_result(**arguments)
+        from .write_receipts import write_with_receipt
+        return write_with_receipt(self, arguments, operation_id)
+
+    def inspect_write_receipt(self, operation_id):
+        from .write_receipts import inspect_write_receipt
+        return inspect_write_receipt(self, operation_id)
+
+    def inspect_write_receipts(self):
+        from .write_receipts import inspect_write_receipts
+        return inspect_write_receipts(self)
+
+    def repair_write_receipt(self, operation_id):
+        from .write_receipts import repair_write_receipt
+        return repair_write_receipt(self, operation_id)
+
+    def _write_receipt_index(self):
+        TesseraEngine.build_index(self, use_cache=False, persist=False, force_rebuild=True)
+
+    def _write_memory_note_result(
+        self,
+        mem_id: str,
+        mem_type: str,
+        episode_id: str,
+        content: str,
+        tags: List[str],
+        entities: List[Entity],
+        description: str = "",
+        provenance_turns: Optional[List[int]] = None,
+        active_connections: Optional[List[Connection]] = None,
+        persist_format: Literal["md"] = "md",
+        _write_operation=None,
+        _before_persist=None,
     ) -> WriteResult:
         """
         Canonical write flow returning the complete gate/persistence contract.
@@ -351,10 +395,14 @@ class TesseraEngine:
         )
 
         frontmatter_dict = frontmatter_data.to_dict()
+        if _write_operation is not None:
+            frontmatter_dict["write_operation"] = _write_operation
         yaml_frontmatter = yaml.dump(
             frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
         )
         markdown_body = f"---\n{yaml_frontmatter}---\n\n{persistence_candidate}"
+        if _before_persist is not None:
+            _before_persist(markdown_body)
         filepath = str(path_validation.destination)
         parent = os.path.dirname(filepath)
         missing_parents = []
@@ -634,7 +682,7 @@ class TesseraEngine:
     # ------------------------------------------------------------------
     # Index build
     # ------------------------------------------------------------------
-    def build_index(self, recursive: bool = True, use_cache: bool = True, persist: bool = True) -> None:
+    def build_index(self, recursive: bool = True, use_cache: bool = True, persist: bool = True, *, force_rebuild: bool = False) -> None:
         """
         Scans the storage directory and (re)builds the heterogeneous
         knowledge graph in memory: memory notes, entities, tags, and their
@@ -653,7 +701,7 @@ class TesseraEngine:
                 ``.tessera_index/`` (pickle for fast reload + a human-readable
                 JSON summary) once the scan finishes.
         """
-        if use_cache and self._load_index_if_fresh():
+        if use_cache and not force_rebuild and self._load_index_if_fresh():
             scanned = len(list(self._iter_source_files(recursive=recursive)))
             self.last_index_stats = {
                 "scanned": scanned,
@@ -672,9 +720,22 @@ class TesseraEngine:
         # Reuse the previous graph when a persisted snapshot exists. Source
         # nodes whose content/path changed are removed and reparsed below;
         # unchanged nodes remain in place. TF-IDF is still refit globally.
-        previous_manifest = dict(self.identity_manifest)
+        if force_rebuild:
+            self.graph.clear()
+            self.file_registry.clear()
+            self.node_corpus.clear()
+            self.node_ids.clear()
+            self.tfidf_matrix = None
+            self.processing_warnings.clear()
+            # Malformed derived manifests must not prevent rebuilding sources.
+            if not isinstance(self.identity_manifest, dict) or any(
+                not isinstance(entry, dict) or not {"id", "content_hash"} <= set(entry)
+                for entry in self.identity_manifest.values()
+            ):
+                self.identity_manifest = {}
+        previous_manifest = {} if force_rebuild else dict(self.identity_manifest)
         previous_registry = dict(self.file_registry)
-        if not previous_registry and os.path.exists(self.index_cache_pkl):
+        if not force_rebuild and not previous_registry and os.path.exists(self.index_cache_pkl):
             try:
                 import pickle
                 with open(self.index_cache_pkl, "rb") as handle:
@@ -775,7 +836,7 @@ class TesseraEngine:
             if incremental and filename in unchanged_paths:
                 continue
             try:
-                with open(filepath, "r", encoding="utf-8") as f:
+                with open(filepath, "r", encoding="utf-8", newline="" if force_rebuild else None) as f:
                     raw_text = f.read()
 
                 # Integrate Canonical Metadata Model (F2/F3/F4/F5/F7)
@@ -936,6 +997,10 @@ class TesseraEngine:
                 if data.get("node_type") in {"entity", "tag"} and self.graph.degree(node_id) == 0:
                     self.graph.remove_node(node_id)
                     self.node_corpus.pop(node_id, None)
+            for old_rel in set(self.identity_manifest) - set(current_paths):
+                self.identity_manifest.pop(old_rel, None)
+
+        if force_rebuild:
             for old_rel in set(self.identity_manifest) - set(current_paths):
                 self.identity_manifest.pop(old_rel, None)
 

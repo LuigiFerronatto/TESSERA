@@ -92,11 +92,11 @@ class TesseraMCP(FastMCP):
                 {"properties": {"error": {"type": "object"}, "data": {"type": "null"}}},
             ]
             tool.meta = {"tessera/schema_version": SCHEMA_VERSION}
-            read_only = tool.name in {"query_memories", "query_store", "query_memories_pipeline",
+            read_only = tool.name in {"inspect_write_receipt", "query_memories", "query_store", "query_memories_pipeline",
                                       "get_index_composition", "get_server_health"}
             tool.annotations = types.ToolAnnotations(
                 readOnlyHint=read_only, destructiveHint=not read_only,
-                idempotentHint=read_only, openWorldHint=tool.name in {
+                idempotentHint=read_only or tool.name == "repair_write_receipt", openWorldHint=tool.name in {
                     "query_memories_pipeline", "decompose_episode"},
             )
         return tools
