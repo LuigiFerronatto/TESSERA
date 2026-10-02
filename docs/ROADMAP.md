@@ -124,9 +124,8 @@ noise (see the buckets after the queue).
 🥉 #16  Conflict resolver containment           P0 VALIDATED (`KEEP`; `708c973e...`)
 4  #118 Clean-room onboarding                   VALIDATED (`KEEP`; `0ee5bbfe...`)
 5  #120 MCP transport/runtime                   VALIDATED (`KEEP`; `b4ead4d...`)
+12 #13  Corpus Doctor                            VALIDATED (`KEEP`; `20814a47...`)
 ```
-
-6  #13  Corpus Doctor                            VALIDATED (`KEEP`; `20814a47...`)
 
 #13 Corpus Doctor merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`;
 exact-head CI, smoke/sanity/distribution and Maintainer Audit/Merge Governor
@@ -149,11 +148,15 @@ candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f` has the same tree: one deli
 with green canonical CI/Benchmark Ledger and decision `KEEP`. Its final candidate
 `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211` has the same tree: one runtime delivery.
 
-These rows preserve Queue #1–#5 delivery history; they are not active `NOW`
+These rows preserve Queue #1–#5 and Queue #12 delivery history; they are not active `NOW`
 work. The single open Project item for #16 now represents only the remaining
 full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NOW
+
+No executable card is currently selected in this reconciled board. #13 has
+completed historical Queue 12; its completion does not select a successor.
+The next implementation requires an explicit selection under the WIP contract.
 
 #87 LICENSE / CONTRIBUTING is VALIDATED / KEEP at historical Queue 6. The owner
 [confirmed MIT and the notice](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368)
