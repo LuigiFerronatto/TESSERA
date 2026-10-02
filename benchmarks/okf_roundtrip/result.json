@@ -1,11 +1,12 @@
 {
   "acceptance_gaps": [
     "Future evidence-aware admission (#19), separate from source conversion",
-    "Broader non-OKF export profiles and exposure filtering",
+    "Accepted #256 encryption and #257 exposure integration policies",
     "Independent full-spec conformance audit",
     "Representative user-corpus evaluation",
     "Canonical merge and exact-head governance gates"
   ],
+  "canonical_json_import_transaction": "PASS (9 records)",
   "canonical_records_equal": {
     "OKF": [
       10,
@@ -57,8 +58,8 @@
   },
   "issue": 204,
   "latency_ms_observational": {
-    "export": 13.592,
-    "import": 13.812
+    "export": 13.767,
+    "import": 13.494
   },
   "lossy_semantic_fields": [],
   "matrix": {
@@ -67,6 +68,60 @@
     "A2_native_export": "PASS",
     "A3_OKF_roundtrip": "PASS",
     "A4_native_roundtrip": "PASS"
+  },
+  "named_profiles": {
+    "canonical-json": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": []
+    },
+    "csv": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "body",
+        "relations",
+        "raw_frontmatter",
+        "quality",
+        "source hashes/span/document ID",
+        "scope level/harness",
+        "recorded_at",
+        "state_key",
+        "superseded_at",
+        "utility",
+        "metadata_origin",
+        "producer extensions",
+        "optional lineage"
+      ]
+    },
+    "markdown": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "raw_frontmatter and producer extensions available in canonical companion",
+        "original body presentation augmented with navigation"
+      ]
+    },
+    "obsidian": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "raw_frontmatter and producer extensions available in canonical companion",
+        "original body presentation augmented with navigation"
+      ]
+    }
   },
   "observation_separate_from_generation": true,
   "reference_validator_blob": "b770a92f33adf9942e2932529308d066430b02a6",

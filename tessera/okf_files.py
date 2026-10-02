@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import sys
 import tempfile
 
@@ -18,19 +19,20 @@ from .canonical import compute_sha256, effective_tags
 from .okf import (
     ExchangeError, EXTENSION, SOURCE_EXTENSION, MAX_BUNDLE_BYTES, MAX_ENTRIES, MAX_FILE_BYTES, PROFILE,
     SPEC_REVISION, _parse, _safe_path, _scan, native_source_document,
-    plan_import, plan_native_export,
+    plan_import, load_native_records,
 )
+from .exchange_profiles import (JSON_FILENAME, PROFILES, parse_canonical_json, project_records, select_records)
 from .security import WriteAdmission, WriteGatingEngine, validate_memory_path
 
 TRANSACTION_SCHEMA = 1
 MANIFEST = ".tessera-okf-exchange.json"
 
 
-def _destination(source, output):
+def _destination(source, output, *, source_file=False):
     source = Path(source).absolute()
     output = Path(output).absolute()
-    if not source.is_dir() or source.is_symlink():
-        raise ExchangeError("Source must be an existing real directory")
+    if not (source.is_file() if source_file else source.is_dir()) or source.is_symlink():
+        raise ExchangeError("Source must be an existing real file/directory of the selected format")
     if not output.parent.is_dir():
         raise ExchangeError("Destination parent must already exist")
     if any(p.is_symlink() for p in (source, *source.parents, output, *output.parents)):
@@ -53,8 +55,11 @@ def _validate_files(files, output):
     spelling = {}
     for path, text in files.items():
         _safe_path(path)
-        if not path.endswith(".md") or not validate_memory_path(str(output), path[:-3]).valid:
-            raise ExchangeError("Output source path is not portable Markdown")
+        if path.endswith(".md"):
+            if not validate_memory_path(str(output), path[:-3]).valid:
+                raise ExchangeError("Output source path is not portable Markdown")
+        elif path not in {JSON_FILENAME, "memories.csv"}:
+            raise ExchangeError("Output path is outside the named exchange profiles")
         for prefix in (Path(path), *Path(path).parents):
             original = prefix.as_posix()
             if original == ".":
@@ -70,7 +75,7 @@ def _validate_files(files, output):
         parents = Path(path).parents
         directories.update(p.as_posix().casefold() for p in parents if p.as_posix() != ".")
         size = len(text.encode("utf-8"))
-        if size > MAX_FILE_BYTES:
+        if size > (MAX_FILE_BYTES if path.endswith(".md") else MAX_BUNDLE_BYTES):
             raise ExchangeError("Rendered source exceeds the supported file size")
         total += size
     if folded & directories or total > MAX_BUNDLE_BYTES or len(files) + len(directories) + 1 > MAX_ENTRIES:
@@ -78,57 +83,102 @@ def _validate_files(files, output):
     return total
 
 
-def plan_destination(source, output, *, operation, namespace=None):
+def _read_json_source(source):
+    source = Path(source).absolute()
+    if any(p.is_symlink() for p in (source, *source.parents)):
+        raise ExchangeError("Canonical JSON symlinks are not supported")
+    if source.stat().st_size > MAX_BUNDLE_BYTES:
+        raise ExchangeError("Canonical JSON exceeds the supported size")
+    fd = os.open(source, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
+    with os.fdopen(fd, "rb") as handle:
+        if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+            raise ExchangeError("Canonical JSON source is not a regular file")
+        data = handle.read(MAX_BUNDLE_BYTES + 1)
+    if len(data) > MAX_BUNDLE_BYTES:
+        raise ExchangeError("Canonical JSON source grew beyond the supported size")
+    return data.decode("utf-8")
+
+
+def _tags_for_record(record):
+    return effective_tags(record.canonical.raw_frontmatter)
+
+
+def plan_destination(source, output, *, operation, namespace=None, profile="okf", selection=None):
     """Plan source copies/export into a new tree, with zero write side effects."""
-    if operation not in {"convert", "export"}:
-        raise ExchangeError("Unknown exchange operation")
-    source, output = _destination(source, output)
-    docs, skipped, errors = _scan(source)
-    if errors:
-        raise ExchangeError("Unsafe source inventory: " + json.dumps(errors, sort_keys=True))
-    if operation == "convert":
-        imported = plan_import(source, namespace=namespace)
-        if imported.report["mapping"] != "PASS":
-            raise ExchangeError("Cannot convert a partial or review-required import plan")
-        files = {r.path: native_source_document(r) for r in imported.records}
-        # Reserved index/log navigation remains in the original source. Copying
-        # it as native memories would manufacture extra retrievable records.
-        excluded = [{"path": p, "reason": "reserved_navigation_not_a_memory"} for p in imported.auxiliary]
-        report = imported.report
+    if operation not in {"convert", "export"} or profile not in PROFILES:
+        raise ExchangeError("Unknown exchange operation/profile")
+    if operation == "convert" and profile not in {"okf", "canonical-json"}:
+        raise ExchangeError("Convert accepts OKF or the versioned canonical JSON profile")
+    json_input = operation == "convert" and profile == "canonical-json"
+    source, output = _destination(source, output, source_file=json_input)
+    if json_input:
+        text = _read_json_source(source)
+        records, source_manifest = parse_canonical_json(text)
+        docs, skipped = {source.name: text}, []
+        report = {"profile": profile, "schema_version": 1, "source_manifest": source_manifest,
+                  "records_seen": len(records), "validation": "PASS"}
+        auxiliary = {}
     else:
-        exported = plan_native_export(source)
-        files = exported["files"]
+        docs, skipped, errors = _scan(source)
+        if errors:
+            raise ExchangeError("Unsafe source inventory: " + json.dumps(errors, sort_keys=True))
+        if operation == "convert":
+            imported = plan_import(source, namespace=namespace)
+            if imported.report["mapping"] != "PASS":
+                raise ExchangeError("Cannot convert a partial or review-required import plan")
+            records, report, auxiliary = imported.records, imported.report, imported.auxiliary
+        else:
+            records, skipped = load_native_records(source)
+            report, auxiliary = {}, {}
+    if operation == "convert":
+        selected, selection_manifest = select_records(records, selection)
+        files = {r.path: native_source_document(r) for r in selected}
+        excluded = [{"path": p, "reason": "reserved_navigation_not_a_memory"} for p in auxiliary]
+        report = {**report, "selection_manifest": selection_manifest}
+    else:
+        exported = project_records(records, profile=profile, selection=selection)
+        files, report = exported["files"], exported["report"]
+        selected, selection_manifest = select_records(records, selection)
         excluded = []
-        report = exported["report"]
     total = _validate_files(files, output)
     gate = WriteGatingEngine()
+    record_gates = {r.canonical.identity.id: gate.evaluate(native_source_document(r), _tags_for_record(r)).to_dict() for r in selected}
+    all_tags = sorted({tag for record in selected for tag in _tags_for_record(record)})
     gates = {}
     for path, text in sorted(files.items()):
-        fm, _ = _parse(text)
-        # Evaluate the exact emitted bytes, including unknown metadata, so a
-        # nested instruction cannot sidestep the existing hostile-pattern gate.
-        tags = set(effective_tags(fm))
-        for marker in (EXTENSION, SOURCE_EXTENSION):
-            envelope = fm.get(marker, {})
-            if isinstance(envelope, dict) and isinstance(envelope.get("canonical"), dict):
-                raw = envelope["canonical"].get("raw_frontmatter", {})
-                if isinstance(raw, dict):
-                    tags.update(effective_tags(raw))
-        decision = gate.evaluate(text, sorted(tags))
-        gates[path] = decision.to_dict()
+        tags = set(all_tags if not path.endswith(".md") else [])
+        if path.endswith(".md"):
+            fm, _ = _parse(text)
+            tags.update(effective_tags(fm))
+            for marker in (EXTENSION, SOURCE_EXTENSION):
+                envelope = fm.get(marker, {})
+                if isinstance(envelope, dict) and isinstance(envelope.get("canonical"), dict):
+                    raw = envelope["canonical"].get("raw_frontmatter", {})
+                    if isinstance(raw, dict):
+                        tags.update(effective_tags(raw))
+        gates[path] = gate.evaluate(text, sorted(tags)).to_dict()
     unapproved_assets = [v for v in skipped if v["path"] != MANIFEST]
-    status = "READY" if not unapproved_assets and all(g["admission"] == WriteAdmission.ACCEPT.value for g in gates.values()) else "REVIEW"
+    accepted = all(g["admission"] == WriteAdmission.ACCEPT.value for g in [*gates.values(), *record_gates.values()])
+    status = "READY" if not unapproved_assets and accepted else "REVIEW"
     hashes = {path: compute_sha256(text) for path, text in sorted(files.items())}
     identity = {
         "schema_version": TRANSACTION_SCHEMA, "operation": operation,
         "source": str(source), "destination": str(output), "namespace": namespace,
-        "profile": PROFILE, "spec_revision": SPEC_REVISION,
+        "profile": profile, "canonical_profile": PROFILE, "spec_revision": SPEC_REVISION,
+        "selection": selection_manifest["selection"],
         "source_hashes": {p: compute_sha256(t) for p, t in sorted(docs.items())},
         "source_skipped": skipped, "excluded": excluded,
-        "file_hashes": hashes, "write_gate": gates, "status": status,
+        "file_hashes": hashes, "write_gate": gates, "record_security_gate": record_gates, "status": status,
     }
     plan_id = compute_sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False))
-    manifest = {**identity, "plan_id": plan_id, "role": "standalone_source_exchange",
+    # Full source/selection detail is available in the private dry-run. Published
+    # manifests do not disclose excluded record IDs, selectors or source paths.
+    manifest = {"schema_version": TRANSACTION_SCHEMA, "operation": operation, "profile": profile,
+                "source_snapshot_hash": compute_sha256(json.dumps(identity["source_hashes"], sort_keys=True)),
+                "file_hashes": hashes, "records_selected": len(selected),
+                "records_excluded": len(selection_manifest["excluded"]),
+                "declared_private_excluded": selection_manifest["declared_private_excluded"],
+                "plan_id": plan_id, "role": "standalone_source_exchange",
                 "semantic_admission": "NOT_PERFORMED", "runtime_registration": "NOT_PERFORMED"}
     manifest_text = json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
     if total + len(manifest_text.encode("utf-8")) > MAX_BUNDLE_BYTES:
@@ -179,13 +229,13 @@ def _write_file(path, text):
         raise ExchangeError("Staged file verification failed")
 
 
-def apply_exchange(source, output, *, operation, expected_plan_id, namespace=None):
+def apply_exchange(source, output, *, operation, expected_plan_id, namespace=None, profile="okf", selection=None):
     """Replan, require exact prior approval, gate all files, then publish once.
 
-    This function never mutates a pre-existing destination or canonical store.
+    This function never mutates a pre-existing destination or selects a canonical store.
     It does not infer approval from elapsed time or accept a stale plan.
     """
-    plan = plan_destination(source, output, operation=operation, namespace=namespace)
+    plan = plan_destination(source, output, operation=operation, namespace=namespace, profile=profile, selection=selection)
     if not isinstance(expected_plan_id, str) or plan["plan_id"] != expected_plan_id:
         raise ExchangeError("Plan changed or expected plan_id is missing; review the new plan")
     if plan["status"] != "READY":
@@ -198,7 +248,7 @@ def apply_exchange(source, output, *, operation, expected_plan_id, namespace=Non
             _write_file(stage / relative, text)
         # Recheck inputs and output state after staging; no stale source or
         # intervening destination may become a successful apply receipt.
-        checked = plan_destination(source, output, operation=operation, namespace=namespace)
+        checked = plan_destination(source, output, operation=operation, namespace=namespace, profile=profile, selection=selection)
         if checked["plan_id"] != plan["plan_id"]:
             raise ExchangeError("Source changed during staging; transaction aborted")
         publish(stage, output)

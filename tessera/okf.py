@@ -328,7 +328,7 @@ def _restore(payload):
         raise ExchangeError("Canonical ID must be a non-empty string")
     if not isinstance(canonical.identity.name, str):
         raise ExchangeError("Canonical name must be a string")
-    if canonical.classification.drawer not in {None, "facts", "preferences", "insights"}:
+    if canonical.classification.drawer not in (None, "facts", "preferences", "insights"):
         raise ExchangeError("Unknown canonical drawer")
     if not isinstance(canonical.raw_frontmatter, dict) or not isinstance(canonical.metadata_origin, dict):
         raise ExchangeError("Canonical raw metadata and origins must be mappings")
@@ -343,8 +343,12 @@ def _restore(payload):
                         canonical.state_key, canonical.superseded_at]
     if not all(isinstance(v, str) for v in required_strings) or not all(v is None or isinstance(v, str) for v in optional_strings):
         raise ExchangeError("Malformed canonical string fields")
-    if canonical.utility is not None and (type(canonical.utility) not in (int, float) or not math.isfinite(canonical.utility)):
-        raise ExchangeError("Canonical utility must be a finite number")
+    try:
+        valid_utility = canonical.utility is None or (type(canonical.utility) in (int, float) and math.isfinite(canonical.utility))
+    except OverflowError:
+        valid_utility = False
+    if not valid_utility:
+        raise ExchangeError("Canonical utility must be a finite representable number")
     for line in (canonical.source.span.start_line, canonical.source.span.end_line):
         if line is not None and (type(line) is not int or line < 1):
             raise ExchangeError("Canonical source spans use positive line numbers")
@@ -602,16 +606,14 @@ def export_records(records, *, auxiliary=None):
         "persistence": "NOT_PERFORMED", "execution": "DISABLED", "network": "DISABLED"}}
 
 
-def plan_native_export(directory):
-    """Explicitly selected native Markdown only; no config/store discovery."""
+def load_native_records(directory):
+    """Load explicit native sources once through the shared canonical boundary."""
     root = Path(directory)
     docs, skipped, safety = _scan(root)
     if safety:
         raise ExchangeError("Unsafe/unreadable native inputs: " + json.dumps(safety))
     records = []
     for path, raw in sorted(docs.items()):
-        if PurePosixPath(path).name in RESERVED:
-            raise ExchangeError("Native index.md/log.md requires an explicit non-reserved export path")
         fm, body = _parse(raw, required=False)
         if SOURCE_EXTENSION in fm:
             records.append(_converted_source_record(fm, body, path))
@@ -619,6 +621,12 @@ def plan_native_export(directory):
             canonical = parse_and_normalize(raw, str(root / path), str(root))
             canonical.temporal.indexed_at = ""
             records.append(ExchangeRecord(canonical, body, path))
+    return records, skipped
+
+
+def plan_native_export(directory):
+    """Explicitly selected native Markdown only; no config/store discovery."""
+    records, skipped = load_native_records(directory)
     result = export_records(records)
     result["report"]["skipped"] = skipped
     return result
@@ -629,29 +637,56 @@ def main(argv=None):
     parser.add_argument("command", choices=("validate", "plan", "convert", "export-native"))
     parser.add_argument("directory")
     parser.add_argument("--namespace", help="Stable user-selected bundle identity namespace")
+    parser.add_argument("--format", dest="profile", default="okf", choices=("okf", "canonical-json", "markdown", "obsidian", "csv"))
+    for flag, dest in (("id", "ids"), ("exclude-id", "exclude_ids"), ("private-id", "private_ids"),
+                       ("drawer", "drawers"), ("scope-level", "scope_levels"), ("scope-path", "scope_paths"),
+                       ("source-path", "source_paths")):
+        parser.add_argument("--" + flag, dest=dest, action="append")
+    parser.add_argument("--time-field", choices=("observed_at", "recorded_at", "valid_from", "valid_until"))
+    parser.add_argument("--time-from")
+    parser.add_argument("--time-to")
     parser.add_argument("--output", help="New standalone destination directory; never overwrite")
     parser.add_argument("--apply", action="store_true", help="Apply a reviewed source-copy/export plan")
     parser.add_argument("--expect", help="Exact destination plan_id returned by a previous dry-run")
     args = parser.parse_args(argv)
+    selection = {key: getattr(args, key) for key in ("ids", "exclude_ids", "private_ids", "drawers", "scope_levels", "scope_paths", "source_paths", "time_field", "time_from", "time_to") if getattr(args, key) is not None}
     try:
-        if args.command in {"convert", "export-native"} and args.output:
+        if args.command not in {"convert", "export-native"} and selection:
+            raise ExchangeError("Selection filters are supported by convert/export-native")
+        if args.command == "validate" and args.profile == "canonical-json":
+            if args.output or args.apply or args.expect:
+                raise ExchangeError("Validation is read-only")
+            from .okf_files import _read_json_source
+            from .exchange_profiles import parse_canonical_json
+            records, _ = parse_canonical_json(_read_json_source(Path(args.directory)))
+            payload = {"profile": args.profile, "schema_version": 1, "validation": "PASS", "records_seen": len(records), "persistence": "NOT_PERFORMED"}
+            code = 0
+        elif args.command not in {"convert", "export-native"} and args.profile != "okf":
+            raise ExchangeError("This command requires OKF (or canonical-json validation)")
+        elif args.command in {"convert", "export-native"} and args.output:
             from .okf_files import apply_exchange, plan_destination
             operation = "convert" if args.command == "convert" else "export"
             if args.apply:
                 if not args.expect:
                     raise ExchangeError("--apply requires the reviewed --expect plan_id")
                 payload = apply_exchange(args.directory, args.output, operation=operation,
-                                         namespace=args.namespace, expected_plan_id=args.expect)
+                                         namespace=args.namespace, expected_plan_id=args.expect, profile=args.profile, selection=selection)
             else:
                 if args.expect:
                     raise ExchangeError("--expect is meaningful only with --apply")
                 payload = plan_destination(args.directory, args.output, operation=operation,
-                                           namespace=args.namespace)
+                                           namespace=args.namespace, profile=args.profile, selection=selection)
             code = 0 if payload.get("status") in {"READY", "APPLIED"} else 2
         elif args.output or args.apply or args.expect or args.command == "convert":
             raise ExchangeError("Source transactions require convert/export-native and an explicit --output")
         elif args.command == "export-native":
-            payload = plan_native_export(args.directory)
+            if args.profile != "okf" or selection:
+                from .exchange_profiles import project_records
+                records, skipped = load_native_records(args.directory)
+                payload = project_records(records, profile=args.profile, selection=selection)
+                payload["report"]["skipped"] = skipped
+            else:
+                payload = plan_native_export(args.directory)
             code = 0
         else:
             if args.command == "plan" and not args.namespace:

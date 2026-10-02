@@ -15,6 +15,7 @@ from tessera.canonical import compute_sha256, parse_and_normalize
 from tessera.engine import TesseraEngine
 from tessera.okf import SPEC_REVISION, export_records, native_preview, plan_import, plan_native_export
 from tessera.okf_files import apply_exchange, plan_destination
+from tessera.exchange_profiles import JSON_FILENAME, parse_canonical_json
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/okf_v02"
@@ -100,6 +101,24 @@ def run():
             expected_plan_id=exchange["plan_id"])
         converted_import = plan_import(root / "converted-export", namespace="frozen-okf-204")
         assert before == [r.to_dict() for r in converted_import.records]
+        profile_evidence = {}
+        private_id = next(r.canonical.identity.id for r in plan.records if r.path.endswith("machine.md"))
+        expected_selected = sorted([r.to_dict() for r in plan.records if r.canonical.identity.id != private_id], key=lambda r: r["canonical"]["identity"]["id"])
+        for profile in ("canonical-json", "markdown", "obsidian", "csv"):
+            destination = root / ("profile-" + profile)
+            selection = {"private_ids": [private_id]}
+            view = plan_destination(root / "converted-source", destination, operation="export", profile=profile, selection=selection)
+            assert not destination.exists()
+            assert view == plan_destination(root / "converted-source", destination, operation="export", profile=profile, selection=selection)
+            receipt = apply_exchange(root / "converted-source", destination, operation="export", profile=profile,
+                                     selection=selection, expected_plan_id=view["plan_id"])
+            restored, _ = parse_canonical_json((destination / JSON_FILENAME).read_text())
+            assert [r.to_dict() for r in restored] == expected_selected
+            profile_evidence[profile] = {"status": receipt["status"], "records_selected": 9, "private_records_excluded": 1,
+                "canonical_companion_equal": True, "repeatability": True, "view_lossy_fields": view["report"]["view_lossy_fields"]}
+        json_copy = plan_destination(root / "profile-canonical-json" / JSON_FILENAME, root / "json-converted", operation="convert", profile="canonical-json")
+        apply_exchange(root / "profile-canonical-json" / JSON_FILENAME, root / "json-converted", operation="convert", profile="canonical-json", expected_plan_id=json_copy["plan_id"])
+        assert len(list((root / "json-converted").rglob("*.md"))) == 9
         assert imported_hits == smoke(root / "converted-source")
         return {
             "issue": 204, "decision": "ITERATE", "spec_revision": SPEC_REVISION,
@@ -124,7 +143,8 @@ def run():
                 "converted_records_equal": [10, 10], "write_gate": "all accept unchanged", "fresh_destination_only": True,
                 "semantic_admission": "NOT_PERFORMED", "runtime_registration": "NOT_PERFORMED",
                 "external_validation_after_transactions": reference_count(root / "converted-export", validator)},
-            "acceptance_gaps": ["Future evidence-aware admission (#19), separate from source conversion", "Broader non-OKF export profiles and exposure filtering",
+            "named_profiles": profile_evidence, "canonical_json_import_transaction": "PASS (9 records)",
+            "acceptance_gaps": ["Future evidence-aware admission (#19), separate from source conversion", "Accepted #256 encryption and #257 exposure integration policies",
                 "Independent full-spec conformance audit", "Representative user-corpus evaluation", "Canonical merge and exact-head governance gates"],
         }
 

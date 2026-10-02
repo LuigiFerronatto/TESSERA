@@ -28,7 +28,8 @@ but no pinned OKF adapter or reproducible OKF round-trip experiment existed.
 
 ## What changed or is being tested?
 
-Read-only import/export plans, explicit source-copy/export transactions, a
+Read-only import/export plans, explicit source-copy/export transactions,
+versioned JSON and human Markdown/Obsidian/CSV views with filters, a
 namespaced canonical extension and a frozen
 11-object synthetic experiment. No native Engine or ranking code changes.
 
@@ -63,8 +64,8 @@ ambiguity without weakening existing storage or silently inventing timestamps.
 
 ## What remains unimplemented?
 
-Future evidence-aware admission (#19), broad format profiles, exposure/privacy
-filtering, user-corpus evaluation, complete independent conformance audit and
+Future evidence-aware admission (#19), accepted encryption/exposure integration
+policies (#256/#257), user-corpus evaluation, complete independent conformance audit and
 canonical merge remain open. Synthetic passes do not satisfy those gates.
 
 ## What is unlocked next?

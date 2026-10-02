@@ -187,8 +187,8 @@ are excluded. Embedded HTML, indented code and full Markdown AST semantics need
 another adapter iteration. Original body
 bytes remain available; do not infer comprehensive graph extraction from this
 fixture. Native exports with non-JSON raw frontmatter require review rather
-than silently converting values. Native reserved filenames need an explicitly
-chosen export path. No automatic privacy inference or cross-project export is implemented. File
+than silently converting values. OKF exports of native reserved filenames need an explicitly
+chosen export path; named view profiles use stable generated filenames. No automatic privacy inference or cross-project export is implemented. File
 exclusions are explicit, and unsupported assets prevent transaction apply. Only
 explicitly selected synthetic input was used in this experiment.
 
@@ -214,8 +214,8 @@ plan/input, write failure, atomic no-replace races, collisions and unsupported
 platforms are tested without touching user stores.
 
 The decision remains ITERATE. Future evidence-aware admission (#19), realistic-corpus evidence,
-independent comprehensive conformance audit, identity review UX, broader
-versioned JSON/Markdown/Obsidian/CSV profiles, selection/privacy/exposure policy,
+independent comprehensive conformance audit, identity review UX, accepted
+privacy/exposure and encrypted-store integration policies,
 encrypted-store behavior and exact-head governance/merge gates remain open.
 No retrieval-quality improvement, full issue completion or promotion is claimed.
 
@@ -229,10 +229,93 @@ No retrieval-quality improvement, full issue completion or promotion is claimed.
 | Semantic preservation | Original canonical snapshot survives source conversion and re-export, including typed relation origin and provenance | Native projections expose the subset currently understood by the Engine |
 | Format conformance | Exact spec revision, structural checks, frozen upstream concept validator, exported-fixture checks | Independent comprehensive spec review remains acceptance evidence |
 | Evidence-aware memory admission | #19 is explicitly a later novelty/utility/stability research policy | Separate semantic policy, not a prerequisite for ordinary source-copy files |
-| Broader JSON/Obsidian/CSV profiles and filtering | The issue's competitive-audit addition routes this broader family through #260; current output is the OKF/native-source profile only | Additional mechanical work remains; not described as an authorization blocker |
+| Named JSON/Markdown/Obsidian/CSV profiles and filtering | Implemented over shared canonical records with versioned JSON companions, explicit selectors, manifests and repeatability tests | No automatic encryption or access-control policy inferred |
 | Encrypted/cross-project exposure behavior | No encrypted stores, cross-project discovery or automatic privacy inference touched | #256/#257 contracts need their own accepted behavior; no guessed decryption/sharing policy |
 | Promotion or issue closure | Source mechanics and synthetic evidence improve this candidate | Human review, complete contract acceptance and canonical merge remain required |
 
 There is no missing user resource for local synthetic validation. The remaining
 scope should not be conflated with needing permission to write temporary test
 files or with a future research gate on every form of persistence.
+
+
+## Named portable profiles from the owner acceptance comment
+
+The four profiles added by the [owner's #204 comment](https://github.com/LuigiFerronatto/TESSERA/issues/204#issuecomment-5673815848)
+are implemented independently from the existing TESSERA canonical contract.
+#260 is the competitive-audit tracker, not a separate implementation owner.
+No competitor source, schema or algorithm was copied.
+
+| Profile | Files | Contract |
+|---|---|---|
+| canonical-json | memories.json | Versioned, strict canonical snapshot and original bodies; re-import supported |
+| markdown | memories/*.md + memories.json | Human metadata, source body and stable cross-links/navigation; exact canonical companion |
+| obsidian | memories/*.md + memories.json | Target-safe wikilinks only to selected exported records; canonical companion retains original text |
+| csv | memories.csv + memories.json | Deliberately lossy tabular view with explicit omitted dimensions; canonical companion retains full structure |
+
+All profiles project existing CanonicalMetadata/ExchangeRecord instances through
+`tessera.exchange_profiles`; they do not define a competing internal memory
+model. JSON decoding delegates to the same canonical restorer as OKF, including
+the optional lineage compatibility repair. Unsupported versions, duplicate keys,
+non-finite values, body/hash mismatches, duplicate IDs/paths and escaping paths
+fail explicitly. The source-only converter can consume the exact selected JSON
+file through the same reviewed transaction and #92 security gate.
+
+```bash
+python -m tessera.okf export-native ./selected-project-sources --format canonical-json --output /tmp/new-json-bundle
+python -m tessera.okf export-native ./selected-project-sources --format markdown --drawer facts --output /tmp/new-markdown-bundle
+python -m tessera.okf export-native ./selected-project-sources --format obsidian --scope-level project --scope-path './**' --output /tmp/new-obsidian-bundle
+python -m tessera.okf export-native ./selected-project-sources --format csv --time-field observed_at --time-from 2026-09-01T00:00:00Z --time-to 2026-10-01T00:00:00Z --output /tmp/new-csv-bundle
+# For each output: review its plan_id, then repeat with --apply --expect PLAN_ID.
+python -m tessera.okf validate /tmp/new-json-bundle/memories.json --format canonical-json
+python -m tessera.okf convert /tmp/new-json-bundle/memories.json --format canonical-json --output /tmp/new-native-copy
+```
+
+Selection is explicit and intersection-based:
+
+- Project: the caller-selected input source root; no global registry discovery,
+  cross-project reads or inferred corpus merge
+- Scope: repeated --scope-level / --scope-path exact canonical values
+- Drawer: repeated --drawer values
+- Source: repeated --source-path canonical paths
+- Identity: repeated --id, --exclude-id and caller-declared --private-id
+- Time: an explicit observed_at, recorded_at, valid_from or valid_until field;
+  inclusive --time-from and exclusive --time-to, both offset-aware ISO datetimes
+
+Missing/ambiguous record timestamps are excluded with a reason, never assigned a
+guessed timezone. Unknown explicit ID selectors are errors, preventing a typo
+in an exclusion from silently exporting an unintended record. Source-only
+identity inference is reported; source helpers do not consult an Engine identity
+manifest or claim to reconstruct unpublished manifest IDs. Callers with canonical
+records can pass those directly to preserve their established IDs.
+
+Dry-runs expose counts, source/output hashes and exact exclusion reasons. Saved
+bundle manifests carry summary counts and a source snapshot digest, excluding
+private selectors and excluded source inventories. Caller-declared private
+records are removed before all projections, including the JSON companion.
+References to an excluded record that were already authored in a selected
+record remain data; this is not transitive content redaction, automatic privacy
+classification or a substitute for the #257 exposure policy.
+
+Human view filenames derive from stable canonical identity, never a mutable
+title. Resolved source-relative links and generated navigation point to selected
+view files. Obsidian converts or neutralizes authored wikilinks so it does not
+manufacture links to unexported records; unknown links become plain text.
+Fenced/inline code examples remain examples within the bounded renderer.
+Original Markdown bodies and all metadata remain in the JSON companion; human
+views declare their body-presentation transformations and metadata omissions.
+
+CSV omits body, relation structure, rich provenance, quality, raw frontmatter,
+lineage and other non-tabular fields from its view, listing those dimensions in
+its report. Spreadsheet formula-looking cells receive an apostrophe prefix and
+the report counts these escapes. The canonical companion retains original cell
+values and all omitted structure. CSV is never presented as a lossless canonical
+storage layer.
+
+The frozen experiment now applies each named profile, proves repeated plans
+match, excludes one explicitly private synthetic record, compares every companion
+with the nine selected canonical records, and re-imports the JSON profile through
+a real source transaction. Filter, malformed-schema, target-safe link,
+formula-escape, unknown-ID, private-record and stale-plan tests are independent
+regressions. #256 encrypted-store behavior and #257 access-control integration
+remain exact, explicitly unimplemented policy gates; no key handling, decryption,
+permission change or real cross-project export was attempted.
