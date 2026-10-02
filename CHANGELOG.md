@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Prepare a pinned LongMemEval-V2 source/schema audit and isolated synthetic
+  adapter mechanics: complete trajectories, text/source-image context plumbing,
+  provenance, lifecycle isolation and evaluator-metadata guards. Official Qwen
+  processor budgeting, visual query understanding, save/load and evaluation
+  remain unsupported; synthetic costs are not model tokens. No runtime,
+  dependencies, canonical ledger or quality claims change. (#106)
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
