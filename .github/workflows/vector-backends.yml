@@ -1,0 +1,37 @@
+name: Frozen vector mechanics
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tessera/vector_backend.py'
+      - 'tessera/vector_sqlite.py'
+      - 'benchmarks/vector_backends/**'
+      - 'tests/test_issue_265_vector_backends.py'
+      - '.github/workflows/vector-backends.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-vector-mechanics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install base package only
+        run: python -m pip install .
+      - name: Compare frozen vectors without models or network services
+        run: python -m benchmarks.vector_backends.evaluate --output artifacts/vector-backends/synthetic-mechanics.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frozen-vector-mechanics
+          path: artifacts/vector-backends/
+          if-no-files-found: error

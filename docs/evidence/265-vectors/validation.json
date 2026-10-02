@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "issue": 265,
+  "audited_at": "2026-10-02",
+  "candidate_state": "unmerged draft; ITERATE",
+  "python": "3.12.14",
+  "focused_tests": {
+    "passed": 96,
+    "command": "python -m pytest tests/test_issue_265_vector_backends.py -q"
+  },
+  "full_tests": {
+    "passed": 658,
+    "skipped": 8,
+    "warnings": 14,
+    "seconds": 124.3,
+    "command": "python -m pytest -ra",
+    "skip_reasons": [
+      "5 gh-aw CLI extension unavailable",
+      "3 optional MCP transport/lifespan tests without mcp extra"
+    ]
+  },
+  "installed_wheel_focused_tests": {
+    "passed": 96,
+    "outside_checkout": true,
+    "site_packages_import_verified": true
+  },
+  "build": {
+    "command": "python -m build --no-isolation",
+    "wheel_and_sdist": true,
+    "repository_only_files_excluded": true,
+    "wheel_runtime_bytes_match_candidate": true,
+    "wheel_bytes": 153266,
+    "sdist_bytes": 146445,
+    "new_dependencies": [],
+    "vector_module_footprint": {
+      "tessera/vector_backend.py": {
+        "bytes": 15100,
+        "compressed_bytes": 3996
+      },
+      "tessera/vector_sqlite.py": {
+        "bytes": 10458,
+        "compressed_bytes": 2931
+      }
+    }
+  },
+  "python39_syntax": true,
+  "python39_runtime": "not available locally; covered by exact-head CI",
+  "sanity": {
+    "dataset": "tessera-sanity-ci-v2-project-agnostic",
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "average_latency_ms": 4.948872000568372,
+    "average_returned_chars": 417.75,
+    "missing_evidence_check": "passed"
+  },
+  "candidate_source_sha256": {
+    "tessera/vector_backend.py": "edabed351bede6a237bd34f3bba9b81181b340c5fcf712b9140e8e1c0c9ae4a6",
+    "tessera/vector_sqlite.py": "7068996ce37c8e248b6a1cf0cd6471d0ce76c80e2435fe6ca06e205680f046e6",
+    "benchmarks/vector_backends/evaluate.py": "bdea4aa0ab40beb033b785b3e2aaa61a7f4a6e1bfe40a81723326d26dfc012f3",
+    "benchmarks/vector_backends/frozen.json": "239122a76c2f66bc1b1eba6fb16a45beefb53f236940b4edc87321786a499b9f"
+  },
+  "benchmark": "synthetic-mechanics.json",
+  "remote_ci": "Pending publication; exact-head runs tracked on the pull request",
+  "limits": [
+    "No real semantic corpora or model quality claim",
+    "No ANN backend or default winner selected",
+    "No native peak RSS or production-scale claim",
+    "Local optional MCP and gh-aw tests skipped as recorded; no local complete optional-integration pass claimed"
+  ]
+}

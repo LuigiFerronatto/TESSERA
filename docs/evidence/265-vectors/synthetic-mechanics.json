@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "issue": 265,
+  "decision": "ITERATE",
+  "scope": "frozen synthetic backend mechanics; no model or semantic-quality claim",
+  "base_commit": "20814a47ec0f72d7bea0639e0b057df1ecf5cded",
+  "candidate_files_sha256": {
+    "tessera/vector_backend.py": "edabed351bede6a237bd34f3bba9b81181b340c5fcf712b9140e8e1c0c9ae4a6",
+    "tessera/vector_sqlite.py": "7068996ce37c8e248b6a1cf0cd6471d0ce76c80e2435fe6ca06e205680f046e6",
+    "benchmarks/vector_backends/evaluate.py": "bdea4aa0ab40beb033b785b3e2aaa61a7f4a6e1bfe40a81723326d26dfc012f3",
+    "benchmarks/vector_backends/frozen.json": "239122a76c2f66bc1b1eba6fb16a45beefb53f236940b4edc87321786a499b9f"
+  },
+  "fixture_sha256": "239122a76c2f66bc1b1eba6fb16a45beefb53f236940b4edc87321786a499b9f",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "record_count": 288,
+  "dimensions": 12,
+  "queries_with_filters": 96,
+  "top_k": 10,
+  "timing_instrumentation": "Python allocation tracing enabled equally for both backends",
+  "backends": {
+    "exact-flat": {
+      "build_ms": 28.49190899905807,
+      "open_ms": 0.01370999962091446,
+      "reopen_ms": null,
+      "incremental_edit_move_delete_ms": 0.9101270006794948,
+      "query_ms_p50": 27.714003499568207,
+      "query_ms_p95": 40.04342000007455,
+      "disk_bytes": 0,
+      "peak_python_tracemalloc_bytes": 1366998,
+      "repeatability_rate": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalent": true,
+      "filtered_search_correctness": 1.0,
+      "recall_at_10_against_flat": 1.0,
+      "exact_score_and_order_agreement": 1.0
+    },
+    "sqlite-exact": {
+      "build_ms": 83.79102199978661,
+      "open_ms": 1.658384000620572,
+      "reopen_ms": 11.032792999685626,
+      "incremental_edit_move_delete_ms": 374.4767389998742,
+      "query_ms_p50": 92.5935435006977,
+      "query_ms_p95": 113.18310999922687,
+      "disk_bytes": 241664,
+      "peak_python_tracemalloc_bytes": 1196846,
+      "repeatability_rate": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalent": true,
+      "filtered_search_correctness": 1.0,
+      "recall_at_10_against_flat": 1.0,
+      "exact_score_and_order_agreement": 1.0
+    }
+  },
+  "limitations": [
+    "SQLite and flat share an exact scoring kernel; analytic metric tests are the independent scoring oracle",
+    "tracemalloc excludes native SQLite allocations and is not process peak RSS",
+    "small fixture, serialized writes, O(ND) search, no ANN-scale claim",
+    "real English/Portuguese/mixed corpora, model quality, ANN comparison and scale gates remain open"
+  ]
+}

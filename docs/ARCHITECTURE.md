@@ -446,6 +446,17 @@ back to the parent document and exposes the matched segment through
 results. Changed/deleted sources retract their derived segments, and the index
 schema version forces older caches to rebuild.
 
+## Experimental vector mechanics (#265 candidate)
+
+The optional [vector backend contract](VECTOR_BACKENDS.md) separates canonical
+identity, supplied embedding vectors and derived backend storage. Atomic,
+source and segment representations have distinct deterministic identities.
+An exact-flat reference and stdlib SQLite candidate expose typed filters,
+profile/dimension compatibility, atomic source replacement and recovery.
+Neither is imported or activated by the deterministic retrieval pipeline.
+This pre-merge candidate does not select an encoder or public default backend;
+#158/#17 continue to own generation quality and candidate fusion.
+
 # 8. Interface boundary
 
 The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
