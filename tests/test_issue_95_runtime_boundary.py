@@ -27,6 +27,34 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGACY_IDENTITY_TOKENS = ("lao", "blip", "lab autonomous officer")
 
 
+def contains_legacy_identity(text):
+    """Catch identity components, not n-grams inside randomized temp names.
+
+    Underscores and hyphens delimit identifier components, so LAO_MEM_DIR and
+    legacy-lao-engine-router still fail the gate. Case remains irrelevant.
+    """
+    return any(re.search(r"(?<![a-z0-9])" + re.escape(token) + r"(?![a-z0-9])",
+                         text, re.IGNORECASE) for token in LEGACY_IDENTITY_TOKENS)
+
+
+@pytest.mark.parametrize("text", [
+    "LAO", "LAO_MEM_DIR", "legacy-lao-engine-router", "Blip", "lab autonomous officer",
+    "blip_gateway", "/legacy/lao/config", "Use LAB AUTONOMOUS OFFICER here",
+], ids=["standalone", "environment", "router", "provider", "historical-name",
+        "gateway", "path-component", "case-insensitive"])
+def test_legacy_identity_gate_rejects_real_tokens(text):
+    assert contains_legacy_identity(text)
+
+
+@pytest.mark.parametrize("text", [
+    "/tmp/tessera_doctor_laoseqhs/_doctor_probe/probe.md",
+    "/tmp/tessera_doctor_blipqx7n/_doctor_probe/probe.md",
+    "tessera_doctor_ablaoxy", "tessera_doctor_xblip", "plain project configuration",
+], ids=["random-prefix-a", "random-prefix-b", "embedded", "suffix", "neutral"])
+def test_legacy_identity_gate_allows_neutral_randomized_words(text):
+    assert not contains_legacy_identity(text)
+
+
 @pytest.mark.parametrize(
     ("explicit", "environ", "expected", "warned"),
     [
@@ -79,10 +107,8 @@ def test_help_doctor_and_quickstart_are_project_neutral(tmp_path, monkeypatch, c
     help_text = capsys.readouterr().out.lower()
     report_text = json.dumps(run_doctor(str(tmp_path)).to_dict(), ensure_ascii=False).lower()
     plan_text = json.dumps(build_quickstart_plan(str(tmp_path)).to_dict(), ensure_ascii=False).lower()
-    for token in LEGACY_IDENTITY_TOKENS:
-        assert token not in help_text
-        assert token not in report_text
-        assert token not in plan_text
+    for text in (help_text, report_text, plan_text):
+        assert not contains_legacy_identity(text)
     assert "TESSERA_STORAGE_DIR" in json.dumps(build_quickstart_plan(str(tmp_path)).mcp_config_block)
 
 

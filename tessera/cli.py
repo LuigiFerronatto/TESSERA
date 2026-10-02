@@ -1088,6 +1088,9 @@ def build_parser():
     parser.add_argument("--version", "--v", action="store_true", help="Show the installed TESSERA version")
     sub = parser.add_subparsers(dest="command", required=False)
 
+    from .integration_setup import add_setup_parsers
+    add_setup_parsers(sub)
+
     # Shared --plain flag for the 3 commands with colorized Rich output
     # (query/list/start) — forces plain-text rendering even on a TTY (color
     # is already auto-disabled when piped/NO_COLOR is set; --plain is for
