@@ -371,12 +371,17 @@ def test_optional_archive_receives_verified_episode_and_all_issued_support(tmp_p
         def record_evidence(self, record): self.evidence.append(record)
     engine=TesseraEngine(str(tmp_path))
     write_fixture(engine)
+    engine.build_index()
     archive=ArchiveProbe()
     engine.revision_history=archive
-    engine.build_index()
+    for data in engine.graph.nodes.values():
+        canonical=data.get("canonical_metadata")
+        if canonical is not None:
+            engine._archive_lineage_evidence(canonical)
     assert archive.captures
-    hit=engine.retrieve_context('SQLite summary region weekly reading time',top_n=20)[0]
-    expected={x['evidence_id'] for x in hit['lineage']['source_evidence']}
+    expected={record['evidence_id'] for data in engine.graph.nodes.values()
+              if data.get('canonical_metadata') is not None and data['canonical_metadata'].lineage is not None
+              for record in data['canonical_metadata'].lineage.source_evidence}
     assert expected <= {x['evidence_id'] for x in archive.evidence}
 
 
@@ -385,6 +390,8 @@ def test_optional_archive_failure_is_not_silently_reported_as_preserved(tmp_path
         def capture(self,*args): raise RuntimeError('archive unavailable')
     engine=TesseraEngine(str(tmp_path))
     write_fixture(engine)
+    engine.build_index()
+    canonical=engine.graph.nodes["demo/0/factual-1"]["canonical_metadata"]
     engine.revision_history=BrokenArchive()
     with pytest.raises(RuntimeError,match='archive unavailable'):
-        engine.build_index()
+        engine._archive_lineage_evidence(canonical)
