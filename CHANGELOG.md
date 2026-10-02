@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added an offline, review-only legacy enrichment preview/capture protocol:
+  explicit safe source selection, source/profile hashes, bounded cost disclosure,
+  exact supporting-span validation and frozen synthetic A1/A2/A3 replay. No
+  provider execution, source/index mutation or durable-memory admission is
+  enabled; default indexing/retrieval remains deterministic. See
+  [experiment protocol](docs/ENRICHMENT_EXPERIMENT.md) ([#176](https://github.com/LuigiFerronatto/TESSERA/issues/176)).
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

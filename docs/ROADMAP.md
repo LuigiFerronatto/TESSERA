@@ -1040,3 +1040,13 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+
+### #176 offline experiment candidate (2026-10-02)
+
+The [#176 stage record](test-cards/176-source-enrichment-experiment.md) describes
+an unmerged source-preserving preview/capture-validation slice and a frozen
+synthetic protocol exercise. This does not promote the semantic experiment to
+KEEP or change portfolio routing. Human labels, authorized model execution,
+quality/cost comparisons, #192 runtime, #137 canonical lineage and #19 admission
+remain separate gates. Default deterministic indexing is unchanged.

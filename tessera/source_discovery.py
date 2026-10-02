@@ -456,10 +456,23 @@ def discover_sources(
     *,
     max_file_size: int = DEFAULT_MAX_SOURCE_BYTES,
     _ignore_text: Optional[str] = None,
+    selected_paths: Optional[Sequence[str]] = None,
 ) -> SourceDiscoveryPlan:
     """Return a deterministic discovery plan without mutating project state."""
     if max_file_size <= 0:
         raise ValueError("max_file_size must be positive")
+    # Explicit selection reuses exactly the same policy without inventorying
+    # siblings or descending into unselected directories. Directories/globs are
+    # not expanded: callers must supply individual root-relative file paths.
+    selected = None
+    if selected_paths is not None:
+        selected = set()
+        for value in selected_paths:
+            if (not isinstance(value, str) or not value or "\\" in value
+                    or value.startswith("/") or value.endswith("/")
+                    or any(part in {"", ".", ".."} for part in value.split("/"))):
+                raise ValueError("selected_paths must be normalized root-relative file paths")
+            selected.add(value)
     lexical_root = Path(project_root).expanduser()
     root = lexical_root.resolve(strict=True)
     if not root.is_dir():
@@ -484,18 +497,27 @@ def discover_sources(
     def scan(directory: Path) -> None:
         metrics["directories_visited"] += 1
         try:
-            entries = sorted(os.scandir(directory), key=lambda item: (item.name.casefold(), item.name))
+            if selected is None:
+                with os.scandir(directory) as iterator:
+                    entries = [Path(entry.path) for entry in iterator]
+            else:
+                prefix = directory.relative_to(root).as_posix()
+                prefix = "" if prefix == "." else prefix + "/"
+                names = {value[len(prefix):].split("/", 1)[0]
+                         for value in selected if value.startswith(prefix)}
+                entries = [directory / name for name in names]
+            entries.sort(key=lambda item: (item.name.casefold(), item.name))
         except OSError as exc:
             relative = _relative_display(directory, root)
             warnings.append(SourceDiscoveryDiagnostic("unreadable", relative, str(exc)))
             candidates.append(_directory_candidate(relative, SourceClassification.IGNORED, SourceReason.UNREADABLE))
             return
         for entry in entries:
-            path = Path(entry.path)
+            path = entry
             relative = path.relative_to(root).as_posix()
             metrics["entries_stat"] += 1
             try:
-                info = entry.stat(follow_symlinks=False)
+                info = entry.lstat()
             except OSError as exc:
                 warnings.append(SourceDiscoveryDiagnostic("unreadable", relative, str(exc)))
                 candidates.append(SourceCandidate(
@@ -545,6 +567,12 @@ def discover_sources(
             top = pure.parts[0].lower() if pure.parts else ""
             convenience = top in _CONVENIENCE_EXCLUSIONS
             if is_dir:
+                if selected is not None and relative in selected:
+                    candidates.append(_directory_candidate(
+                        relative, SourceClassification.IGNORED,
+                        SourceReason.UNSUPPORTED_FORMAT,
+                    ))
+                    continue
                 if not _directory_accessible(info.st_mode):
                     warnings.append(SourceDiscoveryDiagnostic("unreadable", relative, "directory is not readable/searchable"))
                     candidates.append(_directory_candidate(relative, SourceClassification.IGNORED, SourceReason.UNREADABLE))
