@@ -3,6 +3,7 @@ include CONTRIBUTING.md
 include pyproject.toml
 recursive-include tessera *.py
 recursive-include tessera/skills_library *.md
+recursive-include tessera/agent_skills SKILL.md
 prune benchmarks
 prune tests
 prune docs
