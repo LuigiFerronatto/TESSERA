@@ -1,0 +1,2834 @@
+[
+  {
+    "command": "tessera",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--version",
+          "--v"
+        ],
+        "dest": "version",
+        "required": false,
+        "choices": null,
+        "help": "Show the installed TESSERA version"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera status",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera init",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Write project config (default PATH: current directory)"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Write/update this named global registry entry"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Store path (positional path remains a compatibility alias)"
+      },
+      {
+        "flags": [
+          "--sources"
+        ],
+        "dest": "sources",
+        "required": false,
+        "choices": [
+          "recommended",
+          "custom",
+          "memory-only"
+        ],
+        "help": "Source selection policy: recommended, custom, or memory-only"
+      },
+      {
+        "flags": [
+          "--source"
+        ],
+        "dest": "source",
+        "required": false,
+        "choices": null,
+        "help": "Safe project-relative file/directory (repeatable; requires --sources custom)"
+      },
+      {
+        "flags": [
+          "--persist-exclusion"
+        ],
+        "dest": "persist_exclusion",
+        "required": false,
+        "choices": null,
+        "help": "Explicitly add a selectable exclusion to .tessera-ignore (repeatable)"
+      },
+      {
+        "flags": [
+          "--index-path"
+        ],
+        "dest": "index_path",
+        "required": false,
+        "choices": null,
+        "help": "Project-relative derived index path (default: .tessera/index)"
+      },
+      {
+        "flags": [
+          "--update-existing"
+        ],
+        "dest": "update_existing",
+        "required": false,
+        "choices": null,
+        "help": "Allow a declared non-interactive material update to existing configuration"
+      },
+      {
+        "flags": [
+          "--yes"
+        ],
+        "dest": "yes",
+        "required": false,
+        "choices": null,
+        "help": "Accept the fully specified init plan; requires --non-interactive"
+      },
+      {
+        "flags": [
+          "--non-interactive"
+        ],
+        "dest": "non_interactive",
+        "required": false,
+        "choices": null,
+        "help": "Never prompt; fail when choices are missing"
+      },
+      {
+        "flags": [
+          "--dry-run"
+        ],
+        "dest": "dry_run",
+        "required": false,
+        "choices": null,
+        "help": "Show the complete mutation plan without writing"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "Emit stable machine-readable output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera write",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--id"
+        ],
+        "dest": "id",
+        "required": true,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--type"
+        ],
+        "dest": "type",
+        "required": true,
+        "choices": [
+          "factual",
+          "preference",
+          "procedural_anchor"
+        ],
+        "help": null
+      },
+      {
+        "flags": [
+          "--episode"
+        ],
+        "dest": "episode",
+        "required": true,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--content"
+        ],
+        "dest": "content",
+        "required": true,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--tags"
+        ],
+        "dest": "tags",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "Emit the canonical write decision as JSON"
+      },
+      {
+        "flags": [
+          "--entity"
+        ],
+        "dest": "entity",
+        "required": false,
+        "choices": null,
+        "help": "Format \"Name:description\", repeatable"
+      },
+      {
+        "flags": [
+          "--related-to"
+        ],
+        "dest": "related_to",
+        "required": false,
+        "choices": null,
+        "help": "Format \"target_memory_id:relation_type\" (relation_type defaults to \"related_to\"), repeatable. Creates explicit graph edges, mirroring the generic connection schema."
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera index",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera query",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [],
+        "dest": "query",
+        "required": false,
+        "choices": null,
+        "help": "Query text (storage path may be omitted)"
+      },
+      {
+        "flags": [
+          "--top-n"
+        ],
+        "dest": "top_n",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--no-resolve-conflicts"
+        ],
+        "dest": "no_resolve_conflicts",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--paths-only"
+        ],
+        "dest": "paths_only",
+        "required": false,
+        "choices": null,
+        "help": "Print only the filepath of each hit (one per line), no body/score"
+      },
+      {
+        "flags": [
+          "--show-related"
+        ],
+        "dest": "show_related",
+        "required": false,
+        "choices": null,
+        "help": "Also print the ids of directly-connected notes (graph neighbors)"
+      },
+      {
+        "flags": [
+          "--no-body"
+        ],
+        "dest": "no_body",
+        "required": false,
+        "choices": null,
+        "help": "Print id/score/filename/related but skip the note body text"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Show explainable score breakdown for retrieved memories"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "Print the complete machine-readable retrieval contract as JSON"
+      },
+      {
+        "flags": [
+          "--full"
+        ],
+        "dest": "full",
+        "required": false,
+        "choices": null,
+        "help": "Show complete source bodies"
+      },
+      {
+        "flags": [
+          "--explain"
+        ],
+        "dest": "explain",
+        "required": false,
+        "choices": null,
+        "help": "Show ranking components (not confidence)"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera list",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--type"
+        ],
+        "dest": "type",
+        "required": false,
+        "choices": [
+          "factual",
+          "preference",
+          "procedural_anchor"
+        ],
+        "help": null
+      },
+      {
+        "flags": [
+          "--paths-only"
+        ],
+        "dest": "paths_only",
+        "required": false,
+        "choices": null,
+        "help": "Print only the filepath of each note (one per line)"
+      },
+      {
+        "flags": [
+          "--table"
+        ],
+        "dest": "table",
+        "required": false,
+        "choices": null,
+        "help": "Aligned human-readable columns instead of tab-separated output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera skills",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera skills install",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera skills list",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera start",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [],
+        "dest": "task",
+        "required": false,
+        "choices": null,
+        "help": "Task text (storage path may be omitted)"
+      },
+      {
+        "flags": [
+          "--top-n"
+        ],
+        "dest": "top_n",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--llm-backend"
+        ],
+        "dest": "llm_backend",
+        "required": false,
+        "choices": null,
+        "help": "Explicitly select a deprecated compatibility adapter (no default backend)."
+      },
+      {
+        "flags": [
+          "--compat-endpoint"
+        ],
+        "dest": "compat_endpoint",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-api-key"
+        ],
+        "dest": "compat_api_key",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-contact-id"
+        ],
+        "dest": "compat_contact_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-subscription-id"
+        ],
+        "dest": "compat_subscription_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-tenant-id"
+        ],
+        "dest": "compat_tenant_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-router-path"
+        ],
+        "dest": "compat_router_path",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera decompose",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--mem-id-prefix"
+        ],
+        "dest": "mem_id_prefix",
+        "required": true,
+        "choices": null,
+        "help": "Domain-prefixed prefix, e.g. \"research/some-topic\" or \"project/some-run\" - each extracted memory is written as \"{prefix}/{type}-{n}\"."
+      },
+      {
+        "flags": [
+          "--episode-id"
+        ],
+        "dest": "episode_id",
+        "required": false,
+        "choices": null,
+        "help": "Episode id to stamp on every extracted note (default: same as --mem-id-prefix)."
+      },
+      {
+        "flags": [
+          "--beginning"
+        ],
+        "dest": "beginning",
+        "required": true,
+        "choices": null,
+        "help": "Episode's beginning (goal/context/trigger)."
+      },
+      {
+        "flags": [
+          "--middle"
+        ],
+        "dest": "middle",
+        "required": true,
+        "choices": null,
+        "help": "Episode's middle (what actually happened)."
+      },
+      {
+        "flags": [
+          "--end"
+        ],
+        "dest": "end",
+        "required": true,
+        "choices": null,
+        "help": "Episode's end (outcome/resolution/lesson)."
+      },
+      {
+        "flags": [
+          "--tags"
+        ],
+        "dest": "tags",
+        "required": false,
+        "choices": null,
+        "help": "Comma-separated tags applied to every extracted note."
+      },
+      {
+        "flags": [
+          "--llm-backend"
+        ],
+        "dest": "llm_backend",
+        "required": false,
+        "choices": null,
+        "help": "Explicitly select a deprecated compatibility adapter (no default backend)."
+      },
+      {
+        "flags": [
+          "--compat-endpoint"
+        ],
+        "dest": "compat_endpoint",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-api-key"
+        ],
+        "dest": "compat_api_key",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-contact-id"
+        ],
+        "dest": "compat_contact_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-subscription-id"
+        ],
+        "dest": "compat_subscription_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-tenant-id"
+        ],
+        "dest": "compat_tenant_id",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--compat-router-path"
+        ],
+        "dest": "compat_router_path",
+        "required": false,
+        "choices": null,
+        "help": "==SUPPRESS=="
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera banner",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera update",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--check"
+        ],
+        "dest": "check",
+        "required": false,
+        "choices": null,
+        "help": "Only check; do not prompt or install"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera stats",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera doctor",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera corpus",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera corpus doctor",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Path to memory storage (default precedence: explicit argument, TESSERA_STORAGE_DIR, ./memories)"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "Emit the versioned JSON report"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "List every selected source and inferred field"
+      },
+      {
+        "flags": [
+          "--strict"
+        ],
+        "dest": "strict",
+        "required": false,
+        "choices": null,
+        "help": "Return exit code 2 for warning-only reports (errors always return 1)"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera quickstart",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Force plain-text output (no colors/tables), even on a TTY."
+      },
+      {
+        "flags": [
+          "--project-root"
+        ],
+        "dest": "project_root",
+        "required": false,
+        "choices": null,
+        "help": "Project root to detect (default: current directory)"
+      },
+      {
+        "flags": [
+          "--storage-dir"
+        ],
+        "dest": "storage_dir",
+        "required": false,
+        "choices": null,
+        "help": "Force a specific storage_dir instead of auto-detecting one"
+      },
+      {
+        "flags": [
+          "--apply"
+        ],
+        "dest": "apply",
+        "required": false,
+        "choices": null,
+        "help": "Actually create storage_dir and run the first index build (default: dry-run plan only)"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera config",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": "One machine-readable JSON result"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera config show",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera config list",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera config doctor",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [
+          "--store"
+        ],
+        "dest": "store",
+        "required": false,
+        "choices": null,
+        "help": "Explicit canonical store path"
+      },
+      {
+        "flags": [
+          "--project"
+        ],
+        "dest": "project",
+        "required": false,
+        "choices": null,
+        "help": "Start project-config discovery at PATH"
+      },
+      {
+        "flags": [
+          "--global"
+        ],
+        "dest": "global_name",
+        "required": false,
+        "choices": null,
+        "help": "Select this exact global registry entry"
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  },
+  {
+    "command": "tessera config unregister",
+    "options": [
+      {
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "dest": "help",
+        "required": false,
+        "choices": null,
+        "help": "show this help message and exit"
+      },
+      {
+        "flags": [],
+        "dest": "name",
+        "required": true,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--json"
+        ],
+        "dest": "json",
+        "required": false,
+        "choices": null,
+        "help": null
+      },
+      {
+        "flags": [
+          "--plain"
+        ],
+        "dest": "plain",
+        "required": false,
+        "choices": null,
+        "help": "Plain line-oriented output"
+      },
+      {
+        "flags": [
+          "--no-color"
+        ],
+        "dest": "no_color",
+        "required": false,
+        "choices": null,
+        "help": "Keep layout without color"
+      },
+      {
+        "flags": [
+          "--quiet"
+        ],
+        "dest": "quiet",
+        "required": false,
+        "choices": null,
+        "help": "Essential results only"
+      },
+      {
+        "flags": [
+          "--verbose"
+        ],
+        "dest": "verbose",
+        "required": false,
+        "choices": null,
+        "help": "Resolved paths, IDs and stage diagnostics"
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "debug",
+        "required": false,
+        "choices": null,
+        "help": "Developer traceback on stderr and detailed results"
+      },
+      {
+        "flags": [
+          "--lang"
+        ],
+        "dest": "lang",
+        "required": false,
+        "choices": [
+          "en"
+        ],
+        "help": "Message language (v1 supports English)"
+      }
+    ]
+  }
+]

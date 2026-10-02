@@ -300,6 +300,9 @@ See #14, #25 and #26. Those future fields must not be documented as current runt
 
 # Human CLI vs machine-facing semantics
 
+Presentation flags, errors, empty results and terminal behavior are specified in
+[CLI output contract v1](CLI_OUTPUT.md). Query JSON remains this complete hit array.
+
 The human CLI is a presentation surface. Rich/plain rendering may choose labels, panels and formatting.
 
 The semantic contract is the Python result returned from:
