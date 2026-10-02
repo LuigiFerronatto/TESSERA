@@ -278,3 +278,33 @@ def test_code_examples_do_not_invent_relations_and_complex_links_require_review(
     for body in ('[link][ref]\n\n[ref]: /missing.md\n', '[link](/missing.md "title")\n'):
         concept(root, body=body)
         assert plan_import(root, namespace="complex").report["mapping"] == "REVIEW"
+
+
+def test_optional_lineage_field_can_be_absent_without_changing_legacy_profile(monkeypatch):
+    import tessera.okf as adapter
+    from dataclasses import field, make_dataclass
+    payload=adapter._canonical_payload(plan_import(FIXTURE,namespace='optional').records[0].canonical)
+    extended=make_dataclass('ExtendedCanonicalMetadata',[('lineage',object,field(default=None))],bases=(adapter.CanonicalMetadata,))
+    monkeypatch.setattr(adapter,'CanonicalMetadata',extended)
+    restored=adapter._restore(payload)
+    assert restored.lineage is None
+    payload['unrecognized_future_field']='not accepted'
+    with pytest.raises(ExchangeError,match='fields differ'):
+        adapter._restore(payload)
+
+
+def test_supported_lineage_is_restored_as_typed_data_not_an_opaque_mapping(monkeypatch):
+    import tessera.okf as adapter
+    from dataclasses import field, make_dataclass
+    payload=adapter._canonical_payload(plan_import(FIXTURE,namespace='optional').records[0].canonical)
+    extended=make_dataclass('ExtendedCanonicalMetadata',[('lineage',object,field(default=None))],bases=(adapter.CanonicalMetadata,))
+    lineage_type=make_dataclass('LineageMetadata',[('source_episode_id',str),('supporting_turns',list),
+        ('temporal_position',object),('episode_source',object),('source_evidence',list)])
+    monkeypatch.setattr(adapter,'CanonicalMetadata',extended)
+    monkeypatch.setattr(adapter.canonical_types,'LineageMetadata',lineage_type,raising=False)
+    payload['lineage']={'source_episode_id':'ep-1','supporting_turns':[1],
+        'temporal_position':1,'episode_source':None,'source_evidence':[]}
+    assert adapter._restore(payload).lineage==lineage_type(**payload['lineage'])
+    payload['lineage']['supporting_turns']=[True]
+    with pytest.raises(ExchangeError,match='Malformed canonical lineage'):
+        adapter._restore(payload)

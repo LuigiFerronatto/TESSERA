@@ -21,6 +21,7 @@ from urllib.parse import unquote, urlsplit
 
 import yaml
 
+from . import canonical as canonical_types
 from .canonical import (
     CanonicalMetadata, ClassificationMetadata, IdentityMetadata, QualityMetadata,
     RelationMetadata, ScopeMetadata, SourceMetadata, SourceSpan, TemporalMetadata,
@@ -282,7 +283,13 @@ def _restore(payload):
     """Restore only this exact profile, never instantiate arbitrary classes."""
     if not isinstance(payload, dict) or (type(payload.get("schema_version")) is not int or payload["schema_version"] != 1):
         raise ExchangeError("Unsupported canonical extension schema")
-    if set(payload) != {f.name for f in fields(CanonicalMetadata)}:
+    expected = {f.name for f in fields(CanonicalMetadata)}
+    # The independently optional lineage extension omits an absent value from
+    # legacy canonical JSON. All original profile fields remain mandatory and
+    # unknown fields remain rejected rather than silently dropped.
+    optional = {f.name for f in fields(CanonicalMetadata)
+                if f.name == "lineage" and f.default is None}
+    if set(payload) - expected or expected - set(payload) - optional:
         raise ExchangeError("Canonical extension fields differ from the v1 contract")
     value = copy.deepcopy(payload)
     types = {"identity": IdentityMetadata, "classification": ClassificationMetadata,
@@ -295,6 +302,23 @@ def _restore(payload):
         value["source"]["span"] = SourceSpan(**value["source"]["span"])
         value["source"] = SourceMetadata(**value["source"])
         value["relations"] = [RelationMetadata(**item) for item in value["relations"]]
+        if value.get("lineage") is not None:
+            lineage_type = getattr(canonical_types, "LineageMetadata", None)
+            lineage = value["lineage"]
+            if (lineage_type is None or not isinstance(lineage, dict)
+                    or set(lineage) != {f.name for f in fields(lineage_type)}
+                    or not isinstance(lineage.get("source_episode_id"), str)
+                    or not lineage["source_episode_id"]
+                    or not isinstance(lineage.get("supporting_turns"), list)
+                    or any(type(p) is not int or p < 1 for p in lineage["supporting_turns"])
+                    or (lineage.get("temporal_position") is not None
+                        and type(lineage["temporal_position"]) is not int)
+                    or (lineage.get("episode_source") is not None
+                        and not isinstance(lineage["episode_source"], dict))
+                    or not isinstance(lineage.get("source_evidence"), list)
+                    or any(not isinstance(record, dict) for record in lineage["source_evidence"])):
+                raise ExchangeError("Malformed canonical lineage")
+            value["lineage"] = lineage_type(**lineage)
         canonical = CanonicalMetadata(**value)
     except (TypeError, KeyError) as exc:
         raise ExchangeError("Malformed canonical extension") from exc
