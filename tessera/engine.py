@@ -106,12 +106,17 @@ class TesseraEngine(_CoreTesseraEngine):
         top_n: int = 7,
         resolve_conflicts: bool = True,
         weights: Optional[Dict[str, float]] = None,
+        *,
+        graph_expansion: Optional[GraphExpansionPolicy] = None,
+        expansion_debug: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         results = super().retrieve_context(
             query_text=query_text,
             top_n=top_n,
             resolve_conflicts=resolve_conflicts,
             weights=weights,
+            graph_expansion=graph_expansion,
+            expansion_debug=expansion_debug,
         )
         return enrich_retrieval_results(self, results)
 

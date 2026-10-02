@@ -46,6 +46,7 @@ from .security import (
 )
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
+from .graph_expansion import GraphExpansionPolicy
 from .skills import SKILL_IDS, install_default_skills, list_default_skill_files
 from .init_flow import (
     InitRequest,
@@ -80,6 +81,7 @@ __version__ = "0.0.3"
 
 __all__ = [
     "TesseraEngine",
+    "GraphExpansionPolicy",
     "TesseraOrchestrator",
     "OrchestratorResult",
     "TesseraTaskHook",
