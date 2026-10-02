@@ -338,7 +338,7 @@ jobs:
           tessera query "$corpus" "como o projeto aprende?" --top-n 2 --debug --plain | tee -a artifacts/cli-smoke.txt
           grep -q "project/charter" artifacts/cli-smoke.txt
           grep -q "project/learning-process" artifacts/cli-smoke.txt
-          grep -q "raw_pr=" artifacts/cli-smoke.txt
+          grep -q "raw_pagerank:" artifacts/cli-smoke.txt
 
           # Validate the structured engine contract directly. CI must not infer
           # API semantics by scraping human-oriented text.

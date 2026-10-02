@@ -195,7 +195,7 @@ def test_output_policy_color_layout_and_pipe_rules(monkeypatch):
 def hits(count):
     return [{"id": f"project/note-{i}", "type": "factual", "score": 0.7,
              "filepath": f"docs/note-{i}.md", "relevant_evidence": "An Aurora memory.",
-             "body": "The complete memory body. " * 30, "score_explain": {"lexical_score": 0.7},
+             "body": "The complete memory body. " * 30, "score_explain": {"lexical_score": 0.7, "raw_pagerank": 0.25},
              "related_ids": ["project/other"]} for i in range(count)]
 
 
@@ -219,6 +219,7 @@ def test_renderers_share_semantics_and_rich_respects_width(count, width, capsys)
     full = list(human_lines(result, replace(output, full=True, explain=True, show_related=True)))
     assert data[0]["body"] in full
     assert any("not confidence" in line for line in full)
+    assert any("raw_pagerank:" in line for line in full)
     assert any("project/other" in line for line in full)
 
 
