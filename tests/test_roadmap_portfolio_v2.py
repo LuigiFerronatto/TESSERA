@@ -73,7 +73,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     text = ROADMAP.read_text(encoding="utf-8")
 
     open_issues = (
-        "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
+        "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21",
         "#25", "#26", "#27", "#28", "#32", "#67", "#71", "#72",
         "#73", "#78", "#80", "#103", "#104", "#105", "#106",
         "#119", "#121",
@@ -86,7 +86,7 @@ def test_every_audited_open_issue_has_one_reconciliation_row() -> None:
     for issue in open_issues:
         assert "open" in _row(text, issue)
 
-    for issue in ("#69", "#70", "#118", "#120", "#135", "#153", "#154", "#155", "#172"):
+    for issue in ("#13", "#69", "#70", "#118", "#120", "#135", "#153", "#154", "#155", "#172"):
         assert "closed" in _row(text, issue)
         assert "`VALIDATED`" in _row(text, issue)
 
@@ -170,8 +170,11 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "8ca854f14f8f57443784e6cf3524419a953c2ce6" in issue_70
 
     issue_13 = _row(text, "#13")
-    assert "`IN_PROGRESS`" in issue_13
-    assert "PR #277" in issue_13
+    assert "closed" in issue_13
+    assert "`VALIDATED`" in issue_13
+    assert "`KEEP`" in issue_13
+    assert "20814a47ec0f72d7bea0639e0b057df1ecf5cded" in issue_13
+    assert "`IN_PROGRESS`" not in issue_13
 
     issue_71 = _row(text, "#71")
     assert "`READY`" in issue_71
@@ -193,10 +196,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
         and line.split("|")[4].strip() == "EXECUTABLE"
     ]
     assert len(now_executable) <= 2
-    assert len(now_executable) == 1
-    assert "[#13]" in now_executable[0]
+    assert len(now_executable) == 0
 
-    assert "NOW executable                 1" in text
+    assert "NOW executable                 0" in text
     assert "READY                          9 total / 5 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
     assert len(blocked_full_cards) == 27
