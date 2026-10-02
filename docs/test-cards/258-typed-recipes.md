@@ -5,13 +5,19 @@
 | Issue | [#258](https://github.com/LuigiFerronatto/TESSERA/issues/258) |
 | Record status | `IN_PROGRESS` |
 | Capability type | Opt-in architecture/runtime experiment |
-| Pull request / head | Candidate branch `codex/issue-258-typed-recipes`; exact head is recorded by PR checks |
+| Pull request | [#306](https://github.com/LuigiFerronatto/TESSERA/pull/306) |
+| Head commit | Exact current head is recorded by PR #306 checks |
 | Merge commit | Not merged |
-| Proposed decision | `ITERATE` |
+| Decision | `ITERATE` (proposed) |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |
 
-## Problem and hypothesis
+## In one sentence
+
+Two existing read operations can be composed safely, but the experiment has not
+yet shown that its extra layer is simpler than direct calls.
+
+## What problem existed?
 
 Repeated orchestration could drift across callers. A closed typed catalogue and
 inspectable sequential recipes might preserve current operations while reducing
@@ -20,13 +26,20 @@ It does not promote an agent-memory API or select downstream semantic workflows.
 The live issue's design-readiness caveat remains relevant: two demonstrations
 are not evidence for adopting a general workflow platform.
 
+## How did TESSERA behave before?
+
 Before this candidate, callers invoke the Engine and EvidenceLedger directly.
+
+## What changed or is being tested?
+
 After it, an explicit `tessera.recipes` import can plan/run two compositions over
 an already initialized Engine. Existing defaults, Python methods, CLI and MCP
 are unchanged. No package import, configuration discovery, hooks, or repository
 opening executes a recipe.
 
-## Candidate boundary
+## How does it work now?
+
+**CANDIDATE — NOT YET ON MAIN.**
 
 The closed `PrimitiveRegistry` has immutable descriptors and no register/import
 method. Version 1 descriptors expose typed scalar arguments, named versioned
@@ -52,7 +65,7 @@ returns nothing, its second step fails with `REFERENCE_UNAVAILABLE`, retaining
 the completed empty search in the structured result. A branch/empty-result
 policy could improve ergonomics only in a later measured iteration.
 
-## How to inspect and invoke
+## Concrete example
 
 ```python
 from tessera.recipes import RecipeRunner, builtin_recipe
@@ -136,7 +149,7 @@ canonical memories and may differ if source/index/clock state has changed.
 Hashes plus versions identify records, but the in-memory journal is not a
 signed receipt, durable checkpoint, or full source snapshot.
 
-## Evidence and decision
+## How was it validated?
 
 Run with an external virtual environment containing this checkout:
 
@@ -156,6 +169,8 @@ changes. Real CLI JSON and MCP Python adapter results match the recipe's query
 payload without stripping evidence. Existing protocol tests remain in the full
 suite; this does not add a recipe MCP tool.
 
+## What improved?
+
 The built-ins require 31 and 35 serialized YAML lines for two direct operations.
 Production orchestration lines removed: **0**. Primitive calls saved: **0**.
 Agent/tool calls saved: **0**. The experiment adds a substantial parser, planner
@@ -171,7 +186,7 @@ claimed; benchmark applicability is SMOKE_ONLY because only execution mechanics
 wrap current operations. The unchanged deterministic sanity suite remains the
 regression check.
 
-## Explicitly unavailable / owning work
+## What remains unimplemented?
 
 Canonical writes and candidate-producing operations fail as unavailable
 primitives, even if YAML declares write/network effects. #19/#92 admission and
@@ -186,3 +201,28 @@ Rollback: remove the isolated module, focused tests and experiment script/docs.
 No data migration, source rewrite, persisted recipe state or default behavior
 must be undone. After any merge, reconcile the canonical commit and decision
 before describing this as implemented or using it as a dependency.
+
+
+## What is unlocked next?
+
+No dependent card is unlocked by an unmerged experiment. Maintainers can decide
+whether a real caller warrants another bounded iteration; no grammar expansion
+or default integration is selected here.
+
+## Technical provenance
+
+- Canonical base: `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
+- Candidate: [PR #306](https://github.com/LuigiFerronatto/TESSERA/pull/306)
+- Focused contracts: `tests/test_issue_258_recipes.py`
+- Direct/recipe comparison: `scripts/experiments/evaluate_recipes.py`
+- Existing canonical contracts: [output](../OUTPUT_CONTRACT.md),
+  [write gate](../WRITE_GATE_CONTRACT.md), [MCP](../MCP_RUNTIME.md)
+- Independent design; no upstream AGPL implementation copied
+- Exact head CI and benchmark results are recorded on PR #306; merge not performed
+
+## Evolution
+
+Direct calls on canonical main -> isolated read-only candidate -> ITERATE
+pending real reuse evidence. Candidate-producing and canonical-writing flows
+remain with their separate unmerged owning cards. Post-merge reconciliation
+is required before representing this as an adopted capability.
