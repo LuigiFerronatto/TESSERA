@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540" role="img" data-status="experimental">
+  <title>Experimental cognitive-continuity target</title>
+  <desc>Owner cards define each missing contract. This diagram does not select defaults.</desc>
+  <rect width="1400" height="540" fill="#ffffff" />
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#516a7e" />
+    </marker>
+  </defs>
+  <text x="44" y="53" font-size="32" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Experimental cognitive-continuity target</text>
+  <text x="44" y="89" font-size="18" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Owner cards define each missing contract. This diagram does not select defaults.</text>
+  <text x="44" y="489" font-size="18" fill="#a44b00" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">EXPERIMENTAL TARGET: conditional, not delivered</text>
+  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md</text>
+  <rect x="44" y="175" width="224" height="235" rx="6" fill="#fff7ed" stroke="#b85b0e" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="62" y="209" font-size="18" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Construction</text>
+  <text x="62" y="241" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#138 episodes;</text>
+  <text x="62" y="267" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#136 extraction;</text>
+  <text x="62" y="293" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#137 lineage</text>
+  <line x1="268" y1="290" x2="309" y2="290" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="316" y="175" width="224" height="235" rx="6" fill="#fff7ed" stroke="#b85b0e" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="334" y="209" font-size="18" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Durable evolution</text>
+  <text x="334" y="241" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#73 revisions; #15</text>
+  <text x="334" y="267" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">time; #16</text>
+  <text x="334" y="293" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">supersession</text>
+  <line x1="540" y1="290" x2="581" y2="290" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="588" y="175" width="224" height="235" rx="6" fill="#fff7ed" stroke="#b85b0e" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="606" y="209" font-size="18" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Evidence state</text>
+  <text x="606" y="241" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#139 / #140</text>
+  <text x="606" y="267" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">planning; #141</text>
+  <text x="606" y="293" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">state; #20</text>
+  <text x="606" y="319" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">sufficiency</text>
+  <line x1="812" y1="290" x2="853" y2="290" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="860" y="175" width="224" height="235" rx="6" fill="#fff7ed" stroke="#b85b0e" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="878" y="209" font-size="18" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Working context</text>
+  <text x="878" y="241" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#169 Context</text>
+  <text x="878" y="267" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Compiler; #167</text>
+  <text x="878" y="293" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">task packets</text>
+  <line x1="1084" y1="290" x2="1125" y2="290" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="1132" y="175" width="224" height="235" rx="6" fill="#fff7ed" stroke="#b85b0e" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="1150" y="209" font-size="18" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Agent lifecycle</text>
+  <text x="1150" y="241" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#171 semantic API;</text>
+  <text x="1150" y="267" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">#196 hooks; #19</text>
+  <text x="1150" y="293" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">admission</text>
+</svg>

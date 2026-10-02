@@ -1,5 +1,9 @@
 # PR Evolution Audit — Issue #95 legacy runtime boundary
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/PR_EVOLUTION_95.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 Audited starting main: `270bc29a0b0bb93ab1885947303caa6887a8b809` (includes
 runtime merge `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` and lifecycle
 merge `270bc29a0b0bb93ab1885947303caa6887a8b809`). Candidate branch:
@@ -21,10 +25,10 @@ canonical merge commit represent one runtime delivery, never two capabilities.
 PR #79 made the intended public surface agent-agnostic and PR #83 made package
 metadata plus MCP naming TESSERA-native, but the initial runtime remained the
 source of truth for several unexamined defaults. At the audited main, CLI
-storage still preferred `LAO_MEM_DIR`; quickstart generated that alias;
+storage still preferred `<legacy storage variable>`; quickstart generated that alias;
 diagnostics auto-selected `.claude/memory` and inspected a project-specific
-credential; the optional resolver preferred a hard-coded Blip gateway then
-walked parents for `lao_core/engine_router.py`; backend failures could return
+credential; the optional resolver preferred a hard-coded example organization gateway then
+walked parents for `<legacy provider router>`; backend failures could return
 the input prompt as if it were model output. Package/help/examples and ordinary
 fixtures reinforced that identity.
 
@@ -32,16 +36,16 @@ fixtures reinforced that identity.
 
 The audit ran `270bc29` in a detached temporary worktree with no network calls.
 Given a temporary project containing both `.claude/memory/` and a parent
-`lao_core/engine_router.py`, current main returned:
+`<legacy provider router>`, current main returned:
 
 ```text
 quickstart storage_dir: <project>/.claude/memory
-quickstart MCP env:     LAO_MEM_DIR=<project>/.claude/memory
+quickstart MCP env:     <legacy storage variable>=<project>/.claude/memory
 TESSERA_AZURE_GATEWAY_API_KEY=test → selected backend: azure
-_find_engine_router(<project>)      → <project>/lao_core/engine_router.py
+_find_engine_router(<project>)      → <project>/<legacy provider router>
 ```
 
-The CLI source and parser also resolved omitted storage from `LAO_MEM_DIR`, and
+The CLI source and parser also resolved omitted storage from `<legacy storage variable>`, and
 its empty-corpus diagnostic instructed the user to export that alias. These
 outputs are baseline evidence only; the compatibility tests use mocks and never
 call the discovered router or gateway.
@@ -91,8 +95,8 @@ rewritten to erase provenance.
 | `docs/slides/README.md` | 1,4,5,28,50,52 | HISTORICAL_RECORD | no | preserve | presentation provenance |
 | `docs/slides/assets/LOGO_PRIMARIA_fundo_claro.svg` | 3,10,12 | HISTORICAL_RECORD | no | preserve | archived presentation asset |
 | `docs/slides/assets/LOGO_SECUNDARIA_fundo_escuro.svg` | 3,10,12 | HISTORICAL_RECORD | no | preserve | archived presentation asset |
-| `docs/slides/assets/mascots/LAO-3D-happy-birthday-transparent.png` | binary match | HISTORICAL_RECORD | no | preserve | archived presentation asset |
-| `docs/slides/assets/mascots/LAO-3D-transparent.png` | binary match | HISTORICAL_RECORD | no | preserve | archived presentation asset |
+| `docs/slides/assets/mascots/legacy-celebration-asset` | binary match | HISTORICAL_RECORD | no | preserve | archived presentation asset |
+| `docs/slides/assets/mascots/legacy-character-asset` | binary match | HISTORICAL_RECORD | no | preserve | archived presentation asset |
 | `docs/slides/tessera-apresentacao.html` | 5–820 (67 captured lines) | HISTORICAL_RECORD | no | preserve | dated presentation and brand evidence |
 | `docs/test-cards/112-tessera-ascii-banner.md` | 62 | HISTORICAL_RECORD | no | preserve | prior stage evidence explicitly scopes #95 |
 | `tessera/__init__.py` | module description line 5 | DEFAULT_RUNTIME | import | remove | agent-neutral package description |
@@ -119,7 +123,7 @@ classified `OPTIONAL_RUNTIME`, not retroactively relabeled compatibility.
 - Project-specific text removed from default runtime: package description,
   CLI storage/help/warnings/examples, diagnostics/doctor/quickstart, Engine and
   hook comments, ordinary fixtures, implicit optional-backend resolver.
-- Intentionally retained compatibility: `tessera/config.py` (`LAO_MEM_DIR`
+- Intentionally retained compatibility: `tessera/config.py` (`<legacy storage variable>`
   alias), `tessera/legacy_compat.py`, deprecated shims/selections in
   `tessera/llm_bridge.py`, focused compatibility tests, and migration prose.
 - Intentionally preserved history: `archive/`, dated research/demo/slides,
@@ -131,9 +135,9 @@ classified `OPTIONAL_RUNTIME`, not retroactively relabeled compatibility.
 ## Change introduced by PR #126
 
 ```text
-before: explicit CLI path → LAO_MEM_DIR → ./memories
+before: explicit CLI path → <legacy storage variable> → ./memories
 after:  explicit command/API path → TESSERA_STORAGE_DIR
-        → deprecated LAO_MEM_DIR (one actionable warning) → ./memories
+        → deprecated <legacy storage variable> (one actionable warning) → ./memories
 ```
 
 Quickstart no longer discovers `.claude/memory` and emits

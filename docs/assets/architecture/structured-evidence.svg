@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540" role="img" data-status="current">
+  <title>Structured evidence anatomy</title>
+  <desc>Illustrative field groups from the current retrieval contract, not a new schema.</desc>
+  <rect width="1400" height="540" fill="#ffffff" />
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#516a7e" />
+    </marker>
+  </defs>
+  <text x="44" y="53" font-size="32" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Structured evidence anatomy</text>
+  <text x="44" y="89" font-size="18" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Illustrative field groups from the current retrieval contract, not a new schema.</text>
+  <text x="44" y="489" font-size="18" fill="#23506c" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">CURRENT FOUNDATION: audited canonical baseline</text>
+  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md</text>
+  <rect x="44" y="170" width="395" height="230" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="62" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Identity and content</text>
+  <text x="62" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Memory ID, type, body and source</text>
+  <text x="62" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">path</text>
+  <rect x="502" y="170" width="395" height="230" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="520" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Provenance</text>
+  <text x="520" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Evidence ID, document identity,</text>
+  <text x="520" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">version hashes and exact-or-null</text>
+  <text x="520" y="288" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">spans</text>
+  <rect x="960" y="170" width="395" height="230" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="978" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Retrieval context</text>
+  <text x="978" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Relevance score and related IDs;</text>
+  <text x="978" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">freshness checked separately</text>
+  <text x="44" y="446" font-size="20" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Relevance does not establish authority, confidence, validity or sufficient evidence.</text>
+</svg>

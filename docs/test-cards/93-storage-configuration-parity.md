@@ -1,5 +1,9 @@
 # 93 — One configured store means one exact corpus everywhere
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/test-cards/93-storage-configuration-parity.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 | Field | Value |
 |---|---|
 | Issue | [#93](https://github.com/LuigiFerronatto/TESSERA/issues/93) |
@@ -62,7 +66,7 @@ index bootstrap.
 ```text
 explicit command/API path
 → TESSERA_STORAGE_DIR
-→ deprecated LAO_MEM_DIR (one warning)
+→ deprecated <legacy storage variable> (one warning)
 → ./memories
 ```
 

@@ -1,15 +1,20 @@
 # Tessera — Como Funciona e Próximas Evoluções
 
-> Compartilhado no `#lao-innovation-lab` em 2026-08-25, como thread de
-> detalhamento do post de evolução da memória do LAO.
-> Iniciativa criada por **@LuigiFerronatto**.
+> Historical narrative with project-neutral examples. Current contracts take
+> precedence through [the documentation map](README.md). Scientific-fidelity
+> claims follow [the dated source/runtime audit](QUMEM-GAP-ANALYSIS.md), not
+> anecdotal demonstrations or older implementation descriptions.
+
+> Compartilhado no `#example-project-channel` em 2026-08-25, como thread de
+> detalhamento do post de evolução da memória do ExampleAgent.
+> Iniciativa criada por **the project author**.
 
 ---
 
 ## 1. O Problema Que Isso Resolve
 
-O LAO precisa lembrar de coisas entre sessões: OKRs da Blip, preferências de
-como o Luigi/o time quer que eu me comunique, aprendizados sobre bugs que já
+O ExampleAgent precisa lembrar de coisas entre sessões: OKRs da Example Organization, preferências de
+como o Alex/o time quer que eu me comunique, aprendizados sobre bugs que já
 encontrei antes, decisões arquiteturais já tomadas. O modelo antigo era um
 punhado de arquivos `.md` soltos em `.claude/memory/`, lidos por `grep`/`glob`
 sempre que alguma sessão precisava de contexto.
@@ -59,7 +64,7 @@ Toda memória escrita é classificada em **uma de três gavetas**:
 | Store | O que guarda | Exemplo real |
 |---|---|---|
 | **`factual`** | Informação concreta e imutável | Um endpoint, um ID de database Notion, um resultado de benchmark |
-| **`preference`** | Comportamento, gosto, feedback do usuário | "LAO deve responder em primeira pessoa", "não escrever scripts rígidos de comunicação" |
+| **`preference`** | Comportamento, gosto, feedback do usuário | "ExampleAgent deve responder em primeira pessoa", "não escrever scripts rígidos de comunicação" |
 | **`procedural_anchor`** | Insight transferível — um padrão reusável em situações futuras | "Verificação deve ser mandatória, não opcional", um plano de ação testado que funcionou |
 
 Essa separação existe porque cada tipo tem uma **vida útil e uma regra de
@@ -69,7 +74,7 @@ reutilizável em contextos novos, não apenas no contexto onde foi aprendido.
 
 ### Pilar 3 — Pipeline de 3 Agentes (Need → Planner → Inference)
 
-Quando alguém (ou o próprio LAO) faz uma pergunta que precisa de memória,
+Quando alguém (ou o próprio ExampleAgent) faz uma pergunta que precisa de memória,
 três agentes entram em ação, em sequência:
 
 ```
@@ -127,7 +132,7 @@ Não existe um banco de dados misterioso ou binário indecifrável.
 Imagine que o Tessera espeta três tipos de "alfinetes" no quadro:
 1.  **Alfinetes de Notas (Azuis):** São os arquivos de texto (`.md`) com o conteúdo das memórias.
 2.  **Alfinetes de Tags (Verdes):** São os tópicos ou tags (ex: `#benchmark`, `#azure`).
-3.  **Alfinetes de Entidades (Vermelhos):** São os termos ou ferramentas de destaque (ex: `Luigi`, `Azure AI Gateway`).
+3.  **Alfinetes de Entidades (Vermelhos):** São os termos ou ferramentas de destaque (ex: `Alex`, `Azure AI Gateway`).
 
 O Tessera passa "linhas de lã vermelhas" entre esses alfinetes de forma automática:
 *   **Ponte por Tag:** Se o seu teste de velocidade (`Nota A`) tem a tag `#azure`, ele passa um fio dela até o alfinete verde `azure`. Se uma nota sobre custos (`Nota B`) também tem a tag `#azure`, ela se conecta ao mesmo alfinete. **A Nota A e a Nota B agora estão relacionadas através da tag em comum.**
@@ -147,7 +152,7 @@ No modo online, você contrata **três investigadores auxiliares (agentes especi
 *   **O Investigador 1 (Necessidade - Need):** Lê sua tarefa e define o objetivo: *"Pra fazer isso, preciso descobrir o procedimento técnico e o tempo de resposta que usamos antes."*
 *   **O Investigador 2 (Planejador - Planner):** Transforma o objetivo em uma busca certeira pro motor caminhar nos barbantes, escolhendo as gavetas certas (Fatos, Preferências ou Insights) para não perder tempo. O motor offline roda e resgata as notas físicas do quadro.
 *   **O Investigador 3 (Inferência - Inference):** Lê todos os papéis coletados, inclusive possíveis conflitos preservados, e resume o contexto sem assumir que o registro mais recente é automaticamente verdadeiro.
-*   *Se a rede cair ou o LLM falhar:* O Tessera aciona um **fallback offline determinístico** que simula os detetives localmente por regras, impedindo o pipeline do LAO de quebrar.
+*   *Se a rede cair ou o LLM falhar:* O Tessera aciona um **fallback offline determinístico** que simula os detetives localmente por regras, impedindo o pipeline do ExampleAgent de quebrar.
 
 ---
 
@@ -173,10 +178,10 @@ com a pergunta.
 
 ---
 
-## 4. Como Isso Roda no LAO Hoje
+## 4. Como Isso Roda no ExampleAgent Hoje
 
 - **CLI**: `tessera init`, `tessera write`, `tessera query`, `tessera index`, `tessera
-  start` (`.claude/memory/` é o storage_dir do LAO).
+  start` (`.claude/memory/` é o storage_dir do ExampleAgent).
 - **MCP Server** (`tessera`, registrado em `.mcp.json`): expõe
   `query_memories`, `query_store`, `write_memory`, `rebuild_index`,
   `get_memory`, `get_index_stats`, `query_memories_pipeline` — qualquer CLI
@@ -198,7 +203,7 @@ com a pergunta.
 
 ## 5. O Sonho: Tessera Plug-and-Play em Qualquer Repositório
 
-Hoje o Tessera está acoplado ao LAO (`.claude/memory/` como storage padrão,
+Hoje o Tessera está acoplado ao ExampleAgent (`.claude/memory/` como storage padrão,
 integrado via `.mcp.json` deste repositório). **O objetivo declarado é
 transformar o Tessera num pacote instalável e agnóstico** — qualquer pessoa,
 em qualquer repositório, qualquer CLI (Claude Code, Copilot CLI, Gemini
@@ -218,7 +223,7 @@ uv pip install tessera-agent-memory
 
 ...e ter o mesmo sistema de memória com episódios, typed stores e o
 pipeline de 3 agentes funcionando imediatamente, sem precisar saber nada
-sobre LAO ou sobre a Blip.
+sobre ExampleAgent ou sobre a Example Organization.
 
 ### O que já existe a favor disso:
 - O pacote já é instalável via `pip install -e .` ou `uv pip install -e .` (tem `pyproject.toml`
@@ -245,14 +250,14 @@ sobre LAO ou sobre a Blip.
    automático para `--index-url https://pypi.org/simple` se um mirror
    corporativo estiver inacessível) — reduz "clonar → rodar 3-4 comandos
    manuais" para `./install.sh` sozinho.
-3. **Zero acoplamento a nomes específicos do LAO** — hoje alguns exemplos/
+3. **Zero acoplamento a nomes específicos do ExampleAgent** — hoje alguns exemplos/
    docs ainda citam `.claude/memory/`, `tessera` como nome do server;
    generalizar para que o nome do projeto/domínio seja um parâmetro, não
    um hardcode. *(ainda pendente — `tessera quickstart`/`install.sh` já
    deixam o storage_dir configurável por projeto, mas o nome do server
-   MCP e alguns domínios de exemplo continuam LAO-specific)*
-4. **Templates de domínio genéricos** — hoje `lao/`, `research/`,
-   `learnings/` são específicos do LAO; permitir que qualquer projeto
+   MCP e alguns domínios de exemplo continuam project-specific)*
+4. **Templates de domínio genéricos** — hoje `project/`, `research/`,
+   `learnings/` são específicos do ExampleAgent; permitir que qualquer projeto
    defina seus próprios domínios/typed-stores extras sem editar código.
    *(ainda pendente)*
 5. **Modo sem LLM real (fallback determinístico) documentado como
@@ -272,8 +277,8 @@ sobre LAO ou sobre a Blip.
 
 Isso é o próximo horizonte de trabalho no Tessera depois da consolidação
 atual (typed stores + episódios + hook + backend real de LLM) — o momento
-em que ele deixa de ser "o sistema de memória do LAO" e passa a ser "um
-sistema de memória que o LAO também usa", disponível pra qualquer squad.
+em que ele deixa de ser "o sistema de memória do ExampleAgent" e passa a ser "um
+sistema de memória que o ExampleAgent também usa", disponível pra qualquer squad.
 
 ---
 
@@ -286,14 +291,14 @@ sistema de memória que o LAO também usa", disponível pra qualquer squad.
 - `Tessera/tessera/llm_bridge.py` — os backends de LLM reais (Azure Gateway,
   engine_router).
 - `Tessera/tessera/mcp_server.py` — as ferramentas MCP expostas.
-- `.claude/memory/lao/tessera-scientific-grounding-qumem-livemem-graph-retrieval.md`
+- `.claude/memory/project/tessera-scientific-grounding-qumem-livemem-graph-retrieval.md`
   — a nota de memória com a fundamentação científica completa (o próprio
   Tessera guardando o porquê do seu próprio design).
-- `.claude/memory/lao/tessera-llm-backend-benchmark.md` — o benchmark de
+- `.claude/memory/project/tessera-llm-backend-benchmark.md` — o benchmark de
   latência dos backends de LLM.
 
 ---
 
 *Este documento em si é um exemplo do "explain the why, not just the
-what" que rege a comunicação do LAO — não é só uma lista do que foi
+what" que rege a comunicação do ExampleAgent — não é só uma lista do que foi
 construído, é o raciocínio por trás de cada decisão de design.*

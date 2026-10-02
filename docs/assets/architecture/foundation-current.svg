@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540" role="img" data-status="current">
+  <title>Current Foundation architecture</title>
+  <desc>These components exist on the dated baseline. Optional assistance is separate.</desc>
+  <rect width="1400" height="540" fill="#ffffff" />
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#516a7e" />
+    </marker>
+  </defs>
+  <text x="44" y="53" font-size="32" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Current Foundation architecture</text>
+  <text x="44" y="89" font-size="18" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">These components exist on the dated baseline. Optional assistance is separate.</text>
+  <text x="44" y="489" font-size="18" fill="#23506c" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">CURRENT FOUNDATION: audited canonical baseline</text>
+  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md</text>
+  <rect x="44" y="145" width="350" height="110" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="62" y="179" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Configuration</text>
+  <text x="62" y="211" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Generated store, readable</text>
+  <text x="62" y="237" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">sources, derived index</text>
+  <rect x="44" y="300" width="350" height="125" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="62" y="334" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Source input</text>
+  <text x="62" y="366" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Markdown and TXT; canonical</text>
+  <text x="62" y="392" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">normalization and segmentation</text>
+  <rect x="536" y="190" width="360" height="190" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="554" y="224" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Deterministic core</text>
+  <text x="554" y="256" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Write gate, incremental graph,</text>
+  <text x="554" y="282" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">TF-IDF and structured evidence</text>
+  <rect x="1050" y="145" width="305" height="110" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="1068" y="179" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Public surfaces</text>
+  <text x="1068" y="211" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Python API, CLI and</text>
+  <text x="1068" y="237" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">optional stdio MCP</text>
+  <rect x="1050" y="300" width="305" height="125" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="1068" y="334" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Optional assistance</text>
+  <text x="1068" y="366" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Explicit provider,</text>
+  <text x="1068" y="392" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">heuristic baseline and</text>
+  <text x="1068" y="418" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">free-text output</text>
+  <line x1="394" y1="200" x2="531" y2="240" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="394" y1="360" x2="531" y2="330" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="896" y1="250" x2="1045" y2="200" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="896" y1="335" x2="1045" y2="355" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+</svg>
