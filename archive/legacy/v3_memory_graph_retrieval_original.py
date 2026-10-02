@@ -471,14 +471,14 @@ if __name__ == "__main__":
     import tempfile
     import shutil
 
-    # Criação de um ambiente de simulação temporário do LAO
-    with tempfile.TemporaryDirectory() as lao_mem_dir:
+    # Criação de um ambiente de simulação temporário do agente de exemplo
+    with tempfile.TemporaryDirectory() as example_mem_dir:
         print(f"============================================================")
-        print(f"🧪 INICIANDO TESTES DO Tessera ENGINE V3 (LAO PERSISTENCE SYSTEM)")
-        print(f"Diretório de Notas Físicas: {lao_mem_dir}")
+        print(f"🧪 INICIANDO TESTES DO Tessera ENGINE V3 (EXAMPLE MEMORY SYSTEM)")
+        print(f"Diretório de Notas Físicas: {example_mem_dir}")
         print(f"============================================================\n")
 
-        engine = TesseraEngine(storage_dir=lao_mem_dir)
+        engine = TesseraEngine(storage_dir=example_mem_dir)
 
         # 1. ESCRITA DE MEMÓRIA (FLUXO NORMAL)
         print("📥 1. Gravando memórias iniciais no disco...")
@@ -490,7 +490,7 @@ if __name__ == "__main__":
             episode_id="ep_001",
             content="Alex prefere desenvolver utilizando o banco de dados SQLite local por simplicidade.",
             tags=["banco_dados", "sqlite"],
-            entities=[Entity("Alex", "Usuário principal do LAO.")]
+            entities=[Entity("Alex", "Usuário principal do agente de exemplo.")]
         )
         # Força delay no relógio de atualização simulando turnos subsequentes
         import time
@@ -503,7 +503,7 @@ if __name__ == "__main__":
             episode_id="ep_005",
             content="Alex decidiu mudar a arquitetura. Ele agora prefere estritamente PostgreSQL em produção para garantir concorrência e escalabilidade.",
             tags=["banco_dados", "postgresql"],
-            entities=[Entity("Alex", "Usuário principal do LAO.")]
+            entities=[Entity("Alex", "Usuário principal do agente de exemplo.")]
         )
 
         # Fato complementar

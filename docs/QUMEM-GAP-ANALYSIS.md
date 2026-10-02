@@ -1,180 +1,117 @@
-# Tessera vs. QUMem — auditoria de fidelidade científica (2026-08-26)
+# TESSERA and QUMem: source-to-implementation audit
 
-O design do Tessera se declara fundamentado no paper **QUMem** (arXiv
-2608.16168) — ver `REFERENCES.md`. Esta auditoria releu o paper por
-completo (Abstract, Introduction, Related Work, Method §3.1–3.4,
-Experiments, Ablations, Conclusion) e comparou cada uma das 3 contribuições
-centrais do paper contra o código real (`engine.py`, `orchestrator.py`,
-`models.py`, `conflict.py`, `hooks.py`), para separar "o que já está
-fidedigno" de "o que é uma simplificação deliberada" de "o que é um gap
-real que vale corrigir".
+Audit baseline: canonical `main` at
+`20814a47ec0f72d7bea0639e0b057df1ecf5cded`; reviewed 2026-10-02.
+Owner: [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146).
 
-## Bug concreto corrigido nesta rodada (não é sobre o paper, é sobre robustez)
+This is the canonical paper-fidelity map. It supersedes the implementation
+claims in the 2026-08-26 narrative without discarding its design history.
+**TESSERA is QUMem-inspired; full QUMem fidelity is not validated.** A working
+heuristic, a successful provider call, and a faithful reproduction are different
+claims. Current product contracts remain in [ARCHITECTURE](ARCHITECTURE.md),
+[OUTPUT_CONTRACT](OUTPUT_CONTRACT.md) and [ADR 0001](adr/0001-core-vs-optional-llm-boundary.md).
 
-`TesseraEngine.write_memory_note()` fazia `os.path.join(storage_dir,
-f"{mem_id}.md")` e escrevia direto, sem `os.makedirs(...)`. Isso causou,
-em produção (run autônomo `/lao` de 2026-08-25/26, engine Gemini), um
-`mem_id` sem prefixo de domínio (`voice-ai-blip-integration-strategy`,
-sem `/`) cair solto na raiz de `.claude/memory/`, ao lado de
-`MEMORY.md`/`README.md`, em vez de dentro de `research/<topico>/`.
+## Paper, implementation, extension and validation
 
-Corrigido com 3 mudanças:
-1. `engine.py`: `os.makedirs(os.path.dirname(filepath) or storage_dir,
-   exist_ok=True)` antes do `open()` — nunca mais crasha em prefixo novo.
-2. `engine.py`: `write_memory_note()` agora emite `warnings.warn(...)`
-   quando `mem_id` não tem `/` — não bloqueia a escrita (uma run autônoma
-   nunca deveria travar por uma questão de nomenclatura), mas torna o
-   problema visível.
-3. `mcp_server.py`: o docstring da tool `write_memory` agora exige
-   explicitamente o formato `"<domínio>/<slug>"` com exemplos e menciona o
-   incidente real — antes disso, nada no MCP tool guiava o LLM chamador.
+Primary source: [QUMem v1, sections 3.2–3.4](https://arxiv.org/html/2608.16168v1).
+The paper column below summarizes that source; the implementation column is a
+separate audit of this repository, not a result reported by the paper.
 
-Arquivo mal posicionado já foi movido para
-`research/voice-ai-agentive-space/` (onde suas notas irmãs já viviam) com
-o `id` de frontmatter corrigido, e o índice foi reconstruído (`tessera
-doctor` confirma: 279 nós, 460 arestas, round-trip OK).
-
-## 1. Dynamic Episode Construction — **✅ IMPLEMENTADO (2026-08-26, heurística)**
-
-**Paper**: um classificador binário de continuidade leve (`f_θ`), rodado
-turno a turno, decide se o próximo turno pertence ao mesmo episódio ou
-fecha um novo. Episódios emergem dinamicamente da conversa, não são
-delimitados manualmente.
-
-**Tessera hoje** (~~antes desta rodada~~): `Episode` (`models.py`) é um
-dataclass estático (`beginning`/`middle`/`end`) que o chamador preenche
-explicitamente via `write_episode()`. Não existe nenhum mecanismo de
-detecção automática de fronteira — busquei "continuity"/"boundary"/
-"classifier" no código, zero ocorrências fora de `security.py` (que é
-sobre outra coisa).
-
-**Implementado**: `tessera/episode_boundary.py` — `EpisodeBoundaryTracker`,
-uma heurística leve (não um classificador fine-tuned, custo desproporcional
-ao ganho no estágio atual) que fecha um episódio automaticamente por (a)
-timeout (`timeout_minutes`, default 30min) ou (b) queda de similaridade
-TF-IDF entre o novo turno e o texto acumulado do episódio corrente
-(`similarity_threshold`, default 0.03). Reaproveita o mesmo
-`TfidfVectorizer`/`cosine_similarity` que `TesseraEngine.retrieve_context` já
-usa para retrieval, sem dependência nova. Testado: fechamento por timeout
-confirmado (gap de 45min fecha o episódio); fechamento por deriva de
-tópico funciona para turnos com sobreposição lexical suficiente — para
-frases muito curtas e lexicalmente disjuntas, TF-IDF puro é fraco (esperado
-e documentado no próprio módulo), então o timeout continua sendo o sinal
-mais confiável na prática. Não tem CLI/MCP dedicado ainda — é uma
-primitiva de biblioteca (`from tessera.episode_boundary import
-EpisodeBoundaryTracker`) para quem processa uma sequência de turnos
-programaticamente antes de chamar `write_episode`/`decompose_and_write_episode`.
-
-## 2. Typed Memory Decomposition — **✅ IMPLEMENTADO (2026-08-26, LLM real testado)**
-
-**Paper**: um decompositor `g_φ` roda 3x por episódio (uma vez por tipo:
-factual/preference/insight), cada chamada de LLM podendo extrair *múltiplas*
-memórias atômicas daquele tipo.
-
-**Tessera hoje** (~~antes desta rodada~~): `write_fact`/`write_preference`/
-`write_insight` em `engine.py` mapeiam 1:1 para a taxonomia F/P/I do paper
-— isso está correto e fiel. O que faltava era a automação: era o
-*chamador* (skill, hook, agente) que decidia manualmente quantas notas
-escrever e de qual tipo.
-
-**Implementado**: `tessera/decomposer.py` — `decompose_episode()` (função
-pura) e `decompose_and_write()` (decompõe + grava), expostos em 3 camadas
-para manter paridade total:
-- `TesseraEngine.decompose_and_write_episode(mem_id_prefix, episode_id, episode, llm_fn, tags)`
-- `TesseraTaskHook.on_task_end_auto(task_instruction, episode, mem_id_prefix, llm_fn, tags)`
-  — alternativa automática ao `on_task_end` manual existente
-- CLI: `tessera decompose <storage_dir> --mem-id-prefix ... --beginning ... --middle ... --end ... --llm-backend <explicit-compatibility-name>`
-- MCP: tool `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id=None, tags=None)`
-
-Cada memória extraída ainda passa pelo `WriteGatingEngine` normal (a
-decomposição só decide *quantas* notas propor, nunca contorna o gate de
-segurança). Dois modos de extração:
-- **LLM real**: 1 chamada ao modelo pede um array JSON
-  `[{"type": ..., "content": ...}, ...]`; parsing tolerante a fences
-  Markdown/prosa ao redor. Um array válido é autoritativo: `[]` significa
-  sucesso sem candidatos e nunca aciona fallback. Falha esperada do provedor,
-  resposta não analisável ou root/schema inválido aciona a heurística local;
-  erros de programação e invariantes não são silenciados. **Testado ao vivo com o backend Azure Gateway
-  real** (não simulado) — um episódio de exemplo (bug de connection-pool
-  em produção) extraiu corretamente 8 memórias atômicas (6 facts, 1
-  preference, 1 procedural_anchor) em 4.6s; outro exemplo (bug de índice
-  composto) extraiu 5 memórias em ~3s. Saída malformada degrada
-  graciosamente para a heurística offline em vez de falhar.
-- **Heurística offline** (sem callable ou como fallback diagnosticado): classificador
-  determinístico por linha + palavras-chave (sem dependência de rede/API
-  key, retry, modelo, embedding ou segundo provedor). CLI/MCP mantêm sua
-  exigência atual de seleção de backend; uma falha depois da seleção usa essa
-  mesma implementação canônica do Engine/Hook.
-
-`mem_id_prefix` é obrigatoriamente prefixado por domínio (reforça o fix do
-bug #0 acima) — cada memória extraída vira
-`{mem_id_prefix}/{tipo}-{n}.md`, agrupando todas as memórias de um mesmo
-episódio na mesma subpasta.
-
-## 3. Query-Conditioned 3-Agent Retrieval Planning — **SIMPLIFICAÇÃO REAL (não implementado nesta rodada)**
-
-**Paper**: o Retrieval-Planning Agent (`A_2`) produz um **plano
-multi-query**: 𝒫_q = {(q̃_j, 𝒟_j)}, várias sub-queries reescritas, cada
-uma mirando um subconjunto diferente de typed stores.
-
-**Tessera hoje** (`orchestrator.py`):
-- `plan_target_stores()` é uma heurística de keyword-matching simples
-  (substrings tipo "fato"/"fact", "preferênc", "insight"/"procedural" na
-  string da necessidade de informação).
-- `plan_retrieval()` produz **uma única** query reescrita, não um plano de
-  múltiplas sub-queries.
-
-Isso é uma simplificação deliberada e razoável para o volume atual de uso
-(a maioria das tarefas tem 1 necessidade de informação clara, não várias
-facetas concorrentes) — mas é o ponto onde Tessera mais diverge do paper.
-
-**Recomendação concreta**: se `query_memories_pipeline` (ex-`run_task_hook`)
-começar a ser usado para tarefas mais compostas (ex: "preciso saber
-preferências de estilo E decisões técnicas anteriores E aprendizados de
-erro sobre X" — 3 facetas diferentes), vale estender `plan_retrieval()`
-para retornar uma lista de `(sub_query, target_stores)` em vez de uma
-tupla única, e `retrieve_context()` já suporta ser chamado múltiplas vezes
-com merge de resultados no chamador. Não é urgente hoje.
-
-## 4. Conflict Resolution — contenção segura, supersessão ainda pendente
-
-**Paper**: cita abordagens tipo Zep (grafo de conhecimento temporal) como
-related work para lidar com validade temporal de fatos.
-
-**Tessera hoje**: o P0 de #16 contém o risco preservando todos os candidatos
-na ordem ranqueada. O algoritmo anterior agrupava por
-`entity[0] + first_tag` e mantinha apenas o registro mais recente. Essa chave
-causava falso merge, dependia da ordem dos metadados e não provava que duas
-memórias representavam o mesmo estado.
-
-O método público e o parâmetro de compatibilidade continuam existindo, mas o
-fluxo normal não apaga histórico. Isto não implementa `state_key`, validade
-temporal, trajetória `Tq` nem supersessão: #15 e o slice posterior de #16
-continuam donos dessas decisões.
-
-## 5. Eficiência — não comparável diretamente
-
-O paper otimiza para "3 chamadas de LLM por episódio + 1 classificador
-local barato". Tessera, não fazendo decomposição automática nem detecção de
-fronteira, não paga (nem ganha) esse custo — é uma filosofia de design
-diferente (mais "escrita explícita e gated" do que "pipeline de extração
-automática"), não uma ineficiência a ser corrigida.
-
-## Resumo — priorização sugerida
-
-| # | Gap | Severidade | Ação |
-|---|---|---|---|
-| 0 | `write_memory_note` sem `makedirs`, sem aviso de `mem_id` sem domínio | 🔴 Bug confirmado em produção | ✅ Corrigido (engine.py + mcp_server.py docstring) |
-| 1 | Sem detecção dinâmica de fronteira de episódio | 🟡 Gap real vs. paper | ✅ Implementado (`episode_boundary.py`, heurística timeout+TF-IDF) |
-| 2 | Decomposição típica é manual, não automática | 🟡 Divergência de design documentada | ✅ Implementado (`decomposer.py` + engine/hooks/CLI/MCP), testado com LLM real (Azure Gateway, ~3-5s, 5-8 memórias/episódio) |
-| 3 | Retrieval planning é single-query, keyword-heurístico | 🟢 Simplificação aceitável no volume atual | Documentado, plano de extensão descrito - não implementado |
-| 4 | Filtro destrutivo por `entity[0]+first_tag` | 🔴 Perda de evidência/trajetória | ✅ P0 contido: todos os candidatos preservados; supersessão completa continua pendente |
-
-## Como usar as duas novas capacidades (paridade Engine/Hook/CLI/MCP)
-
-| Capacidade | Engine (Python) | Hook (Python) | CLI | MCP tool |
+| Concept | Paper behavior | TESSERA main at the audited commit | Status | Validation owner |
 |---|---|---|---|---|
-| Decomposição automática | `TesseraEngine.decompose_and_write_episode(...)` | `TesseraTaskHook.on_task_end_auto(...)` | `tessera decompose <dir> --mem-id-prefix ... --beginning ... --middle ... --end ... --llm-backend <name>` | `decompose_episode(mem_id_prefix, beginning, middle, end, episode_id=None, tags=None)` |
-| Fronteira de episódio | `from tessera.episode_boundary import EpisodeBoundaryTracker` | — (primitiva de biblioteca, sem wiring de hook ainda) | — (sem CLI dedicado; uso é programático) | — (sem MCP tool dedicado; uso é programático) |
+| Dynamic episode construction | Classify adjacent user utterances; retain assistant replies as context | `EpisodeBoundaryTracker` compares new text with accumulated TF-IDF text and checks timeout; it accepts no role field | Implemented heuristic baseline; partial fidelity | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) |
+| Typed decomposition | Three type-conditioned extraction calls per episode | `decompose_episode_result` makes one mixed-type call or uses local end-line classification | Implemented one-pass baseline; semantic fidelity unvalidated | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) |
+| Memory lineage | Keep source episode, supporting turns and latest supporting position | Candidate objects contain type/content; metadata fields do not establish end-to-end turn lineage | Partial schema; population and inspection gap | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) |
+| Information need | Identify task-relevant historical questions before retrieval | `identify_information_need` returns one free-text sentence | Implemented single-need simplification | [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) |
+| Retrieval planning | Rewrite multiple queries and select typed stores for each | `plan_retrieval` returns one query; `plan_target_stores` selects stores with keywords | Multi-query contract absent | [#140](https://github.com/LuigiFerronatto/TESSERA/issues/140) |
+| User state | Produce chronological facts, preference evolution and applicable insights | `infer_user_state` returns a free-text consolidated context, without a structured state schema | Structured `Fq/Tq/Iq` absent | [#141](https://github.com/LuigiFerronatto/TESSERA/issues/141) |
+| Preference trajectory | Interpret changes with temporal and contextual evidence | `ConflictResolver` preserves all ranked candidates after the P0 containment; it does not prove supersession | Safe containment implemented; full experiment pending | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15), [#16](https://github.com/LuigiFerronatto/TESSERA/issues/16) |
 
-Ver `Tessera/README.md`, seção "🧩 Decomposição automática de episódios" e "🕐 Detecção de fronteira de episódio", para exemplos de uso completos.
+Factual memories describe observed experiences or states, not an immutable truth
+class. Preferences can be contextual; insights must remain grounded in evidence.
+The legacy decomposer prompt still uses an overly strong immutability phrase.
+That is a known semantic defect owned by #136, not a scientific definition and
+not changed by this documentation-only repair.
+
+## TESSERA-specific representation and boundaries
+
+`Episode(beginning, middle, end)` is a **TESSERA-specific extension** for
+representing a task narrative. Semantic episode membership is not the same as
+Beginning/Middle/End internal representation. B/M/E neither implements nor
+validates the paper's boundary classifier. The current tracker is programmatic;
+it does not install runtime hooks or expose a dedicated CLI/MCP boundary tool.
+
+The three semantic drawers remain `facts`, `preferences`, `insights`.
+`procedural_anchor` is the existing compatibility type routed to `insights`;
+sharing a taxonomy does not prove decomposition accuracy. Deterministic
+retrieval remains usable without any generative model. The optional
+orchestrator is not the final answering agent.
+
+TESSERA's source hashes, exact-or-null evidence spans and derived Evidence Ledger
+are its own provenance mechanisms. They do not substitute for supporting-turn
+lineage, immutable historical revisions (#73), or evidence-sufficiency judgments.
+
+## What the completed safety repairs actually established
+
+- **#135:** canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`
+  repaired decomposition fallback. A valid JSON list, including `[]`, is assisted
+  success. Expected provider failures or invalid output select deterministic
+  fallback with diagnostics. Programming errors propagate. See the
+  [validated stage record](test-cards/135-decomposition-fallback.md).
+- **#16 P0:** canonical merge `708c973e23d5c4eb8a52d359a2cadc153e161a90`
+  removed destructive newest-only filtering. Candidate identity, evidence and
+  ranking order survive. This is not full temporal conflict resolution. See the
+  [containment record](test-cards/16-conflict-resolver-containment.md).
+- **MCP boundary:** pure decomposition occurs before the commit phase. MCP
+  reports failed assistance before any fallback write; it must not be described
+  as silently persisting offline fallback after a provider failure. The Python,
+  Hook and CLI paths share candidate construction but have their own documented
+  execution/error boundaries. See [MCP_RUNTIME](MCP_RUNTIME.md).
+
+## Ownership of the remaining experiments
+
+- #135 owns fallback integrity; #136 owns type semantics and one-pass versus
+  three-pass validation; #137 owns episode/turn lineage; #138 owns boundaries
+- #139 owns information needs; #140 owns **WHAT** queries/stores retrieve
+  evidence; #17 separately owns **HOW** retrieval strategies are selected
+- #141 owns structured query-conditioned state; #20 separately owns evidence
+  sufficiency, conflict/ambiguity status and abstention control flow
+- #142 owns the frozen end-to-end fidelity suite; #143 owns the personalized
+  memory benchmark; #144 owns exposure of validated contracts across surfaces
+- #145 coordinates these cards; #146 corrects documentation. #78 separately
+  owns project-neutral cleanup of remaining historical/deep-dive material
+
+[ROADMAP](ROADMAP.md) and the linked issues carry dependencies. An open card or
+an unmerged PR never promotes a capability to `IMPLEMENTED` or `VALIDATED`.
+Future status updates require canonical merge evidence plus the relevant tests,
+review decision and benchmark, rather than issue creation or unit coverage alone.
+
+## Historical evolution retained
+
+The August narrative recorded three useful engineering lessons: writes need
+explicit path handling; a timeout/lexical heuristic can be useful without being
+a learned continuity model; and typed extraction must pass through the same
+write gate as manual candidates. The later #135 and #16 repairs made failure
+and conflict handling more truthful.
+
+The old narrative also reported small live-provider demonstrations. Their
+latencies, memory counts and corpus-specific node/edge totals are anecdotal
+historical observations, not a frozen benchmark or evidence of QUMem fidelity.
+They do not justify a claim that the current simplifications are sufficient.
+No current TESSERA accuracy or cost result is inferred from the paper's results.
+
+## Reproducible audit
+
+Inspect `tessera/models.py`, `episode_boundary.py`, `decomposer.py`,
+`orchestrator.py`, `conflict.py`, and their matching tests at the baseline SHA.
+Run:
+
+```bash
+python -m pytest tests/test_decomposer.py tests/test_conflict_containment.py -q
+```
+
+Dedicated documentation regression checks are carried by [PR #284](https://github.com/LuigiFerronatto/TESSERA/pull/284). This cleanup does not assume that candidate is merged. They do not measure semantic boundary quality, extraction fidelity,
+preference reconstruction, or the unimplemented full regression suite.
+
+Benchmark applicability: NOT_APPLICABLE. This change corrects prose and
+non-executable docstrings only; no prompt, algorithm or benchmark result changes.

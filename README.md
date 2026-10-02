@@ -440,6 +440,13 @@ For implementation details, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 TESSERA is an evolving Foundation. The current implementation is usable, but several long-term-memory capabilities are still being tested.
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the experimental sequence and linked Test Cards.
 
+## Responsibility boundary
+
+![Agent and TESSERA responsibility boundary](docs/assets/architecture/agent-boundary.svg)
+
+See the [diagram guide](docs/ARCHITECTURE_DIAGRAMS.md) for current lifecycle,
+structured evidence and explicitly experimental targets.
+
 ## Research references
 
 TESSERA is research-driven, but a cited paper is a **reference signal**, not proof that its approach is implemented or validated here. The detailed source → interpretation → Test Card trace lives in [`docs/research/REFERENCES.md`](docs/research/REFERENCES.md).

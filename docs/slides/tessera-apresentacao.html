@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tessera — A Memória Adaptativa e Atômica do LAO</title>
+<title>TESSERA — Historical memory-system demonstration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 @font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Regular.otf') format('opentype'); font-weight: 400; }
@@ -12,7 +12,7 @@
 @font-face { font-family: 'Carbona'; src: url('assets/fonts/Carbona-Black.otf') format('opentype'); font-weight: 900; }
 
 :root{
-  --blip-blue:#1968F0;
+  --accent-blue:#1968F0;
   --light-blue:#0096FA;
   --mid-blue:#0C4EC0;
   --dark-blue:#072F73;
@@ -84,8 +84,8 @@ html,body{
   border-right:22px solid transparent;
   border-top:16px solid inherit;
 }
-.bubble.tail-blipblue{background:var(--blip-blue); color:#fff;}
-.bubble.tail-blipblue::after{border-top-color:var(--blip-blue);}
+.bubble.tail-accentblue{background:var(--accent-blue); color:#fff;}
+.bubble.tail-accentblue::after{border-top-color:var(--accent-blue);}
 .bubble.tail-paleblue{background:var(--pale-blue); color:var(--dark-blue);}
 .bubble.tail-paleblue::after{border-top-color:var(--pale-blue);}
 .bubble.tail-darkblue{background:var(--dark-blue); color:var(--light-blue);}
@@ -96,7 +96,7 @@ html,body{
 .bubble.tail-lightblue::after{border-top-color:var(--light-blue);}
 
 /* ---------- LOGO / FOOTER ---------- */
-.brand-logo{position:absolute; top:48px; right:64px; height:28px;}
+.brand-logo{position:absolute; top:26px; right:48px; height:68px; width:138px; object-fit:contain;}
 .footer-block{
   position:absolute; left:88px; bottom:32px;
   font-size:11px; line-height:1.5; opacity:.65; font-weight:400;
@@ -112,9 +112,9 @@ h1{font-weight:800; letter-spacing:-.01em;}
 h2{font-weight:700; letter-spacing:-.01em;}
 .kicker{
   font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--blip-blue); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  color:var(--accent-blue); margin-bottom:18px; display:flex; align-items:center; gap:10px;
 }
-.kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--blip-blue); display:inline-block;}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-blue); display:inline-block;}
 .bg-black .kicker, .bg-darkblue .kicker{color:var(--light-blue);}
 .bg-black .kicker .dot, .bg-darkblue .kicker .dot{background:var(--light-blue);}
 
@@ -161,7 +161,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 .card p{font-size:14.5px; line-height:1.5; font-weight:400;}
 .card.on-white{background:var(--offwhite); color:var(--black);}
 .card.on-white p{color:var(--mgray1);}
-.card.on-blue{background:var(--blip-blue); color:#fff;}
+.card.on-blue{background:var(--accent-blue); color:#fff;}
 .card.on-blue p{color:var(--pale-blue);}
 .card.on-dark{background:var(--dgray2); color:#fff;}
 .card.on-dark p{color:var(--lgray1);}
@@ -184,13 +184,13 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 /* timeline (v1 v2 v3) */
 .timeline{display:flex; flex-direction:column; gap:0; flex:1; justify-content:center;}
-.tl-row{display:grid; grid-template-columns:120px 1fr; gap:28px; position:relative; padding-bottom:34px;}
+.tl-row{display:grid; grid-template-columns:120px 1fr; gap:28px; position:relative; padding-bottom:20px;}
 .tl-row:last-child{padding-bottom:0;}
 .tl-row .tl-marker{display:flex; flex-direction:column; align-items:center;}
 .tl-row .tl-dot{width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:20px; color:#fff; flex-shrink:0;}
 .tl-row .tl-line{flex:1; width:2px; background:var(--lgray2); margin-top:8px;}
 .tl-row:last-child .tl-line{display:none;}
-.tl-body{background:var(--offwhite); border-radius:22px; padding:22px 28px;}
+.tl-body{background:var(--offwhite); border-radius:22px; padding:18px 28px;}
 .tl-body h3{font-size:20px; font-weight:700; margin-bottom:6px; color:var(--black);}
 .tl-body p{font-size:14.5px; color:var(--mgray1); line-height:1.5;}
 .tl-body .pillmini{display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:100px; margin-top:10px; letter-spacing:.04em;}
@@ -245,6 +245,8 @@ h2{font-weight:700; letter-spacing:-.01em;}
 .s-closing .lede{font-size:20px; color:var(--pale-blue); max-width:640px; margin:0 auto 40px auto; font-weight:400;}
 .s-closing .cmascot{width:220px; margin-bottom:36px;}
 
+.history-note{position:fixed;top:8px;left:32px;font:16px Arial,sans-serif;color:#42526a;background:#ffffff;padding:4px 8px;z-index:60;}
+
 /* nav */
 .navhint{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(20,20,20,.75); color:#fff; padding:8px 18px; border-radius:100px; font-size:12px; z-index:50; backdrop-filter:blur(6px); letter-spacing:.02em;}
 
@@ -256,41 +258,42 @@ h2{font-weight:700; letter-spacing:-.01em;}
 </style>
 </head>
 <body>
+<div class="history-note">Historical demo · current contracts: docs/README.md</div>
 <div class="navhint">↑ ↓ ou scroll para navegar · 22 slides</div>
 <div class="deck" id="deck">
 
 <!-- ============ SLIDE 1 — CAPA ============ -->
 <section class="slide s-cover">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="grid">
     <div>
-      <div class="eyebrow">Lab Autonomous Officer · Memória Atômica & Adaptativa</div>
-      <h1>Tessera: a arquitetura científica para o LAO<br><span class="accent">nunca mais esquecer.</span></h1>
+      <div class="eyebrow">ExampleAgent · Memória Atômica & Adaptativa</div>
+      <h1>Tessera: a arquitetura científica para o ExampleAgent<br><span class="accent">nunca mais esquecer.</span></h1>
       <p class="lede">Como sairemos de grep, glob e read em arquivos markdown a um motor de memória atômica com resolução de conflitos temporais e indexação topológica.</p>
     </div>
     <div class="cover-right">
       <div class="bubble-stack">
         <span class="bubble tail-paleblue" style="font-size:14px;font-weight:700;">QUMem · LiveMem · Range Retrieval</span>
-        <span class="bubble tail-blipblue" style="font-size:15px;font-weight:800;">Need → Planner → Inference</span>
+        <span class="bubble tail-accentblue" style="font-size:15px;font-weight:800;">Need → Planner → Inference</span>
       </div>
-      <img class="cover-mascot" src="assets/mascots/LAO-3D-thinking-transparent.png" alt="LAO pensando">
+      <img class="cover-mascot" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
     </div>
   </div>
   <div class="footer-block">
-    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> LAO — Lab Autonomous Officer
+    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> TESSERA documentation
   </div>
 <div class="slide-index">01 / 22</div>
 </section>
 
 <!-- ============ SLIDE 2 — DECODIFICANDO O NOME ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Conceitos Fundamentais</div>
   <h2>Decodificando: Atômica, Adaptativa e Topológica</h2>
   <p class="lede">Antes de aprofundarmos no problema, o que exatamente significa o nome Tessera?</p>
   <div class="grid-cards cols-3" style="margin-top:8px;">
     <div class="card on-white">
-      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">⚛️</div>
+      <div class="card-icon" style="background:var(--accent-blue); color:#fff;">⚛️</div>
       <h3>Memória Atômica</h3>
       <p>Em vez de arquivos de log gigantes e não estruturados, a informação é fatiada no menor pedaço lógico possível (um Fato, uma Preferência). Se uma regra muda, não precisamos reescrever um log inteiro, apenas atualizamos aquele <b>átomo</b> de informação isoladamente.</p>
     </div>
@@ -310,10 +313,10 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 2 — FUNDAMENTAÇÃO CIENTÍFICA ============ -->
 <section class="slide bg-black content">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Estruturação acadêmica</div>
   <h2 style="color:#fff;">Três pilares da literatura científica de sistemas de memória</h2>
-  <p class="lede">O Tessera consolidou o estado da arte de agentes de longa duração para garantir que o comportamento do LAO seja deterministicamente auditável.</p>
+  <p class="lede">O Tessera consolidou o estado da arte de agentes de longa duração para garantir que o comportamento do ExampleAgent seja deterministicamente auditável.</p>
   <div class="grid-cards cols-3">
     <div class="card on-dark">
       <span class="tag" style="background:var(--light-blue); color:#072f73;">arXiv 2608.16168</span>
@@ -334,17 +337,17 @@ h2{font-weight:700; letter-spacing:-.01em;}
 <div class="slide-index">03 / 22</div>
 </section>
 
-<!-- ============ SLIDE 3 — O LAO ============ -->
+<!-- ============ SLIDE 3 — O ExampleAgent ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>O Contexto</div>
-  <h2>O Lab Autonomous Officer (LAO) e o Preço da Amnésia</h2>
-  <p class="lede">O LAO é o agente da Blip que opera autonomamente de segunda a sexta descobrindo tecnologias emergentes, rodando experimentos H3 e gerando inteligência competitiva. Mas ele tinha um problema fundamental.</p>
+  <h2>O ExampleAgent e o Preço da Amnésia</h2>
+  <p class="lede">O ExampleAgent é o agente da Example Organization que opera autonomamente de segunda a sexta descobrindo tecnologias emergentes, rodando experimentos H3 e gerando inteligência competitiva. Mas ele tinha um problema fundamental.</p>
   <div class="grid-cards cols-2" style="margin-top:8px;">
     <div class="card on-white">
       <div class="card-icon" style="background:var(--light-blue); color:#fff;">∞</div>
       <h3>O Loop Infinito da Amnésia</h3>
-      <p>Sem uma memória estruturada e inteligente, o LAO era como o protagonista do filme Amnésia: extremamente brilhante, mas preso em um dia que sempre recomeçava do zero. Ele esquecia os bugs de rede que já tinha corrigido e as regras de negócio que já tinha aprendido na semana anterior.</p>
+      <p>Sem uma memória estruturada e inteligente, o ExampleAgent era como o protagonista do filme Amnésia: extremamente brilhante, mas preso em um dia que sempre recomeçava do zero. Ele esquecia os bugs de rede que já tinha corrigido e as regras de negócio que já tinha aprendido na semana anterior.</p>
     </div>
     <div class="card on-white">
       <div class="card-icon" style="background:var(--mgray2); color:#fff;">$</div>
@@ -357,7 +360,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 4 — O PROBLEMA DAS MEMÓRIAS ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip" style="filter:invert(0);">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork" style="filter:invert(0);">
   <div class="kicker"><span class="dot"></span>A Ilusão do Texto</div>
   <h2>O Paradoxo da Caixa de Sapato 🗄️</h2>
   <p class="lede">"Se a memória do agente é em texto, não é só salvar em arquivos Markdown?" <b>Não.</b> Anotar tudo e jogar numa pasta é como jogar os recibos da empresa numa caixa de sapato. Ter a informação lá dentro não significa ter memória útil.</p>
@@ -391,7 +394,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 6 — AS GAVETAS ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Particionamento Cognitivo</div>
   <h2>As Gavetas Estantes: Blindagem contra colisões</h2>
   <p class="lede">Não se mistura o que é uma config de sistema estável com o que é um feedback de comportamento volátil. O Tessera força a memória a se particionar em 3 gavetas herméticas para viabilizar resolução de tempo.</p>
@@ -402,7 +405,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
       <p>Dados objetivos de infra, credenciais, benchmarks e caminhos físicos de arquivos. Sofre invalidação determinística por identidade de entidade.</p>
     </div>
     <div class="card on-blue">
-      <span class="tag" style="background:#fff; color:var(--blip-blue);">Preference Note</span>
+      <span class="tag" style="background:#fff; color:var(--accent-blue);">Preference Note</span>
       <h3>Preferências (Mutable)</h3>
       <p>Modo de operação, estilos de código e restrições. "O usuário prefere testes antes do commit". Se houver colisão de chave, a versão mais recente sempre ganha.</p>
     </div>
@@ -417,15 +420,15 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 7 — O BOLO DE CENOURA (INTERAÇÃO) ============ -->
 <section class="slide bg-white content" style="justify-content:center; align-items:center; text-align:center;">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip" style="filter:invert(0);">
-  <img class="mascot" src="assets/mascots/LAO-3D-thinking-transparent.png" alt="LAO pensando" style="position:relative; width:300px; margin-bottom:20px;">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork" style="filter:invert(0);">
+  <img class="mascot" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork" style="position:relative; width:300px; margin-bottom:20px;">
   
   <div style="display:flex; flex-direction:column; gap:20px; align-items:center; width:100%;">
     <span class="bubble tail-white" style="font-size:22px; font-weight:700; max-width:600px; line-height:1.4;">
       "Eu adoro bolo de cenoura com cobertura de chocolate molinha..."
     </span>
     
-    <span class="bubble tail-blipblue" style="font-size:18px; font-weight:500; max-width:400px; margin-left:120px;">
+    <span class="bubble tail-accentblue" style="font-size:18px; font-weight:500; max-width:400px; margin-left:120px;">
       "Entendido. Preferência salva."
     </span>
   </div>
@@ -434,13 +437,13 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 7.5 — A ANÁLISE ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Analisando a Interação</div>
   <h2>A Conversa do Bolo de Cenoura 🥕</h2>
   <p class="lede">O agente acabou de salvar uma informação no sistema. Mas pense bem:</p>
   <div class="grid-cards cols-3" style="margin-top:8px;">
     <div class="card on-white">
-      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">?</div>
+      <div class="card-icon" style="background:var(--accent-blue); color:#fff;">?</div>
       <h3>Em qual gaveta isso entra?</h3>
       <p>Isso não é um "Fato" imutável do universo, e sim uma <b>Preferência</b> atrelada ao gosto e comportamento temporal do usuário.</p>
     </div>
@@ -460,7 +463,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 8 — A MUDANÇA ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>O Fator Temporal</div>
   <h2>Meses depois... O Enjoo 🍫</h2>
   <p class="lede">Seis meses se passam. Você volta a conversar com o agente num dia qualquer e comenta:<br><br><b style="color:var(--mid-blue);">"Sabe de uma coisa? Enjoei um pouco de bolo de cenoura... meu preferido agora é bolo de chocolate com cobertura dura."</b></p>
@@ -487,7 +490,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 9 — O COLAPSO DO RAG ============ -->
 <section class="slide bg-black content">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>O Limite Tradicional</div>
   <h2 style="color:#fff;">O Colapso: "Me traz a minha sobremesa favorita!" 💥</h2>
   <p class="lede">No dia seguinte, você apenas pede: <b>"Pede a minha sobremesa favorita."</b> Aqui é onde os sistemas comuns e as buscas por terminal falham miseravelmente.</p>
@@ -499,7 +502,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
         <li style="color:var(--lgray1);"><b>RAG Semântico Clássico:</b> Ambas as notas falam de "bolo" e "favorito". A similaridade de cosseno puxa as duas com força total. O RAG assume cegamente que <b>similaridade = relevância</b>, ignorando a linha do tempo.</li>
       </ul>
     </div>
-    <div class="split-col solution" style="background:var(--blip-blue);">
+    <div class="split-col solution" style="background:var(--accent-blue);">
       <h3 style="color:#fff;">A Síndrome da Contaminação de Estado</h3>
       <ul>
         <li style="color:#fff;">O agente recebe instruções opostas no prompt. Ele cria um Frankenstein cômico: <i>"Vou pedir um bolo de cenoura com cobertura dura de chocolate!"</i></li>
@@ -512,10 +515,10 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 10 — A EVOLUÇÃO ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Engenharia de Sobrevivência</div>
-  <h2>Como Chegamos Aqui? O Ciclo Evolutivo do LAO</h2>
-  <p class="lede">Foi observando esse "bolo Frankenstein" em projetos de produção da Blip que forçamos a arquitetura do LAO a evoluir continuamente por quatro estágios.</p>
+  <h2>Como Chegamos Aqui? O Ciclo Evolutivo do ExampleAgent</h2>
+  <p class="lede">Foi observando esse "bolo Frankenstein" em projetos de produção da Example Organization que forçamos a arquitetura do ExampleAgent a evoluir continuamente por quatro estágios.</p>
   <div class="timeline">
     <div class="tl-row">
       <div class="tl-marker"><div class="tl-dot" style="background:var(--mgray1);">v1</div><div class="tl-line"></div></div>
@@ -525,17 +528,17 @@ h2{font-weight:700; letter-spacing:-.01em;}
       </div>
     </div>
     <div class="tl-row">
-      <div class="tl-marker"><div class="tl-dot" style="background:var(--blip-blue);">v2</div><div class="tl-line"></div></div>
+      <div class="tl-marker"><div class="tl-dot" style="background:var(--accent-blue);">v2</div><div class="tl-line"></div></div>
       <div class="tl-body">
         <h3>O Especialista (agent/memory.md)</h3>
-        <p>Isolamos a tarefa em um agente focado apenas em buscar dados para o LAO. Resolveu o foco, mas não a lentidão: o especialista ainda sofria timeouts de CLI varrendo e cruzando arquivos manualmente pelo bash.</p>
+        <p>Isolamos a tarefa em um agente focado apenas em buscar dados para o ExampleAgent. Resolveu o foco, mas não a lentidão: o especialista ainda sofria timeouts de CLI varrendo e cruzando arquivos manualmente pelo bash.</p>
       </div>
     </div>
     <div class="tl-row">
       <div class="tl-marker"><div class="tl-dot" style="background:var(--lpurple);">v3</div><div class="tl-line"></div></div>
       <div class="tl-body">
         <h3>memory-graph: O primeiro grafo acoplado</h3>
-        <p>Criamos um indexador que via os metadados dos .mds e montava grafos de conhecimento de apoio. Porém era travado dentro dos scripts nativos do LAO, redundante com outros serviços de graphify e frágil.</p>
+        <p>Criamos um indexador que via os metadados dos .mds e montava grafos de conhecimento de apoio. Porém era travado dentro dos scripts nativos do ExampleAgent, redundante com outros serviços de graphify e frágil.</p>
       </div>
     </div>
     <div class="tl-row">
@@ -551,7 +554,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 11 — EPISÓDIOS ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Fronteiras Dinâmicas</div>
   <h2>Fronteira de Episódios: Organizando o fluxo temporal</h2>
   <p class="lede">No Tessera, memória não é log bruto, são <b>episódios semanticamente coerentes</b>. Mas como decidir autonomamente onde um assunto começa e outro termina?</p>
@@ -562,7 +565,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
       <p>O paper original do QUMem assume um classificador binário turno a turno, que é computacionalmente caro para nosso volume de interações.</p>
     </div>
     <div class="card on-offwhite" style="background:var(--offwhite);">
-      <div class="card-icon" style="background:var(--blip-blue); color:#fff;">dt</div>
+      <div class="card-icon" style="background:var(--accent-blue); color:#fff;">dt</div>
       <h3>Fronteira por Tempo</h3>
       <p>O <code>EpisodeBoundaryTracker</code> fecha o episódio atual após um hiato de silêncio de $T$ minutos (padrão: 30) entre as interações do dev e a IA.</p>
     </div>
@@ -577,15 +580,15 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 12 — PIPELINE 3-AGENTES ============ -->
 <section class="slide bg-black content">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Estimação de Estado</div>
   <h2 style="color:#fff;">O Trio de Agentes Detetives: Estimando o Estado Atual</h2>
-  <p class="lede">Em vez de buscar cegamente no sistema, o Tessera ativa um pipeline de 3 etapas de IA especializado em limpar o ruído antes da resposta do LAO.</p>
+  <p class="lede">Em vez de buscar cegamente no sistema, o Tessera ativa um pipeline de 3 etapas de IA especializado em limpar o ruído antes da resposta do ExampleAgent.</p>
   <div class="pipeline">
     <div class="pipe-step">
       <span class="step-num">01</span>
       <h3>Information-Need Agent (A1)</h3>
-      <p>Lê a instrução que você passou ao LAO e infere criticamente o que o agente NÃO sabe (ex: regras passadas de código) para completar o job.</p>
+      <p>Lê a instrução que você passou ao ExampleAgent e infere criticamente o que o agente NÃO sabe (ex: regras passadas de código) para completar o job.</p>
       <span class="pipe-arrow">→</span>
     </div>
     <div class="pipe-step">
@@ -603,7 +606,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
     <div class="pipe-step" style="background:var(--dark-blue);">
       <span class="step-num" style="color:#fff;">04</span>
       <h3>User-State Inference Agent (A3)</h3>
-      <p style="color:var(--pale-blue);">Consolida as notas sobreviventes em um sumário impecável de contexto e entrega ao LAO. Sem Frankenstein.</p>
+      <p style="color:var(--pale-blue);">Consolida as notas sobreviventes em um sumário impecável de contexto e entrega ao ExampleAgent. Sem Frankenstein.</p>
     </div>
   </div>
 <div class="slide-index">14 / 22</div>
@@ -611,7 +614,7 @@ h2{font-weight:700; letter-spacing:-.01em;}
 
 <!-- ============ SLIDE 13 — RESOLUÇÃO DE CONFLITOS ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Mecânica Interna</div>
   <h2>ConflictResolver: Preservando a História</h2>
   <p class="lede">O algoritmo de contenção em <code>conflict.py</code> impede que uma preferência antiga seja apagada só porque outra foi registrada depois.</p>
@@ -638,7 +641,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
 
 <!-- ============ SLIDE 14 — QUADRO DE CORTIÇA ============ -->
 <section class="slide bg-black content">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Indexação Topológica</div>
   <h2 style="color:#fff;">O "Quadro de Cortiça" do Investigador e a força do DW-PR</h2>
   <p class="lede">A busca apenas por proximidade vetorial não alcança insights que têm lógicas entrelaçadas. O Tessera caminha pelos tópicos conectivos através de uma topologia física de grafo de conhecimento.</p>
@@ -656,7 +659,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
     <div class="card on-dark">
       <span class="tag" style="background:var(--lgreen); color:#072f73;">Topologia Vence Cosseno</span>
       <h3>Zero "Vácuo Semântico"</h3>
-      <p>Uma nota vital sobre uma interrupção crítica será recuperada e lida pelo LAO porque compartilha a entidade da arquitetura de deploy com a sua tarefa atual, mesmo se a sua busca omitir a palavra exata "crash".</p>
+      <p>Uma nota vital sobre uma interrupção crítica será recuperada e lida pelo ExampleAgent porque compartilha a entidade da arquitetura de deploy com a sua tarefa atual, mesmo se a sua busca omitir a palavra exata "crash".</p>
     </div>
   </div>
 <div class="slide-index">16 / 22</div>
@@ -664,7 +667,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
 
 <!-- ============ SLIDE 15 — DECOMPOSIÇÃO ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>A Função g_φ de Extração</div>
   <h2>Toda história tem Início, Meio e Fim. A memória também.</h2>
   <p class="lede">Nós não lembramos o mundo em tabelas frias de banco de dados. Nós narramos episódios. O Tessera permite que agentes e humanos registrem <em>o que aconteceu</em> de forma fluida, e o próprio motor fatia a prosa em "átomos" de conhecimento.</p>
@@ -692,7 +695,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
 
 <!-- ============ SLIDE 16 — MCP ============ -->
 <section class="slide bg-black content">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Protocolo Unificado</div>
   <h2 style="color:#fff;">Model Context Protocol (tessera): Agnóstico de Engine</h2>
   <p class="lede">A evolução do Tessera é ser universal. Ele é agora um servidor MCP rodando sobre JSON-RPC unificado, expondo 8 ferramentas potentes de forma nativa e agnóstica a qualquer CLI.</p>
@@ -718,7 +721,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
     </div>
     <div class="card on-dark" style="padding:18px;">
       <h3>Unidade de Verdade</h3>
-      <p>O insight anotado pelo desenvolvedor Copilot codando a dashboard ontem, já é usado pelo Gemini na cron autônoma do LAO de amanhã.</p>
+      <p>O insight anotado pelo desenvolvedor Copilot codando a dashboard ontem, já é usado pelo Gemini na cron autônoma do ExampleAgent de amanhã.</p>
     </div>
   </div>
 <div class="slide-index">18 / 22</div>
@@ -726,7 +729,7 @@ contained = <span class="fn">list</span>(retrieved_notes)
 
 <!-- ============ SLIDE 17 — HORA DA DEMO ============ -->
 <section class="slide bg-white content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Hora da Demo</div>
   <h2>Tessera vs. Grep: Na prática, direto do terminal</h2>
   <p class="lede">A prova de fogo: o que acontece quando você lembra do <em>conceito geral</em> de uma métrica de nuvem, mas esquece completamente a <em>palavra exata</em> do título do arquivo markdown?</p>
@@ -749,7 +752,7 @@ $ time (grep -rli "quanto tempo demora chamar a IA pelo gateway da azure compara
       <div class="codeblock" style="font-size:12px; line-height:1.4; padding:12px;">
 $ time tessera query .claude/memory "quanto tempo demora chamar a IA pelo gateway da azure..." --top-n 1
 
-<span class="fn">✔ Note: lao/tessera-llm-backend-benchmark (factual)</span>
+<span class="fn">✔ Note: project/tessera-llm-backend-benchmark (factual)</span>
 <span style="color:#c9d1d9;">[O terminal cospe as métricas exatas resgatadas do conhecimento histórico validado]</span>
 
 <span class="cm">real  0m1.850s</span>
@@ -764,20 +767,20 @@ $ time tessera query .claude/memory "quanto tempo demora chamar a IA pelo gatewa
 
 <!-- ============ SLIDE 18 — ONBOARDING E SETUP ============ -->
 <section class="slide bg-offwhite content">
-  <img class="brand-logo" src="assets/LOGO_PRIMARIA_fundo_claro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Plug & Play</div>
   <h2>Agnóstico, Autoinstalável e Open Source</h2>
-  <p class="lede">Nós não fizemos uma engenharia proprietária apenas para rodar em uma VM da Blip. O Tessera v4 é pacote Python robusto que é independente de escopo de projeto.</p>
+  <p class="lede">Nós não fizemos uma engenharia proprietária apenas para rodar em uma VM da Example Organization. O Tessera v4 é pacote Python robusto que é independente de escopo de projeto.</p>
   <div class="grid-cards cols-2" style="margin-top:8px;">
     <div class="card on-white">
-      <span class="tag" style="background:var(--blip-blue); color:#fff;">tessera doctor</span>
+      <span class="tag" style="background:var(--accent-blue); color:#fff;">tessera doctor</span>
       <h3>Check-up de Integridade Completo</h3>
       <p>A primeira coisa após o clone do repo do Tessera é verificar todo o motor. O <code>tessera doctor</code> roda um teste cego na escrita, valida grafos e a conectividade opcional Azure.</p>
     </div>
     <div class="card on-white">
       <span class="tag" style="background:var(--lpurple); color:#fff;">tessera quickstart</span>
       <h3>Wizard de Instalação Universal</h3>
-      <p>O <code>quickstart</code> descobre qual tipo de framework Node ou Python ou Rust você usa, cria uma pasta virgem, cospe um json do seu Servidor MCP pronto e já deixa seu projeto novo com a mesma capacidade de memória do LAO.</p>
+      <p>O <code>quickstart</code> descobre qual tipo de framework Node ou Python ou Rust você usa, cria uma pasta virgem, cospe um json do seu Servidor MCP pronto e já deixa seu projeto novo com a mesma capacidade de memória do ExampleAgent.</p>
     </div>
   </div>
   <div class="codeblock" style="margin-top:8px; font-size:12px; line-height:1.4;">
@@ -792,10 +795,10 @@ $ tessera doctor .claude/memory
 
 <!-- ============ SLIDE 19 — AUTO-MELHORIA CONTÍNUA ============ -->
 <section class="slide bg-darkblue">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <div class="kicker"><span class="dot"></span>Lições de Produção</div>
   <div class="quote-row" style="margin-top:16px;">
-    <img class="qmascot" src="assets/mascots/LAO-3D-research-book-transparent.png" alt="LAO pesquisando">
+    <img class="qmascot" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
     <div>
       <div class="qtext">"A real capacidade de autonomia de um agente reside na habilidade de <b>notar seus próprios gaps operacionais</b> e refatorar a infraestrutura e arquitetura que os causou."</div>
       <p style="margin-top:24px; font-size:15px; color:var(--pale-blue); font-weight:400;">O Tessera não nasceu pronto. Ele é o somatório de resiliência a cada travamento e hallucination de um dia perdido. Extraímos as lições, validamos pela literatura científica rigorosa e codamos a resolução nativamente para ele se tornar o que é hoje.</p>
@@ -806,13 +809,13 @@ $ tessera doctor .claude/memory
 
 <!-- ============ SLIDE 20 — CLOSING ============ -->
 <section class="slide s-closing">
-  <img class="brand-logo" src="assets/LOGO_SECUNDARIA_fundo_escuro.svg" alt="Blip">
-  <img class="cmascot" src="assets/mascots/LAO-3D-happy-birthday-transparent.png" alt="LAO celebrando">
+  <img class="brand-logo" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
+  <img class="cmascot" src="../assets/brand/tessera-hero-nobg-sm.svg" alt="TESSERA canonical artwork">
   <h1>Obrigado!</h1>
   <p class="lede">Garantindo a evolução perpétua e coerente do conhecimento das IAs autônomas corporativas e de engenharia.<br>O seu agente é o que ele lembra. Conecte sua IA agora mesmo.</p>
-  <span class="bubble tail-blipblue" style="font-size:16px; font-weight:700;">Tessera/README.md · tessera quickstart</span>
+  <span class="bubble tail-accentblue" style="font-size:16px; font-weight:700;">Tessera/README.md · tessera quickstart</span>
   <div class="footer-block" style="left:88px; bottom:32px; color:var(--pale-blue);">
-    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> LAO — Lab Autonomous Officer
+    <b>Classificação:</b> Interno &nbsp;·&nbsp; <b>Criação:</b> 28/08/2026 &nbsp;·&nbsp; <b>Versão:</b> 2.0 &nbsp;·&nbsp; <b>Responsável:</b> TESSERA documentation
   </div>
 <div class="slide-index">22 / 22</div>
 </section>

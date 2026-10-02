@@ -1,5 +1,9 @@
 # #117 — Let TESSERA explain where memory lives
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/test-cards/117-configuration-init-discovery.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 | Field | Value |
 |---|---|
 | Issue | [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117) |
@@ -28,7 +32,7 @@ without a path silently used `./memories`, including in non-interactive use.
 ## How did TESSERA behave before?
 
 The selection chain was explicit path, `TESSERA_STORAGE_DIR`, deprecated
-`LAO_MEM_DIR`, then `./memories`. `tessera init` constructed an Engine for that
+`<legacy storage variable>`, then `./memories`. `tessera init` constructed an Engine for that
 path and built its index. It wrote no durable explanation of which project or
 named store owned the directory.
 
@@ -62,7 +66,7 @@ reports fields including `store_id`, `storage_dir`, `source`, `project_root`,
 **VALIDATED ON `main`.**
 
 Selection precedence is exactly: explicit store/path, `TESSERA_STORAGE_DIR`,
-deprecated `LAO_MEM_DIR`, nearest project config, explicitly named global
+deprecated `<legacy storage variable>`, nearest project config, explicitly named global
 registry entry, then actionable configuration failure. The result identifies
 the absolute store, source, persisted store ID, and applicable project or
 registry metadata. The persisted UUID identifies the logical store rather than

@@ -29,6 +29,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [OVERVIEW.md](OVERVIEW.md) | What TESSERA is, why it exists, current vs planned architecture. |
 | [FEATURES.md](FEATURES.md) | Capabilities implemented on current Foundation. |
 | [CONCEPTS.md](CONCEPTS.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
+| [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) | Versioned current/experimental SVG diagrams and source mappings. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical current-main architecture and module/pipeline boundaries. |
 | [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
@@ -165,7 +166,7 @@ The following files preserve useful project history, demos or earlier architectu
 | [REFERENCES.md](REFERENCES.md) | Older compact reference list; prefer `research/REFERENCES.md` for current research decision trace. |
 | `archive/` | Explicit older implementation/version material when present. |
 
-Historical docs should preserve useful decision history, but they must not define the current public product contract. Project-specific legacy narratives are tracked for cleanup separately.
+Historical docs should preserve useful decision history, but they must not define the current public product contract. Legacy examples are project-neutral. Exact prior identifiers and presentation artwork remain available through pinned Git-history links; historical claims never override current contracts.
 
 ---
 

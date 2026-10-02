@@ -1,5 +1,9 @@
 # PR Evolution Audit — Issue #117 configuration and discovery
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/PR_EVOLUTION_117.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 Audited starting `main`: `b3be96f4aa842a81c135b6ac87d3311ed292d339`,
 the actual fetched `origin/main` when branch
 `test-card/117-config-init-discovery` was created. This is PR #133's canonical
@@ -29,7 +33,7 @@ retrieval semantics.
 | PR #98 / Issue #68 | merged, `fb23012ba4b2fddc3912d7cb593391a04fe45ae7` | aligned current Engine/CLI/MCP retrieval result semantics | selection feeds the same Engine contract; retrieval is unchanged |
 | PR #101 / Issue #94 | merged, `467ba649f53312cedcecf40caf548af5f766c67b` | Markdown-only successful persistence and no pre-admission mutation | init never rewrites source memories; config remains separate from corpus data |
 | PR #108 / Issue #92 | merged, `9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05` | containment and truthful write-gate mutation boundary | reuses strict path/data treatment; config never executes values |
-| PR #126 / Issue #95 | merged, `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | project-neutral explicit/env/deprecated-env/default resolver and explicit optional integration boundary | preserves canonical env and legacy warning; adds product config without LAO/Blip probing |
+| PR #126 / Issue #95 | merged, `6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599` | project-neutral explicit/env/deprecated-env/default resolver and explicit optional integration boundary | preserves canonical env and legacy warning; adds product config without external-project probing |
 | PR #129 / Issue #93 | merged, `c6124548f32b6dc5e1b7acf5127632bc6c75fccc` | same selected canonical store gives Python/CLI/MCP agreement | regression target; **storage parity is not product configuration/discovery** |
 | PR #128 / Issue #115 | merged, `b475f1cd805f86cc8ad9526e563e3c6fb8409ff1` | accepted root-package/repository/distribution boundary | new configuration stays inside the distributed `tessera` package |
 | PR #131 / Issue #116 | merged, `0dd6e5c8c3e720cc39b1e666abed98a9fa3357e4` | ownership-correct wheel/sdist with 37-export public API and five resources | configuration module remains packaged without adding exports or dependencies |

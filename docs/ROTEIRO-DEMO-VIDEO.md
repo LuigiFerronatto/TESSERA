@@ -1,6 +1,11 @@
 # Roteiro de Demo — Tessera no Terminal (para gravar e postar no Slack)
 
-> Testado ao vivo em 2026-08-25 dentro do próprio repo `lab-autonomous-officer`.
+> Historical narrative with project-neutral examples. Current contracts take
+> precedence through [the documentation map](README.md). Scientific-fidelity
+> claims follow [the dated source/runtime audit](QUMEM-GAP-ANALYSIS.md), not
+> anecdotal demonstrations or older implementation descriptions.
+
+> Historical demo recorded on 2026-08-25 in an external project; the project name and path below are neutral placeholders.
 > Todos os comandos abaixo rodam de verdade — copie e cole durante a gravação.
 
 ---
@@ -44,19 +49,19 @@ Recomendação: **OBS** se quiser algo mais "produzido" (com sua voz explicando)
 Narre (fala de frente pra câmera/tela, sem terminal ainda, ou sobre um
 slide/README aberto):
 > "Isso aqui é o Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories. É o sistema de memória de
-> longo prazo que eu construí pro LAO, o Lab Autonomous Officer. Hoje o LAO
+> longo prazo que eu construí pro ExampleAgent, o example research agent. Hoje o ExampleAgent
 > tem mais de 200 memórias — decisões, aprendizados, benchmarks, contexto de
 > negócio — guardadas como arquivos Markdown legíveis por humano, mas
 > organizadas por trás como um grafo de conhecimento.
 >
 > Mas para entender o valor real do Tessera, a gente precisa olhar para trás e ver como
-> o LAO gerenciava o próprio conhecimento. Passamos por três fases claras de evolução:
+> o ExampleAgent gerenciava o próprio conhecimento. Passamos por três fases claras de evolução:
 >
 > **1. A Fase do Brute-Force (O LEAD fazendo tudo):** No início, o próprio agente LEAD
 > buscava memória rodando dezenas de comandos manuais de terminal por vez. Mesmo sabendo a arquitetura de pastas perfeitamente, o agente precisava engatilhar múltiplas queries de `grep`, `glob` e `find` em sequência — literalmente dezenas de processos bash *spawned* na máquina — apenas para cruzar referências e validar se um dado existia.
 > Ele fazia isso em paralelo com outras tarefas complexas. O resultado? A janela de contexto
 > explodia com logs e resultados de busca inúteis, as ações demoravam muito, o agente se perdia na linha de raciocínio e falhava
-> em interligar os dados com os objetivos da Blip. Pior: ele tratava a memória recuperada
+> em interligar os dados com os objetivos da Example Organization. Pior: ele tratava a memória recuperada
 > como verdade absoluta, sem questionar relevância, validade ou se precisava ser atualizada ou excluída.
 >
 > **2. A Fase do Especialista (agent/memory.md):** Para resolver isso, criamos um agente especialista
@@ -80,7 +85,7 @@ slide/README aberto):
 > funciona bem, onde ela para de funcionar, e onde o Tessera entra."
 
 ```bash
-cd ~/Desktop/Workspace/lab-autonomous-officer
+cd /path/to/example-project
 clear
 tessera list .claude/memory | grep "notas indexadas"
 ```
@@ -124,7 +129,7 @@ pergunta, só que com outras palavras)*
 time tessera query .claude/memory "quanto tempo demora chamar a IA pelo gateway da azure comparado a rodar via linha de comando" --top-n 1
 ```
 
-*(Isso retorna a nota certa: `lao/tessera-llm-backend-benchmark`, com o texto
+*(Isso retorna a nota certa: `project/tessera-llm-backend-benchmark`, com o texto
 completo do benchmark — em ~1,6-1,9s, contra os ~15ms do grep vazio)*
 
 Narre:
@@ -136,7 +141,7 @@ Narre:
 >
 > Mas e aí, como ele faz essa mágica por baixo dos panos no modo offline, sem gastar um centavo de LLM ou rede?
 > É o seguinte: primeiro, ele pega a minha pergunta em português normal e usa uma parada clássica de busca chamada **TF-IDF com similaridade de cosseno** pra achar os arquivos mais parecidos (que são as 'sementes').
-> Depois, ele olha pro **grafo de conhecimento** que montamos com as notas do LAO e faz uma expansão de 1-hop: ele puxa todos os arquivos conectados (por tags ou entidades) até um nível de distância.
+> Depois, ele olha pro **grafo de conhecimento** que montamos com as notas do ExampleAgent e faz uma expansão de 1-hop: ele puxa todos os arquivos conectados (por tags ou entidades) até um nível de distância.
 > Aí vem o pulo do gato: ele roda uma versão modificada do algoritmo **PageRank do Google** (o Dynamic Weighted PageRank) sobre esse pedaço do grafo, dando um bônus de peso para arestas de procedimentos importantes. O PageRank faz os arquivos mais relevantes 'ganharem força' no ranking.
 > Por fim, ele roda um **ConflictResolver** de contenção: possíveis conflitos continuam visíveis, porque uma data mais recente não prova sozinha que a memória anterior deixou de valer. A busca continua determinística e offline sem apagar evidência histórica."
 
@@ -187,7 +192,7 @@ tessera write .claude/memory \
   --type factual \
   --episode start \
   --tags "demo,video,exemplo" \
-  --content "Esta e uma nota de exemplo criada ao vivo durante a gravacao do video de demo do Tessera para o canal lao-innovation-lab."
+  --content "Esta e uma nota de exemplo criada ao vivo durante a gravacao do video de demo do Tessera para o canal example-project-channel."
 ```
 
 *(Mostra a mensagem "✔ Nota de memória gravada em: ...")*
@@ -239,7 +244,7 @@ Narre:
 > "Isso aqui não é busca simples. É o pipeline cognitivo completo com LLM ligado — a parte mais animal do Tessera.
 > Em vez de dar uma query direta, a gente aciona um trio de 'agentes detetives' inspirados em papers de memória de longo prazo. Olha o fluxo:
 >
-> Primeiro, o **Agente de Necessidade (Need)** analisa o prompt principal e se pergunta: 'Cara, o que eu realmente preciso resgatar do passado do LAO pra fazer isso?'. Ele define a intenção da busca de forma lógica.
+> Primeiro, o **Agente de Necessidade (Need)** analisa o prompt principal e se pergunta: 'Cara, o que eu realmente preciso resgatar do passado do ExampleAgent pra fazer isso?'. Ele define a intenção da busca de forma lógica.
 > Depois, o **Agente de Planejamento (Planner)** traduz essa necessidade em uma query de busca otimizada pro nosso motor. E ele é esperto: decide em quais 'gavetas tipadas' do Tessera (Facts, Preferences ou Insights) buscar, evitando ler arquivos inúteis e cruzar dados à toa.
 > Aí, o motor offline que mostrei na Cena 3 entra em ação, puxa as notas e o ConflictResolver preserva possíveis conflitos em vez de escolher um vencedor por recência.
 > Por fim, o **Agente de Inferência de Estado** recebe toda a evidência ranqueada e consolida um resumo Markdown para o LEAD, sem tratar “mais novo” como sinônimo de “mais verdadeiro”.
@@ -308,5 +313,5 @@ echo "Tessera: memoria que entende, nao so armazena."
 ## Onde postar
 
 Suba o vídeo/gif como reply na mesma thread do post de evolução do Tessera em
-`#lao-innovation-lab` (a thread já tem: benchmark + papers + arquitetura +
+`#example-project-channel` (a thread já tem: benchmark + papers + arquitetura +
 roadmap plug-and-play em texto — o vídeo é a prova viva disso tudo).
