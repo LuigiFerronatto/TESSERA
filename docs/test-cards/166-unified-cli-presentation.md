@@ -5,8 +5,8 @@
 | Issue | [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166), parent [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime`, CLI presentation |
-| Pull request | Draft candidate, linked in submission evidence |
-| Head commit | See draft PR exact-head checks |
+| Pull request | [Draft PR #298](https://github.com/LuigiFerronatto/TESSERA/pull/298) |
+| Head commit | Implementation candidate [`1ab9d1f`](https://github.com/LuigiFerronatto/TESSERA/commit/1ab9d1fd0627fc5087aaa4729594cf49f8b890b7); latest documentation/review head in PR #298 |
 | Merge commit | Not merged |
 | Decision | `PENDING` human review |
 | Benchmark applicability | `SMOKE_ONLY`, no retrieval/storage semantics changed |
