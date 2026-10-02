@@ -453,7 +453,7 @@ class TesseraEngine:
         entities: Optional[List[Entity]] = None,
         active_connections: Optional[List[Connection]] = None,
     ) -> str:
-        """Writes a concrete, immutable fact to the `facts` store."""
+        """Writes a concrete factual record to the `facts` store."""
         return self.write_memory_note(
             mem_id=mem_id,
             mem_type="factual",
