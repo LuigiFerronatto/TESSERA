@@ -5,8 +5,8 @@
 | Issue | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12), reliability follow-up to the delivered index contract |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Draft repair candidate; link recorded in the PR evidence |
-| Head commit | See the linked repair PR's exact head and CI |
+| Pull request | [Draft PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282) |
+| Head commit | Runtime candidate `51a8c3c281470bd290829beb94202405a61befc4`; final head/CI in PR #282 |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `REQUIRED` |
@@ -65,9 +65,15 @@ candidate: one source reparsed; query("magenta") -> documentation/guide
 The four independent baseline reproductions fail before the patch and pass
 with the repair. `tests/test_index_corpus_equivalence.py` adds lifecycle,
 configuration, migration, rename, provenance and relation regression controls.
-The draft PR records exact final full-suite, installed-wheel, CLI/MCP, sanity
-and CI evidence. Required benchmark results must be recorded before a merge
-decision; an unrun or blocked benchmark is never treated as a pass.
+Local final validation: 586 passed and five gh-aw-dependent skips on Python
+3.12.14/Linux, including 21 added cases. The installed wheel passed the four
+original probes, 37 API/CLI checks and 18 real stdio MCP groups. Another 125
+mutation/reload cycles matched cleanly reparsed graphs and identities.
+Four-query sanity remained Hit@1=0.75, Hit@3=1.0, MRR=0.875.
+[PR #282 checks](https://github.com/LuigiFerronatto/TESSERA/pull/282/checks)
+record the final remote CI and required benchmark. Required benchmark results
+must be recorded before a merge decision; an unrun or blocked benchmark is
+never treated as a pass.
 
 ## What improved?
 
