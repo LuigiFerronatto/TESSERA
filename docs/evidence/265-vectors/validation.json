@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "issue": 265,
+  "audited_at": "2026-10-02",
+  "candidate_state": "unmerged draft; ITERATE",
+  "python": "3.12.14",
+  "focused_tests": {
+    "passed": 112,
+    "command": "python -m pytest tests/test_issue_265_vector_backends.py tests/test_issue_265_ckdtree.py tests/test_issue_265_vector_sweep.py -q"
+  },
+  "full_tests": {
+    "passed": 674,
+    "skipped": 8,
+    "warnings": 14,
+    "seconds": 121.37,
+    "command": "python -m pytest -ra",
+    "skip_reasons": [
+      "5 gh-aw CLI extension unavailable",
+      "3 optional MCP transport/lifespan tests without mcp extra"
+    ]
+  },
+  "installed_wheel_focused_tests": {
+    "passed": 111,
+    "outside_checkout": true,
+    "site_packages_import_verified": true,
+    "scope": "both backend contract files; repository-only sweep generator test is excluded because benchmarks are not packaged"
+  },
+  "build": {
+    "command": "python -m build --no-isolation",
+    "wheel_and_sdist": true,
+    "repository_only_files_excluded": true,
+    "wheel_runtime_bytes_match_candidate": true,
+    "wheel_bytes": 155191,
+    "sdist_bytes": 147634,
+    "new_dependencies": [],
+    "vector_module_footprint": {
+      "tessera/vector_backend.py": {
+        "bytes": 15100,
+        "compressed_bytes": 3996
+      },
+      "tessera/vector_ckdtree.py": {
+        "bytes": 4854,
+        "compressed_bytes": 1752
+      },
+      "tessera/vector_sqlite.py": {
+        "bytes": 10458,
+        "compressed_bytes": 2931
+      }
+    }
+  },
+  "python39_syntax": true,
+  "python39_runtime": "not available locally; covered by exact-head CI",
+  "sanity": {
+    "dataset": "tessera-sanity-ci-v2-project-agnostic",
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "average_latency_ms": 4.948872000568372,
+    "average_returned_chars": 417.75,
+    "missing_evidence_check": "passed"
+  },
+  "candidate_source_sha256": {
+    "tessera/vector_backend.py": "edabed351bede6a237bd34f3bba9b81181b340c5fcf712b9140e8e1c0c9ae4a6",
+    "tessera/vector_sqlite.py": "7068996ce37c8e248b6a1cf0cd6471d0ce76c80e2435fe6ca06e205680f046e6",
+    "tessera/vector_ckdtree.py": "932d3f5c00e45729721ddef1dc53ab4106dbb1bcf007108f397ada903c35b53b",
+    "benchmarks/vector_backends/scale_sweep.py": "26ecf794b5a6f141e396722cc02f883b154e62299ba8130a62d5bfec476b9b05"
+  },
+  "benchmark": "synthetic-mechanics.json",
+  "remote_ci": "Pending continued candidate publication; prior head b5c9229 engineering gates passed, with draft governance BLOCK",
+  "limits": [
+    "No real semantic corpora or model quality claim; #158 model route remains required",
+    "Bounded 256/2048/8192-record and 16/64-dimensional synthetic evidence; no production-default winner",
+    "Native RSS includes scientific runtime and input records; latency includes each adapter verification/cache policy",
+    "Local optional MCP and gh-aw tests skipped as recorded; no local complete optional-integration pass claimed"
+  ],
+  "scale_sweep": {
+    "file": "synthetic-scale-rss.json",
+    "cells": 24,
+    "all_mechanics_gates_passed": true,
+    "plan_sha256": "78a5cfe46beb33dcc11bb69beff8ba20fed6988ed9d959b27777719507584dc4",
+    "native_memory_method": "isolated subprocess ru_maxrss and Linux current RSS",
+    "independent_ann": "SciPy cKDTree epsilon 0.5; exact tree control epsilon 0",
+    "ann_queries_below_095_recall": 3,
+    "minimum_ann_query_recall": 0.9,
+    "max_ranked_unit_l2_distance_ratio": 1.0599160079358259
+  }
+}
