@@ -373,7 +373,10 @@ def cmd_write(args):
         entities=entities,
         active_connections=active_connections,
     )
-    return emit(args, "write", result.to_dict(), 0 if result.persisted else 2)
+    payload = result.to_dict()
+    receipt = payload.get("write_receipt") or {}
+    code = (3 if receipt.get("repair_required") else 0) if result.persisted else 2
+    return emit(args, "write", payload, code)
 
 
 def cmd_index(args):

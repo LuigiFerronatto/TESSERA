@@ -273,10 +273,16 @@ def human_lines(result: CommandResult, output: OutputPolicy) -> Iterable[str]:
             for source in data["sources"]:
                 yield json.dumps(source, ensure_ascii=False, sort_keys=True)
     elif kind == "write":
+        receipt = data.get("write_receipt") or {}
         if data["persisted"]:
             yield f"Memory note written to: {data.get('filepath')}"
+            if receipt.get("repair_required"):
+                yield "Derived state is incomplete. Inspect the receipt before retrying."
+                yield f"How to fix: tessera receipt repair --operation-id {receipt.get('operation_id', '<operation-id>')}"
         else:
             yield "Note not written"
+        if receipt.get("errors"):
+            yield "Operational errors: " + ", ".join(receipt["errors"])
         yield from _fields({key: data[key] for key in ("admission", "reasons", "content_changed", "is_sanitized") if key in data}, "  ")
     elif kind == "skills.list":
         yield from data
