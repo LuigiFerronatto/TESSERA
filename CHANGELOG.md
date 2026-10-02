@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
+  with explicit scope/store bindings, strict Claude/Gemini JSON adapters, and
+  ownership-safe experimental filesystem apply/rollback mechanics tested only
+  on synthetic configs. CLI apply, real provider/version acceptance, Codex/
+  Copilot adapters and semantic/lifecycle hooks remain unavailable. (#190)
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
