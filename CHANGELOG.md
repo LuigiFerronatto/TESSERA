@@ -46,6 +46,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   support remains. See [runtime contract](docs/MCP_RUNTIME.md).
 
 ### Architecture Decisions
+- Retired automatic AI pull-request reviews and their CI gate. Deterministic
+  tests, builds, offline benchmarks, conflict/thread checks and required human
+  review remain; GitHub branch-protection migration is a separate admin step.
+  See [current governance](docs/AGENTIC_GOVERNANCE.md).
 - Added a deterministic, idempotent sync tool
   (`scripts/sync_project_board.py`) that reflects each open issue's own
   authoritative `## Portfolio routing` block onto GitHub Project #9's
