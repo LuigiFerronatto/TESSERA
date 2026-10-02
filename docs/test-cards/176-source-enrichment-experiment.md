@@ -5,7 +5,7 @@
 | Issue | [#176](https://github.com/LuigiFerronatto/TESSERA/issues/176) |
 | Record status | `IN_PROGRESS` |
 | Capability type | Optional offline experiment infrastructure |
-| Pull request | Draft branch `feat/issue-176-enrichment-preview`; PR link pending |
+| Pull request | [Draft PR #322](https://github.com/LuigiFerronatto/TESSERA/pull/322) |
 | Merge commit | Not merged |
 | Decision | `ITERATE`; semantic KEEP unmeasured |
 | Benchmark applicability | `REQUIRED` |
@@ -49,7 +49,12 @@ explicitly specified preferences. Neither proposal changes the author's file.
 Focused source-discovery/enrichment tests and the checksum-frozen synthetic
 runner cover exclusions, symlinks/races, limits, CRLF evidence, invalid schemas,
 stale plans, duplicates, failures, mode boundaries and source-byte preservation.
-The broader regression result and exact candidate CI belong to the PR evidence.
+The clean full suite passed 635 tests with 5 expected gh-aw-extension skips.
+Pinned deterministic dev-50 was repeatable and matched an isolated canonical
+base reconstruction exactly (Recall@10 0.916667, MRR 0.778502, provenance 1.0).
+Offline wheel/sdist build and installed-wheel module help also passed. These
+measure unchanged deterministic retrieval, not assisted-enrichment quality.
+Exact candidate CI belongs to [PR #322](https://github.com/LuigiFerronatto/TESSERA/pull/322).
 
 ## What improved?
 
