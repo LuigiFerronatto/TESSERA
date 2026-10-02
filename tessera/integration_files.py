@@ -82,6 +82,7 @@ class FileReceipt:
     after_config: FileSnapshot = field(repr=False)
     after_owner: FileSnapshot = field(repr=False)
     created_directories: tuple = ()
+    extra_changes: tuple = field(default=(), repr=False)
 
 
 class FileTransactionError(IntegrationError):
@@ -201,8 +202,8 @@ def _desired_snapshot(data, before):
     return FileSnapshot(data, before.mode if before.mode is not None else 0o600)
 
 
-def apply_file_plan(file_plan):
-    """Explicit filesystem apply; never called by the read-only public CLI.
+def apply_file_plan(file_plan, *, extra_changes=(), config_mode=None, owner_mode=None):
+    """Explicit filesystem apply, also used by the hash-bound CLI.
 
     Callers must obtain consent for these exact runtime/access changes. This API
     does not install/start clients, change trust, or copy credentials to backups.
@@ -211,7 +212,19 @@ def apply_file_plan(file_plan):
     apply_plan(plan, plan.before, other_scope=plan.other_scope)
     config = _desired_snapshot(plan.after.config, file_plan.before_config)
     owner = _desired_snapshot(plan.after.ownership, file_plan.before_owner)
-    if plan.operation == "noop":
+    if config.data is not None and config_mode is not None:
+        config = FileSnapshot(config.data, config_mode)
+    if owner.data is not None and owner_mode is not None:
+        owner = FileSnapshot(owner.data, owner_mode)
+    reserved = {file_plan.config_path, file_plan.owner_path,
+                file_plan.other_config_path, file_plan.other_owner_path}
+    for path, before, after in extra_changes:
+        if path in reserved or path.parent != file_plan.config_path.parent:
+            raise IntegrationError("extra receipt paths must be distinct siblings of the config")
+        reserved.add(path)
+        if not isinstance(before, FileSnapshot) or not isinstance(after, FileSnapshot):
+            raise IntegrationError("extra receipt changes require file snapshots")
+    if plan.operation == "noop" and not extra_changes:
         _expect(file_plan.config_path, file_plan.before_config)
         _expect(file_plan.owner_path, file_plan.before_owner)
         if not plan.request.remove:
@@ -220,8 +233,9 @@ def apply_file_plan(file_plan):
         return FileReceipt(file_plan, config, owner)
     changes = [(file_plan.config_path, file_plan.before_config, config),
                (file_plan.owner_path, file_plan.before_owner, owner)]
+    changes.extend(extra_changes)
     directories = _transaction(file_plan, changes, check_other=not plan.request.remove)
-    return FileReceipt(file_plan, config, owner, directories)
+    return FileReceipt(file_plan, config, owner, directories, tuple(extra_changes))
 
 
 def rollback_file_plan(receipt):
@@ -229,5 +243,6 @@ def rollback_file_plan(receipt):
     file_plan = receipt.file_plan
     changes = [(file_plan.config_path, receipt.after_config, file_plan.before_config),
                (file_plan.owner_path, receipt.after_owner, file_plan.before_owner)]
+    changes.extend((path, after, before) for path, before, after in receipt.extra_changes)
     _transaction(file_plan, changes, check_other=False)
     _remove_empty(receipt.created_directories)

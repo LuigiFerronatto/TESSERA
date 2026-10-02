@@ -199,12 +199,12 @@ def test_apply_is_blocked_without_writes(sandbox, capsys):
     before = contents(project.parent)
     assert main(["integrate", "claude", "--scope", "project", "--store-name", "fixture", "--apply", "--json"]) == 2
     output = json.loads(capsys.readouterr().out)
-    assert "unavailable" in output["error"]
+    assert "plan-hash" in output["error"]
     assert output["applied"] is False
     assert contents(project.parent) == before
 
 
-@pytest.mark.parametrize("runtime", ["codex", "copilot", "generic-mcp"])
+@pytest.mark.parametrize("runtime", ["codex", "generic-mcp"])
 def test_unsupported_runtime_reports_real_boundary(sandbox, capsys, runtime):
     assert main(["integrate", runtime, "--scope", "project", "--store-name", "fixture", "--json"]) == 2
     result = json.loads(capsys.readouterr().out)["selected_integrations"][0]
@@ -444,3 +444,287 @@ def test_owned_legacy_launcher_update_and_exact_sidecar_preview():
     assert mutations[0]["after"]["command"] == "tessera-mcp"
     assert mutations[0]["config_file_action"] == "rewrite"
     assert mutations[1]["after"] == json.loads(plan.after.ownership)
+
+
+def cli_result(capsys, args):
+    code = main([*args, "--json"])
+    return code, json.loads(capsys.readouterr().out)
+
+
+def preview_and_apply(capsys, args):
+    code, preview = cli_result(capsys, args)
+    assert code == 0, preview
+    code, applied = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 0, applied
+    assert applied["applied"] is True
+    return preview, applied
+
+
+@pytest.mark.parametrize("runtime", ["claude", "gemini", "copilot"])
+@pytest.mark.parametrize("scope", ["project", "user"])
+def test_cli_hash_bound_install_update_remove_rollback(sandbox, capsys, runtime, scope):
+    home, project = sandbox
+    base = ["integrate", runtime, "--scope", scope, "--config-home", str(home)]
+    path = config_path(runtime, scope, project, home)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    original = {"mcpServers": {"unrelated": {"command": "fixture", "env": {"TOKEN": "fixture-secret"}}}}
+    path.write_bytes(raw(original))
+    first, _ = preview_and_apply(capsys, [*base, "--store-name", "fixture"])
+    assert "fixture-secret" not in json.dumps(first)
+    code, unchanged = cli_result(capsys, [*base, "--store-name", "fixture"])
+    assert code == 0 and unchanged["selected_integrations"][0]["operation"] == "noop"
+    preview_and_apply(capsys, [*base, "--store-name", "changed"])
+    preview_and_apply(capsys, [*base, "--rollback"])
+    assert json.loads(path.read_bytes())["mcpServers"]["tessera"]["args"] == ["--global", "fixture"]
+    preview_and_apply(capsys, [*base, "--remove"])
+    assert json.loads(path.read_bytes()) == original
+    preview_and_apply(capsys, [*base, "--rollback"])
+    assert json.loads(path.read_bytes())["mcpServers"]["tessera"]["args"] == ["--global", "fixture"]
+    assert json.loads(path.read_bytes())["mcpServers"]["unrelated"] == original["mcpServers"]["unrelated"]
+
+
+def test_cli_rollback_fresh_install_restores_absence_and_does_not_store_secrets(sandbox, capsys):
+    home, project = sandbox
+    args = ["integrate", "gemini", "--scope", "project"]
+    preview_and_apply(capsys, [*args, "--store-name", "fixture"])
+    path = config_path("gemini", "project", project, home)
+    preview_and_apply(capsys, [*args, "--rollback"])
+    assert not path.exists()
+    assert not ownership_path(path, "gemini", "project").exists()
+    assert not list(path.parent.glob("*"))
+
+
+@pytest.mark.parametrize("change", ["config", "permissions", "receipt", "selection", "binding"])
+def test_cli_hash_refuses_stale_or_changed_request_without_writes(sandbox, capsys, change):
+    home, project = sandbox
+    args = ["integrate", "gemini", "--scope", "project", "--store-name", "fixture"]
+    path = config_path("gemini", "project", project, home)
+    path.parent.mkdir()
+    path.write_text("{}")
+    code, preview = cli_result(capsys, args)
+    assert code == 0
+    if change == "config":
+        path.write_text('{"other": true}')
+    elif change == "permissions":
+        path.chmod(0o640)
+    elif change == "receipt":
+        from tessera.integration_cli import receipt_path
+        receipt_path(path, "gemini", "project").write_text("{}")
+    elif change == "selection":
+        args[1] = "claude"
+    else:
+        args[-1] = "changed"
+    before = contents(project.parent)
+    code, result = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 2 and not result["applied"]
+    assert contents(project.parent) == before
+
+
+def test_cli_stale_rollback_receipt_preserves_external_changes(sandbox, capsys):
+    home, project = sandbox
+    args = ["integrate", "gemini", "--scope", "project"]
+    preview_and_apply(capsys, [*args, "--store-name", "fixture"])
+    path = config_path("gemini", "project", project, home)
+    data = json.loads(path.read_bytes())
+    data["external"] = "preserve"
+    path.write_bytes(raw(data))
+    before = contents(project.parent)
+    code, result = cli_result(capsys, [*args, "--rollback"])
+    assert code == 2 and "stale rollback" in result["selected_integrations"][0]["error"]
+    assert contents(project.parent) == before
+
+
+def test_cli_receipt_failure_rolls_back_config_and_owner(sandbox, capsys, monkeypatch):
+    from tessera import integration_files as files
+    home, project = sandbox
+    args = ["integrate", "gemini", "--scope", "project", "--store-name", "fixture"]
+    code, preview = cli_result(capsys, args)
+    original = files._replace
+    def fail_receipt(path, expected, desired):
+        if path.name.endswith("-undo.json"):
+            raise OSError("fixture receipt failure")
+        return original(path, expected, desired)
+    monkeypatch.setattr(files, "_replace", fail_receipt)
+    before = contents(project.parent)
+    code, result = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 2 and not result["applied"]
+    assert "no partial writes" in result["error"]
+    assert contents(project.parent) == before
+
+
+def test_guided_apply_and_rollback_share_direct_hash_core(sandbox, capsys):
+    args = ["--scope", "project", "--store-name", "fixture"]
+    code, direct = cli_result(capsys, ["integrate", "gemini", *args])
+    code, guided = cli_result(capsys, ["mcp", "setup", "--runtime", "gemini", *args])
+    assert direct["plan_hash"] == guided["plan_hash"]
+    code, applied = cli_result(capsys, ["mcp", "setup", "--runtime", "gemini", *args,
+                                       "--apply", "--plan-hash", direct["plan_hash"]])
+    assert code == 0 and applied["applied_integrations"] == ["gemini"]
+    preview_and_apply(capsys, ["mcp", "setup", "--runtime", "gemini", "--scope", "project", "--rollback"])
+
+
+def test_copilot_schema_precedence_and_native_scope(sandbox, capsys):
+    home, project = sandbox
+    base = ["integrate", "copilot", "--store-name", "fixture"]
+    code, user = cli_result(capsys, [*base, "--scope", "user"])
+    assert code == 0
+    target = user["selected_integrations"][0]
+    assert target["native_cli_candidate"] == ["copilot", "mcp", "add", "tessera", "--", "tessera-mcp", "--global", "fixture"]
+    assert target["planned_mutations"][0]["after"]["type"] == "local"
+    code, planned = cli_result(capsys, [*base, "--scope", "project"])
+    assert planned["selected_integrations"][0]["native_cli_candidate"] is None
+    (project / ".mcp.json").write_bytes(raw({"mcpServers": {"tessera": {"command": "fixture"}}}))
+    code, blocked = cli_result(capsys, [*base, "--scope", "project"])
+    assert code == 2 and "precedence" in blocked["selected_integrations"][0]["error"]
+
+
+def test_codex_native_plan_is_pinned_argv_only_and_never_runs_clients(sandbox, capsys, monkeypatch):
+    import subprocess
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: pytest.fail("actual provider execution is forbidden"))
+    base = ["integrate", "codex", "--scope", "user", "--store-name", "fixture"]
+    code, result = cli_result(capsys, base)
+    assert code == 0
+    plan = result["selected_integrations"][0]
+    assert plan["strategy"] == "native-command-plan"
+    assert plan["native_cli_candidate"] == ["codex", "mcp", "add", "tessera", "--", "tessera-mcp", "--global", "fixture"]
+    assert plan["native_rollback_candidate"] == ["codex", "mcp", "remove", "tessera"]
+    code, applied = cli_result(capsys, [*base, "--apply", "--plan-hash", result["plan_hash"]])
+    assert code == 2 and not applied["applied"]
+    assert "native-command plans" in applied["error"]
+
+
+def test_codex_owned_remove_plan_preserves_unrelated_toml(sandbox, capsys):
+    import hashlib
+    from tessera.integration_setup import OWNER_SCHEMA
+    home, project = sandbox
+    path = config_path("codex", "user", project, home)
+    path.parent.mkdir()
+    data = b'model = "fixture-model"\n# preserved comment\n[mcp_servers.tessera]\ncommand = "tessera-mcp"\nargs = ["--global", "fixture"]\n'
+    path.write_bytes(data)
+    entry = {"command": "tessera-mcp", "args": ["--global", "fixture"]}
+    canonical = (json.dumps(entry, ensure_ascii=False, indent=2) + "\n").encode()
+    owner = {"schema_version": OWNER_SCHEMA, "runtime": "codex", "scope": "user", "entry_sha256": hashlib.sha256(canonical).hexdigest(), "created_file": False, "created_servers": False}
+    ownership_path(path, "codex", "user").write_bytes(raw(owner))
+    code, result = cli_result(capsys, ["integrate", "codex", "--scope", "user", "--remove"])
+    assert code == 0
+    assert result["selected_integrations"][0]["native_cli_candidate"] == ["codex", "mcp", "remove", "tessera"]
+    assert path.read_bytes() == data
+
+
+def test_cli_receipt_never_contains_unrelated_credentials_and_refuses_unknown_fields(sandbox, capsys):
+    from tessera.integration_cli import receipt_path
+    home, project = sandbox
+    path = config_path("gemini", "project", project, home)
+    path.parent.mkdir()
+    path.write_bytes(raw({"credentials": "synthetic-secret-value"}))
+    args = ["integrate", "gemini", "--scope", "project"]
+    preview_and_apply(capsys, [*args, "--store-name", "fixture"])
+    undo = receipt_path(path, "gemini", "project")
+    assert b"synthetic-secret-value" not in undo.read_bytes()
+    data = json.loads(undo.read_bytes())
+    data["prior_entry"] = {"command": "tessera-mcp", "args": ["--global", 42]}
+    undo.write_bytes(raw(data))
+    code, output = cli_result(capsys, [*args, "--rollback"])
+    assert code == 2 and output["selected_integrations"][0]["status"] == "blocked"
+
+
+def test_cli_group_collision_is_in_preview_and_blocks_every_write(sandbox, capsys):
+    home, project = sandbox
+    args = ["mcp", "setup", "--runtime", "claude", "--runtime", "copilot",
+            "--scope", "project", "--store-name", "fixture"]
+    code, preview = cli_result(capsys, args)
+    assert code == 2
+    assert all(target["status"] == "blocked" for target in preview["selected_integrations"])
+    before = contents(project.parent)
+    code, output = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 2 and not output["applied"]
+    assert contents(project.parent) == before
+
+
+def test_filesystem_in_process_rollback_includes_cli_receipt(tmp_path):
+    from tessera.integration_files import FileSnapshot, apply_file_plan, rollback_file_plan
+    plan = fixture_file_plan(tmp_path)
+    extra = (plan.config_path.with_name("fixture-undo.json"), FileSnapshot(None, None), FileSnapshot(b'{}', 0o600))
+    receipt = apply_file_plan(plan, extra_changes=(extra,))
+    assert extra[0].is_file()
+    rollback_file_plan(receipt)
+    assert not list(tmp_path.rglob("*"))
+
+
+def test_cli_replay_after_apply_is_stale_and_noop_requires_fresh_hash(sandbox, capsys):
+    home, project = sandbox
+    args = ["integrate", "gemini", "--scope", "project", "--store-name", "fixture"]
+    preview, _ = preview_and_apply(capsys, args)
+    before = contents(project.parent)
+    code, output = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 2 and "stale" in output["error"]
+    assert contents(project.parent) == before
+    _, result = preview_and_apply(capsys, args)
+    assert result["selected_integrations"][0]["operation"] == "noop"
+    assert contents(project.parent) == before
+
+
+def test_copilot_documented_bare_shape_preserves_unrelated_servers():
+    bare = DocumentState(raw({"other": {"type": "local", "command": "fixture"}}))
+    plan = build_plan(install("copilot"), bare)
+    assert plan.server_path == "/tessera"
+    assert "mcpServers" not in json.loads(plan.after.config)
+    assert json.loads(plan.after.config)["other"] == json.loads(bare.config)["other"]
+    removed = build_plan(SetupRequest("copilot", "project", remove=True), plan.after)
+    assert json.loads(removed.after.config) == json.loads(bare.config)
+
+
+def test_cli_subprocess_cross_process_apply_and_rollback(tmp_path):
+    import os
+    import subprocess
+    import sys
+    home, root = tmp_path / "home", tmp_path / "project"
+    home.mkdir(); root.mkdir()
+    env = dict(os.environ)
+    for key in ("CODEX_HOME", "GEMINI_CLI_HOME", "CLAUDE_CONFIG_DIR", "COPILOT_HOME"):
+        env.pop(key, None)
+    base = [sys.executable, "-m", "tessera.cli", "integrate", "copilot", "--scope", "user",
+            "--project-root", str(root), "--config-home", str(home), "--json"]
+    def run(flags):
+        output = subprocess.run([*base, *flags], env=env, capture_output=True, text=True, check=True)
+        return json.loads(output.stdout)
+    plan = run(["--store-name", "fixture"])
+    assert run(["--store-name", "fixture", "--apply", "--plan-hash", plan["plan_hash"]])["applied"]
+    undo = run(["--rollback"])
+    assert run(["--rollback", "--apply", "--plan-hash", undo["plan_hash"]])["applied"]
+    assert not (home / ".copilot" / "mcp-config.json").exists()
+
+
+def test_copilot_bare_cli_apply_remove_and_semantic_rollback(sandbox, capsys):
+    home, project = sandbox
+    path = config_path("copilot", "project", project, home)
+    path.parent.mkdir()
+    original = {"other": {"type": "local", "command": "fixture"}}
+    path.write_bytes(raw(original))
+    args = ["integrate", "copilot", "--scope", "project"]
+    preview_and_apply(capsys, [*args, "--store-name", "fixture"])
+    assert "mcpServers" not in json.loads(path.read_bytes())
+    preview_and_apply(capsys, [*args, "--remove"])
+    assert json.loads(path.read_bytes()) == original
+    preview_and_apply(capsys, [*args, "--rollback"])
+    assert "tessera" in json.loads(path.read_bytes()) and "mcpServers" not in json.loads(path.read_bytes())
+
+
+def test_guided_sequential_failure_reports_completed_targets(sandbox, capsys, monkeypatch):
+    from tessera import integration_files as files
+    home, project = sandbox
+    args = ["mcp", "setup", "--runtime", "gemini", "--runtime", "claude",
+            "--scope", "user", "--store-name", "fixture"]
+    code, preview = cli_result(capsys, args)
+    assert code == 0
+    original = files._replace
+    claude = config_path("claude", "user", project, home)
+    def fail_later(path, before, after):
+        if path == claude:
+            raise OSError("fixture second-target failure")
+        return original(path, before, after)
+    monkeypatch.setattr(files, "_replace", fail_later)
+    code, result = cli_result(capsys, [*args, "--apply", "--plan-hash", preview["plan_hash"]])
+    assert code == 2 and result["applied_integrations"] == ["gemini"]
+    assert config_path("gemini", "user", project, home).is_file()
+    assert not claude.exists()

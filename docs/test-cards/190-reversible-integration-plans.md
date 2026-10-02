@@ -1,4 +1,4 @@
-# 190 — Review runtime setup before changing anything
+# 190 — Review and reverse runtime setup explicitly
 
 | Field | Value |
 |---|---|
@@ -14,97 +14,102 @@
 
 ## In one sentence
 
-A user can inspect one consistent runtime setup plan through direct or guided
-commands, while temporary-fixture tests prove reversible filesystem mechanics.
+A user can inspect the same setup plan through direct or guided commands, then
+explicitly apply or undo supported JSON changes using the reviewed plan hash.
 
 ## What problem existed?
 
-Setup needed a common current-to-desired plan and an ownership-safe removal path;
-writing a plausible JSON block alone did not prove safe installation or rollback.
+Setup needed a common current-to-desired plan and ownership-safe removal path;
+a plausible config block alone did not prove safe installation or rollback.
 
 ## How did TESSERA behave before?
 
-Canonical base `20814a47ec0f72d7bea0639e0b057df1ecf5cded` provides the existing
-quickstart and #120 MCP server. It has neither these direct/guided entrypoints nor
-this setup transaction core. #166/#196 unmerged candidates are not dependencies
-silently imported by this work.
+Base `20814a47ec0f72d7bea0639e0b057df1ecf5cded` has quickstart and #120 MCP,
+without these shared setup entrypoints or transaction core. Unmerged #166/#196
+candidates are not silently imported.
 
 ## What changed or is being tested?
 
-The candidate adds read-only direct and guided plans over one implementation,
-strict Claude/Gemini JSON document planning, fingerprint-based ownership,
-explicit scopes, and an opt-in experimental filesystem apply/rollback API.
+Preview-by-default direct/guided commands, explicit scopes and store binding,
+Claude/Gemini/Copilot JSON adapters, hash-bound CLI apply/remove/semantic undo,
+and byte-exact in-process rollback. Codex has an inspected, pinned user-native
+argv plan without TOML rewriting or client execution.
 
 ## How does it work now?
 
 **TARGET — NOT YET ON MAIN**
 
-Detection observes PATH and known config files without launching clients or
-claiming version compatibility. Plans show exact owned-entry changes and safe
-rollback prerequisites. A named store avoids committed machine-specific paths.
-The filesystem API uses per-file atomic replacements, checks stale snapshots,
-and restores completed writes after caught failures without overwriting edits.
-It does not promise crash-atomic multi-file commits; CLI apply stays unavailable.
+Detection observes PATH/config evidence without launching clients or asserting
+version compatibility. The SHA-256 binds the selected action, paths, config,
+ownership, receipt, other-scope and mode guards. Mutation needs explicit `--apply
+--plan-hash`. Durable undo stores only the prior managed entry/ownership metadata,
+not unrelated config or credentials. CLI rollback is semantic; in-process
+rollback is byte-exact. Transactions are per-file atomic and sequential across
+runtimes, with explicit partial-success reporting, not crash-atomic globally.
 
 ## Concrete example
 
 ```bash
-tessera integrate claude --scope project --store-name shared-notes --dry-run --json
-tessera mcp setup --runtime claude --scope project --store-name shared-notes --dry-run --json
+tessera integrate gemini --scope project --store-name shared-notes --json
+tessera mcp setup --runtime gemini --scope project --store-name shared-notes --json
+tessera integrate gemini --scope project --store-name shared-notes --apply --plan-hash <reviewed-hash> --json
+tessera integrate gemini --scope project --rollback --json
 ```
 
-Both emit the same structured plan and change zero files. A Codex or Copilot
-selection gives an explicit unavailable-adapter diagnostic instead of guessed config.
+The first two return identical plans/hashes and change zero files. The third
+applies exactly the reviewed JSON action. The last previews a separately
+hash-bound inverse. Codex project native scope gets a source-backed diagnostic.
 
 ## How was it validated?
 
-`tests/test_issue_190_integration_setup.py` exercises synthetic temporary configs:
-plan parity; no client execution; ownership/idempotency; updates/removal; byte and
-mode restoration; absent files/directories; stale config/owner/other-scope guards;
-intervening edits; caught write failures and partial recovery; lock/symlink/hardlink/
-special-file rejection; malformed/redacted JSON; and portable descriptor generation.
-52 focused integration tests pass; built wheel/sdist and a clean installed-wheel
-preview/apply/rollback smoke pass. Final full-suite and exact-head CI evidence
-are recorded in the draft PR. A demonstrated #95 test-only flake was repaired:
-legacy identity matching now checks identifier boundaries instead of random
-substrings, with positive/negative regression cases; runtime behavior is unchanged.
-Deterministic sanity remains Hit@1 0.75, Hit@3/5 1.0, MRR 0.875, evidence hit 1.0;
-this work changes no retrieval behavior and claims no quality gain.
+`tests/test_issue_190_integration_setup.py` covers synthetic temporary configs:
+parity, no provider execution, hash replay/staleness, idempotency, ownership,
+legacy launcher updates, scope/precedence conflicts, Copilot wrapped/bare maps,
+Codex argv-only plans, cross-process apply/remove/undo, secret-free receipts,
+byte/mode restoration, absent files, malformed inputs, unsafe paths, caught
+failures and preservation of detected concurrent edits.
+
+The PR records final focused/full-suite counts, installed-wheel smoke and
+exact-head deterministic CI. A test-only #95 flake was repaired: identifier
+boundary matching replaces random substring matching, with 13 positive/negative
+cases and neutral test IDs. Runtime behavior and its source inventory gate stay
+unchanged. Sanity remains Hit@1 0.75, Hit@3/5 1.0, MRR 0.875 and evidence hit 1.0;
+no retrieval-quality improvement is claimed.
 
 ## What improved?
 
-Reviewable direct/guided plans share one result. Fixture setup does not duplicate
-entries, remove another server, leak credentials into the preview/ownership
-record, or overwrite a detected intervening edit during rollback.
+One shared contract spans preview and explicit mutation. Fixture actions avoid
+duplicate registrations, preserve unrelated config, refuse stale plans and
+unsafe ownership, and keep unrelated credentials out of persisted undo metadata.
 
 ## What remains unimplemented?
 
-Real client/version/OS acceptance, CLI apply, crash-durable transactions, Codex
-TOML/Copilot/generic adapters, #171 semantic tools, #177/#196 lifecycle integration,
-and #257 automatic project identity remain unimplemented. This is a bounded
-candidate, not completion or closure of #190.
+Real client/version/OS acceptance, crash durability, controlled native Codex
+execution, generic-client mapping, #171 semantic tools, #177/#196 lifecycle
+integration and #257 automatic project identity remain outside this candidate.
+The issue is not closed by synthetic correctness.
 
 ## What is unlocked next?
 
-A reviewable setup-plan contract and isolated filesystem experiments are ready
-for review. No downstream semantic/hook dependency is declared satisfied.
+The setup mechanics are available for review and client acceptance. No downstream
+semantic/hook dependency is marked satisfied.
 
 ## Technical provenance
 
 | Artifact | Link or identifier |
 |---|---|
-| Issue/Test Card | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190), including its Copilot/portability comments |
+| Issue/Test Card | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190), including Copilot/portability comments |
 | Pull request | [Draft PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
 | Merge commit | Not merged |
-| Evidence/Learnings/Decision | [Detailed boundaries and source pins](../INTEGRATION_SETUP.md); `PENDING` |
+| Evidence/Learnings/Decision | [Boundaries and source pins](../INTEGRATION_SETUP.md); `PENDING` |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, no retrieval changes |
-| PR Evolution Audit | Existing #120 baseline retained; no #190 implementation on the audited canonical base; this is the first bounded candidate in this delivery |
+| PR Evolution Audit | Existing #120 retained; #317 first adds previews/transactions, then hash-bound CLI and provider planning; no canonical #190 delivery claimed |
 
 ## Evolution
 
 ```text
-manual/quickstart MCP configuration
-→ shared inspectable setup plan + temporary-fixture reversible transactions
-→ draft candidate only
-→ actual client acceptance and semantic/hook dependencies still required
+manual/quickstart MCP config
+→ shared previews and synthetic reversible transactions
+→ explicit hash-bound JSON CLI actions and pinned native command plans
+→ draft candidate; client acceptance and semantic/hook dependencies remain open
 ```

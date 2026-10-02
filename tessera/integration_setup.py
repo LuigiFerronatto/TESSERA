@@ -1,9 +1,7 @@
-"""Experimental, read-only setup UX and pure reversible document planning.
+"""Experimental setup plans, provider descriptions and CLI argument routing.
 
-No function in this module writes files, launches a provider, or grants access.
-``apply_plan`` and ``rollback_plan`` transform immutable snapshots in memory;
-the explicit experimental ``integration_files`` adapter can materialize them.
-Public CLI apply is gated off pending real-client acceptance.
+Planning is read-only. Explicit CLI apply requires a hash-bound reviewed plan;
+filesystem execution lives in ``integration_files`` and never launches clients.
 """
 from dataclasses import dataclass, field
 import hashlib
@@ -19,7 +17,7 @@ from typing import Optional
 SCHEMA = "tessera.integration-plan.v1"
 OWNER_SCHEMA = "tessera.integration-owner.v1"
 RUNTIMES = ("claude", "codex", "gemini", "copilot", "generic-mcp")
-JSON_ADAPTERS = ("claude", "gemini")
+JSON_ADAPTERS = ("claude", "gemini", "copilot")
 MAX_BYTES = 1024 * 1024
 SOURCES = {
     "claude": {
@@ -37,7 +35,8 @@ SOURCES = {
     },
     "copilot": {
         "url": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers",
-        "revision": "documentation observed 2026-10-02; diagnostic only",
+        "revision": "0b8c768bf0d5a13560ec82fd3daa414137e2e436",
+        "schema_source": "https://github.com/github/docs/blob/0b8c768bf0d5a13560ec82fd3daa414137e2e436/content/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers.md",
     },
 }
 
@@ -126,7 +125,10 @@ class SetupRequest:
             if any(ord(char) < 32 for char in self.store_path):
                 raise IntegrationError("store path must not contain control characters")
             args = ["--store", self.store_path]
-        return {"command": "tessera-mcp", "args": args}
+        result = {"command": "tessera-mcp", "args": args}
+        if self.runtime == "copilot":
+            result.update({"type": "local", "tools": ["*"]})
+        return result
 
 
 @dataclass(frozen=True)
@@ -138,6 +140,7 @@ class SetupPlan:
     previous_entry: Optional[bytes] = field(default=None, repr=False)
     desired_entry: Optional[bytes] = field(default=None, repr=False)
     other_scope: DocumentState = field(default=DocumentState(), repr=False)
+    server_path: str = "/mcpServers/tessera"
 
     def to_dict(self):
         request = self.request
@@ -151,13 +154,17 @@ class SetupPlan:
                 if request.runtime == "claude":
                     native.append("--")
                 native += [entry["command"], *entry["args"]]
+        if request.runtime == "copilot":
+            native = None if request.scope == "project" else (
+                ["copilot", "mcp", "remove", "tessera"] if request.remove else
+                ["copilot", "mcp", "add", "tessera", "--", entry["command"], *entry["args"]])
         return {
             "schema_version": SCHEMA, "runtime": request.runtime, "scope": request.scope,
             "operation": self.operation, "current_state": self.before.fingerprints(),
             "desired_state": self.after.fingerprints(),
             "other_scope_guard": self.other_scope.fingerprints(),
             "planned_mutations": [] if self.operation == "noop" else [{
-                "path": "/mcpServers/tessera", "operation": self.operation,
+                "path": self.server_path, "operation": self.operation,
                 "before_sha256": _hash(self.previous_entry), "after": entry,
                 "config_file_action": ("delete" if self.after.config is None else
                                        "create" if self.before.config is None else "rewrite"),
@@ -170,7 +177,7 @@ class SetupPlan:
                 "after": _parse(self.after.ownership) if self.after.ownership is not None else None,
             }],
             "native_cli_candidate": native,
-            "native_cli_execution": "unavailable: version/OS and rollback acceptance gates pending",
+            "native_cli_execution": "not implemented by the file executor; argv are inspectable only",
             "rollback": {
                 "method": "rollback_plan(plan, current_snapshot) restores exact original bytes in memory",
                 "requires": self.after.fingerprints(), "stale_state": "refuse",
@@ -184,7 +191,7 @@ class SetupPlan:
                 "store_reach": "explicit shared store; no automatic project-identity isolation",
             } if not request.remove else None,
             "warnings": [
-                "Preview only: no runtime registration, permission, client launch, or filesystem apply",
+                "Preview is the default; mutation requires the exact reviewed --plan-hash",
                 "Install tessera-agent-memory[mcp] separately; executable/version/store readiness is unverified",
                 "Named stores must be registered on each machine; no absolute source-checkout path is generated",
                 "Runtime policy/trust approval remains with the client; setup does not change it",
@@ -196,17 +203,23 @@ class SetupPlan:
 def capabilities(runtime):
     return {
         "mcp_transport": "existing #120 stdio tools; not semantic #171 tools",
-        "document_adapter": "experimental-json" if runtime in JSON_ADAPTERS else "unavailable",
+        "document_adapter": ("experimental-json" if runtime in JSON_ADAPTERS else
+                             "native-command-plan" if runtime == "codex" else "unavailable"),
         "runtime_version": None, "runtime_compatibility": "unverified",
         "semantic_agent_api": "unavailable: #171",
         "lifecycle_hooks": "unavailable: #177 and canonical #196 dependency",
         "before_reasoning_context": False, "tool_pre_post_hooks": False,
         "subagent_events": False, "compaction_events": False, "async_hooks": False,
-        "filesystem_apply": "experimental Python API; public CLI unavailable",
+        "filesystem_apply": runtime in JSON_ADAPTERS,
     }
 
 
-def _servers(document):
+def _servers(document, runtime=None):
+    if runtime == "copilot" and document and "mcpServers" not in document:
+        if not all(isinstance(value, dict) and ("command" in value or "url" in value)
+                   for value in document.values()):
+            raise IntegrationError("unknown Copilot bare server-map shape")
+        return document
     servers = document.get("mcpServers", {})
     if not isinstance(servers, dict):
         raise IntegrationError("mcpServers must be an object; unknown formats are not rewritten")
@@ -219,7 +232,9 @@ def build_plan(request, state=DocumentState(), *, other_scope=DocumentState()):
     if request.runtime not in JSON_ADAPTERS:
         raise IntegrationError("no validated document adapter for this runtime; no mutations planned")
     document = _parse(state.config)
-    servers = _servers(document)
+    bare = request.runtime == "copilot" and bool(document) and "mcpServers" not in document
+    server_path = "/tessera" if bare else "/mcpServers/tessera"
+    servers = _servers(document, request.runtime)
     present = "tessera" in servers
     previous = _encode(servers["tessera"]) if present else None
     owner = _parse(state.ownership)
@@ -236,29 +251,30 @@ def build_plan(request, state=DocumentState(), *, other_scope=DocumentState()):
         raise IntegrationError("tessera entry is not owned by this installer; refusing takeover/removal")
     elif state.ownership is not None:
         raise IntegrationError("empty ownership sidecar is invalid")
-    if not request.remove and "tessera" in _servers(_parse(other_scope.config)):
+    if not request.remove and "tessera" in _servers(_parse(other_scope.config), request.runtime):
         raise IntegrationError("tessera exists in the other scope; resolve the scope conflict explicitly")
     if request.remove:
         if not present:
-            return SetupPlan(request, state, state, "noop")
+            return SetupPlan(request, state, state, "noop", other_scope=other_scope, server_path=server_path)
         del servers["tessera"]
-        if not servers and owner["created_servers"]:
+        if not bare and not servers and owner["created_servers"]:
             document.pop("mcpServers", None)
         after = DocumentState(None if not document and owner["created_file"] else _encode(document))
-        return SetupPlan(request, state, after, "remove", previous)
+        return SetupPlan(request, state, after, "remove", previous, other_scope=other_scope, server_path=server_path)
     wanted = _encode(desired)
     if present and previous == wanted:
-        return SetupPlan(request, state, state, "noop", previous, wanted, other_scope)
+        return SetupPlan(request, state, state, "noop", previous, wanted, other_scope, server_path)
     new_owner = {
         "schema_version": OWNER_SCHEMA, "runtime": request.runtime, "scope": request.scope,
         "entry_sha256": _hash(wanted),
         "created_file": owner.get("created_file", state.config is None),
-        "created_servers": owner.get("created_servers", "mcpServers" not in document),
+        "created_servers": owner.get("created_servers", not bare and "mcpServers" not in document),
     }
     servers["tessera"] = desired
-    document["mcpServers"] = servers
+    if not bare:
+        document["mcpServers"] = servers
     after = DocumentState(_encode(document), _encode(new_owner))
-    return SetupPlan(request, state, after, "update" if present else "add", previous, wanted, other_scope)
+    return SetupPlan(request, state, after, "update" if present else "add", previous, wanted, other_scope, server_path)
 
 
 def apply_plan(plan, current, *, other_scope=DocumentState()):
@@ -282,6 +298,8 @@ def config_path(runtime, scope, project_root, home):
         return project_root / ".mcp.json" if scope == "project" else home / ".claude.json"
     if runtime == "gemini":
         return (project_root if scope == "project" else home) / ".gemini" / "settings.json"
+    if runtime == "copilot":
+        return project_root / ".github" / "mcp.json" if scope == "project" else home / ".copilot" / "mcp-config.json"
     if runtime == "codex":
         return (project_root if scope == "project" else home) / ".codex" / "config.toml"
     return None
@@ -372,54 +390,29 @@ def preview_target(request, project_root, home, *, environ=None):
 
 
 def add_setup_parsers(sub):
-    direct = sub.add_parser("integrate", help="Experimental read-only runtime setup plan")
+    direct = sub.add_parser("integrate", help="Plan explicit runtime setup, apply or rollback")
     direct.add_argument("runtime", choices=RUNTIMES)
-    mcp = sub.add_parser("mcp", help="MCP setup discovery (experimental preview only)")
+    mcp = sub.add_parser("mcp", help="MCP setup discovery (preview by default)")
     guided = mcp.add_subparsers(dest="mcp_command", required=True).add_parser("setup")
     guided.add_argument("--runtime", action="append", choices=RUNTIMES, help="Explicit target; repeatable")
     for parser in (direct, guided):
         parser.add_argument("--scope", choices=("project", "user"), required=True)
         parser.add_argument("--project-root", default=".")
+        parser.add_argument("--config-home", default=None, help="Explicit user config home (default: platform home)")
         binding = parser.add_mutually_exclusive_group()
         binding.add_argument("--store-name", help="Logical named store registered separately on each machine")
         binding.add_argument("--store-path", help="Absolute user-local store path (user scope only)")
-        parser.add_argument("--remove", action="store_true")
+        action = parser.add_mutually_exclusive_group()
+        action.add_argument("--remove", action="store_true")
+        action.add_argument("--rollback", action="store_true", help="Undo the last owned-entry change using its safe receipt")
         mode = parser.add_mutually_exclusive_group()
         mode.add_argument("--dry-run", action="store_true", help="Explicit preview; also the default")
-        mode.add_argument("--apply", action="store_true", help="Unavailable until real-client acceptance passes")
+        mode.add_argument("--apply", action="store_true", help="Apply the exact reviewed plan; requires --plan-hash")
+        parser.add_argument("--plan-hash", help="SHA-256 printed by the matching preview")
         parser.add_argument("--json", action="store_true")
         parser.set_defaults(func=cmd_setup)
 
 
 def cmd_setup(args):
-    root = Path(os.path.abspath(os.path.expanduser(args.project_root)))
-    home = Path.home()
-    detected = detect_runtimes(root, home)
-    selected = [args.runtime] if isinstance(args.runtime, str) else list(dict.fromkeys(args.runtime or []))
-    if not selected and not args.json and sys.stdin.isatty() and not args.apply:
-        for runtime in detected:
-            print(f"{runtime['runtime']}: executable {'found' if runtime['executable_on_path'] else 'not observed'}; version unverified")
-        try:
-            selected = list(dict.fromkeys(input("Targets (comma-separated; blank cancels): ").strip().split(",")))
-            selected = [item.strip() for item in selected if item.strip()]
-        except (EOFError, KeyboardInterrupt):
-            selected = []
-    results = [preview_target(SetupRequest(runtime, args.scope, args.store_name, args.store_path, args.remove), root, home)
-               for runtime in selected]
-    error = None
-    if args.apply:
-        error = "CLI apply is unavailable pending provider/version/OS acceptance; the experimental filesystem API is fixture-tested"
-    elif not selected:
-        error = "select targets explicitly with --runtime; discovery did not select or configure anything"
-    output = {"schema_version": SCHEMA, "mode": "dry-run", "applied": False,
-              "detected_runtimes": detected, "selected_integrations": results, "error": error}
-    if args.json:
-        print(json.dumps(output, ensure_ascii=False, sort_keys=True))
-    else:
-        print("TESSERA experimental integration preview (no files changed)")
-        for result in results:
-            print(f"{result['runtime']} / {result['scope']}: {result['status']}")
-            print(json.dumps(result, ensure_ascii=False, indent=2))
-        if error:
-            print(error)
-    return 2 if error or any(item["status"] == "blocked" for item in results) else 0
+    from .integration_cli import run_setup
+    return run_setup(args)
