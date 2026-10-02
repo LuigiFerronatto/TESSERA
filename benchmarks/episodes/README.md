@@ -18,6 +18,7 @@ From an editable development checkout with its normal dev dependencies:
 ```bash
 python -m pytest tests/test_episode_boundary.py
 python -m benchmarks.episodes.run --output artifacts/episodes/draft.json
+python -m benchmarks.episodes.run --output artifacts/episodes/summary.json --summary
 python -m benchmarks.episodes.prepare_review --output-dir artifacts/episodes/review-v1
 python -m benchmarks.episodes.run --output artifacts/episodes/reviewed.json --require-reviewed
 ```

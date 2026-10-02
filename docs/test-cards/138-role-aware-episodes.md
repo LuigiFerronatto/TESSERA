@@ -5,8 +5,8 @@
 | Issue | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) |
 | Record status | `IN_PROGRESS` preparation; reviewed-fixture readiness remains `BLOCKED` |
 | Capability type | `benchmark` |
-| Pull request | Publication pending |
-| Head commit | Candidate source hashes in local evidence; exact remote head pending |
+| Pull request | [#312](https://github.com/LuigiFerronatto/TESSERA/pull/312) |
+| Head commit | Implementation source [09156dc](https://github.com/LuigiFerronatto/TESSERA/commit/09156dc64f2d748f4c6ac7322039b7b4c3c92254); later link/evidence-only edits do not change executable bytes |
 | Merge commit | Not merged |
 | Decision | `PENDING`; no new default selected |
 | Benchmark applicability | `REQUIRED` |
@@ -100,7 +100,12 @@ No canonical dependency is unlocked: #74 is satisfied, but #138 still lacks
 independent human-reviewed boundaries. #136/#137/#177 integration remains separate.
 
 
-See the candidate PR for exact-head CI; local command results are reported there.
+Local Python 3.12.14 regression: **608 passed, 8 skipped**, 14 expected legacy
+bare-ID warnings. Skips: 5 unavailable gh-aw extension checks and 3 optional MCP
+transport checks (extra not installed). The 46 episode tests and 8 stage-doc
+checks passed. Wheel/sdist build and benchmark-exclusion inspections passed;
+sanity Hit@1=.75, Hit@3/5=1, MRR=.875, evidence hit rate=1. No providers or
+downloads were used. See #312 for current exact-head CI.
 The REQUIRED dev-50 retrieval gate is separate and cannot prove episode quality.
 After human review, score reviewed boundaries and holdout cases, then compare
 fixed downstream decomposition. Only a reviewed decision can select a runtime
@@ -113,7 +118,7 @@ merge, record its canonical SHA and reconcile the roadmap/lifecycle explicitly.
 |---|---|
 | Canonical baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Issue/Test Card | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) |
-| Pull request | Publication pending |
+| Pull request | [#312](https://github.com/LuigiFerronatto/TESSERA/pull/312) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | [Draft diagnostics](../evidence/138/local-diagnostics.json); human metrics null; `PENDING` |
 | Benchmark record | REQUIRED exact-head dev-50 pending; distinct from human segmentation quality |
