@@ -346,3 +346,20 @@ def test_bad_cancellation_callback_preserves_partial_journal(engine):
     assert result["status"] == "failed" and result["error"] == "CANCEL_CHECK_FAILED"
     assert result["completed_steps"] == 1 and result["journal"][0]["status"] == "completed"
     assert "sensitive" not in json.dumps(result)
+
+
+def test_native_frontmatter_dates_preserve_public_read_contract(tmp_path):
+    import datetime as dt
+    path = tmp_path / "dated.md"
+    path.write_text("---\nname: dated\nreviewed_on: 2026-01-01\n---\nAuditable memory reports.\n")
+    engine = TesseraEngine(str(tmp_path))
+    engine.build_index()
+    expected = engine.retrieve_context_contract("auditable memory", top_n=1)
+    result = RecipeRunner(engine).run(builtin_recipe("search_and_provenance"), {"query": "auditable memory"})
+    assert result["status"] == "completed"
+    assert result["outputs"]["search"]["hits"] == expected
+    assert expected[0]["frontmatter"]["reviewed_on"] == dt.date(2026, 1, 1)
+    recipe = changed()
+    recipe["steps"][0]["with"]["query"] = dt.date(2026, 1, 1)
+    with pytest.raises(RecipeError, match="NON_JSON_VALUE"):
+        load(recipe)

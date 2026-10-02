@@ -51,6 +51,9 @@ output contracts, owning cards and explicit read effects:
 
 The runner validates core typed output fields and preserves the entire original
 result payload; it does not reinterpret scores, evidence, drawers, or authority.
+Native YAML dates/datetimes remain unchanged in Python outputs and use the
+existing CLI/MCP string convention only for byte budgets/hashes; unsupported
+non-JSON objects fail safely.
 Retrieval descriptors truthfully mark `deterministic=False`: the existing
 `score_explain.recency_boost` depends on the Engine clock even with zero recency
 weight. Repeatability requires unchanged inputs, index, source state and clock.

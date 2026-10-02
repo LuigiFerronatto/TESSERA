@@ -5,6 +5,7 @@ write, index-build, persisted checkpoint, or user-defined callable is supported.
 """
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 import re
@@ -86,10 +87,16 @@ class PrimitiveRegistry:
         raise RecipeError("UNAVAILABLE_PRIMITIVE_VERSION")
 
 
-def _json(value: Any) -> bytes:
+def _json(value: Any, *, output: bool = False) -> bytes:
+    def encode_extra(item):
+        # Current source frontmatter may contain SafeLoader date values. Keep
+        # the Python payload untouched and hash the CLI/MCP string convention.
+        if output and isinstance(item, (dt.date, dt.datetime)):
+            return str(item)
+        raise TypeError("unsupported value")
     try:
         return json.dumps(value, sort_keys=True, separators=(",", ":"),
-                          ensure_ascii=False, allow_nan=False).encode("utf-8")
+                          ensure_ascii=False, allow_nan=False, default=encode_extra).encode("utf-8")
     except (TypeError, ValueError, UnicodeError, RecursionError) as exc:
         raise RecipeError("NON_JSON_VALUE") from exc
 
@@ -419,7 +426,7 @@ class RecipeRunner:
                          type(item.get("schema_version")) is not int or
                          item["schema_version"] != 1 for item in result[key]):
                     raise RecipeError("INVALID_PRIMITIVE_OUTPUT")
-                encoded = _json(result)
+                encoded = _json(result, output=True)
                 total_bytes += len(encoded)
                 if total_bytes > recipe["budgets"]["max_output_bytes"]:
                     raise RecipeError("OUTPUT_BUDGET_EXCEEDED")
