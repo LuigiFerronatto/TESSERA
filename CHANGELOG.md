@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add a provider-neutral lifecycle Hook Core SDK with explicit project/run
+  identity, redacted bounded ephemeral capture, prepared-context budgets and
+  frozen Claude/Codex/Gemini/Copilot mappings. Response boundaries never save
+  memory; downstream handlers and installation remain unimplemented. Includes
+  an offline semantic parity experiment. ([#196](https://github.com/LuigiFerronatto/TESSERA/issues/196))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

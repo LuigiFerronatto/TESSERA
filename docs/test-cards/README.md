@@ -65,6 +65,8 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #70 Structural source segmentation | `VALIDATED` | [70-structural-segmentation.md](70-structural-segmentation.md) | [Issue #70](https://github.com/LuigiFerronatto/TESSERA/issues/70), [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`, `KEEP` |
 | #13 Read-only Corpus Doctor | `IN_PROGRESS` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), decision pending |
 
+| #196 Provider-neutral lifecycle Hook Core | `IN_PROGRESS` | [196-neutral-hook-core.md](196-neutral-hook-core.md) | [Issue #196](https://github.com/LuigiFerronatto/TESSERA/issues/196), additive SDK candidate, ITERATE pending review |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
