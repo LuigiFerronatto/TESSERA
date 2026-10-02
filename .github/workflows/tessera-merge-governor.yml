@@ -1,24 +1,15 @@
 name: TESSERA Merge Governor
 
-# Deterministic (non-AI) merge-authorization gate for TESSERA pull requests.
-#
-# This workflow NEVER merges anything and NEVER grants write-all permissions.
-# It verifies deterministic gates and publishes a check run
-# (`tessera-merge-governor`) that a maintainer can add to branch protection
-# as a required status check. Stage A (this initial rollout) is
-# report-only: it never calls the merge API.
-#
-# The anti-stale-head mechanism: it parses the exact head SHA recorded by
-# `.github/workflows/tessera-pr-maintainer-audit.md` in its
-# `## Maintainer audit` comment and requires that SHA to equal the PR's
-# *current* head SHA. Any new commit invalidates a prior KEEP until a fresh
-# audit runs against the new head. See `governance/merge_governor.py`.
-
+# Deterministic readiness only. Never calls a merge/auto-merge API and never
+# requires an AI audit, engine availability, or an AI-authored comment.
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled]
+    types: [opened, reopened, synchronize, edited, ready_for_review, converted_to_draft, labeled, unlabeled]
   pull_request_review:
     types: [submitted, dismissed]
+  workflow_run:
+    workflows: [TESSERA CI, TESSERA Benchmark Ledger]
+    types: [completed]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -28,19 +19,25 @@ on:
 permissions:
   contents: read
   pull-requests: read
-  issues: read
   checks: write
 
 concurrency:
-  group: tessera-merge-governor-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  # Keep manual and event-driven evaluations serialized for each PR. Ignored
+  # title edits must not cancel an in-flight body/candidate evaluation.
+  group: tessera-merge-governor-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.inputs.pr_number || github.run_id }}-${{ github.event.action == 'edited' && github.event.changes.body == null && github.run_id || 'active' }}
   cancel-in-progress: true
 
 jobs:
   evaluate:
     name: Evaluate deterministic merge gates
+    if: >-
+      (github.event_name != 'workflow_run' || github.event.workflow_run.pull_requests[0].number != null) &&
+      (github.event.action != 'edited' || github.event.changes.body != null)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # workflow_run always checks out the trusted default branch, never a
+      # PR-controlled artifact/ref from the completed workflow.
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -52,155 +49,63 @@ jobs:
       - name: Resolve PR number
         id: pr
         env:
-          GH_TOKEN: ${{ github.token }}
           EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          WORKFLOW_PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
           INPUT_PR_NUMBER: ${{ github.event.inputs.pr_number }}
         run: |
           set -euo pipefail
-          number="${EVENT_PR_NUMBER:-$INPUT_PR_NUMBER}"
-          if [[ -z "$number" ]]; then
-            echo "No PR number available (neither event nor manual input)." >&2
-            exit 1
-          fi
+          number="${EVENT_PR_NUMBER:-${WORKFLOW_PR_NUMBER:-$INPUT_PR_NUMBER}}"
+          [[ "$number" =~ ^[1-9][0-9]*$ ]] || { echo "Invalid PR number" >&2; exit 1; }
           echo "number=$number" >> "$GITHUB_OUTPUT"
 
-      - name: Gather PR state and comments
+      - name: Gather current PR and human review state
         id: gather
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           REPO: ${{ github.repository }}
-        shell: bash
+          COMPLETED_HEAD: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
           gh pr view "$PR_NUMBER" --repo "$REPO" \
-            --json headRefOid,isDraft,mergeable,reviewDecision,statusCheckRollup,files \
-            > pr.json
-          gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate > comments.json
-          head_sha="$(python -c 'import json;print(json.load(open("pr.json")).get("headRefOid") or "")')"
-          # Latest run conclusion of the maintainer-audit workflow for this
-          # exact head, used to distinguish a confirmed engine failure
-          # (quota/auth/timeout/provider outage) from "hasn't run yet". See
-          # governance.merge_governor.is_engine_unavailable.
-          gh api "repos/$REPO/actions/workflows/tessera-pr-maintainer-audit.lock.yml/runs?head_sha=$head_sha&per_page=1" \
-            > audit_runs.json || echo '{"workflow_runs":[]}' > audit_runs.json
-
+            --json headRefOid,isDraft,mergeable,reviewDecision,statusCheckRollup,body,author > pr.json
+          head_sha="$(python -c 'import json;print(json.load(open("pr.json"))["headRefOid"])')"
+          # An older run must never publish readiness for a newer PR head.
+          if [[ -n "$COMPLETED_HEAD" && "$COMPLETED_HEAD" != "$head_sha" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Ignoring completed workflow for a superseded head."
+            exit 0
+          fi
+          gh api graphql --paginate --slurp \
+            -f query='query($owner:String!, $name:String!, $number:Int!, $endCursor:String) {
+              repository(owner:$owner, name:$name) {
+                pullRequest(number:$number) {
+                  reviewThreads(first:100, after:$endCursor) {
+                    nodes { isResolved }
+                    pageInfo { hasNextPage endCursor }
+                  }
+                }
+              }
+            }' \
+            -F owner="${REPO%/*}" -F name="${REPO#*/}" -F number="$PR_NUMBER" > threads.json
+          gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate --slurp > reviews.json
           python - <<'PY'
           import json
-
+          from governance.merge_governor import payload_from_pr
           with open("pr.json", encoding="utf-8") as fh:
               pr = json.load(fh)
-          with open("comments.json", encoding="utf-8") as fh:
-              comments = json.load(fh)
-          with open("audit_runs.json", encoding="utf-8") as fh:
-              audit_runs = json.load(fh)
-
-          rollup = pr.get("statusCheckRollup") or []
-
-          def conclusions_for(name_substring):
-              # Returns every matching check's pass/fail state (not just the
-              # first match). A single first-match `or` previously let a red
-              # required job (for example a failing `test (Python 3.9)`)
-              # hide behind an unrelated green job (for example
-              # `distribution (Python 3.9)`) that happened to match first.
-              matches = []
-              for check in rollup:
-                  name = (check.get("name") or check.get("context") or "")
-                  if name_substring.lower() in name.lower():
-                      state = check.get("conclusion") or check.get("state") or ""
-                      matches.append(str(state).upper() in ("SUCCESS", "NEUTRAL", "SKIPPED"))
-              return matches
-
-          def all_green(name_substring):
-              matches = conclusions_for(name_substring)
-              return bool(matches) and all(matches)
-
-          # TESSERA CI (.github/workflows/tessera-ci.yml) publishes these
-          # required job names; every one of them must be present and green
-          # on the current head for CI to count as green. Missing evidence
-          # (job not yet run/reported) must fail closed, not pass open.
-          required_ci_jobs = (
-              "distribution (Python 3.9)",
-              "distribution (Python 3.12)",
-              "test (Python 3.9)",
-              "test (Python 3.12)",
-              "smoke",
-              "sanity-eval",
-          )
-          ci_success = all(all_green(job_name) for job_name in required_ci_jobs)
-
-          # The Benchmark Ledger (.github/workflows/benchmark.yml) always
-          # runs `benchmark-reporting (offline)`; it must be green regardless
-          # of applicability level (it also validates the PR's own
-          # applicability declaration).
-          benchmark_success = all_green("benchmark-reporting")
-
-          # `mergeable` (MERGEABLE/CONFLICTING/UNKNOWN) is GitHub's raw
-          # git-level merge-conflict computation. It is deliberately used
-          # here instead of `mergeStateStatus`, which is the *aggregate* of
-          # git mergeability AND every required status check (including
-          # this workflow's own `tessera-merge-governor` check). Gating on
-          # `mergeStateStatus` created a self-referential loop: the first
-          # pull_request_review-triggered run (right when a fresh audit
-          # submits its review) could see a stale/non-clean aggregate state
-          # from *before* this very run publishes its own checks, and
-          # reject an otherwise fully green head. `mergeable` has no such
-          # circular dependency — it reflects only whether the PR's diff
-          # applies cleanly against the base branch.
-          mergeable = pr.get("mergeable")
-          mergeable_state = {
-              "MERGEABLE": "clean",
-              "CONFLICTING": "conflicting",
-          }.get(mergeable)
-
-          # Latest run conclusion for the maintainer-audit workflow at this
-          # exact head, used by governance.merge_governor.is_engine_unavailable
-          # to distinguish a confirmed engine/provider failure from "the
-          # audit simply hasn't run yet" (both look like "no audit comment
-          # found" from the comment-scraping side alone).
-          audit_workflow_runs = audit_runs.get("workflow_runs") or []
-          audit_workflow_conclusion = (
-              audit_workflow_runs[0].get("conclusion") if audit_workflow_runs else None
-          )
-
-          payload = {
-              "current_head_sha": pr.get("headRefOid"),
-              "is_draft": bool(pr.get("isDraft")),
-              "mergeable_state": mergeable_state,
-              "ci_success": ci_success,
-              "benchmark_success": benchmark_success,
-              "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
-              # Unresolved-thread detection requires a GraphQL query beyond
-              # `gh pr view --json`; conservatively treat as satisfied only
-              # when reviewDecision is not itself blocking. A maintainer
-              # extending this workflow should wire the exact
-              # `reviewThreads(isResolved: false)` GraphQL query for their
-              # branch-protection policy before relying on this gate alone.
-              "has_unresolved_threads": False,
-              "required_checks_satisfied": True,
-              "audit_workflow_conclusion": audit_workflow_conclusion,
-              "comments": [
-                  {
-                      "id": c.get("id"),
-                      "body": c.get("body", ""),
-                      "created_at": c.get("created_at"),
-                      "author_association": c.get("author_association"),
-                      "author_is_bot": (c.get("user") or {}).get("type") == "Bot",
-                  }
-                  for c in comments
-              ],
-          }
+          with open("threads.json", encoding="utf-8") as fh:
+              threads = json.load(fh)
+          with open("reviews.json", encoding="utf-8") as fh:
+              reviews = json.load(fh)
           with open("payload.json", "w", encoding="utf-8") as fh:
-              json.dump(payload, fh)
-
-          with open("head_sha.txt", "w", encoding="utf-8") as fh:
-              fh.write(payload["current_head_sha"] or "")
+              json.dump(payload_from_pr(pr, threads, reviews), fh)
           PY
-          echo "head_sha=$(cat head_sha.txt)" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
 
       - name: Evaluate deterministic gates
         id: evaluate
-        shell: bash
+        if: steps.gather.outputs.skip != 'true'
         run: |
           set -euo pipefail
           set +e
@@ -212,109 +117,46 @@ jobs:
           echo "$result"
 
       - name: Publish merge-governor check run
+        if: steps.gather.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
           HEAD_SHA: ${{ steps.gather.outputs.head_sha }}
           RESULT_JSON: ${{ steps.evaluate.outputs.result }}
           STATUS: ${{ steps.evaluate.outputs.status }}
-        shell: bash
         run: |
           set -euo pipefail
-          conclusion="success"
-          if [[ "$STATUS" != "0" ]]; then
-            conclusion="failure"
-          fi
-          reasons="$(python - <<PY
-          import json
-          data = json.loads('''$RESULT_JSON''')
-          reasons = data.get("reasons") or []
-          notes = data.get("notes") or []
-          lines = [f"- {r}" for r in reasons]
-          lines += [f"- (note) {n}" for n in notes]
-          print("\n".join(lines) or "No blocking reasons.")
-          PY
-          )"
-          gh api "repos/$REPO/check-runs" \
-            -f name="tessera-merge-governor" \
-            -f head_sha="$HEAD_SHA" \
-            -f status="completed" \
-            -f conclusion="$conclusion" \
-            -f "output[title]=TESSERA Merge Governor: $conclusion" \
-            -f "output[summary]=$reasons" \
-            > /dev/null || echo "::warning::could not publish check-run (requires checks: write on this token/context)"
-          if [[ "$conclusion" == "failure" ]]; then
-            echo "::warning::Deterministic merge gates are not satisfied yet:"
-            echo "$reasons"
-          fi
-
-      # Publish `TESSERA Maintainer Audit` as its own required status check,
-      # independent from `tessera-merge-governor`. This lets branch
-      # protection require the semantic audit signal on its own (not just
-      # the aggregate governor), per "defense in depth": CI, Benchmark,
-      # Maintainer Audit and Merge Governor are each independently required
-      # rather than trusting a single aggregator to never have a bug. Bound
-      # to the exact current head SHA: any new commit makes this check
-      # pending again (a stale audit publishes `failure`, never a stale
-      # `success`).
-      - name: Publish maintainer-audit check run
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ steps.gather.outputs.head_sha }}
-          RESULT_JSON: ${{ steps.evaluate.outputs.result }}
-        shell: bash
-        run: |
-          set -euo pipefail
+          # Close the gather/publish race: never stamp a new head with old evidence.
+          gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefOid,body > current_pr.json
+          current_head="$(python -c 'import json;print(json.load(open("current_pr.json"))["headRefOid"])')"
+          [[ "$HEAD_SHA" == "$current_head" ]] || { echo "PR head changed; skipping stale result."; exit 0; }
           python - <<'PY'
           import json
           import os
-
-          from governance.merge_governor import audit_check_status
-
+          from governance.merge_governor import GateResult, recheck_benchmark_contract
           data = json.loads(os.environ["RESULT_JSON"])
-          audit = data.get("audit")
-          engine_unavailable = bool(data.get("engine_unavailable"))
-          status = audit_check_status(audit, engine_unavailable)
-          if status is None:
-              # No audit recorded yet, and no confirmed engine failure: leave
-              # the check unpublished so branch protection shows it as
-              # pending, not a false failure raised before the audit has had
-              # a chance to run.
-              out = {"skip": True}
-          else:
-              conclusion = status["conclusion"]
-              label = status["status_label"]
-              if label == "ENGINE_UNAVAILABLE":
-                  summary = (
-                      "The maintainer-audit engine did not complete for this head "
-                      "(provider/quota/auth failure). This check fails closed: a "
-                      "human break-glass override (`## Maintainer override — KEEP`, "
-                      "from a trusted maintainer, with CI and Benchmark green) is "
-                      "the only path to authorize merge without a completed audit."
-                  )
-              elif label.startswith("STALE_"):
-                  summary = (
-                      f"Stale: audited head `{audit['audited_head_sha']}` does not "
-                      "match the current head. A fresh audit is required."
-                  )
-              else:
-                  summary = f"Latest maintainer-audit decision: {audit['decision']}."
-              out = {"skip": False, "conclusion": conclusion, "summary": summary}
-          with open("audit_check.json", "w", encoding="utf-8") as fh:
-              json.dump(out, fh)
+          with open("pr.json", encoding="utf-8") as fh:
+              evaluated = json.load(fh)
+          with open("current_pr.json", encoding="utf-8") as fh:
+              current = json.load(fh)
+          result = recheck_benchmark_contract(GateResult(**data), evaluated.get("body"), current.get("body"))
+          with open("publication.json", "w", encoding="utf-8") as fh:
+              json.dump(result.to_dict(), fh)
           PY
-          if [[ "$(python -c 'import json;print(json.load(open("audit_check.json"))["skip"])')" == "True" ]]; then
-            echo "No maintainer-audit decision recorded yet for this head; leaving check pending."
-            exit 0
+          conclusion="failure"
+          if [[ "$STATUS" == "0" && "$(python -c 'import json;print(json.load(open("publication.json"))["authorized"])')" == 'True' ]]; then
+            conclusion="success"
           fi
-          conclusion="$(python -c 'import json;print(json.load(open("audit_check.json"))["conclusion"])')"
-          summary="$(python -c 'import json;print(json.load(open("audit_check.json"))["summary"])')"
+          summary="$(python - <<'PY'
+          import json
+          with open("publication.json", encoding="utf-8") as fh:
+              data = json.load(fh)
+          print("\n".join(f"- {r}" for r in data["reasons"]) or "Deterministic gates and required human review are satisfied.")
+          PY
+          )"
           gh api "repos/$REPO/check-runs" \
-            -f name="TESSERA Maintainer Audit" \
-            -f head_sha="$HEAD_SHA" \
-            -f status="completed" \
-            -f conclusion="$conclusion" \
-            -f "output[title]=TESSERA Maintainer Audit: $conclusion" \
-            -f "output[summary]=$summary" \
-            > /dev/null || echo "::warning::could not publish check-run (requires checks: write on this token/context)"
+            -f name="tessera-merge-governor" -f head_sha="$HEAD_SHA" \
+            -f status="completed" -f conclusion="$conclusion" \
+            -f "output[title]=TESSERA Merge Governor: $conclusion" \
+            -f "output[summary]=$summary" > /dev/null

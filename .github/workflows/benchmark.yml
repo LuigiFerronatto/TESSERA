@@ -3,6 +3,7 @@ name: TESSERA Benchmark Ledger
 on:
   pull_request:
     branches: [main]
+    types: [opened, reopened, synchronize, edited]
   push:
     branches: [main]
   schedule:
@@ -13,7 +14,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: tessera-benchmark-${{ github.workflow }}-${{ github.ref }}
+  # A title-only edit must not cancel an in-flight body/candidate evaluation.
+  group: tessera-benchmark-${{ github.workflow }}-${{ github.ref }}-${{ github.event.action == 'edited' && github.event.changes.body == null && github.run_id || 'active' }}
   cancel-in-progress: true
 
 env:
@@ -27,12 +29,15 @@ env:
 
 jobs:
   benchmark-reporting:
-    name: benchmark-reporting (offline)
+    # Ignored edits must not replace required success with a same-name skip.
+    name: ${{ github.event.action == 'edited' && github.event.changes.body == null && 'benchmark-reporting (ignored edit)' || 'benchmark-reporting (offline)' }}
+    if: github.event.action != 'edited' || github.event.changes.body != null
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       applicability: ${{ steps.applicability.outputs.applicability }}
       benchmark_issue: ${{ steps.applicability.outputs.benchmark_issue }}
+      contract_check: ${{ steps.applicability.outputs.contract_check }}
 
     steps:
       - name: Checkout
@@ -83,8 +88,35 @@ jobs:
           GEMINI_API_KEY: ""
         run: python -m pytest -q tests/test_benchmark_reporting.py
 
+  # A native check name binds the terminal verdict to parsed PR metadata without
+  # downloading artifacts, executing PR outputs or adding token permissions.
+  benchmark-contract:
+    name: ${{ needs.benchmark-reporting.outputs.contract_check || 'benchmark-contract (invalid)' }}
+    needs: [benchmark-reporting, longmemeval-dev-50]
+    if: >-
+      always() && github.event_name == 'pull_request' &&
+      (github.event.action != 'edited' || github.event.changes.body != null)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require successful evidence from this workflow run
+        env:
+          REPORTING_RESULT: ${{ needs.benchmark-reporting.result }}
+          DEV50_RESULT: ${{ needs.longmemeval-dev-50.result }}
+          APPLICABILITY: ${{ needs.benchmark-reporting.outputs.applicability }}
+          CONTRACT_CHECK: ${{ needs.benchmark-reporting.outputs.contract_check }}
+        run: |
+          set -euo pipefail
+          [[ "$REPORTING_RESULT" == 'success' ]]
+          [[ "$CONTRACT_CHECK" =~ ^benchmark-contract\ \([0-9a-f]{64}\)$ ]]
+          case "$APPLICABILITY" in
+            REQUIRED) [[ "$DEV50_RESULT" == 'success' ]] ;;
+            SMOKE_ONLY|NOT_APPLICABLE) [[ "$DEV50_RESULT" == 'skipped' ]] ;;
+            *) exit 1 ;;
+          esac
+
   longmemeval-dev-50:
-    name: longmemeval-v1-dev-50
+    name: ${{ github.event.action == 'edited' && github.event.changes.body == null && 'longmemeval-v1-dev-50 (ignored edit)' || 'longmemeval-v1-dev-50' }}
     needs: benchmark-reporting
     if: >-
       (github.event_name == 'pull_request' && needs.benchmark-reporting.outputs.applicability == 'REQUIRED') ||
