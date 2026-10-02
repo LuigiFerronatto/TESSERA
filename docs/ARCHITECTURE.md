@@ -121,6 +121,18 @@ durable memories remain indexable, while selected existing project sources are
 stored as exact allow-list entries. The derived index is written only after
 confirmation and config persistence. Source bytes are never rewritten.
 
+## Typed model profile candidate (#157)
+
+The opt-in [model profile contract](MODEL_PROFILES.md) adds immutable, distinct
+embedding/generation/reranking identities to the resolved configuration. A
+`ModelReference` selects one capability and profile, independently of provider.
+Project and named-global profiles stay with their selected configuration and
+never merge corpus state. Parsing and inspection load no SDK, read no provider
+credential and enable no stage. Explicit application factory preparation is the
+only new optional adapter boundary; concrete execution and pipeline wiring
+remain separate cards. Existing deterministic retrieval and evidence contracts
+are unchanged. This section describes the candidate, not a merged capability.
+
 ## Episode decomposition failure boundary
 
 Episode decomposition is a pure candidate-producing step before persistence:

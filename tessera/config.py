@@ -19,6 +19,8 @@ from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 import yaml
 
 from .source_formats import RECURSIVE_SOURCE_PATTERNS
+from .config_errors import ConfigurationError
+from .model_profiles import ModelProfiles
 
 
 # JSON command envelopes and the global registry remain on their established
@@ -36,10 +38,6 @@ class LegacyStorageConfigurationWarning(FutureWarning):
     """Warns that a deprecated storage alias supplied the selected path."""
 
 
-class ConfigurationError(ValueError):
-    """An invalid, missing, or unsafe configuration decision."""
-
-
 class _UniqueKeyLoader(yaml.SafeLoader):
     pass
 
@@ -48,8 +46,10 @@ def _construct_mapping(loader, node, deep=False):
     mapping = {}
     for key_node, value_node in node.value:
         key = loader.construct_object(key_node, deep=deep)
+        if not isinstance(key, str):
+            raise ConfigurationError("configuration keys must be strings")
         if key in mapping:
-            raise ConfigurationError(f"duplicate configuration key: {key!r}")
+            raise ConfigurationError("duplicate configuration key")
         mapping[key] = loader.construct_object(value_node, deep=deep)
     return mapping
 
@@ -64,8 +64,8 @@ def _load_yaml(path: Path) -> Dict[str, Any]:
         value = yaml.load(path.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
     except ConfigurationError:
         raise
-    except (OSError, yaml.YAMLError) as exc:
-        raise ConfigurationError(f"cannot parse configuration {path}: {exc}") from exc
+    except (OSError, yaml.YAMLError):
+        raise ConfigurationError(f"cannot parse configuration {path}: invalid YAML or unreadable file") from None
     if not isinstance(value, dict):
         raise ConfigurationError(f"configuration root in {path} must be a mapping")
     return value
@@ -257,6 +257,7 @@ class ProjectConfig:
     sources: Tuple[SourceRootRecord, ...] = ()
     index: Optional[IndexRecord] = None
     loaded_schema_version: int = PROJECT_SCHEMA_VERSION
+    models: ModelProfiles = field(default_factory=ModelProfiles)
 
     @classmethod
     def load(cls, config_path: Path) -> "ProjectConfig":
@@ -272,7 +273,7 @@ class ProjectConfig:
                 f"expected 1 or {PROJECT_SCHEMA_VERSION}"
             )
         allowed = {"schema_version", "store"} if version == 1 else {
-            "schema_version", "store", "sources", "index"
+            "schema_version", "store", "sources", "index", "models"
         }
         _closed_keys(raw, allowed, str(config_path))
         store = StoreRecord.from_mapping(
@@ -330,6 +331,7 @@ class ProjectConfig:
             sources=sources,
             index=index,
             loaded_schema_version=int(version),
+            models=ModelProfiles.from_mapping(raw.get("models", {})),
         )
 
     def resolved_sources(self) -> Tuple[SourceRootRecord, ...]:
@@ -354,6 +356,7 @@ class ProjectConfig:
                 ]
             },
             "index": self.resolved_index().to_mapping(project_root=self.project_root),
+            **({"models": self.models.to_mapping()} if self.models.to_mapping() else {}),
         }
 
 
@@ -361,6 +364,7 @@ class ProjectConfig:
 class GlobalRegistry:
     path: Path
     stores: Dict[str, StoreRecord] = field(default_factory=dict)
+    models: Dict[str, ModelProfiles] = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Path, *, missing_ok: bool = True) -> "GlobalRegistry":
@@ -378,13 +382,19 @@ class GlobalRegistry:
         if not isinstance(stores_raw, dict):
             raise ConfigurationError(f"stores in {path} must be a mapping")
         stores: Dict[str, StoreRecord] = {}
+        models: Dict[str, ModelProfiles] = {}
         ids: Dict[str, str] = {}
         paths: Dict[str, tuple[str, str]] = {}
         for name, value in stores_raw.items():
             if not isinstance(name, str) or not name.strip():
                 raise ConfigurationError("registry names must be non-empty strings")
+            if not isinstance(value, dict):
+                raise ConfigurationError("global store must be a mapping")
+            _closed_keys(value, {"id", "path", "models"}, "global store")
+            models[name] = ModelProfiles.from_mapping(value.get("models", {}))
             record = StoreRecord.from_mapping(
-                value, base=None, context=f"stores.{name} in {path}"
+                {key: item for key, item in value.items() if key != "models"},
+                base=None, context=f"stores.{name} in {path}"
             )
             serialized_path = value.get("path") if isinstance(value, dict) else None
             if not isinstance(serialized_path, str) or not Path(serialized_path).expanduser().is_absolute():
@@ -403,13 +413,19 @@ class GlobalRegistry:
             ids[record.id] = name
             paths[path_key] = (name, record.id)
             stores[name] = record
-        return cls(path=path, stores=stores)
+        return cls(path=path, stores=stores, models=models)
 
     def to_mapping(self) -> Dict[str, Any]:
+        if set(self.models) - set(self.stores):
+            raise ConfigurationError("global models must belong to a named store")
         return {
             "schema_version": SCHEMA_VERSION,
             "stores": {
-                name: self.stores[name].to_mapping() for name in sorted(self.stores)
+                name: {
+                    **self.stores[name].to_mapping(),
+                    **({"models": self.models[name].to_mapping()}
+                       if name in self.models and self.models[name].to_mapping() else {}),
+                } for name in sorted(self.stores)
             },
         }
 
@@ -429,6 +445,7 @@ class ResolvedConfiguration:
     index_dir: Optional[str] = None
     identity_root: Optional[str] = None
     config_schema_version: Optional[int] = None
+    models: ModelProfiles = field(default_factory=ModelProfiles)
 
     def __post_init__(self) -> None:
         store = str(Path(self.storage_dir).expanduser().resolve(strict=False))
@@ -456,6 +473,7 @@ class ResolvedConfiguration:
             "index_dir": self.index_dir,
             "identity_root": self.identity_root,
             "config_schema_version": self.config_schema_version,
+            **({"models": self.models.to_mapping()} if self.models.to_mapping() else {}),
         }
 
 
@@ -470,6 +488,7 @@ def _legacy_configuration(
     store_id: Optional[str] = None,
     registry_name: Optional[str] = None,
     registry_path: Optional[str] = None,
+    models: Optional[ModelProfiles] = None,
 ) -> ResolvedConfiguration:
     store = str(Path(storage_dir).expanduser().resolve(strict=False))
     return ResolvedConfiguration(
@@ -482,6 +501,7 @@ def _legacy_configuration(
         index_dir=str((Path(store) / ".tessera_index").resolve(strict=False)),
         identity_root=store,
         config_schema_version=1,
+        models=models if models is not None else ModelProfiles(),
     )
 
 
@@ -576,6 +596,7 @@ class ConfigurationResolver:
                     else config.store.path
                 ),
                 config_schema_version=config.loaded_schema_version,
+                models=config.models,
             )
 
         if global_name:
@@ -592,6 +613,7 @@ class ConfigurationResolver:
                 store_id=record.id,
                 registry_name=global_name,
                 registry_path=str(registry.path),
+                models=registry.models.get(global_name, ModelProfiles()),
             )
         raise ConfigurationError(
             "no TESSERA store is configured; pass --store, set TESSERA_STORAGE_DIR, "
@@ -713,6 +735,7 @@ class InitPlan:
     index_dir: Optional[str] = None
     identity_root: Optional[str] = None
     deletes: tuple[str, ...] = ()
+    models: ModelProfiles = field(default_factory=ModelProfiles)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -795,6 +818,8 @@ def build_init_plan(
         source_roots=source_roots,
         index_dir=index_dir,
         identity_root=identity_root,
+        models=(existing.models if mode == "project" and existing else
+                registry.models.get(registry_name, ModelProfiles()) if mode == "global" else ModelProfiles()),
     )
 
 
@@ -812,6 +837,7 @@ def apply_init_plan(plan: InitPlan) -> ResolvedConfiguration:
             plan.source_roots or (SourceRootRecord(record.path, RECURSIVE_SOURCE_PATTERNS),),
             IndexRecord(plan.index_dir or str(project_root / ".tessera" / "index")),
             PROJECT_SCHEMA_VERSION,
+            models=plan.models,
         )
         write_project_config(project_config)
         return ResolvedConfiguration(
@@ -824,6 +850,7 @@ def apply_init_plan(plan: InitPlan) -> ResolvedConfiguration:
             index_dir=project_config.resolved_index().path,
             identity_root=plan.identity_root or record.path,
             config_schema_version=PROJECT_SCHEMA_VERSION,
+            models=project_config.models,
         )
     registry = GlobalRegistry.load(config_path)
     stores = dict(registry.stores)
@@ -836,13 +863,16 @@ def apply_init_plan(plan: InitPlan) -> ResolvedConfiguration:
             raise ConfigurationError(f"store id {record.id} is already registered as {name!r}")
     storage.mkdir(parents=True, exist_ok=True)
     stores[plan.registry_name or ""] = record
-    write_global_registry(GlobalRegistry(config_path, stores))
+    write_global_registry(GlobalRegistry(
+        config_path, stores, {**registry.models, plan.registry_name or "": plan.models}
+    ))
     return _legacy_configuration(
         record.path,
         "global_registry",
         store_id=record.id,
         registry_name=plan.registry_name,
         registry_path=str(config_path),
+        models=plan.models,
     )
 
 
@@ -852,7 +882,9 @@ def unregister_global_store(name: str, registry_path: Path) -> StoreRecord:
         raise ConfigurationError(f"global store {name!r} is not registered")
     stores = dict(registry.stores)
     removed = stores.pop(name)
-    write_global_registry(GlobalRegistry(registry.path, stores))
+    write_global_registry(GlobalRegistry(
+        registry.path, stores, {key: value for key, value in registry.models.items() if key != name}
+    ))
     return removed
 
 

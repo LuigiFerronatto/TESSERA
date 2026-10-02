@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add opt-in, capability-typed embedding, generation and reranking profiles to
+  project and named-global configuration, with environment-only credential
+  references, inspectable model identity and explicit application adapter
+  resolution. No default model, provider SDK, download or retrieval change is
+  introduced. ([#157](https://github.com/LuigiFerronatto/TESSERA/issues/157))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
