@@ -5,7 +5,7 @@
 | Issue | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `opt-in runtime experiment` |
-| Pull request | Pending draft publication |
+| Pull request | [#291](https://github.com/LuigiFerronatto/TESSERA/pull/291) (draft) |
 | Merge commit | Not merged |
 | Decision | `KEEP opt-in R2`; defer full R3 temporal validity to #15 |
 | Benchmark applicability | `SMOKE_ONLY` plus dedicated lifecycle experiment |

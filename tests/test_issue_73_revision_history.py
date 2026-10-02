@@ -324,3 +324,15 @@ def test_writer_cannot_create_invisible_memories_in_reserved_history(tmp_path, e
     )
     assert not result.persisted
     assert not (tmp_path / HISTORY_DIRECTORY).exists()
+
+
+def test_crlf_write_and_index_share_one_normalized_text_revision(tmp_path):
+    engine = TesseraEngine(str(tmp_path), revision_history=True)
+    result = write(engine, "Browser capture uses Playwright.\r\nKeep separate session logs.\r\n")
+    assert b"\r\n" in Path(result.filepath).read_bytes()
+    document_id = engine.revision_history.identity_entries()["project/browser.md"]["document_id"]
+    engine.build_index()
+    engine.build_index()
+    assert len(engine.revision_history.list_revisions(document_id)) == 1
+    evidence = engine.retrieve_context("Playwright browser capture")[0]["evidence"]
+    assert engine.revision_history.resolve_evidence(evidence["evidence_id"])

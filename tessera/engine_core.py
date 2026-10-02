@@ -278,6 +278,10 @@ class TesseraEngine:
         if raw_text is None:
             with open(filepath, "r", encoding="utf-8") as handle:
                 raw_text = handle.read()
+        else:
+            # Match the universal-newline text view used by source indexing.
+            # Do not invent a second revision when a CRLF write is first indexed.
+            raw_text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
         memory_id, document_id = self._resolve_persistent_id(filepath, raw_text)
         metadata = parse_and_normalize(
             raw_text, filepath, self._identity_base_for(filepath),
