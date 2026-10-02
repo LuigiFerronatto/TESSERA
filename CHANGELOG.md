@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add an explicitly enabled, privacy-minimized Python operational ledger with
+  bounded project/run events, deterministic deduplication, aggregate analytics,
+  read-only export plans and stale-safe retention/clear plans. Collection stays
+  OFF by default, with no CLI/MCP hooks, raw content capture or ranking feedback.
+  Full session integration remains gated by lifecycle identity (#196/#177).
+  ([#259](https://github.com/LuigiFerronatto/TESSERA/issues/259))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
