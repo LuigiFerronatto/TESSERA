@@ -2,7 +2,11 @@
 
 > **Scope:** compare memory-system design choices, not marketing claims.
 >
-> **Primary-source verification date:** 2026-08-30.
+> **Original primary-source verification date:** 2026-08-30.
+>
+> **Scoped lifecycle/source refresh:** 2026-10-02, [#179 audit](MEMORY_LIFECYCLE_2026-10-02.md).
+> Its pinned code-backed findings supersede older lifecycle shorthand for the five
+> audited systems. Unrelated entries and historical benchmark claims are not reverified.
 >
 > Product/framework behavior changes quickly. Revalidate primary sources before publishing this document outside the project.
 
@@ -71,7 +75,11 @@ A blank or cautious cell does **not** mean a competitor lacks a capability. It m
 
 ### Current architecture signal
 
-Mem0 focuses on extracting salient memories and retrieving them through production-oriented search infrastructure.
+Mem0 OSS focuses on extracting memories and hybrid retrieval. The
+[2026-10-02 audit](MEMORY_LIFECYCLE_2026-10-02.md#mem0) separately verifies the
+current coding plugin: local redacted event evidence, bounded first-prompt search,
+transcript-aware capture and recoverable background extraction requests. Do not
+describe the whole product as extraction-only or conflate OSS with Platform v3.
 
 A current OSS migration guide describes a newer algorithm with:
 
@@ -107,7 +115,10 @@ without identifying version/product path. Current Mem0 documentation contains ma
 
 ### TESSERA difference / hypothesis
 
-TESSERA starts with source-backed text and stable document/evidence identity rather than making extracted memory the only visible truth substrate.
+TESSERA starts with source-backed text and stable document/evidence identity.
+Source preservation itself is not a unique contrast: the current Mem0 plugin
+keeps local event/flush evidence, while its OSS infer=False path stores message
+content. Compare exact supporting-turn guarantees at the same product layer.
 
 TESSERA's basic retrieval path can operate without a generative extraction call.
 
@@ -203,7 +214,12 @@ Related Test Cards: #12, #14, #15, #16, #25, #26, #27.
 
 ### How it approaches memory
 
-Letta positions itself as a platform/runtime for **stateful agents**. Memory is closely integrated with persistent agent state and agent operation rather than exposed only as an external retrieval service.
+Letta positions itself as a platform/runtime for **stateful agents**. As of the
+[2026-10-02 pinned audit](MEMORY_LIFECYCLE_2026-10-02.md#letta),
+`letta-ai/letta` main explicitly points to active `letta-ai/letta-code`; the V1
+server is historical on `archive`. Current MemFS code and prompt documentation
+separate editable core prompt memory, external/shared files, Git history and
+recall. Retired V1 archival-memory internals are not evidence of current behavior.
 
 Its memory model and broader harness let agents maintain persistent state across interactions and use memory as part of an agent runtime.
 
@@ -321,13 +337,20 @@ The research question is whether a narrower auditable substrate produces a stron
 
 ### Primary source verified
 
-- https://github.com/bassemhalawani/memorypalace
+- https://github.com/MemPalace/mempalace
 
-> Previous TESSERA documentation referenced `MemPalace/mempalace`. The verified public repository identifies `bassemhalawani/memorypalace` as an official source; this document corrects that reference.
+> The [2026-10-02 source audit](MEMORY_LIFECYCLE_2026-10-02.md#mempalace)
+> supersedes the August account reference (`bassemhalawani/memorypalace`). The
+> current repository identifies `MemPalace/mempalace` as canonical. Its default
+> branch is `develop`; inspected hook write routing is explicitly unreleased
+> and must not be presented as a v3.6.0 capability.
 
 ### How it approaches memory
 
-MemPalace describes itself as local-first AI memory with **verbatim storage**. It explicitly says it does not summarize, extract or paraphrase stored conversation history by default.
+MemPalace describes its conversation storage as local-first **verbatim storage**.
+That scope matters: current hook code also constructs compressed diary checkpoints
+alongside raw conversation ingestion. A checkpoint is not itself a complete raw
+transcript or proof that asynchronous ingest has finished.
 
 Its documented architecture includes:
 
@@ -521,7 +544,10 @@ Legend:
 | MemOS | ✓ multi-source/textual | ✓ multiple memory types | ✓ supported | ~ lifecycle-oriented | ~ explainable/governed | Memory OS / orchestration layer | ✓ open source |
 | MemPalace | ✓ strong/verbatim | ~ structured organization | ✓ temporal KG | ✓ graph validity | ✓ source retained | local memory/MCP layer | ✓ |
 
-This table represents **documented architectural emphasis as of the verification date**, not benchmark ranking.
+This table preserves **documented architectural emphasis as of 2026-08-30**,
+not benchmark ranking or a current lifecycle verdict. For current code-backed
+source preservation, hook coverage, time semantics and product/version boundaries,
+use the [2026-10-02 five-system matrix](MEMORY_LIFECYCLE_2026-10-02.md).
 
 ---
 
