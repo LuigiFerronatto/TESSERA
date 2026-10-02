@@ -8,6 +8,18 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add opt-in Open Knowledge Format import/export plans, explicit standalone
+  source-copy/export transactions and a pinned
+  synthetic round-trip experiment. Typed relations, temporal truth and provenance
+  use a namespaced canonical extension; imported attestations never execute.
+  Transactions use reviewed source/destination hashes, the current security
+  gate and atomic no-overwrite publication; semantic admission and promotion
+  remain pending (#204). Versioned JSON, human Markdown, target-safe Obsidian
+  and explicitly lossy CSV projections share canonical records and explicit
+  selection/manifests; no encryption/access-control policy is inferred.
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

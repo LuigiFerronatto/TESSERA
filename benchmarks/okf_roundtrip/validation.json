@@ -1,0 +1,33 @@
+{
+  "accepted_candidates": 10,
+  "concepts_seen": 10,
+  "decision": "ITERATE",
+  "diagnostics": [
+    {
+      "code": "attestation_not_executed",
+      "field": "computation",
+      "path": "concepts/attestation.md"
+    },
+    {
+      "code": "unresolved_link",
+      "path": "concepts/broken.md",
+      "target": "/concepts/not-yet-written.md"
+    }
+  ],
+  "execution": "DISABLED",
+  "external_format": "PASS",
+  "external_validation_scope": "local pinned-spec structural checks; not upstream certification",
+  "lossy_fields": [],
+  "mapping": "PASS",
+  "namespace": "validation-only",
+  "network": "DISABLED",
+  "persistence": "NOT_PERFORMED; explicit standalone-source transaction available",
+  "profile": "tessera-canonical-v1",
+  "review_required": 0,
+  "security": "PASS",
+  "security_diagnostics": [],
+  "skipped": [],
+  "spec_revision": "ad30107c31c06aec8a7d5636e0d1058118604e6f",
+  "spec_url": "https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/ad30107c31c06aec8a7d5636e0d1058118604e6f/SPEC.md",
+  "spec_version": "0.2"
+}

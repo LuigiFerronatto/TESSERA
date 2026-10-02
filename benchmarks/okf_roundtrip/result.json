@@ -1,0 +1,151 @@
+{
+  "acceptance_gaps": [
+    "Future evidence-aware admission (#19), separate from source conversion",
+    "Accepted #256 encryption and #257 exposure integration policies",
+    "Independent full-spec conformance audit",
+    "Representative user-corpus evaluation",
+    "Canonical merge and exact-head governance gates"
+  ],
+  "canonical_json_import_transaction": "PASS (9 records)",
+  "canonical_records_equal": {
+    "OKF": [
+      10,
+      10
+    ],
+    "native": [
+      1,
+      1
+    ]
+  },
+  "decision": "ITERATE",
+  "derived_fields_excluded": [
+    "temporal.indexed_at"
+  ],
+  "deterministic_plans": true,
+  "explicit_OKF_relations_preserved": 3,
+  "export_hashes": {
+    "concepts/attestation.md": "1754ef9951285ff464ca0baa03959de75a91adb78d4a9531993bc1b4f85a5944",
+    "concepts/broken.md": "94e877baf3adef026b8bb121583ec7bed0ef199850e65972d49c8bdfcbeaf7e3",
+    "concepts/database-conflict.md": "0670e065904d676b184c19289885538b4dfe56825c246016aa9093ae44811b15",
+    "concepts/database-current.md": "a6d7ba9bce45c30d1049e76ada360db56a525fa598dbce5f8b19d4bfc4d2f887",
+    "concepts/database-old.md": "3d3b511e63e25434df0ea0debf98095d17b4233d62ce20495f43e5a98dbf8304",
+    "concepts/freshness.md": "5b82fe9778f2106c13e93e0743e301960f0138908ef611b97d95892d6171a5bb",
+    "concepts/human.md": "05d469b1540af28d17bbed77776f22efef2b3e2d2edc4cfbf004d913e49dbea5",
+    "concepts/machine.md": "ce2e750f30875f26894dae56c3bee0774b69f7f937e1fecced0e9224c2861a25",
+    "concepts/provenance.md": "ffdc8853f613794f5189c0a2236be8a81066e1a810379115651bdfb5eefdfb4c",
+    "concepts/unknown.md": "73df132fc20e9734f05029ef811353d4277c0d804fbe738d6957466b0f663b68",
+    "index.md": "85c8d37f5d99ee276cb3dd061188b1c965f369519e224d0d1b2ff518facbf5f1",
+    "log.md": "659e782fcd21fe95e8bff330ccafd3923bbc30a862771276bb2f98e64e19df48"
+  },
+  "external_concept_validation": {
+    "exported": 10,
+    "input": 10,
+    "native_exported": 1
+  },
+  "input_hashes": {
+    "concepts/attestation.md": "e7318d7ee56fabdacaa8da297f237705bf7e3b5fc10a54c191192e786d839ebc",
+    "concepts/broken.md": "20660bf80e089754a3c0b1d54b730049a1a69b8362b259e95181c6786208c573",
+    "concepts/database-conflict.md": "d099683a2b2e7ae87c351be4d4783853e7f8bb1ccc10b9314e8a1b51d6d093ba",
+    "concepts/database-current.md": "1d2ed6cf17197a1fbc438480f6d6f2b4c6b62bbdb9a2825760caf6e6fd2f572e",
+    "concepts/database-old.md": "e75e893961329385feba4c33e28f3a1941cf1b2b64266d5434b57ca24f4cb254",
+    "concepts/freshness.md": "2743d6b5c185c8fd1b30b12df522f1a26cc669dc3f35af43f6358df2fd598b63",
+    "concepts/human.md": "75cd3393a63e213992d5d31f79223c3e43a201b6f339ab0a59186967b8578412",
+    "concepts/machine.md": "37bd985f96cbb8bf67750bb7a1707cef14e3f9c904fd0066833f02b18531f9ea",
+    "concepts/provenance.md": "b64f16ddf1a402ce2c9d86ca8eb654ac3aa983b35550954cf8520f1260b3d6f8",
+    "concepts/unknown.md": "9a542e51c703f157b88548695cd328af29c1ee1a839bd0186bc47d9b513e999e",
+    "index.md": "85c8d37f5d99ee276cb3dd061188b1c965f369519e224d0d1b2ff518facbf5f1",
+    "log.md": "659e782fcd21fe95e8bff330ccafd3923bbc30a862771276bb2f98e64e19df48"
+  },
+  "issue": 204,
+  "latency_ms_observational": {
+    "export": 13.767,
+    "import": 13.494
+  },
+  "lossy_semantic_fields": [],
+  "matrix": {
+    "A0_native_smoke": "PASS",
+    "A1_import_smoke": "PASS",
+    "A2_native_export": "PASS",
+    "A3_OKF_roundtrip": "PASS",
+    "A4_native_roundtrip": "PASS"
+  },
+  "named_profiles": {
+    "canonical-json": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": []
+    },
+    "csv": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "body",
+        "relations",
+        "raw_frontmatter",
+        "quality",
+        "source hashes/span/document ID",
+        "scope level/harness",
+        "recorded_at",
+        "state_key",
+        "superseded_at",
+        "utility",
+        "metadata_origin",
+        "producer extensions",
+        "optional lineage"
+      ]
+    },
+    "markdown": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "raw_frontmatter and producer extensions available in canonical companion",
+        "original body presentation augmented with navigation"
+      ]
+    },
+    "obsidian": {
+      "canonical_companion_equal": true,
+      "private_records_excluded": 1,
+      "records_selected": 9,
+      "repeatability": true,
+      "status": "APPLIED",
+      "view_lossy_fields": [
+        "raw_frontmatter and producer extensions available in canonical companion",
+        "original body presentation augmented with navigation"
+      ]
+    }
+  },
+  "observation_separate_from_generation": true,
+  "reference_validator_blob": "b770a92f33adf9942e2932529308d066430b02a6",
+  "reference_validator_scope": "Upstream concept parser and required-key validator, not complete spec certification",
+  "retrieval_smoke_parity": {
+    "OKF_roundtrip": true,
+    "native_roundtrip": true
+  },
+  "semantic_diff": [],
+  "source_transactions": {
+    "convert": "APPLIED",
+    "converted_records_equal": [
+      10,
+      10
+    ],
+    "export": "APPLIED",
+    "external_validation_after_transactions": 10,
+    "fresh_destination_only": true,
+    "runtime_registration": "NOT_PERFORMED",
+    "semantic_admission": "NOT_PERFORMED",
+    "write_gate": "all accept unchanged"
+  },
+  "spec_revision": "ad30107c31c06aec8a7d5636e0d1058118604e6f",
+  "truth_validity_separate_from_freshness": true,
+  "typed_native_relations_preserved": 3,
+  "unknown_extensions_preserved": true
+}
