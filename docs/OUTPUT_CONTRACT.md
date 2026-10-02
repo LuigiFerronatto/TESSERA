@@ -375,3 +375,11 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
+
+## Optional assisted information needs
+
+Opt-in N1/N2 orchestrator results add `information_needs` with validated bounded
+needs, status, reason and call measurements. This is derived assisted analysis,
+not a field on deterministic retrieval hits. N0 serialization remains unchanged.
+See [the experimental contract](INFORMATION_NEEDS.md); no semantic deduplication
+or downstream quality improvement has been established by the offline fixtures.

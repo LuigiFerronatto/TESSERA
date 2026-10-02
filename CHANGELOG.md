@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added opt-in bounded N1/N2 historical information needs to the assisted
+  orchestrator, with strict validation, explicit no-memory/ambiguous empty
+  outcomes and inspectable generation measurements. N0 remains the default;
+  deterministic retrieval is unchanged. The frozen controlled experiment and
+  exact-prompt capture/replay support mechanics evaluation, while provider-backed
+  semantic/quality and consumer-effort gates remain pending. (#139)
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
