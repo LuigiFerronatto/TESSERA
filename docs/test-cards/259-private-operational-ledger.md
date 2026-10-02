@@ -5,8 +5,8 @@
 | Issue | [#259](https://github.com/LuigiFerronatto/TESSERA/issues/259) |
 | Record status | `IN_PROGRESS` mechanics; `BLOCKED` full session integration |
 | Capability type | Experimental Python runtime mechanics |
-| Pull request | Draft publication pending |
-| Head commit | Exact candidate will be linked in the draft PR |
+| Pull request | [Draft PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) |
+| Head commit | [Runtime candidate `381b9edd`](https://github.com/LuigiFerronatto/TESSERA/commit/381b9edd8cda7725542642fe08f76f936ba38809); current documentation head is on PR #319 |
 | Merge commit | Not merged |
 | Decision | `PENDING`; proposed `ITERATE` for mechanics only |
 | Benchmark applicability | `SMOKE_ONLY` — no retrieval/ranking/admission behavior changes |
@@ -106,7 +106,7 @@ review; no dependent product capability is declared unlocked by an unmerged PR.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#259](https://github.com/LuigiFerronatto/TESSERA/issues/259) |
-| Pull request | Draft publication pending |
+| Pull request | [Draft PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Tests and smoke above; `PENDING` / proposed `ITERATE` |
 | Benchmark record | `benchmarks/operational/ledger_smoke.py` (synthetic, SMOKE_ONLY) |
