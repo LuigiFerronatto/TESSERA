@@ -5,7 +5,7 @@
 | Issue | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Draft publication pending |
+| Pull request | [Draft #297](https://github.com/LuigiFerronatto/TESSERA/pull/297) |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
 | Benchmark applicability | `REQUIRED` |
@@ -68,7 +68,7 @@ and rebuilding the index. Position 99 is rejected if it does not exist.
 supports, duplicate-content exact spans, source immutability, malformed/forged
 references, unsupported IDs, source loss/change, index/result parity, legacy
 manual APIs, byte-exact CRLF/Unicode content, path containment and gate behavior.
-The pre-final full regression run passed 605 tests with 5 tooling-only skips;
+The local full regression run passed 607 tests with 5 tooling-only skips;
 final exact-candidate counts and remote CI are recorded in the draft PR.
 
 The frozen structural audit uses no model/provider and includes disjoint spans,
