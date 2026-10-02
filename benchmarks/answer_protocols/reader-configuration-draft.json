@@ -1,0 +1,28 @@
+{
+  "schema_version": "tessera-reader-configuration-draft/1",
+  "status": "DRAFT",
+  "selection": {
+    "created_at": null,
+    "endpoint_class": null,
+    "environment_fingerprint": null,
+    "max_output_tokens": null,
+    "message_overhead_policy": null,
+    "model": null,
+    "model_revision": null,
+    "prompt_version": null,
+    "provider": null,
+    "question_count": null,
+    "question_ids_sha256": null,
+    "renderer": null,
+    "renderer_version": null,
+    "retrieval_artifact_sha256": null,
+    "retry_policy": null,
+    "seed": null,
+    "structured_output_schema": null,
+    "system_prompt_sha256": null,
+    "temperature": null,
+    "timeout_seconds": null,
+    "tokenizer_revision": null,
+    "top_p": null
+  }
+}
