@@ -65,7 +65,13 @@ TESSERA interpretation:
 - exactly three semantic drawers: `facts`, `preferences`, `insights`;
 - do not make QUMem's full inference pipeline mandatory for basic retrieval.
 
-Related: #9, #17, #20.
+The [canonical fidelity audit](../QUMEM-GAP-ANALYSIS.md) separates this
+paper from the current implementation. TESSERA currently uses a timeout/lexical
+boundary heuristic, one mixed-type decomposition pass, a single rewritten
+query and free-text consolidation. #135 fallback and #16 non-destructive
+containment are validated repairs; they do not validate full QUMem fidelity.
+
+Related: #9, #17, #20; implementation/validation owners #135–#146.
 
 2026-09-07 review mapping: **P08**; opportunities 02, 04, 06, 08, 25;
 existing fidelity work #136–#146. Treat the full sequential inference pipeline as

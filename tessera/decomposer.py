@@ -1,37 +1,16 @@
 """
-Automatic typed-memory decomposition — a stand-in for QUMem's g_φ decomposer.
+QUMem-inspired optional mixed-type memory decomposition.
 
-QUMem's decomposer runs 3 times per episode (once per type: factual /
-preference / insight), each an LLM call that can extract *multiple* atomic
-memories of that type from one raw episode. Tessera previously had NO
-equivalent: `write_fact`/`write_preference`/`write_insight` existed and
-map cleanly to the paper's F/P/I taxonomy, but each required the CALLER to
-manually decide what to write and of which type — there was no mechanical
-"take a raw episode/interaction, extract N atomic memories automatically"
-step anywhere.
+This implementation makes one mixed-type extraction call, not the paper's
+three type-conditioned passes. Without a provider, or after an expected provider
+or parse/schema failure, it classifies lines from Episode.end heuristically.
+That end-only selection is a TESSERA simplification, not a paper requirement.
+A valid empty list is assisted success; programming errors are not swallowed.
+All persistence uses the canonical write gate.
 
-This module adds that automatic step, `decompose_and_write()`, while
-preserving Tessera's existing write-side gating philosophy: it's an explicit
-function a caller opts into (never silently triggered), and every
-extracted memory still goes through the exact same
-`TesseraEngine.write_memory_note` gating/sanitization path as a manual write
-— decomposition only changes *how many notes get proposed*, never bypasses
-the security/sanitization gate on any of them.
-
-Two extraction modes:
-    - Real LLM (`llm_fn` provided, e.g. via `llm_bridge.resolve_llm_fn()`):
-      one prompt asks the model to return a JSON array of
-      {"type": "factual"|"preference"|"procedural_anchor", "content": "..."}
-      objects extracted from the raw episode text. Malformed/unparseable
-      output degrades gracefully to the heuristic fallback below rather
-      than raising.
-    - Offline heuristic fallback (no `llm_fn`, or the LLM call/parse
-      fails): a simple, deterministic, dependency-free line-based
-      classifier that tags each non-empty line of the episode's "end"
-      (the QUMem-relevant part - the resolution/lesson) using keyword
-      cues, mirroring the same trade-off TesseraOrchestrator's own
-      `_simulated_llm` already makes (offline-runnable by default, real
-      reasoning opt-in).
+Issue #135 validated the failure boundary, not semantic extraction fidelity.
+Issue #136 owns type semantics and one-pass/three-pass evaluation; #137 owns
+source episode/supporting-turn lineage. See docs/QUMEM-GAP-ANALYSIS.md.
 """
 
 from __future__ import annotations
