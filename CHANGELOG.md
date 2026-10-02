@@ -8,6 +8,13 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add opt-in, read-only Open Knowledge Format import/export plans and a pinned
+  synthetic round-trip experiment. Typed relations, temporal truth and provenance
+  use a namespaced canonical extension; imported attestations never execute.
+  Store persistence and promotion remain pending (#204).
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
