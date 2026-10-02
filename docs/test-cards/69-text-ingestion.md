@@ -1,5 +1,9 @@
 # 69 — Plain-text files are first-class knowledge sources
 
+This record describes the canonical delivery at the audit date below. Its
+downstream routing is historical; use [ROADMAP.md](../ROADMAP.md) for current
+readiness and selected work.
+
 | Field | Value |
 |---|---|
 | Issue | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) |
@@ -102,9 +106,9 @@ and [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) still depend on
 | Issue/Test Card | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) |
 | Pull request | [#264](https://github.com/LuigiFerronatto/TESSERA/pull/264) |
 | Merge commit | [`c815a684e4c8cbd426a0d717e243a7dfb0f04395`](https://github.com/LuigiFerronatto/TESSERA/commit/c815a684e4c8cbd426a0d717e243a7dfb0f04395) |
-| Evidence/Learnings/Decision | Maintainer Audit `KEEP` on final candidate `ddc1ff3a`; PR #264 evaluation card |
+| Evidence/Learnings/Decision | [Maintainer Audit](https://github.com/LuigiFerronatto/TESSERA/pull/264#issuecomment-5673959396) `KEEP` on final candidate `ddc1ff3a`; PR #264 evaluation card |
 | Benchmark record | `REQUIRED`; LongMemEval V1 dev-50 passed on `ddc1ff3a` |
-| PR Evolution Audit | Recorded in the [PR #264 body](https://github.com/LuigiFerronatto/TESSERA/pull/264) |
+| PR Evolution Audit | [Canonical delivery audit](../PR_EVOLUTION_69.md); [PR #264 body](https://github.com/LuigiFerronatto/TESSERA/pull/264) |
 
 ## Evolution
 

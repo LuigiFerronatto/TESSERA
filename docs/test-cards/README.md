@@ -64,7 +64,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #69 Plain-text source ingestion | `VALIDATED` | [69-text-ingestion.md](69-text-ingestion.md) | [Issue #69](https://github.com/LuigiFerronatto/TESSERA/issues/69), [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`, `KEEP` |
 | #70 Structural source segmentation | `VALIDATED` | [70-structural-segmentation.md](70-structural-segmentation.md) | [Issue #70](https://github.com/LuigiFerronatto/TESSERA/issues/70), [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`, `KEEP` |
 | #157 Typed model profiles | `IN_PROGRESS` | [157-typed-model-profiles.md](157-typed-model-profiles.md) | [Issue #157](https://github.com/LuigiFerronatto/TESSERA/issues/157), [draft PR #286](https://github.com/LuigiFerronatto/TESSERA/pull/286); decision pending |
-| #13 Read-only Corpus Doctor | `IN_PROGRESS` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), decision pending |
+| #13 Read-only Corpus Doctor | `VALIDATED` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), canonical merge `20814a47ec0f72d7bea0639e0b057df1ecf5cded`, `KEEP` |
 
 ## Stage map
 
