@@ -1,0 +1,722 @@
+[
+  {
+    "path": "AGENTS.md",
+    "raw_text": "# Project rules\nRun deterministic tests.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "AGENTS",
+        "name": "AGENTS"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "harness_instructions"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_a54ff182c7e8",
+        "path": "AGENTS.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "7e0187a168ea49549d7dc299660963ff825b8a63d0cb17fcd9ab9c081d839478",
+        "content_hash": "7e0187a168ea49549d7dc299660963ff825b8a63d0cb17fcd9ab9c081d839478"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "nested/CLAUDE.md",
+    "raw_text": "# Local rules\nPreserve sources.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "nested/CLAUDE",
+        "name": "CLAUDE"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "harness_instructions"
+      },
+      "scope": {
+        "level": "folder",
+        "path": "./nested/**",
+        "harness": "claude"
+      },
+      "source": {
+        "document_id": "doc_d05756690a93",
+        "path": "nested/CLAUDE.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "b62da8f9f514ab278d226cac5975ea5ea3bb0612a1e4a30756882cf1a913f13c",
+        "content_hash": "b62da8f9f514ab278d226cac5975ea5ea3bb0612a1e4a30756882cf1a913f13c"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "inferred",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "GEMINI.md",
+    "raw_text": "# Build rules\nUse Python 3.9.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "GEMINI",
+        "name": "GEMINI"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "harness_instructions"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": "gemini"
+      },
+      "source": {
+        "document_id": "doc_399080f41ccf",
+        "path": "GEMINI.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "84951698e7beeca6e4788ad6bc9d852a9159d07aaba0afd192e198dd49b46611",
+        "content_hash": "84951698e7beeca6e4788ad6bc9d852a9159d07aaba0afd192e198dd49b46611"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "inferred",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "skills/SKILL.md",
+    "raw_text": "---\nname: Explain evidence\ndescription: Inspect provenance\n---\nKeep exact citations.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "skills/SKILL",
+        "name": "Explain evidence"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "skill_instructions"
+      },
+      "scope": {
+        "level": "folder",
+        "path": "./skills/**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_cdafa84b3ebd",
+        "path": "skills/SKILL.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 5
+        },
+        "document_hash": "502379727c242582d8feb928549fa288b22faf92da2bac2676f3dab2a487521e",
+        "content_hash": "a059998cae0e37a5244e00bb661834fe2d80c78d02a5ad0c519f4ff3410aca17"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "explicit",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {
+        "name": "Explain evidence",
+        "description": "Inspect provenance"
+      }
+    }
+  },
+  {
+    "path": "memory-retrieval.SKILL.md",
+    "raw_text": "# Skill rules\nInspect source evidence.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "memory-retrieval.SKILL",
+        "name": "memory-retrieval.SKILL"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "skill_instructions"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_60c130da329b",
+        "path": "memory-retrieval.SKILL.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "98b223f1398dcf9187c5f0644c932896e51a8cd4648d61d87bfdd397324ef560",
+        "content_hash": "98b223f1398dcf9187c5f0644c932896e51a8cd4648d61d87bfdd397324ef560"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "copilot-instructions.md",
+    "raw_text": "# Coding rules\nKeep tests.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "copilot-instructions",
+        "name": "copilot-instructions"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "harness_instructions"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": "copilot"
+      },
+      "source": {
+        "document_id": "doc_8478dc8715bd",
+        "path": "copilot-instructions.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "3c4da9b4d455dd08d69d098cfa7ebe9b49c1a1f7e9283d0cb1979c873346fa1b",
+        "content_hash": "3c4da9b4d455dd08d69d098cfa7ebe9b49c1a1f7e9283d0cb1979c873346fa1b"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "inferred",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "unknown-guide.md",
+    "raw_text": "# Guide\nOrdinary source context.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "unknown-guide",
+        "name": "unknown-guide"
+      },
+      "classification": {
+        "drawer": "facts",
+        "kind": "factual",
+        "document_type": "memory"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_4a90abdd759f",
+        "path": "unknown-guide.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "c9b35e298a72237abf480eabb3fb0e689306a9b65684c6068a721707193a1706",
+        "content_hash": "c9b35e298a72237abf480eabb3fb0e689306a9b65684c6068a721707193a1706"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "inferred",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "AGENTS.md.txt",
+    "raw_text": "# Literal example\nNot a supported harness basename.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "AGENTS.md",
+        "name": "AGENTS.md"
+      },
+      "classification": {
+        "drawer": "facts",
+        "kind": "factual",
+        "document_type": "memory"
+      },
+      "scope": {
+        "level": "project",
+        "path": "./**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_5e0beea0b99e",
+        "path": "AGENTS.md.txt",
+        "format": "text",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "79838ea236d9a8ae4a94c1900a7b0275914aad8634b99c7bbde155340060f92f",
+        "content_hash": "79838ea236d9a8ae4a94c1900a7b0275914aad8634b99c7bbde155340060f92f"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "inferred",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "report/README.md",
+    "raw_text": "# Report guide\nGeneric project context.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "report/README",
+        "name": "README"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "factual",
+        "document_type": "project_context"
+      },
+      "scope": {
+        "level": "folder",
+        "path": "./report/**",
+        "harness": null
+      },
+      "source": {
+        "document_id": "doc_39f0dc473d02",
+        "path": "report/README.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 2
+        },
+        "document_hash": "e619992fdfda2f3eef8db7bf80b1c815950e39089c1bff639efb5959f63d3d24",
+        "content_hash": "e619992fdfda2f3eef8db7bf80b1c815950e39089c1bff639efb5959f63d3d24"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "inferred",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "default",
+        "scope.path": "default",
+        "scope.harness": "default",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {}
+    }
+  },
+  {
+    "path": "AGENTS.md",
+    "raw_text": "---\ndocument_type: harness_instructions\nscope:\n  level: folder\n  path: ./src/**\n  harness: custom\n---\nExplicit source-owned metadata.\n",
+    "canonical": {
+      "schema_version": 1,
+      "identity": {
+        "id": "AGENTS",
+        "name": "AGENTS"
+      },
+      "classification": {
+        "drawer": null,
+        "kind": "instruction",
+        "document_type": "harness_instructions"
+      },
+      "scope": {
+        "level": "folder",
+        "path": "./src/**",
+        "harness": "custom"
+      },
+      "source": {
+        "document_id": "doc_a54ff182c7e8",
+        "path": "AGENTS.md",
+        "format": "markdown",
+        "span": {
+          "start_line": 1,
+          "end_line": 8
+        },
+        "document_hash": "2f50ed4311c5ae6c2104b75695c46e0e0235229d38b381a825b52572492aa0a5",
+        "content_hash": "54e9657bec4f61e5399d82a80828a0fccaeea30d9f25554af00168038e436a94"
+      },
+      "temporal": {
+        "observed_at": null,
+        "valid_from": null,
+        "valid_until": null,
+        "recorded_at": null,
+        "indexed_at": "<runtime-index-time>"
+      },
+      "quality": {
+        "confidence": null,
+        "authority": null
+      },
+      "relations": [],
+      "metadata_origin": {
+        "id": "inferred",
+        "name": "inferred",
+        "document_type": "explicit",
+        "kind": "inferred",
+        "drawer": "default",
+        "scope.level": "explicit",
+        "scope.path": "explicit",
+        "scope.harness": "explicit",
+        "source.document_id": "system",
+        "source.path": "system",
+        "source.format": "system",
+        "source.span": "system",
+        "source.document_hash": "system",
+        "source.content_hash": "system",
+        "temporal.observed_at": "default",
+        "temporal.valid_from": "default",
+        "temporal.valid_until": "default",
+        "temporal.recorded_at": "default",
+        "temporal.indexed_at": "system",
+        "quality.confidence": "default",
+        "quality.authority": "default"
+      },
+      "state_key": null,
+      "superseded_at": null,
+      "utility": null,
+      "raw_frontmatter": {
+        "document_type": "harness_instructions",
+        "scope": {
+          "level": "folder",
+          "path": "./src/**",
+          "harness": "custom"
+        }
+      }
+    }
+  }
+]
