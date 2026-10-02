@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add repository-only offline preparation for reader captures, independent-human
+  judge calibration review and full-500 preregistration. Model selections,
+  budgets, thresholds and human labels remain unaccepted; synthetic controls do
+  not execute or establish LongMemEval answer quality. Runtime and retrieval-only
+  ledger behavior are unchanged. (#103, #104, #105)
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

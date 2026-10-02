@@ -1,0 +1,74 @@
+{
+  "schema_version": "reader-judge-offline-preparation-evidence/1",
+  "base_commit": "20814a47ec0f72d7bea0639e0b057df1ecf5cded",
+  "issues": [
+    103,
+    104,
+    105
+  ],
+  "decision": "ITERATE",
+  "benchmark_applicability": "SMOKE_ONLY",
+  "execution_scope": "offline synthetic plumbing and checksum-verified ID projection only",
+  "focused_tests": 127,
+  "focused_with_docs_tests": 151,
+  "full_tests": 689,
+  "skipped": 8,
+  "skip_reasons": {
+    "gh_aw_extension_unavailable": 5,
+    "optional_mcp_extra_uninstalled": 3
+  },
+  "synthetic_runs": 2,
+  "synthetic_summaries_identical": true,
+  "synthetic_capture_sha256": "147a0e520327fdf15cc8000569a221e70c74648455ec52f420048381c9e6d3d7",
+  "synthetic_scores_sha256": "62a289f945b390840ed2b5ff8fcf3525d84982b5c16d12f74e970aa33555c437",
+  "renderer_compatibility": {
+    "producer_pr": 315,
+    "producer_head": "85638e1320ca68bfdd15efbfaed14a1791218120",
+    "producer_unmerged": true,
+    "synthetic_rows_accepted": 9,
+    "renderer_arms": [
+      "R0",
+      "R1",
+      "R2"
+    ],
+    "messages_unchanged": true,
+    "input_hashes_unchanged": true,
+    "requests_sha256": "857d85f8b05b21982690b1a99de244f89932548146999956a2f11dd45032413f",
+    "provider_calls": 0,
+    "quality_acceptance": null
+  },
+  "full500_id_count": 500,
+  "full500_question_ids_sha256": "a4849b8afda6b6ed31ead4fc28d00784d2d5fef945be87642f5ce3ab710b21c4",
+  "missing_preregistration_gates": 58,
+  "provider_calls": 0,
+  "full500_experiment_runs": 0,
+  "sanity": {
+    "queries": 4,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "mrr": 0.875,
+    "evidence_hit_rate": 1.0,
+    "missing_evidence_check": "passed"
+  },
+  "distribution_build": "wheel and sdist built; benchmark modules/artifacts excluded",
+  "installed_wheel_smoke": "runtime import and CLI help passed; benchmarks and requests absent",
+  "python_validation": "3.12 executed; modules also parse with Python 3.9 grammar; actual 3.9 CI pending",
+  "runtime_diff": false,
+  "workflow_diff": false,
+  "retrieval_ledger_diff": false,
+  "reader_model": null,
+  "judge_model": null,
+  "human_calibration": null,
+  "accepted_thresholds": null,
+  "accepted_budget": null,
+  "limitations": [
+    "Synthetic oracle agreement is not model repeatability or TESSERA quality",
+    "Human review packet has no actual labels",
+    "Draft #28 compatibility is not canonical acceptance",
+    "No real reader/judge or full500 executor is implemented",
+    "CI and governance evidence must be checked for exact published head"
+  ],
+  "pull_request": 321,
+  "pull_request_url": "https://github.com/LuigiFerronatto/TESSERA/pull/321"
+}
