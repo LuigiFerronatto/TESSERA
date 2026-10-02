@@ -125,7 +125,10 @@ class CanonicalMetadata:
     lineage: Optional[LineageMetadata] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        result = asdict(self)
+        if self.lineage is None:
+            result.pop("lineage")
+        return result
 
     def is_content_equivalent(self, other: "CanonicalMetadata") -> bool:
         return isinstance(other, CanonicalMetadata) and self.source.content_hash == other.source.content_hash

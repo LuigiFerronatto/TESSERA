@@ -353,3 +353,38 @@ asyncio.run(main())
 '''
     actual = subprocess.run([sys.executable, "-c", code, str(tmp_path)], check=True, capture_output=True, text=True)
     assert json.loads(actual.stdout) == expected
+
+
+def test_absent_lineage_preserves_pre_extension_canonical_shape():
+    canonical = parse_and_normalize('# Rules\nKeep source evidence.\n', '/source/AGENTS.md', '/source')
+    assert canonical.lineage is None
+    assert 'lineage' not in canonical.to_dict()
+
+
+def test_optional_archive_receives_verified_episode_and_all_issued_support(tmp_path):
+    class ArchiveProbe:
+        def __init__(self): self.captures=[]; self.evidence=[]
+        def capture(self, canonical, raw):
+            from tessera.canonical import compute_sha256
+            assert compute_sha256(raw)==canonical.source.document_hash
+            self.captures.append(canonical)
+        def record_evidence(self, record): self.evidence.append(record)
+    engine=TesseraEngine(str(tmp_path))
+    write_fixture(engine)
+    archive=ArchiveProbe()
+    engine.revision_history=archive
+    engine.build_index()
+    assert archive.captures
+    hit=engine.retrieve_context('SQLite summary region weekly reading time',top_n=20)[0]
+    expected={x['evidence_id'] for x in hit['lineage']['source_evidence']}
+    assert expected <= {x['evidence_id'] for x in archive.evidence}
+
+
+def test_optional_archive_failure_is_not_silently_reported_as_preserved(tmp_path):
+    class BrokenArchive:
+        def capture(self,*args): raise RuntimeError('archive unavailable')
+    engine=TesseraEngine(str(tmp_path))
+    write_fixture(engine)
+    engine.revision_history=BrokenArchive()
+    with pytest.raises(RuntimeError,match='archive unavailable'):
+        engine.build_index()

@@ -73,8 +73,30 @@ class TesseraEngine(_CoreTesseraEngine):
                 # The primary record still identifies the atomic note itself;
                 # supporting source-turn records must never replace it.
                 data["evidence_record"] = evidence_from_canonical(canonical).to_dict()
+                self._archive_lineage_evidence(canonical)
             else:
                 data.pop("evidence_record", None)
+
+    def _archive_lineage_evidence(self, canonical: CanonicalMetadata) -> None:
+        """Preserve issued source references when an optional archive is enabled.
+
+        The archive capability is supplied by the independently opt-in revision
+        feature. Missing/changed source references remain visible diagnostics;
+        an actual archive failure is never swallowed as successful preservation.
+        """
+        history = getattr(self, "revision_history", None)
+        if history is None or canonical.lineage is None:
+            return
+        from .lineage import validate_lineage
+        try:
+            source = validate_lineage(self.storage_dir, canonical.identity.id, canonical.lineage)
+        except (OSError, ValueError, TypeError, AttributeError):
+            return
+        with open(source.filepath, "r", encoding="utf-8") as handle:
+            history.capture(source.canonical, handle.read())
+        for record in [canonical.lineage.episode_source, *canonical.lineage.source_evidence]:
+            if record is not None:
+                history.record_evidence(record)
 
     def _persist_evidence_summary(self) -> None:
         os.makedirs(self.index_cache_dir, exist_ok=True)
