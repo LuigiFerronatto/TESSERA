@@ -5,7 +5,7 @@
 | Issue | [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `benchmark infrastructure` |
-| Pull request | Draft candidate; see issue-linked PR |
+| Pull request | [#315](https://github.com/LuigiFerronatto/TESSERA/pull/315), draft |
 | Head commit | Exact source revision recorded by each replay manifest and PR head |
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
@@ -103,7 +103,7 @@ the staged reader dependency need maintainer reconciliation before final KEEP.
 | Ledger contract | [#100 / PR #102](100-benchmark-ledger-and-ci.md), [Benchmark CI](../BENCHMARK_CI.md) |
 | Offline contract | [Renderer guide](../../benchmarks/rendering/README.md) |
 | Draft future experiment | [Preregistration](../../benchmarks/rendering/preregistration.json) |
-| Evidence/Learnings/Decision | This candidate PR, linked from #28; `ITERATE` |
+| Evidence/Learnings/Decision | [PR #315](https://github.com/LuigiFerronatto/TESSERA/pull/315); `ITERATE` |
 
 ## Evolution
 
