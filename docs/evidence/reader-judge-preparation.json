@@ -68,5 +68,7 @@
     "Draft #28 compatibility is not canonical acceptance",
     "No real reader/judge or full500 executor is implemented",
     "CI and governance evidence must be checked for exact published head"
-  ]
+  ],
+  "pull_request": 321,
+  "pull_request_url": "https://github.com/LuigiFerronatto/TESSERA/pull/321"
 }

@@ -5,7 +5,7 @@
 | Issue | [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) |
 | Record status | `IN_PROGRESS` preparation; empirical execution `BLOCKED` |
 | Capability type | `benchmark infrastructure` |
-| Pull request | Preparation candidate; exact PR/head recorded in the PR conversation |
+| Pull request | [#321](https://github.com/LuigiFerronatto/TESSERA/pull/321); exact head recorded by GitHub checks |
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
 | Benchmark applicability | `SMOKE_ONLY` for this offline preparation |
@@ -69,7 +69,7 @@ are accepted. Models, budget decisions, thresholds and human labels remain null.
 - [Protocol and commands](../../benchmarks/answer_protocols/README.md)
 - [Independent-human instructions](../../benchmarks/answer_protocols/HUMAN_REVIEW.md)
 - Proposed #28 interface: unmerged [PR #315](https://github.com/LuigiFerronatto/TESSERA/pull/315), head `85638e1320ca68bfdd15efbfaed14a1791218120`
-- Exact candidate/head and CI URLs: PR conversation; no canonical merge claimed
+- Exact candidate/head and CI URLs: [PR #321](https://github.com/LuigiFerronatto/TESSERA/pull/321); no canonical merge claimed
 
 ## Evolution
 
