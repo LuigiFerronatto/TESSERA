@@ -5,7 +5,7 @@
 | Issue | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) |
 | Record status | `IN_PROGRESS` preparation / `BLOCKED` full card |
 | Capability type | benchmark |
-| Pull request | Draft candidate, publication pending |
+| Pull request | [Draft PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323) |
 | Head commit | Exact candidate identified by the PR and local manifest |
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
@@ -79,7 +79,7 @@ medium additionally needs a separate readiness and approved resource decision.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) |
-| Pull request | Draft candidate, not merged |
+| Pull request | [Draft PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323), not merged |
 | Merge commit | None |
 | Evidence/Learnings/Decision | Protocol audit and synthetic tests; ITERATE |
 | Benchmark record | Separate synthetic preparation profile; V1 ledger unchanged |
