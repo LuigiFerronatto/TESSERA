@@ -5,8 +5,8 @@
 | Issue | [#179](https://github.com/LuigiFerronatto/TESSERA/issues/179) |
 | Record status | `IN_PROGRESS` research candidate |
 | Capability type | documentation / comparative research |
-| Pull request | Publication pending; draft branch `codex/research-memory-lifecycle-179` |
-| Head commit | Pending publication; exact candidate is recorded in PR metadata |
+| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), draft |
+| Head commit | Latest [PR #311 head](https://github.com/LuigiFerronatto/TESSERA/pull/311); source-audit anchor [`9923678`](https://github.com/LuigiFerronatto/TESSERA/commit/9923678b74724a714c8aec3b17e1cdda9e40c1f9), followed only by publication-metadata sync |
 | Merge commit | Not merged |
 | Decision | `PENDING`; proposal: KEEP research baseline, ITERATE bounded unknowns |
 | Benchmark applicability | `NOT_APPLICABLE` — no retrieval/runtime change or external quality experiment |
@@ -47,8 +47,8 @@ Local validation on 2026-10-02: **571 passed, 5 skipped, 14 warnings** in
 `gh-aw` CLI extension; no other checks were silently treated as passed. A final
 focused research/stage rerun passed **14 tests** after the last wording change.
 The [validation record](../evidence/179-memory-lifecycle/validation.json) captures
-commands, counts and scope. Hosted CI is pending publication and is not claimed
-green. Commands use an isolated Python 3.12 environment outside the checkout:
+commands, counts and scope. Hosted CI is checked against the exact PR head separately and is not claimed
+green by this local record. Commands use an isolated Python 3.12 environment outside the checkout:
 
 ```bash
 python -m pytest -q tests/test_memory_lifecycle_research.py tests/test_plain_language_test_card_docs.py
@@ -77,7 +77,7 @@ No dependency completion or WIP-selection state changes. Existing owners receive
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#179](https://github.com/LuigiFerronatto/TESSERA/issues/179) |
-| Pull request | Draft publication pending |
+| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), draft |
 | Canonical baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | [Dated audit](../research/MEMORY_LIFECYCLE_2026-10-02.md), [matrix](../evidence/179-memory-lifecycle/matrix.json), [source manifest](../evidence/179-memory-lifecycle/sources.json) |

@@ -36,5 +36,13 @@
     "No competitor runtime or quality benchmark tested",
     "Hosted CI and independent review are not represented by local results",
     "Full regression run preceded only final documentation/evidence wording and PR-link metadata; focused artifact gates cover those changes"
-  ]
+  ],
+  "publication": {
+    "pull_request": "https://github.com/LuigiFerronatto/TESSERA/pull/311",
+    "draft": true,
+    "initial_source_audit_commit": "9923678b74724a714c8aec3b17e1cdda9e40c1f9",
+    "initial_source_audit_tree": "1b4ef4a5d15b4df3ad2a914527f86fd5e793c65a",
+    "head_policy": "PR metadata is authoritative for latest head; subsequent commit updates only PR/stage/publication metadata",
+    "remote_initial_tree_matches_local_tested_index": true
+  }
 }
