@@ -64,6 +64,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #69 Plain-text source ingestion | `VALIDATED` | [69-text-ingestion.md](69-text-ingestion.md) | [Issue #69](https://github.com/LuigiFerronatto/TESSERA/issues/69), [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`, `KEEP` |
 | #70 Structural source segmentation | `VALIDATED` | [70-structural-segmentation.md](70-structural-segmentation.md) | [Issue #70](https://github.com/LuigiFerronatto/TESSERA/issues/70), [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`, `KEEP` |
 | #13 Read-only Corpus Doctor | `IN_PROGRESS` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), decision pending |
+| #106 V2 protocol and synthetic preparation | `IN_PROGRESS` preparation / `BLOCKED` full | [106-v2-conformance-preparation.md](106-v2-conformance-preparation.md) | [Issue #106](https://github.com/LuigiFerronatto/TESSERA/issues/106); draft preparation, no official acceptance |
 
 ## Stage map
 

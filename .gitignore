@@ -11,3 +11,6 @@ dist/
 .benchmark-data/
 artifacts/longmemeval-v1/
 artifacts/benchmark-reporting/
+
+# Local synthetic/official V2 artifacts are not distribution inputs.
+artifacts/longmemeval-v2/
