@@ -43,10 +43,12 @@ from .source_formats import (
     split_source,
 )
 from .segmentation import SEGMENT_NODE_TYPE, SEGMENTATION_SCHEMA_VERSION, segment_source_document
+from .revisions import HISTORY_DIRECTORY, RevisionHistory, RevisionHistoryError
 
 
 _BUILTIN_EXCLUDED_SOURCE_DIRS = {
     ".tessera_index",
+    HISTORY_DIRECTORY,
     ".git",
     "node_modules",
     "venv",
@@ -107,6 +109,7 @@ class TesseraEngine:
         source_roots: Optional[Tuple[Any, ...]] = None,
         index_dir: Optional[str] = None,
         identity_root: Optional[str] = None,
+        revision_history: bool = False,
     ):
         self.storage_dir = str(Path(storage_dir).expanduser().resolve(strict=False))
         self.source_roots = tuple(source_roots or ())
@@ -152,6 +155,9 @@ class TesseraEngine:
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
         self.manifest_path = os.path.join(self.index_cache_dir, "identity_manifest.json")
         self.identity_manifest = self._load_identity_manifest()
+        self.revision_history = (
+            RevisionHistory(self.storage_dir, self.index_cache_dir) if revision_history else None
+        )
 
     def set_today_provider(self, provider: Any) -> None:
         """Injects a custom provider to fetch 'today's date for determinism in testing."""
@@ -198,9 +204,12 @@ class TesseraEngine:
         # 2. Extract content hash
         content_hash = compute_sha256(body)
         
+        # Durable observations retain identity when the disposable cache is removed.
+        identities = self.revision_history.identity_entries() if self.revision_history else {}
+        identities.update(self.identity_manifest)
         # 3. Look up in identity manifest by path
-        if rel_path in self.identity_manifest:
-            entry = self.identity_manifest[rel_path]
+        if rel_path in identities:
+            entry = identities[rel_path]
             mem_id = explicit_id or entry["id"]
             doc_id = entry.get("document_id") or f"doc_{compute_sha256(rel_path)[:12]}"
             return str(mem_id).strip(), doc_id
@@ -208,7 +217,11 @@ class TesseraEngine:
         # 4. Look up in identity manifest by content_hash to detect Rename/Move! (F5)
         # Verify old path no longer exists on disk to distinguish rename from copy/duplicates (F5)
         candidates = []
-        for path, entry in self.identity_manifest.items():
+        for path, entry in identities.items():
+            if self.revision_history is not None and explicit_id and str(explicit_id).strip() != entry["id"]:
+                # A distinct explicit identity at a new location is an independent
+                # memory, not an inferred rename of a deleted historical source.
+                continue
             if entry["content_hash"] == content_hash:
                 relative = path.replace("/", os.sep)
                 possible_old_paths = {
@@ -218,6 +231,8 @@ class TesseraEngine:
                 if not any(os.path.exists(item) for item in possible_old_paths):
                     candidates.append((path, entry))
                     
+        # Multiple historical locations of one document are still one candidate.
+        candidates = list({entry.get("document_id", path): (path, entry) for path, entry in candidates}.values())
         if len(candidates) == 1:
             # Unambiguous move/rename detected!
             old_path, entry = candidates[0]
@@ -255,6 +270,24 @@ class TesseraEngine:
             "file_hash": __import__("hashlib").sha256(raw_text.encode("utf-8")).hexdigest(),
             "updated_at": datetime.datetime.now().isoformat()
         }
+
+    def _archive_source(self, filepath: str, raw_text: Optional[str] = None) -> None:
+        if self.revision_history is None:
+            return
+        from .canonical import parse_and_normalize
+        if raw_text is None:
+            with open(filepath, "r", encoding="utf-8") as handle:
+                raw_text = handle.read()
+        else:
+            # Match the universal-newline text view used by source indexing.
+            # Do not invent a second revision when a CRLF write is first indexed.
+            raw_text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
+        memory_id, document_id = self._resolve_persistent_id(filepath, raw_text)
+        metadata = parse_and_normalize(
+            raw_text, filepath, self._identity_base_for(filepath),
+            persistent_id=memory_id, persistent_doc_id=document_id,
+        )
+        self.revision_history.capture(metadata, raw_text)
 
     # ------------------------------------------------------------------
     # Write path
@@ -295,7 +328,8 @@ class TesseraEngine:
             )
 
         path_validation = validate_memory_path(self.storage_dir, mem_id)
-        if not path_validation.valid or path_validation.destination is None:
+        if (not path_validation.valid or path_validation.destination is None
+                or HISTORY_DIRECTORY in mem_id.split("/")[:-1]):
             decision = self.gating_engine.reject_invalid_memory_id(content)
             return WriteResult(mem_id, None, False, decision)
 
@@ -366,6 +400,13 @@ class TesseraEngine:
                 break
             cursor = next_cursor
 
+        # Preserve the old body durably BEFORE the destructive replace. Archive
+        # failure is fatal; an enabled policy never silently becomes overwrite-only.
+        if self.revision_history is not None:
+            self.revision_history.check_available()
+            if os.path.exists(filepath):
+                self._archive_source(filepath)
+
         descriptor = None
         temporary_path = None
         try:
@@ -390,6 +431,14 @@ class TesseraEngine:
                     pass
             raise
 
+        if self.revision_history is not None:
+            try:
+                self._archive_source(filepath, markdown_body)
+            except Exception as exc:
+                raise RevisionHistoryError(
+                    "source was committed, but its new revision could not be archived; "
+                    "the prior version remains preserved", source_committed=True,
+                ) from exc
         self.file_registry[mem_id] = filepath
         return WriteResult(mem_id, filepath, True, decision)
 
@@ -810,6 +859,8 @@ class TesseraEngine:
                     mem_id = f"{mem_id}__{suffix}"
 
                 canonical_meta.identity.id = mem_id
+                if self.revision_history is not None:
+                    self.revision_history.capture(canonical_meta, raw_text)
                 self._update_identity_manifest(filepath, canonical_meta, raw_text)
 
                 self.file_registry[mem_id] = filepath
@@ -916,6 +967,8 @@ class TesseraEngine:
                     )
 
             except Exception as e:
+                if isinstance(e, RevisionHistoryError):
+                    raise
                 # Re-raise explicit collisions to fail build_index properly
                 if isinstance(e, ValueError) and (
                     "Collision de IDs Explícitos" in str(e)
@@ -1100,8 +1153,11 @@ class TesseraEngine:
                             raise ValueError(
                                 f"configured source escapes its root through a symlink: {candidate}"
                             ) from exc
+                        history_root = Path(self.storage_dir) / HISTORY_DIRECTORY
+                        if resolved == history_root or history_root in resolved.parents:
+                            continue
                         relative_parts = resolved.relative_to(root).parts[:-1]
-                        mandatory_parts = {".git", ".tessera_index"}
+                        mandatory_parts = {".git", ".tessera_index", HISTORY_DIRECTORY}
                         if any(part in mandatory_parts for part in relative_parts):
                             continue
                         has_wildcard = any(character in pattern for character in "*?[")
