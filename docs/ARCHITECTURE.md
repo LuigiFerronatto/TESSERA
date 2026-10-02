@@ -597,3 +597,13 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Experimental lifecycle SDK candidate (#196)
+
+[Hook Core](HOOK_CORE.md) separates frozen provider wire mappings from canonical
+lifecycle milestones, explicit project/run identity, redacted bounded ephemeral
+evidence and prepared-context budgets. It never invokes a writer, admission,
+model or index refresh. Existing `TesseraTaskHook` remains unchanged. Candidate
+boundaries are inputs for future episode work, not automatic task completion.
+This unmerged experiment has required semantic-parity evidence and explicit
+unimplemented downstream effects; it is not a delivered integration.

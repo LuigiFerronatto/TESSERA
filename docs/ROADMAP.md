@@ -1040,3 +1040,11 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+## Candidate evolution — #196 Hook Core
+
+The isolated #196 SDK candidate proposes a normalized lifecycle schema, bounded
+ephemeral journal, provider capability profiles and an offline semantic-parity
+benchmark. It is `IN_PROGRESS`, not merged or KEEP. The [stage record](test-cards/196-neutral-hook-core.md)
+records unavailable downstream effects and expanded-comment gaps. No existing
+queue, dependency status or runtime installation is changed by this candidate.
