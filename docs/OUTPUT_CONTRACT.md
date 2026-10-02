@@ -375,3 +375,14 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
+
+## Automatic-memory source lineage (#137)
+
+Automatically decomposed memories additionally expose `lineage`: the original
+source episode, ordered supporting positions, the last supporting position,
+version-aware source/turn evidence and a freshly verified linkage status.
+This is distinct from `provenance`/`evidence`, which still describe the atomic
+note itself. It does not alter relevance scores or imply validity/entailment.
+Legacy manual notes omit this field; section-only automatic inputs report
+`episode_only_no_source_turns` rather than inventing IDs. See the complete
+[episode lineage contract](EPISODE_LINEAGE.md) for fields and failure semantics.

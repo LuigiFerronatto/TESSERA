@@ -11,6 +11,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 from .config import ResolvedConfiguration
+from .canonical import CanonicalMetadata
 
 # Preserve the engine module's existing public constants/types/functions for
 # callers that import them from ``tessera.engine``.
@@ -18,6 +19,7 @@ from .engine_core import *  # noqa: F401,F403
 from .engine_core import TesseraEngine as _CoreTesseraEngine
 from .evidence import (
     EvidenceLedger,
+    evidence_from_canonical,
     enrich_retrieval_results,
     ledger_from_graph,
     retrieval_results_contract,
@@ -64,14 +66,37 @@ class TesseraEngine(_CoreTesseraEngine):
         self.evidence_cache_json = os.path.join(self.index_cache_dir, "evidence.json")
 
     def _rebuild_evidence_ledger(self) -> None:
-        self.evidence_ledger = ledger_from_graph(self.graph)
+        self.evidence_ledger = ledger_from_graph(self.graph, storage_dir=self.storage_dir)
         for node_id, data in self.graph.nodes(data=True):
-            records = self.evidence_ledger.for_memory(node_id)
-            if records:
-                # Derived metadata only. Never written back into source files.
-                data["evidence_record"] = records[0].to_dict()
+            canonical = data.get("canonical_metadata")
+            if isinstance(canonical, CanonicalMetadata):
+                # The primary record still identifies the atomic note itself;
+                # supporting source-turn records must never replace it.
+                data["evidence_record"] = evidence_from_canonical(canonical).to_dict()
+                self._archive_lineage_evidence(canonical)
             else:
                 data.pop("evidence_record", None)
+
+    def _archive_lineage_evidence(self, canonical: CanonicalMetadata) -> None:
+        """Preserve issued source references when an optional archive is enabled.
+
+        The archive capability is supplied by the independently opt-in revision
+        feature. Missing/changed source references remain visible diagnostics;
+        an actual archive failure is never swallowed as successful preservation.
+        """
+        history = getattr(self, "revision_history", None)
+        if history is None or canonical.lineage is None:
+            return
+        from .lineage import validate_lineage
+        try:
+            source = validate_lineage(self.storage_dir, canonical.identity.id, canonical.lineage)
+        except (OSError, ValueError, TypeError, AttributeError):
+            return
+        with open(source.filepath, "r", encoding="utf-8") as handle:
+            history.capture(source.canonical, handle.read())
+        for record in [canonical.lineage.episode_source, *canonical.lineage.source_evidence]:
+            if record is not None:
+                history.record_evidence(record)
 
     def _persist_evidence_summary(self) -> None:
         os.makedirs(self.index_cache_dir, exist_ok=True)

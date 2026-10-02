@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Automatic decomposition retains an independently inspectable Markdown source
+  episode, validated supporting-turn references, exact source-version/span
+  evidence and episode-local temporal position through write/index/rebuild.
+  Legacy section-only inputs remain usable with explicitly unavailable turn
+  support; no semantic entailment, validity time or state accuracy is claimed.
+  ([#137](https://github.com/LuigiFerronatto/TESSERA/issues/137))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
