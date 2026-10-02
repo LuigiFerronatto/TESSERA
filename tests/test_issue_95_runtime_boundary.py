@@ -40,7 +40,8 @@ def contains_legacy_identity(text):
 @pytest.mark.parametrize("text", [
     "LAO", "LAO_MEM_DIR", "legacy-lao-engine-router", "Blip", "lab autonomous officer",
     "blip_gateway", "/legacy/lao/config", "Use LAB AUTONOMOUS OFFICER here",
-])
+], ids=["standalone", "environment", "router", "provider", "historical-name",
+        "gateway", "path-component", "case-insensitive"])
 def test_legacy_identity_gate_rejects_real_tokens(text):
     assert contains_legacy_identity(text)
 
@@ -49,7 +50,7 @@ def test_legacy_identity_gate_rejects_real_tokens(text):
     "/tmp/tessera_doctor_laoseqhs/_doctor_probe/probe.md",
     "/tmp/tessera_doctor_blipqx7n/_doctor_probe/probe.md",
     "tessera_doctor_ablaoxy", "tessera_doctor_xblip", "plain project configuration",
-])
+], ids=["random-prefix-a", "random-prefix-b", "embedded", "suffix", "neutral"])
 def test_legacy_identity_gate_allows_neutral_randomized_words(text):
     assert not contains_legacy_identity(text)
 
