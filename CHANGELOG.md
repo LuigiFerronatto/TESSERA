@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added an opt-in, read-only typed recipe composition experiment with explicit
+  effects, bounded validation, dry-run plans and structured partial outcomes.
+  Adoption is `ITERATE`; direct APIs remain the default and canonical writes,
+  providers, automatic discovery and checkpoint resume remain unavailable.
+  ([#258](https://github.com/LuigiFerronatto/TESSERA/issues/258))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
