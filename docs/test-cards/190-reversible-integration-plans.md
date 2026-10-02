@@ -5,7 +5,7 @@
 | Issue | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190) |
 | Record status | `IN_PROGRESS` |
 | Capability type | runtime |
-| Pull request | Draft candidate on `codex/issue-190-reversible-setup`; link added on publication |
+| Pull request | [Draft PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
 | Head commit | See draft PR exact head; not canonical |
 | Merge commit | Not merged |
 | Decision | `PENDING` |
@@ -63,7 +63,11 @@ plan parity; no client execution; ownership/idempotency; updates/removal; byte a
 mode restoration; absent files/directories; stale config/owner/other-scope guards;
 intervening edits; caught write failures and partial recovery; lock/symlink/hardlink/
 special-file rejection; malformed/redacted JSON; and portable descriptor generation.
-Final local/full-suite and exact-head CI evidence are recorded in the draft PR.
+52 focused integration tests pass; built wheel/sdist and a clean installed-wheel
+preview/apply/rollback smoke pass. Final full-suite and exact-head CI evidence
+are recorded in the draft PR. A demonstrated #95 test-only flake was repaired:
+legacy identity matching now checks identifier boundaries instead of random
+substrings, with positive/negative regression cases; runtime behavior is unchanged.
 Deterministic sanity remains Hit@1 0.75, Hit@3/5 1.0, MRR 0.875, evidence hit 1.0;
 this work changes no retrieval behavior and claims no quality gain.
 
@@ -90,7 +94,7 @@ for review. No downstream semantic/hook dependency is declared satisfied.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190), including its Copilot/portability comments |
-| Pull request | Draft candidate; see publication evidence |
+| Pull request | [Draft PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | [Detailed boundaries and source pins](../INTEGRATION_SETUP.md); `PENDING` |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, no retrieval changes |
