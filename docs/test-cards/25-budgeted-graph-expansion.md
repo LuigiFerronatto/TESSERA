@@ -5,7 +5,7 @@
 | Issue | [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime / benchmark experiment` |
-| Pull request | Draft publication pending |
+| Pull request | [Draft PR #300](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
 | Head commit | See exact-head PR checks |
 | Merge commit | Not merged |
 | Decision | `ITERATE` proposed; default remains A1 |
@@ -100,7 +100,7 @@ work is declared unblocked or merged by this candidate.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) |
-| Pull request | Draft publication pending |
+| Pull request | [Draft PR #300](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Frozen fixture and benchmark runner; proposed `ITERATE` |
 | Benchmark record | [Local ablation aggregates](../evidence/25-graph-expansion/local-ablation.json); PR exact-head Benchmark Ledger artifacts |
