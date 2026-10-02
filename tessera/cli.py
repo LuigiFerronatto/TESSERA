@@ -10,16 +10,15 @@ Usage:
 """
 
 import argparse
+from contextlib import redirect_stderr
 import os
 import sys
-import json
 import warnings
 from pathlib import Path
 from typing import Dict
 
 from .config import (
     CANONICAL_STORAGE_ENV,
-    LEGACY_STORAGE_ENV,
     SCHEMA_VERSION,
     ConfigurationError,
     ConfigurationResolver,
@@ -42,6 +41,10 @@ from .models import Connection, Entity
 from .orchestrator import TesseraOrchestrator
 from .skills import install_default_skills, list_default_skill_files
 from . import __version__
+from .presentation import (
+    ArgumentParser, CliFailure, OutputPolicy, UiEvent, emit, event, output_policy,
+    EXIT_FILESYSTEM, EXIT_INTERNAL, EXIT_CANCELLED, EXIT_PROVIDER, SafeDiagnostics, say, stage,
+)
 
 STORAGE_HELP = (
     "Path to memory storage (default precedence: explicit argument, "
@@ -92,12 +95,13 @@ def cmd_init(args):
     mode = "global" if args.global_name else ("project" if args.project is not None else None)
     compatibility_positional = args.storage_dir
     store_path = args.store or compatibility_positional
-    interactive = not args.non_interactive and not args.json and sys.stdin.isatty()
+    interactive = OutputPolicy.detect(args).interactive
     console = None
     if interactive:
         from .display import get_console, print_banner
         console = get_console(getattr(args, "plain", False))
-        print_banner(console)
+        if not args.quiet:
+            print_banner(console)
     if mode is None and compatibility_positional:
         mode = "project"  # documented compatibility for `tessera init PATH`
     if mode is None:
@@ -105,8 +109,8 @@ def cmd_init(args):
             raise ConfigurationError(
                 "init needs --project [PATH] or --global NAME in non-interactive mode"
             )
-        print("TESSERA\nPersistent memory for this project\n")
-        print(
+        say("TESSERA\nPersistent memory for this project\n")
+        say(
             "How would you like to configure TESSERA?\n"
             "1. This project (recommended)\n2. Named global store\n3. Cancel"
         )
@@ -118,7 +122,7 @@ def cmd_init(args):
             mode = "global"
             args.global_name = _init_input("Named global store: ").strip()
         elif choice == "3":
-            print("Initialization cancelled; no files were changed.")
+            say("Initialization cancelled; no files were changed.")
             return 1
         else:
             raise ConfigurationError("init selection must be 1, 2, or 3")
@@ -152,6 +156,30 @@ def cmd_init(args):
             if existing_path.exists():
                 from .config import ProjectConfig
                 current = ProjectConfig.load(existing_path)
+                from .init_presentation import show_existing_configuration
+                show_existing_configuration(current, existing_path)
+                if store_path is None and args.sources is None and not args.source:
+                    choice = _init_input(
+                        "1. Keep this configuration and update the index\n"
+                        "2. Change configuration / re-run source selection\n"
+                        "3. Cancel\nSelection [1]: "
+                    ).strip() or "1"
+                    if choice == "3":
+                        raise InitializationCancelled("initialization cancelled")
+                    if choice == "1":
+                        selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
+                        if args.dry_run:
+                            return emit(args, "init.keep", {
+                                "applied": False, "mode": "dry-run", "config_changed": False,
+                                "storage_selection": selection.to_dict(),
+                            })
+                        if _init_input("Update the index with this configuration? [y/N]: ").strip().lower() not in {"y", "yes"}:
+                            raise InitializationCancelled("initialization cancelled")
+                        args.storage_selection = selection
+                        args.storage_dir = selection.storage_dir
+                        return cmd_index(args)
+                    if choice != "2":
+                        raise ConfigurationError("existing configuration selection must be 1, 2, or 3")
                 try:
                     default_store = str(Path(current.store.path).relative_to(root))
                 except ValueError:
@@ -196,16 +224,16 @@ def cmd_init(args):
     if plan.preflight_problems:
         message = "preflight failed: " + "; ".join(plan.preflight_problems)
         if args.json:
-            print(json.dumps({
+            emit(args, "init", {
                 "schema_version": SCHEMA_VERSION,
                 "mode": "dry-run" if args.dry_run else "apply",
                 "plan": plan.to_dict(),
                 "applied": False,
                 "error": {"code": "preflight_failed", "message": message},
-            }, sort_keys=True))
+            })
         else:
             _render_initialization_plan(plan, dry_run=args.dry_run)
-            print(f"Cannot apply: {message}", file=sys.stderr)
+            say(f"Cannot apply: {message}", file=sys.stderr)
         return 2
     existing_material_change = (
         plan.current_configuration is not None and plan.material_config_change
@@ -216,10 +244,10 @@ def cmd_init(args):
         )
     if args.json:
         if args.dry_run:
-            print(json.dumps({
+            emit(args, "init", {
                 "schema_version": SCHEMA_VERSION, "mode": "dry-run",
                 "plan": plan.to_dict(), "applied": False,
-            }, sort_keys=True))
+            })
             return 0
     else:
         _render_initialization_plan(plan, dry_run=args.dry_run)
@@ -228,13 +256,15 @@ def cmd_init(args):
     if interactive:
         answer = _init_input("Proceed? [y/N]: ").strip().lower()
         if answer not in {"y", "yes"}:
-            print("Initialization cancelled; no files were changed.")
+            say("Initialization cancelled; no files were changed.")
             return 1
     try:
-        result = apply_initialization_plan(plan, console=console if interactive else None)
+        # Presentation owns terminal activity; application receives no Console.
+        with stage("progress.index"):
+            result = apply_initialization_plan(plan)
     except InitializationApplyError as exc:
         if args.json:
-            print(json.dumps({
+            emit(args, "init", {
                 "schema_version": SCHEMA_VERSION,
                 "applied": False,
                 "partial_state": {
@@ -246,51 +276,29 @@ def cmd_init(args):
                 },
                 "error": str(exc),
                 "plan": plan.to_dict(),
-            }, sort_keys=True))
+            })
         else:
-            print(f"Initialization incomplete: {exc}", file=sys.stderr)
+            say(f"Initialization incomplete: {exc}", file=sys.stderr)
             if exc.config_applied:
-                print("Configuration was saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
+                say("Configuration was saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
             else:
-                print("Configuration was not saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
-            print("Source files modified: 0", file=sys.stderr)
+                say("Configuration was not saved; correct the problem and rerun `tessera init`.", file=sys.stderr)
+            say("Source files modified: 0", file=sys.stderr)
         return 3
-    if args.json:
-        result_payload = result.to_dict()
-        print(json.dumps({
-            "schema_version": SCHEMA_VERSION,
-            "plan": plan.to_dict(),
-            "applied": True,
-            "result": result_payload,
-            # Compatibility aliases retained for the established init JSON
-            # envelope while Issue #155 adds the complete semantic plan.
-            "storage_selection": result_payload["storage_selection"],
-            "indexed_nodes": result_payload["indexed_nodes"],
-        }, sort_keys=True))
-    else:
-        print(f"✔ TESSERA configured {result.configuration.storage_dir}")
-        print(f"✔ {result.indexed_nodes} nodes indexed from {len(result.indexed_sources)} selected files")
-        source_counts = plan.to_dict()["sources"]
-        print(
-            "✔ source discovery: "
-            f"{source_counts['selected_count']} selected, "
-            f"{source_counts['ignored_count']} ignored, "
-            f"{source_counts['forbidden_count']} forbidden"
-        )
-        if result.processing_warnings:
-            print(
-                f"⚠ {len(result.processing_warnings)} source note(s) were skipped due to parse errors; "
-                "fix them and run `tessera index` again.",
-                file=sys.stderr,
-            )
-        print("✔ source files modified: 0")
-        print("Next: `tessera doctor`, `tessera index`, or `tessera query \"...\"`")
-    return 0
+    result_payload = result.to_dict()
+    return emit(args, "init", {
+        "schema_version": SCHEMA_VERSION, "plan": plan.to_dict(),
+        "applied": True, "result": result_payload,
+        # Established init JSON aliases remain stable.
+        "storage_selection": result_payload["storage_selection"],
+        "indexed_nodes": result_payload["indexed_nodes"],
+    })
 
 
 def _init_input(prompt: str) -> str:
     try:
-        return input(prompt)
+        from .presentation import prompt_input
+        return prompt_input(prompt)
     except (EOFError, KeyboardInterrupt) as exc:
         raise InitializationCancelled("initialization cancelled") from exc
 
@@ -299,52 +307,21 @@ def _interactive_discovery(root: Path, *, console=None):
     from .source_discovery import discover_sources, discover_sources_for_configuration
 
     config_path = root / ".tessera" / "config.yaml"
-    status = console.status("[bold #ff9966]Loading project sources...[/]") if console else None
-    if status:
-        status.start()
-    try:
-        if config_path.exists():
-            selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
-            discovery = discover_sources_for_configuration(selection)
-        else:
-            discovery = discover_sources(root)
-    finally:
-        if status:
-            status.stop()
-    print("\nKnowledge sources found")
-    for cluster in discovery.clusters:
-        marker = "x" if cluster.recommended else (" " if cluster.selectable else "!")
-        count = cluster.recommended_count + cluster.supported_count
-        detail = f"{count} selectable"
-        if cluster.forbidden_count:
-            detail += f", {cluster.forbidden_count} forbidden"
-        if console is not None:
-            style = {"x": "green", "!": "yellow", "-": "red"}.get(marker, "white")
-            console.print(f"  [{style}]{marker}[/] {cluster.path:<28} {detail}")
-        else:
-            print(f"  [{marker}] {cluster.path:<28} {detail}")
-    clustered = {item.path.split('/', 1)[0] for item in discovery.files if "/" in item.path}
-    for item in discovery.files:
-        if "/" in item.path and item.path.split('/', 1)[0] in clustered:
-            continue
-        marker = (
-            "x" if item.selected_by_default
-            else " " if item.selectable
-            else "!" if item.classification == "FORBIDDEN"
-            else "-"
-        )
-        if console is not None:
-            style = {"x": "green", "!": "yellow", "-": "red"}.get(marker, "white")
-            console.print(f"  [{style}]{marker}[/] {item.path:<28} {item.classification.lower()}")
-        else:
-            print(f"  [{marker}] {item.path:<28} {item.classification.lower()}")
+    event(UiEvent("progress.discovery"))
+    if config_path.exists():
+        selection = ConfigurationResolver(cwd=root, environ={}).resolve(project=root)
+        discovery = discover_sources_for_configuration(selection)
+    else:
+        discovery = discover_sources(root)
+    from .init_presentation import show_discovery
+    show_discovery(discovery)
     return discovery
 
 
 def _interactive_source_choice(discovery):
     selectable = [item.path for item in discovery.files if item.kind == "file" and item.selectable]
     if not selectable:
-        print("\nNo compatible project sources were found. You can still initialize an empty generated-memory store.")
+        say("\nNo compatible project sources were found. You can still initialize an empty generated-memory store.")
         answer = _init_input("1. Generated-memory store only\n2. Cancel\nSelection [1]: ").strip() or "1"
         if answer == "2":
             raise InitializationCancelled("initialization cancelled")
@@ -359,9 +336,9 @@ def _interactive_source_choice(discovery):
     if answer == "1":
         return "recommended", []
     if answer == "2":
-        print("Selectable sources:")
+        say("Selectable sources:")
         for index, path in enumerate(selectable, start=1):
-            print(f"  {index}. {path}")
+            say(f"  {index}. {path}")
         raw = _init_input("Enter comma-separated numbers or project-relative paths: ").strip()
         selected = []
         for item in (part.strip() for part in raw.split(",") if part.strip()):
@@ -378,59 +355,8 @@ def _interactive_source_choice(discovery):
 
 
 def _render_initialization_plan(plan: InitializationPlan, *, dry_run: bool) -> None:
-    payload = plan.to_dict()
-    sources = payload["sources"]
-    print("\nInitialization plan:")
-    print(f"  Scope: {plan.mode}")
-    print(f"  Project: {plan.project_root or '-'}")
-    print(f"  Configuration: {plan.config_path}")
-    print(f"  Store id: {plan.store_id}")
-    print(f"  Generated memories: {plan.generated_memory_store}")
-    print(f"  Source mode: {plan.source_mode}")
-    print(f"  Selected project sources: {sources['selected_count']} files")
-    print(f"  Derived index: {plan.index_path}")
-    print(f"  Ignored: {sources['ignored_count']} (discovery only; no files changed)")
-    print(f"  Forbidden: {sources['forbidden_count']}")
-    print("  Source files modified: 0")
-    print(f"  Configuration changes: {', '.join(plan.config_changes) or 'none'}")
-    print(f"  Ignore changes: {', '.join(plan.ignore_changes) or 'none'}")
-    print("  Indexing: will start after confirmation")
-    if plan.current_configuration is not None:
-        print("  Existing configuration: loaded and compared")
-        _render_configuration_summary("Current", plan.current_configuration)
-        if plan.proposed_configuration is not None:
-            _render_configuration_summary("Proposed", plan.proposed_configuration)
-    if plan.warnings:
-        print("  Warnings:")
-        for warning in plan.warnings:
-            print(f"    - {warning}")
-        symlink_warnings = [
-            warning for warning in plan.warnings
-            if warning.startswith(("unsafe_symlink:", "outside_root:"))
-        ]
-        if symlink_warnings:
-            print(
-                "  Symlink policy: these entries were ignored during discovery; "
-                "they are not selected, followed, written to configuration, or added to .tessera-ignore."
-            )
-    if plan.preflight_problems:
-        print("  Preflight problems:")
-        for problem in plan.preflight_problems:
-            print(f"    - {problem}")
-    if dry_run:
-        print("\nDRY RUN — no changes made")
-
-
-def _render_configuration_summary(label: str, mapping: Dict) -> None:
-    store = mapping.get("store", mapping)
-    sources = mapping.get("sources", {}).get("roots", [])
-    index = mapping.get("index", {})
-    print(f"  {label}:")
-    print(f"    Generated memories: {store.get('path', '-')}")
-    if sources:
-        include_count = sum(len(root.get("include", [])) for root in sources)
-        print(f"    Source allow-list entries: {include_count}")
-    print(f"    Derived index: {index.get('path', '-')}")
+    from .init_presentation import render_initialization_plan
+    render_initialization_plan(plan, dry_run=dry_run)
 
 
 def cmd_write(args):
@@ -447,145 +373,37 @@ def cmd_write(args):
         entities=entities,
         active_connections=active_connections,
     )
-    if getattr(args, "json", False):
-        print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
-        return 0 if result.persisted else 2
-
-    if not result.persisted:
-        decision = result.decision
-        print(
-            f"✘ Note not written: admission={decision.admission.value}; "
-            f"reasons={','.join(decision.reasons)}",
-            file=sys.stderr,
-        )
-        return 2
-
-    filepath = result.filepath or ""
-    conn_ids = [c.target_memory_id for c in active_connections]
-
-    from .display import get_console, render_write_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_write_result(console, filepath, args.id, args.type, conn_ids)
-        return 0
-    print(f"✔ Memory note written to: {filepath}")
-    print(
-        f"  security: admission={result.decision.admission.value}; "
-        f"content_changed={str(result.decision.content_changed).lower()}; "
-        f"is_sanitized={str(result.decision.is_sanitized).lower()}"
-    )
-    if active_connections:
-        print(f"  ({len(active_connections)} explicit connection(s) recorded: "
-              f"{', '.join(conn_ids)})")
-    return 0
+    payload = result.to_dict()
+    receipt = payload.get("write_receipt") or {}
+    code = (3 if receipt.get("repair_required") else 0) if result.persisted else 2
+    return emit(args, "write", payload, code)
 
 
 def cmd_index(args):
     engine = _engine_for_args(args)
-    # Reuse unchanged source contributions and rebuild only changed sources.
-    from .display import get_console, render_index_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    status = console.status("[bold #ff9966]Indexing sources...[/]") if console else None
-    if status:
-        status.start()
-    else:
-        print(f"[tessera] Indexing: {os.path.abspath(args.storage_dir)}", file=sys.stderr)
-    try:
+    with stage("progress.index"):
         engine.build_index(use_cache=True)
-    finally:
-        if status:
-            status.stop()
-    if console is not None:
-        render_index_result(
-            console, args.storage_dir, engine.graph.number_of_nodes(), engine.graph.number_of_edges(),
-            str(engine.index_cache_pkl), str(engine.index_cache_json),
-        )
-        if engine.processing_warnings:
-            console.print(
-                f"[yellow]⚠ {len(engine.processing_warnings)} source note(s) skipped due to parse errors; "
-                "fix them and run `tessera index` again.[/yellow]"
-            )
-        return
-    print(
-        f"✔ Index rebuilt: {engine.graph.number_of_nodes()} nodes, "
-        f"{engine.graph.number_of_edges()} edges. (source: {args.storage_dir})"
-    )
-    stats = getattr(engine, "last_index_stats", {})
-    if stats:
-        print(
-            "  sources: "
-            f"scanned={stats.get('scanned', 0)}, parsed={stats.get('parsed', 0)}, "
-            f"unchanged={stats.get('unchanged', 0)}, added={stats.get('added', 0)}, "
-            f"updated={stats.get('updated', 0)}, moved={stats.get('moved', 0)}, "
-            f"removed={stats.get('removed', 0)}, segments={stats.get('segments', 0)} "
-            f"({stats.get('mode', 'unknown')})"
-        )
-    print(
-        f"  Persisted at: {engine.index_cache_pkl} (binary) and {engine.index_cache_json} (readable)",
-        file=sys.stderr,
-    )
-    if engine.processing_warnings:
-        print(
-            f"⚠ {len(engine.processing_warnings)} source note(s) skipped due to parse errors; "
-            "fix them and run `tessera index` again.",
-            file=sys.stderr,
-        )
+    return emit(args, "index", {
+        "schema_version": 1, "storage_dir": args.storage_dir,
+        "nodes": engine.graph.number_of_nodes(), "edges": engine.graph.number_of_edges(),
+        "stats": getattr(engine, "last_index_stats", {}),
+        "artifacts": {"binary": str(engine.index_cache_pkl), "readable": str(engine.index_cache_json)},
+        "warnings": engine.processing_warnings,
+    })
 
 
 def cmd_query(args):
-    print(f"[tessera] storage_dir: {args.storage_dir}  |  query: {args.query!r}", file=sys.stderr)
     engine = _engine_for_args(args)
     engine.build_index()
-    if engine.graph.number_of_nodes() == 0:
-        print(
-            f"No memory notes indexed em '{args.storage_dir}'. "
-            "Check the path (ou defina TESSERA_STORAGE_DIR)."
-        )
-        return
+    # Empty corpora are successful empty retrieval, exactly like the Engine API.
     results = engine.retrieve_context(
-        query_text=args.query,
-        top_n=args.top_n,
+        query_text=args.query, top_n=args.top_n,
         resolve_conflicts=not args.no_resolve_conflicts,
-    )
-    if args.json:
-        print(json.dumps(results, ensure_ascii=False, indent=2, default=str))
-        return
-    if not results:
-        print("No relevant memories found for this query.")
-        return
-
-    if args.paths_only:
-        # Just the file path of each hit, one per line — for piping into
-        # another tool (cat/xargs/an editor), not for reading the body here.
-        for r in results:
-            print(r.get("filepath") or r.get("filename") or r["id"])
-        return
-
-    from .display import get_console, render_query_results
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_query_results(
-            results, console, show_related=args.show_related, show_body=not args.no_body, show_debug=getattr(args, "debug", False)
-        )
-        return
-
-    for i, r in enumerate(results, 1):
-        print(f"\n[{i}] {r['id']} ({r['type']}) — score={r['score']:.4f}  [{r.get('filename', '')}]")
-        if getattr(args, "debug", False) and r.get("score_explain"):
-            exp = r["score_explain"]
-            print(f"    debug: final={r['score']:.3f} | tfidf={exp.get('lexical_tfidf', 0.0):.2f} | overlap={exp.get('lexical_overlap', 0.0):.2f} | title={exp.get('title', 0.0):.2f} | metadata={exp.get('metadata', 0.0):.2f} | raw_pr={exp.get('raw_pagerank', 0.0):.4f} | relations={exp.get('normalized_relations', 0.0):.2f} | type_boost={exp.get('type_boost', 1.0):.1f} | recency_boost={exp.get('recency_boost', 1.0):.1f}")
-        if r.get("related_ids"):
-            print(f"    relacionadas: {', '.join(r['related_ids'])}")
-        if not args.no_body:
-            print(r["body"])
-
+    ) if engine.graph.number_of_nodes() else []
+    return emit(args, "query", results)
 
 
 def cmd_list(args):
-    print(f"[tessera] Usando storage_dir: {args.storage_dir}", file=sys.stderr)
     engine = _engine_for_args(args)
     engine.build_index()
     rows = []
@@ -595,70 +413,39 @@ def cmd_list(args):
             continue
         if args.type and node_type != args.type:
             continue
-        rows.append((node_id, node_type, data.get("filename", ""), data.get("filepath", "")))
-
-    if not rows:
-        print(
-            f"No memory note found in '{args.storage_dir}'. "
-            "Check that the path is correct or run `tessera init <dir>` primeiro."
-        )
-        return
-
-    if args.paths_only:
-        # Just the filepath, one per line — for piping into cat/xargs/an editor.
-        for _, _, _, filepath in rows:
-            print(filepath)
-    elif args.table:
-        from .display import get_console, print_list_plain, render_list_table
-
-        console = get_console(force_plain=getattr(args, "plain", False))
-        if console is not None:
-            render_list_table(rows, console)
-        else:
-            print_list_plain(rows)
-    else:
-        for node_id, node_type, filename, _ in rows:
-            print(f"{node_id}\t{node_type}\t{filename}")
-
-    print(f"\n({len(rows)} notas indexadas)", file=sys.stderr)
+        rows.append({"id": node_id, "type": node_type,
+                     "filename": data.get("filename", ""), "filepath": data.get("filepath", "")})
+    return emit(args, "list", rows)
 
 
 def cmd_skills_install(args):
     engine = _engine_for_args(args)
     paths = install_default_skills(engine)
-
-    from .display import get_console, render_skills_install_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_skills_install_result(console, [str(p) for p in paths], os.path.abspath(args.storage_dir))
-        return
-    print(f"✔ {len(paths)} procedural anchors installed at {os.path.abspath(args.storage_dir)}:")
-    for p in paths:
-        print(f"  - {p}")
+    return emit(args, "skills.install", {
+        "schema_version": 1, "paths": [str(path) for path in paths],
+        "storage_dir": os.path.abspath(args.storage_dir),
+    })
 
 
 def cmd_skills_list(args):
-    skill_ids = [path.stem for path in list_default_skill_files()]
-
-    from .display import get_console, render_skills_list_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_skills_list_result(console, skill_ids)
-        return
-    for skill_id in skill_ids:
-        print(skill_id)
+    return emit(args, "skills.list", [path.stem for path in list_default_skill_files()])
 
 
 def cmd_start(args):
-    """Runs the full Need -> Planner -> Retrieval -> Inference pipeline (TesseraOrchestrator)."""
-    print(f"[tessera] storage_dir: {args.storage_dir}  |  task: {args.task!r}", file=sys.stderr)
     engine = _engine_for_args(args)
     engine.build_index()
+    llm_fn = _optional_backend(args)
+    try:
+        with stage("progress.reason"):
+            result = TesseraOrchestrator(engine, llm_fn=llm_fn).run(task_instruction=args.task, top_n=args.top_n)
+    except (RuntimeError, ConnectionError, TimeoutError) as exc:
+        raise CliFailure("provider_failure", f"The selected optional service failed ({type(exc).__name__}).",
+                         exit_code=EXIT_PROVIDER, suggested_command="Check the selected provider's configuration and availability.") from exc
+    return emit(args, "start", result.to_dict())
 
+
+def _optional_backend(args):
     from .llm_bridge import resolve_llm_fn
-
     try:
         llm_fn, backend_name = resolve_llm_fn(
             backend=args.llm_backend, endpoint=args.compat_endpoint,
@@ -668,183 +455,61 @@ def cmd_start(args):
             return_backend_name=True,
         )
     except RuntimeError as exc:
-        print(f"[tessera] optional backend configuration failed: {exc}", file=sys.stderr)
-        return 2
+        raise CliFailure("provider_configuration", str(exc), exit_code=EXIT_PROVIDER,
+                         suggested_command="tessera start --help") from exc
     if llm_fn is None:
-        print(
-            "[tessera] No optional backend selected. Pass a custom llm_fn in "
-            "Python or explicitly select a configured compatibility adapter.",
-            file=sys.stderr,
-        )
-        return 2
-    print(f"[tessera] backend={backend_name} (explicit compatibility selection).", file=sys.stderr)
-
-    from .display import get_console, print_banner, render_query_results
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        print_banner(console)
-
-    def step_callback(step_name, data):
-        if console is not None:
-            if step_name == "information_need":
-                console.print(f"[bold]🧠 Information need:[/bold] {data}")
-            elif step_name == "retrieval_query":
-                console.print(f"[bold]🔎 Consulta de busca planejada:[/bold] {data}")
-            elif step_name == "target_stores":
-                console.print(f"[bold]🗂️  Gavetas consultadas:[/bold] {', '.join(data)}")
-            elif step_name == "raw_memories":
-                console.print(f"[bold]📚 Raw memories retrieved:[/bold] {len(data)}")
-                if data:
-                    console.print()
-                    console.rule("[bold]Memories used as evidence[/bold]", style="dim")
-                    render_query_results(data, console, show_related=True, show_body=False)
-            elif step_name == "consolidated_context":
-                from rich.panel import Panel
-                console.print()
-                console.rule("[bold yellow]Contexto Consolidado[/bold yellow]")
-                console.print(Panel(data, border_style="yellow"))
-        else:
-            if step_name == "information_need":
-                print(f"🧠 Information need: {data}")
-            elif step_name == "retrieval_query":
-                print(f"🔎 Consulta de busca planejada: {data}")
-            elif step_name == "target_stores":
-                print(f"🗂️  Gavetas consultadas: {', '.join(data)}")
-            elif step_name == "raw_memories":
-                print(f"📚 Raw memories retrieved: {len(data)}")
-                for i, m in enumerate(data, 1):
-                    filepath = m.get("filepath") or m.get("filename") or ""
-                    print(f"  [{i}] {m['id']} ({m['type']}) score={m['score']:.4f}  [{filepath}]")
-            elif step_name == "consolidated_context":
-                print("\n--- Contexto Consolidado ---")
-                print(data)
-
-    orchestrator = TesseraOrchestrator(engine, llm_fn=llm_fn)
-    result = orchestrator.run(task_instruction=args.task, top_n=args.top_n, step_callback=step_callback)
+        raise CliFailure("provider_missing", "No optional backend selected.", exit_code=EXIT_PROVIDER,
+                         suggested_command="tessera start --help")
+    event(UiEvent("provider.selected", fields={"backend": backend_name}))
+    return llm_fn
 
 
 def cmd_decompose(args):
-    """QUMem-style automatic typed decomposition of a raw episode (beginning/middle/end)
-    into N atomic facts/preferences/insights, written through the normal gated path."""
     from .models import Episode
-
-    print(f"[tessera] storage_dir: {args.storage_dir}  |  mem_id_prefix: {args.mem_id_prefix!r}", file=sys.stderr)
     engine = _engine_for_args(args)
     engine.build_index()
-
-    from .llm_bridge import resolve_llm_fn
-
-    try:
-        llm_fn, backend_name = resolve_llm_fn(
-            backend=args.llm_backend, endpoint=args.compat_endpoint,
-            api_key=args.compat_api_key, contact_id=args.compat_contact_id,
-            subscription_id=args.compat_subscription_id,
-            tenant_id=args.compat_tenant_id, router_path=args.compat_router_path,
-            return_backend_name=True,
-        )
-    except RuntimeError as exc:
-        print(f"[tessera] optional backend configuration failed: {exc}", file=sys.stderr)
-        return 2
-    if llm_fn is None:
-        print("[tessera] No optional backend selected.", file=sys.stderr)
-        return 2
-        
-    print(f"[tessera] backend={backend_name}.", file=sys.stderr)
-
-    episode = Episode(beginning=args.beginning, middle=args.middle, end=args.end)
-    tags = args.tags.split(",") if args.tags else []
-
-    decomposition = engine.decompose_and_write_episode_result(
-        mem_id_prefix=args.mem_id_prefix,
-        episode_id=args.episode_id or args.mem_id_prefix,
-        episode=episode,
-        llm_fn=llm_fn,
-        tags=tags,
+    llm_fn = _optional_backend(args)
+    event(UiEvent("progress.decompose"))
+    result = engine.decompose_and_write_episode_result(
+        mem_id_prefix=args.mem_id_prefix, episode_id=args.episode_id or args.mem_id_prefix,
+        episode=Episode(beginning=args.beginning, middle=args.middle, end=args.end),
+        llm_fn=llm_fn, tags=args.tags.split(",") if args.tags else [],
     )
-    filepaths = list(decomposition.filepaths)
-    print(f"[tessera] decomposition_mode={decomposition.decomposition.mode}.", file=sys.stderr)
-    if decomposition.decomposition.fallback_reason:
-        print(
-            "[tessera] fallback_reason="
-            f"{decomposition.decomposition.fallback_reason}.",
-            file=sys.stderr,
-        )
     engine.build_index()
-
-    from .display import get_console
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None and filepaths:
-        console.print(f"[bold green]✔[/bold green] {len(filepaths)} atomic memory/memories extracted and written:")
-        for p in filepaths:
-            console.print(f"  [dim]-[/dim] {p}")
-        return
-    if console is not None:
-        console.print("[yellow]![/yellow] No memory was extracted from this episode (nothing judged worth persisting).")
-        return
-
-    if not filepaths:
-        print("No memory was extracted from this episode (nothing judged worth persisting).")
-        return
-    print(f"✔ {len(filepaths)} atomic memory/memories extracted and written:")
-    for p in filepaths:
-        print(f"  - {p}")
+    if result.decomposition.fallback_reason:
+        event(UiEvent("decomposition.fallback", level="warning", fields={
+            "decomposition_mode": result.decomposition.mode,
+            "fallback_reason": result.decomposition.fallback_reason,
+        }))
+    from dataclasses import asdict
+    return emit(args, "decompose", asdict(result))
 
 
 def cmd_stats(args):
     engine = _engine_for_args(args)
     engine.build_index()
-
     type_counts: Dict[str, int] = {}
     for _node_id, data in engine.graph.nodes(data=True):
         node_type = data.get("node_type", "unknown")
         type_counts[node_type] = type_counts.get(node_type, 0) + 1
-    edge_count = engine.graph.number_of_edges()
-
-    from .display import get_console, print_stats_plain, render_stats_result
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_stats_result(console, args.storage_dir, type_counts, edge_count)
-        return
-    print_stats_plain(args.storage_dir, type_counts, edge_count)
+    return emit(args, "stats", {
+        "schema_version": 1, "storage_dir": args.storage_dir,
+        "type_counts": type_counts, "edges": engine.graph.number_of_edges(),
+    })
 
 
 def cmd_doctor(args):
     from .diagnostics import run_doctor
-    from .display import get_console, print_doctor_report_plain, render_doctor_report
-
-    report = run_doctor(
-        args.storage_dir,
-        configuration=getattr(args, "storage_selection", None),
-    )
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_doctor_report(console, report)
-    else:
-        print_doctor_report_plain(report)
-
-    return 0 if report.all_ok else 1
+    report = run_doctor(args.storage_dir, configuration=getattr(args, "storage_selection", None))
+    return emit(args, "doctor", report.to_dict(), 0 if report.all_ok else 1)
 
 
 def cmd_corpus_doctor(args):
-    from .corpus_diagnostics import print_corpus_doctor_plain, run_corpus_doctor
-
-    configuration = getattr(args, "storage_selection", None)
-    if configuration is None:
-        configuration = _selection_from_args(args)
+    from .corpus_diagnostics import run_corpus_doctor
+    configuration = getattr(args, "storage_selection", None) or _selection_from_args(args)
     report = run_corpus_doctor(configuration)
-    if args.json:
-        print(json.dumps(report.to_dict(), sort_keys=True))
-    else:
-        print_corpus_doctor_plain(report, verbose=args.verbose)
-    if report.errors:
-        return 1
-    if args.strict and report.warnings:
-        return 2
-    return 0
+    code = 1 if report.errors else 2 if args.strict and report.warnings else 0
+    return emit(args, "corpus.doctor", report.to_dict(), code)
 
 
 def _selection_from_args(args):
@@ -859,37 +524,21 @@ def _selection_from_args(args):
             global_name=getattr(args, "global_name", None),
         )
     for warning in caught:
-        print(f"[tessera] warning: {warning.message}", file=sys.stderr)
+        event(UiEvent("configuration.warning", level="warning", fields={"message": str(warning.message)}))
     return selection
 
 
 def cmd_config_show(args):
     selection = _selection_from_args(args)
-    payload = {"schema_version": SCHEMA_VERSION, "storage_selection": selection.to_dict()}
-    if args.json:
-        print(json.dumps(payload, sort_keys=True))
-    else:
-        for key, value in selection.to_dict().items():
-            print(f"{key}: {value if value is not None else '-'}")
-    return 0
+    return emit(args, "config.show", {"schema_version": SCHEMA_VERSION, "storage_selection": selection.to_dict()})
 
 
 def cmd_config_list(args):
     path = global_registry_path()
     registry = GlobalRegistry.load(path)
-    stores = [
-        {"name": name, "store_id": record.id, "storage_dir": record.path}
-        for name, record in sorted(registry.stores.items())
-    ]
-    payload = {"schema_version": SCHEMA_VERSION, "registry_path": str(path), "stores": stores}
-    if args.json:
-        print(json.dumps(payload, sort_keys=True))
-    elif stores:
-        for store in stores:
-            print(f"{store['name']}\t{store['store_id']}\t{store['storage_dir']}")
-    else:
-        print("No global stores are registered.")
-    return 0
+    stores = [{"name": name, "store_id": record.id, "storage_dir": record.path}
+              for name, record in sorted(registry.stores.items())]
+    return emit(args, "config.list", {"schema_version": SCHEMA_VERSION, "registry_path": str(path), "stores": stores})
 
 
 def cmd_config_doctor(args):
@@ -989,12 +638,7 @@ def cmd_config_doctor(args):
         "source_discovery": source_discovery.to_dict() if source_discovery else None,
         "checks": checks,
     }
-    if args.json:
-        print(json.dumps(payload, sort_keys=True))
-    else:
-        for check in checks:
-            print(f"{'OK' if check['ok'] else 'PROBLEM'} {check['name']}: {check['detail']}")
-    return 0 if healthy else 1
+    return emit(args, "config.doctor", payload, 0 if healthy else 1)
 
 
 def cmd_config_unregister(args):
@@ -1008,56 +652,42 @@ def cmd_config_unregister(args):
         "store_deleted": False,
         "registry_path": str(path),
     }
-    if args.json:
-        print(json.dumps(payload, sort_keys=True))
-    else:
-        print(f"Unregistered {args.name!r}; only registry metadata was removed.")
-        print(f"Store retained: {removed.path}")
-    return 0
+    return emit(args, "config.unregister", payload)
 
 
 def cmd_quickstart(args):
     from .diagnostics import apply_quickstart_plan, build_quickstart_plan
-    from .display import get_console, print_quickstart_plan_plain, render_quickstart_plan
-
     plan = build_quickstart_plan(project_root=args.project_root, storage_dir=args.storage_dir)
     if args.apply:
         plan = apply_quickstart_plan(plan)
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is not None:
-        render_quickstart_plan(console, plan, applied=args.apply)
-    else:
-        print_quickstart_plan_plain(plan, applied=args.apply)
+    return emit(args, "quickstart", plan.to_dict())
 
 
 def cmd_banner(args):
-    from .display import get_console, print_banner
-
-    console = get_console(force_plain=getattr(args, "plain", False))
-    if console is None:
-        print("Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories")
-        return
-    print_banner(console)
+    from .display import TESSERA_TAGLINE, get_console, print_banner
+    if not getattr(args, "json", False):
+        console = get_console(force_plain=getattr(args, "plain", False))
+        if console is not None:
+            print_banner(console)
+            return 0
+    return emit(args, "banner", {"name": "TESSERA", "tagline": TESSERA_TAGLINE})
 
 
 def cmd_update(args):
     from .update import check_for_update, install_latest
-
+    if getattr(args, "json", False) and not args.check:
+        raise CliFailure("invalid_usage", "JSON update requires --check; installing requires explicit interactive confirmation.", exit_code=2,
+                         suggested_command="tessera update --check --json")
     found = check_for_update(force=True)
-    if not found:
-        print("TESSERA is up to date.")
+    emit(args, "update", {"installed": __version__, "latest": found[1] if found else None})
+    if not found or args.check:
         return 0
-    installed, latest = found
-    print(f"Update available: {installed} -> {latest}")
-    if getattr(args, "check", False):
-        return 0
-    if not sys.stdin.isatty():
-        print("Run interactively or pass --check to inspect updates.", file=sys.stderr)
-        return 2
-    answer = _init_input("Install this update? [y/N]: ").strip().lower()
+    if not OutputPolicy.detect(args).interactive:
+        raise CliFailure("interaction_required", "Run interactively or pass --check to inspect updates.", exit_code=2)
+    from .presentation import prompt_input
+    answer = prompt_input("Install this update? [y/N]: ").strip().lower()
     if answer not in {"y", "yes"}:
-        print("Update cancelled.")
+        say("Update cancelled.")
         return 0
     return install_latest()
 
@@ -1083,18 +713,41 @@ def _add_store_selection_arguments(parser):
     parser.add_argument("--global", dest="global_name", default=None, metavar="NAME", help="Select this exact global registry entry")
 
 
+def _add_presentation_arguments(parser):
+    options = {
+        "--plain": {"action": "store_true", "help": "Plain line-oriented output"},
+        "--no-color": {"action": "store_true", "help": "Keep layout without color"},
+        "--json": {"action": "store_true", "help": "One machine-readable JSON result"},
+        "--quiet": {"action": "store_true", "help": "Essential results only"},
+        "--verbose": {"action": "store_true", "help": "Resolved paths, IDs and stage diagnostics"},
+        "--debug": {"action": "store_true", "help": "Developer traceback on stderr and detailed results"},
+        "--lang": {"choices": ["en"], "help": "Message language (v1 supports English)"},
+    }
+    for option, kwargs in options.items():
+        if option not in parser._option_string_actions:
+            parser.add_argument(option, default=argparse.SUPPRESS, **kwargs)
+        else:
+            parser._option_string_actions[option].default = argparse.SUPPRESS
+    for action in parser._actions:
+        if isinstance(action, argparse._SubParsersAction):
+            for child in action.choices.values():
+                _add_presentation_arguments(child)
+
+
 def build_parser():
-    parser = argparse.ArgumentParser(prog="tessera", description="Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories CLI")
+    parser = ArgumentParser(prog="tessera", description="Tessera — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories CLI")
     parser.add_argument("--version", "--v", action="store_true", help="Show the installed TESSERA version")
     sub = parser.add_subparsers(dest="command", required=False)
 
-    # Shared --plain flag for the 3 commands with colorized Rich output
-    # (query/list/start) — forces plain-text rendering even on a TTY (color
-    # is already auto-disabled when piped/NO_COLOR is set; --plain is for
-    # when you're on a real terminal but still want the old scriptable text).
-    plain_parent = argparse.ArgumentParser(add_help=False)
+    # Compatibility parent; all parsers receive the complete output policy
+    # below, with suppressed defaults preserving flags supplied at any level.
+    plain_parent = ArgumentParser(add_help=False)
     plain_parent.add_argument("--plain", action="store_true",
                                help="Force plain-text output (no colors/tables), even on a TTY.")
+
+    p_status = sub.add_parser("status", help="Read-only project dashboard", parents=[plain_parent])
+    p_status.add_argument("--project", default=None, metavar="PATH")
+    p_status.set_defaults(func=cmd_dashboard)
 
     p_init = sub.add_parser("init", help="Configure and initialize an explicit TESSERA store", parents=[plain_parent])
     p_init.add_argument("storage_dir", nargs="?", default=None, help=STORAGE_HELP)
@@ -1121,6 +774,7 @@ def build_parser():
         "--update-existing", action="store_true",
         help="Allow a declared non-interactive material update to existing configuration",
     )
+    p_init.add_argument("--yes", action="store_true", help="Accept the fully specified init plan; requires --non-interactive")
     p_init.add_argument("--non-interactive", action="store_true", help="Never prompt; fail when choices are missing")
     p_init.add_argument("--dry-run", action="store_true", help="Show the complete mutation plan without writing")
     p_init.add_argument("--json", action="store_true", help="Emit stable machine-readable output")
@@ -1163,6 +817,8 @@ def build_parser():
                          help="Show explainable score breakdown for retrieved memories")
     p_query.add_argument("--json", action="store_true",
                          help="Print the complete machine-readable retrieval contract as JSON")
+    p_query.add_argument("--full", action="store_true", help="Show complete source bodies")
+    p_query.add_argument("--explain", action="store_true", help="Show ranking components (not confidence)")
     p_query.set_defaults(func=cmd_query)
 
     p_list = sub.add_parser("list", help="List indexed memory notes", parents=[plain_parent])
@@ -1295,26 +951,42 @@ def build_parser():
     p_config_unregister.add_argument("--json", action="store_true")
     p_config_unregister.set_defaults(func=cmd_config_unregister)
 
+    _add_presentation_arguments(parser)
     return parser
 
 
-def main(argv=None):
-    parser = build_parser()
-    args = parser.parse_args(argv)
+def cmd_dashboard(args):
+    """Inspect configuration and corpus without creating directories or rebuilding."""
+    root = getattr(args, "project", None) or os.getcwd()
+    config_path = discover_project_config(root)
+    if not config_path and not os.environ.get(CANONICAL_STORAGE_ENV):
+        return emit(args, "dashboard", {"schema_version": 1, "configured": False})
+    from .corpus_diagnostics import run_corpus_doctor
+    selection = ConfigurationResolver().resolve(project=root)
+    report = run_corpus_doctor(selection)
+    codes = {finding.code for finding in report.findings}
+    freshness = {"stale_source_version", "source_not_indexed", "source_removed", "stale_evidence"}
+    index_status = "missing" if "index_missing" in codes else (
+        "needs attention" if report.errors or codes & freshness else "inspected; no freshness issue detected"
+    )
+    return emit(args, "dashboard", {
+        "schema_version": 1, "configured": True,
+        "project": Path(selection.project_root).name if selection.project_root else None,
+        "config_path": selection.config_path, "configuration_source": selection.source,
+        "storage_dir": selection.storage_dir,
+        "index_dir": selection.index_dir, "index_status": index_status,
+        "sources": report.counts["sources_selected"], "counts": report.counts,
+        "source_files_modified": 0,
+    })
+
+
+def _run_command(args, parser):
+    if args.lang != "en":
+        parser.error("only the English catalog is supported; use --lang en")
     if args.version:
-        from .update import check_for_update
-        found = check_for_update()
-        print(f"tessera {__version__}")
-        if found:
-            print(f"Update available: {found[0]} -> {found[1]}", file=sys.stderr)
-        return 0
+        return emit(args, "version", {"version": __version__})
     if args.command is None:
-        parser.error("a command is required (or use --version)")
-    if args.command in {"init", "index", "query", "doctor"}:
-        from .update import check_for_update
-        found = check_for_update()
-        if found and not getattr(args, "json", False):
-            print(f"[tessera] update available: {found[0]} -> {found[1]} (run `tessera update`)", file=sys.stderr)
+        return cmd_dashboard(args)
     if args.command in {"query", "start"}:
         text_field = "query" if args.command == "query" else "task"
         if getattr(args, text_field) is None:
@@ -1322,50 +994,105 @@ def main(argv=None):
             args.storage_dir = None
         if getattr(args, text_field) is None:
             parser.error(f"{args.command} requires {text_field} text")
-    try:
-        if hasattr(args, "storage_dir") and args.command not in {"init", "quickstart"}:
-            if args.command == "doctor":
-                if args.storage_dir is None:
-                    configured_project = discover_project_config(os.getcwd())
-                    configured_environment = bool(os.environ.get(CANONICAL_STORAGE_ENV))
-                    if configured_project or configured_environment:
-                        selection = _selection_from_args(args)
-                        args.storage_selection = selection
-                        args.storage_dir = selection.storage_dir
-                    else:
-                        args.storage_dir = resolve_storage_dir(None)
+    if getattr(args, "top_n", 1) < 1:
+        parser.error("--top-n must be greater than zero")
+    if getattr(args, "yes", False) and not args.non_interactive:
+        parser.error("--yes requires a fully specified --non-interactive init plan")
+    if hasattr(args, "storage_dir") and args.command not in {"init", "quickstart"}:
+        if args.command == "doctor":
+            if args.storage_dir is None:
+                configured_project = discover_project_config(os.getcwd())
+                configured_environment = bool(os.environ.get(CANONICAL_STORAGE_ENV))
+                if configured_project or configured_environment:
+                    selection = _selection_from_args(args)
+                    args.storage_selection = selection
+                    args.storage_dir = selection.storage_dir
                 else:
-                    with warnings.catch_warnings(record=True) as caught:
-                        warnings.simplefilter("always")
-                        args.storage_dir = resolve_storage_dir(args.storage_dir)
-                    for warning in caught:
-                        print(f"[tessera] warning: {warning.message}", file=sys.stderr)
+                    args.storage_dir = resolve_storage_dir(None)
             else:
-                selection = _selection_from_args(args)
-                args.storage_selection = selection
-                args.storage_dir = selection.storage_dir
-        return args.func(args) or 0
+                args.storage_dir = resolve_storage_dir(args.storage_dir)
+        else:
+            selection = _selection_from_args(args)
+            args.storage_selection = selection
+            args.storage_dir = selection.storage_dir
+    if args.verbose and getattr(args, "storage_selection", None):
+        event(UiEvent("configuration.resolved", fields=args.storage_selection.to_dict()))
+    return args.func(args) or 0
+
+
+def main(argv=None):
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    # Detect JSON before parsing so malformed usage/help also honors the wire contract.
+    options = arguments[:arguments.index("--")] if "--" in arguments else arguments
+    args = argparse.Namespace(json="--json" in options, debug="--debug" in options)
+    exception_info = None
+    try:
+        with output_policy(OutputPolicy.detect(args)):
+            parser = build_parser()
+            args = parser.parse_args(arguments)
+        for name in ("json", "plain", "no_color", "quiet", "verbose", "debug"):
+            if not hasattr(args, name):
+                setattr(args, name, False)
+        if not hasattr(args, "lang"):
+            args.lang = os.environ.get("TESSERA_LANG", "en")
+        selected_policy = OutputPolicy.detect(args)
+        with output_policy(selected_policy), redirect_stderr(SafeDiagnostics(sys.stderr, selected_policy)):
+            return _run_command(args, parser)
     except InitializationCancelled:
-        if getattr(args, "json", False) and args.command == "init":
-            print(json.dumps({"schema_version": SCHEMA_VERSION, "applied": False, "cancelled": True}, sort_keys=True))
-        else:
-            print("Initialization cancelled; no files were changed.")
-        return 1
+        # Compatibility: init cancellation before apply has historically returned 1.
+        return emit(args, "init.cancelled", {
+            "schema_version": SCHEMA_VERSION, "applied": False, "cancelled": True,
+        }, 1)
+    except (KeyboardInterrupt, EOFError):
+        exception_info = sys.exc_info()
+        failure = CliFailure("cancelled", "Operation cancelled. Inspect state before retrying a mutating command.", exit_code=EXIT_CANCELLED)
     except ConfigurationError as exc:
-        if getattr(args, "json", False) and args.command == "init":
-            print(json.dumps({
-                "schema_version": SCHEMA_VERSION,
-                "applied": False,
-                "error": {"code": "configuration_error", "message": str(exc)},
-            }, sort_keys=True))
-        else:
-            print(f"tessera: configuration error: {exc}", file=sys.stderr)
-        return 2
+        exception_info = sys.exc_info()
+        failure = CliFailure("configuration_error", str(exc), exit_code=2,
+                             suggested_command="tessera config doctor")
+    except CliFailure as exc:
+        exception_info = sys.exc_info()
+        failure = exc
     except BrokenPipeError:
-        # Harmless: happens when output is piped into `head`/`grep -m` and the
-        # reader closes early. Exit quietly instead of printing a traceback.
-        sys.stderr.close()
-        sys.exit(0)
+        # Prevent a second error when Python flushes buffered stdout at shutdown.
+        try:
+            null = os.open(os.devnull, os.O_WRONLY)
+            try:
+                os.dup2(null, sys.stdout.fileno())
+            finally:
+                os.close(null)
+        except (OSError, ValueError):
+            pass
+        return 0
+    except OSError as exc:
+        exception_info = sys.exc_info()
+        failure = CliFailure("filesystem_error", str(exc), exit_code=EXIT_FILESYSTEM,
+                             suggested_command="Check the resolved paths and filesystem permissions.")
+    except Exception:
+        exception_info = sys.exc_info()
+        failure = CliFailure("internal_error", "An unexpected internal error occurred.", exit_code=EXIT_INTERNAL,
+                             suggested_command="Repeat with --debug to inspect developer diagnostics.")
+    # Expected failures never expose a traceback unless explicitly requested.
+    if getattr(args, "debug", False) and exception_info:
+        import traceback
+        traceback.print_exception(*exception_info, file=sys.stderr)
+    context = failure.context
+    if getattr(args, "storage_selection", None):
+        context.update({"config": args.storage_selection.config_path, "store": args.storage_dir})
+    if not context:
+        if getattr(args, "storage_dir", None) or getattr(args, "store", None):
+            context["store"] = getattr(args, "store", None) or args.storage_dir
+        elif not getattr(args, "global_name", None):
+            try:
+                location = discover_project_config(getattr(args, "project", None) or os.getcwd())
+                if location:
+                    context["config"] = str(location)
+            except OSError:
+                pass
+    payload = failure.to_dict()
+    if getattr(args, "command", None) == "init":
+        payload["applied"] = False
+    return emit(args, "error", payload, failure.exit_code)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,20 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### CLI presentation (#166 / #119)
+
+- Added shared human/plain/JSON presentation, global output flags, structured
+  operational errors and read-only no-args/status dashboards. Empty query JSON
+  now returns `[]`; existing successful JSON payloads remain intact.
+- Human queries default to compact evidence previews, with `--full` and
+  `--explain` for detail. Existing init foregrounds the saved configuration and
+  preserves it through an explicit Keep/update choice.
+- Added safe literal terminal rendering, English-only catalog selection,
+  delayed line-based progress and PTY/ASCII/cancellation coverage. Ordinary
+  commands no longer perform advisory update checks; use `update --check`.
+- Documented versioned exit-code compatibility and remaining integration,
+  intelligence, enrichment and review boundaries in `docs/CLI_OUTPUT.md`.
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
