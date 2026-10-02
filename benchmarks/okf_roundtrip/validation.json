@@ -21,7 +21,7 @@
   "mapping": "PASS",
   "namespace": "validation-only",
   "network": "DISABLED",
-  "persistence": "NOT_PERFORMED; admission/write integration remains required",
+  "persistence": "NOT_PERFORMED; explicit standalone-source transaction available",
   "profile": "tessera-canonical-v1",
   "review_required": 0,
   "security": "PASS",

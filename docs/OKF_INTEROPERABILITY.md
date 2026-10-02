@@ -4,20 +4,29 @@
 
 Issue [#204](https://github.com/LuigiFerronatto/TESSERA/issues/204) has an
 **ITERATE candidate**, not a promoted import pipeline. This experiment adds
-read-only import and export **plans** and tests semantic exchange offline.
-It does not persist imports, change native discovery, install providers,
-modify Engine ranking or make OKF the internal storage model.
+read-only import/export **plans** plus explicit source-copy/export transactions,
+and tests semantic exchange offline. It does not admit durable memories, change
+native discovery, install providers, modify Engine ranking or make OKF the
+internal storage model.
 
 ```text
 OKF ↔ isolated adapter ↔ Canonical Metadata ↔ Engine / Retrieval / Evidence
-     plans only                         synthetic smoke only
+     explicit source copies             explicit Engine smoke only
 ```
 
-The last arrow is exercised by a test-only temporary synthetic corpus. Actual
-user-store persistence still requires integration with admission/write safety,
-source exposure policy and explicit commit approval. An accepted candidate in
-an import report is not an admitted memory. Do not feed the preview directly
-into a store as a substitute for that integration.
+The last arrow is exercised by explicit indexing of temporary synthetic source
+copies through the current Engine. The new operation creates a standalone source
+directory. It does not register a configured source, select a user store or infer
+semantic admission. Source files and exchange manifests are real output files;
+calling that operation blocked on future memory admission would be incorrect.
+
+The applicable current contract is [#92 / WRITE_GATE_CONTRACT](WRITE_GATE_CONTRACT.md):
+known-hostile-pattern reject/review decisions must precede any persistence.
+Every exact emitted Markdown file crosses that existing gate, including unknown
+metadata. No transformed/sanitized output is silently substituted. The separate
+[#19 research contract](https://github.com/LuigiFerronatto/TESSERA/issues/19)
+explicitly distinguishes this security check from future evidence-aware
+novelty/utility/stability admission; this adapter does not invent that policy.
 
 ## Audited external contract
 
@@ -41,27 +50,53 @@ concept syntax and the required key, **not every specification recommendation**.
 Local structural validation and upstream validation are separately reported;
 neither is described as complete external certification.
 
-## Commands: deterministic JSON, no persistence
+## Commands: deterministic plans and explicit transactions
 
 ```bash
 python -m tessera.okf validate tests/fixtures/okf_v02
 python -m tessera.okf plan tests/fixtures/okf_v02 --namespace synthetic-project
 python -m tessera.okf export-native tests/fixtures/okf_native
+python -m tessera.okf convert tests/fixtures/okf_v02 --namespace synthetic-project --output /tmp/new-source-copy
+# Review the preceding JSON, then pass its exact plan_id:
+python -m tessera.okf convert tests/fixtures/okf_v02 --namespace synthetic-project --output /tmp/new-source-copy --apply --expect PLAN_ID
+python -m tessera.okf export-native /tmp/new-source-copy --output /tmp/new-okf-bundle
+# Review that destination-specific plan_id before applying export:
+python -m tessera.okf export-native /tmp/new-source-copy --output /tmp/new-okf-bundle --apply --expect PLAN_ID
 python benchmarks/okf_roundtrip/run.py
 ```
 
-`validate` reports external structure, import mapping and safety separately.
-`plan` adds canonical candidate records, unchanged bodies, original metadata,
-advisory trust/lifecycle signals and reserved navigation/history files.
-`export-native` emits a path-to-text dictionary and file hashes on stdout.
-There is no `--apply` or `--output` switch. Commands do not construct an Engine,
-read project configuration, enumerate other stores or write source files.
-A mapping/safety problem exits 2. Warnings may accompany a consumable concept.
-The command is intentionally separate from the main `tessera` CLI/MCP.
+Without `--apply`, all commands are read-only. `validate` separates external
+structure, mapping and safety; `plan` adds canonical candidate records and
+unchanged bodies. `export-native` without a destination still returns a
+path-to-text dictionary. Destination plans also expose source/output hashes,
+exact emitted files, exclusions, existing security-gate decisions, counts and a
+plan_id bound to the source snapshot, operation, namespace and destination.
+A changed plan must be inspected again; apply cannot accept an old digest.
 
-Python callers can use `plan_import`, `export_records`, `plan_native_export`
-and `native_preview`. The preview is a review artifact; it is not a lossless
-persistence API. All imported bodies and metadata remain untrusted data.
+Apply requires a new, non-overlapping destination whose parent already exists.
+It refuses existing files/directories (even empty), symlinks, case-fold aliases,
+partial imports, unknown assets and security reject/review decisions. A private
+sibling staging tree holds fsynced, verified bytes. Linux renameat2 with
+RENAME_NOREPLACE publishes it atomically without replacing even a competing
+empty directory. Failures remove only the unpublished staging tree. Input drift
+is rechecked immediately before publication. Directory crash durability and
+hostile concurrent ancestor replacement are not promised. Apply currently needs
+Linux/libc/filesystem support for this primitive; other platforms can plan and
+fail closed before mutation. See the [Linux primitive](https://man7.org/linux/man-pages/man2/rename.2.html).
+
+The generated `.tessera-okf-exchange.json` is an auditable transaction manifest,
+not Engine configuration. Conversion lists reserved navigation/history files as
+excluded instead of manufacturing extra native memory records. Original files
+remain unchanged. No command constructs an Engine, updates config/registry or
+selects other stores. Querying the resulting source through the existing Engine
+is an explicit separate operation, verified only against temporary fixtures.
+
+Python callers use `plan_import`, `export_records`, `plan_native_export`,
+`native_source_document`, and `okf_files.plan_destination/apply_exchange`.
+`native_preview` remains a review projection; converted source files additionally
+carry a canonical snapshot for lossless exchange re-export. All source text and
+metadata stay untrusted, and the narrow security gate is not a general semantic
+prompt-injection classifier.
 
 ## Mapping and identity
 
@@ -119,7 +154,13 @@ migration or namespace overwrite.
 Within the tested supported profile, OKF → canonical → OKF → canonical and
 native canonical → OKF → canonical preserve semantic dictionaries and bodies.
 YAML ordering/quoting is normalized, so byte identity of exported documents is
-not promised. Source inputs remain byte-identical. Export hashes are deterministic
+not promised. Converted source copies embed `tessera_source_exchange` with the original canonical
+snapshot, external metadata and projection hashes. Re-export restores that
+snapshot only while the body and projected metadata match. Edited converted
+sources require explicit reconciliation; old snapshots never silently override
+new text. The ordinary Engine exposes native projections and current file
+provenance, while original relation origins/provenance remain inspectable in the
+snapshot. Source inputs remain byte-identical. Export hashes are deterministic
 for the same candidate state. Broken links remain in bodies with diagnostics;
 no source or attestation is fetched to resolve them.
 
@@ -147,8 +188,9 @@ another adapter iteration. Original body
 bytes remain available; do not infer comprehensive graph extraction from this
 fixture. Native exports with non-JSON raw frontmatter require review rather
 than silently converting values. Native reserved filenames need an explicitly
-chosen export path. No automatic private/excluded filtering is implemented:
-only explicitly selected synthetic input was used in this experiment.
+chosen export path. No automatic privacy inference or cross-project export is implemented. File
+exclusions are explicit, and unsupported assets prevent transaction apply. Only
+explicitly selected synthetic input was used in this experiment.
 
 ## Evidence and remaining gates
 
@@ -165,8 +207,32 @@ three native typed relations preserved, independent upstream validation of
 and same-result retrieval/evidence smoke. Latencies are observational synthetic
 single runs, not production performance claims.
 
-The decision remains ITERATE. Admission/persistence, realistic-corpus evidence,
+Source-only conversion and export transactions also pass: a real new source tree
+is queried through the existing Engine, re-exported, externally validated and
+compared with 10/10 original canonical records. Security reject/review, stale
+plan/input, write failure, atomic no-replace races, collisions and unsupported
+platforms are tested without touching user stores.
+
+The decision remains ITERATE. Future evidence-aware admission (#19), realistic-corpus evidence,
 independent comprehensive conformance audit, identity review UX, broader
 versioned JSON/Markdown/Obsidian/CSV profiles, selection/privacy/exposure policy,
 encrypted-store behavior and exact-head governance/merge gates remain open.
 No retrieval-quality improvement, full issue completion or promotion is claimed.
+
+## Acceptance audit: mechanics versus prerequisite decisions
+
+| Requirement | Evidence / current scope | Remaining gate |
+|---|---|---|
+| Explicit conversion and export persistence | Destination-bound plans; real new-directory transactions; A0–A4 + source-copy round trips | Available experimentally on Linux; other apply platforms fail closed |
+| Existing write/security contract | Exact emitted bytes evaluated by the current #92 gate; reject/review produces no destination | No new admission policy is assumed |
+| Queryable imported source with provenance | The unchanged Engine indexes a converted temporary fixture; stable IDs, evidence and original snapshots remain inspectable | No automatic store/source registration |
+| Semantic preservation | Original canonical snapshot survives source conversion and re-export, including typed relation origin and provenance | Native projections expose the subset currently understood by the Engine |
+| Format conformance | Exact spec revision, structural checks, frozen upstream concept validator, exported-fixture checks | Independent comprehensive spec review remains acceptance evidence |
+| Evidence-aware memory admission | #19 is explicitly a later novelty/utility/stability research policy | Separate semantic policy, not a prerequisite for ordinary source-copy files |
+| Broader JSON/Obsidian/CSV profiles and filtering | The issue's competitive-audit addition routes this broader family through #260; current output is the OKF/native-source profile only | Additional mechanical work remains; not described as an authorization blocker |
+| Encrypted/cross-project exposure behavior | No encrypted stores, cross-project discovery or automatic privacy inference touched | #256/#257 contracts need their own accepted behavior; no guessed decryption/sharing policy |
+| Promotion or issue closure | Source mechanics and synthetic evidence improve this candidate | Human review, complete contract acceptance and canonical merge remain required |
+
+There is no missing user resource for local synthetic validation. The remaining
+scope should not be conflated with needing permission to write temporary test
+files or with a future research gate on every form of persistence.

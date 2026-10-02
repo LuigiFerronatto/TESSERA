@@ -1,6 +1,6 @@
 {
   "acceptance_gaps": [
-    "Admission/write integration; no import persistence",
+    "Future evidence-aware admission (#19), separate from source conversion",
     "Broader non-OKF export profiles and exposure filtering",
     "Independent full-spec conformance audit",
     "Representative user-corpus evaluation",
@@ -57,8 +57,8 @@
   },
   "issue": 204,
   "latency_ms_observational": {
-    "export": 13.753,
-    "import": 14.207
+    "export": 13.592,
+    "import": 13.812
   },
   "lossy_semantic_fields": [],
   "matrix": {
@@ -76,6 +76,19 @@
     "native_roundtrip": true
   },
   "semantic_diff": [],
+  "source_transactions": {
+    "convert": "APPLIED",
+    "converted_records_equal": [
+      10,
+      10
+    ],
+    "export": "APPLIED",
+    "external_validation_after_transactions": 10,
+    "fresh_destination_only": true,
+    "runtime_registration": "NOT_PERFORMED",
+    "semantic_admission": "NOT_PERFORMED",
+    "write_gate": "all accept unchanged"
+  },
   "spec_revision": "ad30107c31c06aec8a7d5636e0d1058118604e6f",
   "truth_validity_separate_from_freshness": true,
   "typed_native_relations_preserved": 3,

@@ -1,4 +1,4 @@
-"""Experimental, offline OKF exchange plans; never persist or execute imports.
+"""Experimental offline OKF plans and explicit standalone source exchange.
 
 The existing CanonicalMetadata remains authoritative. This opt-in boundary is
 not imported by Engine, CLI, MCP, discovery or the native parser.
@@ -31,6 +31,8 @@ from .canonical import (
 SPEC_REVISION = "ad30107c31c06aec8a7d5636e0d1058118604e6f"
 SPEC_URL = f"https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/{SPEC_REVISION}/SPEC.md"
 PROFILE = "tessera-canonical-v1"
+SOURCE_EXTENSION = "tessera_source_exchange"
+SOURCE_PROFILE = "tessera-converted-source-v1"
 EXTENSION = "tessera_exchange"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_BUNDLE_BYTES = 16 * MAX_FILE_BYTES
@@ -500,7 +502,7 @@ def plan_import(bundle, *, namespace: str) -> ImportPlan:
               "mapping": "PASS" if len(records) == seen and external_valid and not safety else "REVIEW",
               "security": "PASS" if not safety else "FAIL", "security_diagnostics": safety,
               "diagnostics": diagnostics, "skipped": skipped, "lossy_fields": [],
-              "persistence": "NOT_PERFORMED; admission/write integration remains required",
+              "persistence": "NOT_PERFORMED; explicit standalone-source transaction available",
               "execution": "DISABLED", "network": "DISABLED", "decision": "ITERATE"}
     return ImportPlan(records, report, auxiliary)
 
@@ -519,6 +521,47 @@ def native_preview(record: ExchangeRecord) -> str:
     for key in ("observed_at", "valid_from", "valid_until", "recorded_at"):
         fm[key] = getattr(c.temporal, key)
     return _dump(fm, record.body)
+
+
+def native_source_document(record: ExchangeRecord) -> str:
+    """Lossless exchange snapshot inside an ordinary, indexable source copy.
+
+    The current native parser sees the projected fields. Exchange re-export
+    restores the original canonical snapshot only while the projection's body
+    and metadata still match their recorded hashes. No runtime registration or
+    semantic admission is performed here.
+    """
+    fm, body = _parse(native_preview(record))
+    if SOURCE_EXTENSION in fm:
+        raise ExchangeError("Cannot overwrite an unknown converted-source namespace")
+    fm[SOURCE_EXTENSION] = {
+        "profile": SOURCE_PROFILE,
+        "canonical": _canonical_payload(record.canonical),
+        "external_frontmatter": copy.deepcopy(record.external_frontmatter),
+        "extension_extra": copy.deepcopy(record.extension_extra or {}),
+        "projected_frontmatter_hash": compute_sha256(json.dumps(fm, sort_keys=True, ensure_ascii=False)),
+    }
+    return _dump(fm, body)
+
+
+def _converted_source_record(fm, body, path):
+    envelope = fm[SOURCE_EXTENSION]
+    if not isinstance(envelope, dict) or envelope.get("profile") != SOURCE_PROFILE:
+        raise ExchangeError("Unsupported converted-source namespace")
+    expected = {"profile", "canonical", "external_frontmatter", "extension_extra", "projected_frontmatter_hash"}
+    if set(envelope) != expected:
+        raise ExchangeError("Unsupported converted-source snapshot fields")
+    projected = {k: v for k, v in fm.items() if k != SOURCE_EXTENSION}
+    if envelope["projected_frontmatter_hash"] != compute_sha256(json.dumps(projected, sort_keys=True, ensure_ascii=False)):
+        raise ExchangeError("Converted-source metadata changed; explicit reconciliation is required")
+    canonical = _restore(envelope["canonical"])
+    if canonical.source.content_hash != compute_sha256(body):
+        raise ExchangeError("Converted-source body changed; explicit reconciliation is required")
+    external = envelope["external_frontmatter"]
+    extra = envelope["extension_extra"]
+    if (external is not None and not isinstance(external, dict)) or not isinstance(extra, dict):
+        raise ExchangeError("Malformed converted-source exchange metadata")
+    return ExchangeRecord(canonical, body, path, external, extra)
 
 
 def export_records(records, *, auxiliary=None):
@@ -569,23 +612,45 @@ def plan_native_export(directory):
     for path, raw in sorted(docs.items()):
         if PurePosixPath(path).name in RESERVED:
             raise ExchangeError("Native index.md/log.md requires an explicit non-reserved export path")
-        _, body = _parse(raw, required=False)
-        canonical = parse_and_normalize(raw, str(root / path), str(root))
-        canonical.temporal.indexed_at = ""
-        records.append(ExchangeRecord(canonical, body, path))
+        fm, body = _parse(raw, required=False)
+        if SOURCE_EXTENSION in fm:
+            records.append(_converted_source_record(fm, body, path))
+        else:
+            canonical = parse_and_normalize(raw, str(root / path), str(root))
+            canonical.temporal.indexed_at = ""
+            records.append(ExchangeRecord(canonical, body, path))
     result = export_records(records)
     result["report"]["skipped"] = skipped
     return result
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Experimental offline OKF plans; no import persistence or execution")
-    parser.add_argument("command", choices=("validate", "plan", "export-native"))
+    parser = argparse.ArgumentParser(description="Experimental offline OKF plans and explicit source-copy transactions; no semantic admission")
+    parser.add_argument("command", choices=("validate", "plan", "convert", "export-native"))
     parser.add_argument("directory")
     parser.add_argument("--namespace", help="Stable user-selected bundle identity namespace")
+    parser.add_argument("--output", help="New standalone destination directory; never overwrite")
+    parser.add_argument("--apply", action="store_true", help="Apply a reviewed source-copy/export plan")
+    parser.add_argument("--expect", help="Exact destination plan_id returned by a previous dry-run")
     args = parser.parse_args(argv)
     try:
-        if args.command == "export-native":
+        if args.command in {"convert", "export-native"} and args.output:
+            from .okf_files import apply_exchange, plan_destination
+            operation = "convert" if args.command == "convert" else "export"
+            if args.apply:
+                if not args.expect:
+                    raise ExchangeError("--apply requires the reviewed --expect plan_id")
+                payload = apply_exchange(args.directory, args.output, operation=operation,
+                                         namespace=args.namespace, expected_plan_id=args.expect)
+            else:
+                if args.expect:
+                    raise ExchangeError("--expect is meaningful only with --apply")
+                payload = plan_destination(args.directory, args.output, operation=operation,
+                                           namespace=args.namespace)
+            code = 0 if payload.get("status") in {"READY", "APPLIED"} else 2
+        elif args.output or args.apply or args.expect or args.command == "convert":
+            raise ExchangeError("Source transactions require convert/export-native and an explicit --output")
+        elif args.command == "export-native":
             payload = plan_native_export(args.directory)
             code = 0
         else:

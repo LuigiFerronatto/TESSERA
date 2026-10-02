@@ -10,10 +10,13 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
-- Add opt-in, read-only Open Knowledge Format import/export plans and a pinned
+- Add opt-in Open Knowledge Format import/export plans, explicit standalone
+  source-copy/export transactions and a pinned
   synthetic round-trip experiment. Typed relations, temporal truth and provenance
   use a namespaced canonical extension; imported attestations never execute.
-  Store persistence and promotion remain pending (#204).
+  Transactions use reviewed source/destination hashes, the current security
+  gate and atomic no-overwrite publication; semantic admission and promotion
+  remain pending (#204).
 
 ### Changed
 

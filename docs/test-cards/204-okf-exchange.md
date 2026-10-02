@@ -28,13 +28,16 @@ but no pinned OKF adapter or reproducible OKF round-trip experiment existed.
 
 ## What changed or is being tested?
 
-Read-only import/export plans, a namespaced canonical extension and a frozen
+Read-only import/export plans, explicit source-copy/export transactions, a
+namespaced canonical extension and a frozen
 11-object synthetic experiment. No native Engine or ranking code changes.
 
 ## How does it work now?
 
 **CANDIDATE — NOT YET ON main.** The opt-in Python module checks a bounded local
-bundle and returns JSON candidates. It never persists memories or executes
+bundle and returns JSON candidates. An explicit destination and previously
+reviewed plan hash can publish a new standalone source directory through the
+existing security gate. It never registers/adopts those sources or executes
 attestation code. Existing source formats continue on their unchanged path.
 
 ## Concrete example
@@ -60,14 +63,15 @@ ambiguity without weakening existing storage or silently inventing timestamps.
 
 ## What remains unimplemented?
 
-Actual admitted import persistence, broad format profiles, exposure/privacy
+Future evidence-aware admission (#19), broad format profiles, exposure/privacy
 filtering, user-corpus evaluation, complete independent conformance audit and
 canonical merge remain open. Synthetic passes do not satisfy those gates.
 
 ## What is unlocked next?
 
-Review the namespaced extension and identity policy, then design admission and
-exposure integration before allowing imports into user stores.
+Review the namespaced extension, identity policy and tested source-copy
+transactions. Evidence-aware admission/exposure remain separate contracts;
+ordinary explicit source conversion does not require inventing them.
 
 ## Technical provenance
 

@@ -14,6 +14,7 @@ import time
 from tessera.canonical import compute_sha256, parse_and_normalize
 from tessera.engine import TesseraEngine
 from tessera.okf import SPEC_REVISION, export_records, native_preview, plan_import, plan_native_export
+from tessera.okf_files import apply_exchange, plan_destination
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/okf_v02"
@@ -90,6 +91,16 @@ def run():
         baseline = parse_and_normalize(source.read_text(), str(source), str(NATIVE))
         baseline.temporal.indexed_at = ""
         assert baseline.to_dict() == native_import.records[0].canonical.to_dict()
+        conversion = plan_destination(FIXTURE, root / "converted-source", operation="convert", namespace="frozen-okf-204")
+        assert not (root / "converted-source").exists()
+        conversion_receipt = apply_exchange(FIXTURE, root / "converted-source", operation="convert",
+            namespace="frozen-okf-204", expected_plan_id=conversion["plan_id"])
+        exchange = plan_destination(root / "converted-source", root / "converted-export", operation="export")
+        exchange_receipt = apply_exchange(root / "converted-source", root / "converted-export", operation="export",
+            expected_plan_id=exchange["plan_id"])
+        converted_import = plan_import(root / "converted-export", namespace="frozen-okf-204")
+        assert before == [r.to_dict() for r in converted_import.records]
+        assert imported_hits == smoke(root / "converted-source")
         return {
             "issue": 204, "decision": "ITERATE", "spec_revision": SPEC_REVISION,
             "reference_validator_blob": "b770a92f33adf9942e2932529308d066430b02a6",
@@ -109,7 +120,11 @@ def run():
             "latency_ms_observational": {"import": round(import_ms, 3), "export": round(export_ms, 3)},
             "input_hashes": {p.relative_to(FIXTURE).as_posix(): compute_sha256(p.read_text()) for p in sorted(FIXTURE.rglob("*.md"))},
             "export_hashes": export["report"]["file_hashes"],
-            "acceptance_gaps": ["Admission/write integration; no import persistence", "Broader non-OKF export profiles and exposure filtering",
+            "source_transactions": {"convert": conversion_receipt["status"], "export": exchange_receipt["status"],
+                "converted_records_equal": [10, 10], "write_gate": "all accept unchanged", "fresh_destination_only": True,
+                "semantic_admission": "NOT_PERFORMED", "runtime_registration": "NOT_PERFORMED",
+                "external_validation_after_transactions": reference_count(root / "converted-export", validator)},
+            "acceptance_gaps": ["Future evidence-aware admission (#19), separate from source conversion", "Broader non-OKF export profiles and exposure filtering",
                 "Independent full-spec conformance audit", "Representative user-corpus evaluation", "Canonical merge and exact-head governance gates"],
         }
 
