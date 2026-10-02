@@ -597,3 +597,10 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Durable memory versus ephemeral context
+
+The [proposed Long-Term Memory boundary](LONG_TERM_MEMORY.md) names canonical
+source ownership separately from disposable indexes, generated state and Working
+Context. It inventories current contracts and reserves future admission, revision
+and context-invalidation work to their owning Test Cards; it activates no behavior.

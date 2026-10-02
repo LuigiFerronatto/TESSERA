@@ -1040,3 +1040,10 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+## Long-Term Memory boundary candidate
+
+[#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) has a proposed
+[durable/ephemeral contract](LONG_TERM_MEMORY.md). It documents current primitives
+and reserves future admission, temporal, lineage and context responsibilities.
+The candidate changes no queue status and does not implement its child contracts.
