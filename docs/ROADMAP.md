@@ -349,7 +349,11 @@ coordination umbrellas whose children are the actual queue items above.
 ```
 
 Research issues inform design (e.g. `#196`/`#177` above drew on `#179`'s
-findings) but are not themselves implementation work.
+findings) but are not themselves implementation work. The
+[2026-10-02 candidate lifecycle audit](research/MEMORY_LIFECYCLE_2026-10-02.md)
+adds pinned five-system evidence and existing-owner routing. Its KEEP-baseline /
+ITERATE-unknowns proposal is pending review; it changes no WIP selection or
+dependency completion state. See the [#179 stage record](test-cards/179-memory-lifecycle-research.md).
 
 ## Benchmarks (parallel lane, not a final phase)
 

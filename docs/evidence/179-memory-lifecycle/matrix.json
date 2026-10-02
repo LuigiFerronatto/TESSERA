@@ -1,0 +1,1692 @@
+{
+  "schema_version": 1,
+  "audit_version": "1.0",
+  "audited_on": "2026-10-02",
+  "issue": 179,
+  "decision": "PENDING",
+  "proposal": "KEEP source-backed research baseline; ITERATE only explicitly listed unknowns within existing owners. No adoption or WIP promotion.",
+  "dimensions": [
+    "Capture lifecycle",
+    "Hook architecture",
+    "Read-before-reasoning",
+    "Write-after-learning",
+    "Source preservation / lineage",
+    "Memory representations",
+    "Retrieval stack",
+    "Temporal / evolution semantics",
+    "Working context",
+    "Operational concerns"
+  ],
+  "systems": [
+    {
+      "system": "MemPalace",
+      "scope": "Default-branch develop snapshot; not a claim about the v3.6.0 release.",
+      "dimensions": [
+        {
+          "dimension": "Capture lifecycle",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Claude plugin registers Stop, SessionEnd and PreCompact; Codex registers SessionStart, Stop and PreCompact. Python dispatch implements those four handlers. No prompt-submit or per-tool handler is in that dispatch. PreCompact calls transcript ingestion asynchronously (daemon wait=False or spawned miner), then synchronous project mining; a hook return is not proof the transcript finished persisting.",
+              "sources": [
+                "MP02",
+                "MP05",
+                "MP06",
+                "MP07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Prompt/tool capture through other adapters is not exhaustively audited; absence from this dispatch is not product-wide absence.",
+              "sources": [
+                "MP02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Represent capture requests separately from durable-completion receipts."
+          },
+          "owning_issues": [
+            177,
+            138
+          ]
+        },
+        {
+          "dimension": "Hook architecture",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "The inspected Claude shell wrapper delegates to the shared Python hook runtime. That runtime advertises claude-code, codex and dsh; the two inspected manifests have different event coverage.",
+              "sources": [
+                "MP02",
+                "MP05",
+                "MP06",
+                "MP07"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Legacy/manual hook setup and backup/backfill are documented separately.",
+              "sources": [
+                "MP13"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Installer-wide idempotency, uninstall and rollback across Cursor/Antigravity/other integrations were not verified by reading these wrappers.",
+              "sources": [
+                "MP13",
+                "MP07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Use thin adapters with explicit host capability tables and reversible owned configuration."
+          },
+          "owning_issues": [
+            177,
+            178
+          ]
+        },
+        {
+          "dimension": "Read-before-reasoning",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "The README supplies a mempalace-recall skill for search-before-answer recall and scoped palace organization.",
+              "sources": [
+                "MP01"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Inspected SessionStart initializes/probes readiness and emits empty output or a warning; it does not run retrieval. Stop output is a systemMessage or a legacy blocking save request.",
+              "sources": [
+                "MP02"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No universal query-conditioned, pre-prompt injected packet is established by these hooks; recall skill compliance and other retrieval adapters were not executed.",
+              "sources": [
+                "MP01",
+                "MP02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Distinguish skill-directed recall from deterministic automatic prompt injection."
+          },
+          "owning_issues": [
+            121,
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Write-after-learning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Conversation exchange filing upserts text plus metadata. Stop periodically saves a compressed diary checkpoint from recent messages, requests transcript ingestion and may mine project files. Silent mode advances its save marker only when the diary reports a positive count; legacy blocking mode advances before agent-confirmed save.",
+              "sources": [
+                "MP08",
+                "MP02"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "The README verbatim emphasis describes conversation storage, not a guarantee that every diary/checkpoint is verbatim or that a checkpoint count proves all associated ingest jobs succeeded.",
+              "sources": [
+                "MP01",
+                "MP02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Keep verbatim source capture and derived checkpoint summaries as separate representations."
+          },
+          "owning_issues": [
+            168,
+            137,
+            138
+          ]
+        },
+        {
+          "dimension": "Source preservation / lineage",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Live exchange metadata includes source_file, chunk_index, authored_at, filed_at, ingest/extract modes, normalizer/chunker versions and source identity; the graph accepts source_closet, source_file, source_drawer_id and adapter_name.",
+              "sources": [
+                "MP08",
+                "MP09"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "A universal guarantee linking every derived checkpoint/triple to all exact original supporting turns was not verified. Source locators alone do not establish that guarantee.",
+              "sources": [
+                "MP02",
+                "MP08",
+                "MP09"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Carry source identity and derivation pointers without equating them to verified supporting-turn completeness."
+          },
+          "owning_issues": [
+            137,
+            138
+          ]
+        },
+        {
+          "dimension": "Memory representations",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Inspected paths include verbatim exchange drawers, compressed diary entries, and SQLite entity/triple graph structures. Backend base classes expose storage/retrieval interfaces.",
+              "sources": [
+                "MP08",
+                "MP02",
+                "MP09",
+                "MP10"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Wings/rooms/drawers organize the source corpus.",
+              "sources": [
+                "MP01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Activation/KV, parametric learning and a persistent always-hot prompt are not established in this source sample.",
+              "sources": [
+                "MP01",
+                "MP10"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Preserve source, derived summary and graph as explicit views rather than inventing semantic drawers."
+          },
+          "owning_issues": [
+            168,
+            171
+          ]
+        },
+        {
+          "dimension": "Retrieval stack",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Backend registry supports entry-point discovery and configurable built-ins; base interfaces separate retrieval from storage implementation. Ranking combines vector similarity with candidate-corpus BM25.",
+              "sources": [
+                "MP10",
+                "MP11",
+                "MP12"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "README names ChromaDB as current default and local semantic recall; its benchmark headline was not reproduced.",
+              "sources": [
+                "MP01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No LLM-planner or cross-encoder guarantee is inferred from the inspected ranking module; graph availability does not establish graph expansion in every search.",
+              "sources": [
+                "MP09",
+                "MP12"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Backend abstraction and local hybrid retrieval are established controls, not novelty claims."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Temporal / evolution semantics",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Exchange metadata separates authored_at from filed_at (authored_at falls back to filing time). Graph triples expose valid_from/valid_to and invalidate sets the end time; as-of filtering uses a half-open interval, with date-only compatibility handling.",
+              "sources": [
+                "MP08",
+                "MP09"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "These fields do not prove a complete bitemporal, append-only source revision ledger for every mutation.",
+              "sources": [
+                "MP09"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Separate source event time, ingestion time and interval validity with explicit boundary tests."
+          },
+          "owning_issues": [
+            15,
+            16,
+            137
+          ]
+        },
+        {
+          "dimension": "Working context",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "Search scoping is based on palace organization, with an agent recall skill.",
+              "sources": [
+                "MP01"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Diary checkpoints are filed by agent and project-derived wing; readiness hooks are not a task-packet compiler.",
+              "sources": [
+                "MP02"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Frozen, reusable, evidence-sufficient cross-subagent packets were not verified in the sampled sources.",
+              "sources": [
+                "MP01",
+                "MP02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Treat recalled source excerpts and disposable task state as separately testable outputs."
+          },
+          "owning_issues": [
+            167,
+            169
+          ]
+        },
+        {
+          "dimension": "Operational concerns",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Transcript spawns use per-target PID guards; write routing resolves once per hook burst. After attempted daemon submission, exceptions do not trigger a duplicate direct write. Require mode blocks writes if the daemon is unavailable and does not cold-start it.",
+              "sources": [
+                "MP02"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "The routing page explicitly labels this develop behavior unreleased and says v3.6.0 does not consume write_routing.hooks. First embedding use needs a model download.",
+              "sources": [
+                "MP04",
+                "MP01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "CPU-storm resistance, crash recovery and secret-redaction completeness were not runtime-tested. Windows SessionEnd handling is described in code as best-effort without Windows CI coverage.",
+              "sources": [
+                "MP02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Test ambiguous submission and retry receipts before copying any single-flight pattern."
+          },
+          "owning_issues": [
+            120,
+            177,
+            168,
+            178
+          ]
+        }
+      ]
+    },
+    {
+      "system": "Mem0",
+      "scope": "Separately inspect OSS Memory SDK, coding-plugin shared core/Claude adapter, and Platform v3 documentation.",
+      "dimensions": [
+        {
+          "dimension": "Capture lifecycle",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Claude manifest registers SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, PreCompact, SessionEnd and scoped sidekick subagent start/stop. Adapter routes failed tools and transcript-aware Stop into shared orchestration; pre-compact/session-end trigger flush.",
+              "sources": [
+                "M004",
+                "M005",
+                "M002",
+                "M006"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Normalize each event without implying every event must retrieve or admit memory."
+          },
+          "owning_issues": [
+            177,
+            138
+          ]
+        },
+        {
+          "dimension": "Hook architecture",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Shared Python runner handles capture/search/flush; Claude adapter supplies transcript parsing and sidekick events. Manifest sets short per-event timeouts. Entrypoint logs exceptions and exits zero.",
+              "sources": [
+                "M002",
+                "M004",
+                "M005"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Claude is the audited installed-manifest path; other harnesses and installer/uninstaller/rollback guarantees were not verified. Shared-core naming alone is not proof of equal harness support.",
+              "sources": [
+                "M002",
+                "M005"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Centralize orchestration but retain adapter-specific transcript and protocol handling."
+          },
+          "owning_issues": [
+            177,
+            178,
+            120
+          ]
+        },
+        {
+          "dimension": "Read-before-reasoning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Runner searches only on the first recorded prompt, with a default 20-character minimum, query capped at 6000 characters, top_k=5 and a two-second search timeout argument. Results become UserPromptSubmit additionalContext. Shared core applies repository/directory/personal scopes and tracks previously injected memory IDs; default formatted-context budget is 4000 characters.",
+              "sources": [
+                "M002",
+                "M003"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "This is bounded retrieved memory text, not a verified minimum-sufficiency compiler.",
+              "sources": [
+                "M002",
+                "M003"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Budget and scope automatic retrieval; do not describe first-prompt recall as every-prompt recall."
+          },
+          "owning_issues": [
+            169,
+            171,
+            121
+          ]
+        },
+        {
+          "dimension": "Write-after-learning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Plugin records prompts, tool previews and assistant/transcript evidence locally, groups event ranges into flush packets and sends scoped extraction messages with infer=True to Platform v3. OSS infer=True uses existing-memory context, a single additive extraction call, batch embedding and hash dedup; infer=False stores message content directly.",
+              "sources": [
+                "M003",
+                "M006",
+                "M001"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "The issue initial ADD/UPDATE/DELETE-loop hypothesis is too broad for this pinned default additive OSS path; explicit update/delete APIs and platform behavior must be evaluated separately.",
+              "sources": [
+                "M001"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Separate local raw event capture, extraction requests and acknowledged durable memory."
+          },
+          "owning_issues": [
+            168,
+            137,
+            138
+          ]
+        },
+        {
+          "dimension": "Source preservation / lineage",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "SQLite EvidenceStore keeps timestamped repo/session event payloads, flush event ranges, packet IDs and remote semantic event IDs. Claude transcript parser follows the active conversation branch. Tool previews are bounded/redacted; this is not a byte-for-byte archive of all tool results.",
+              "sources": [
+                "M003",
+                "M006"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Local flush provenance does not establish that every Platform-derived fact returns exact supporting-turn IDs. That server-side contract was not inspected.",
+              "sources": [
+                "M003"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Retain local event-to-flush lineage while checking remote fact-to-turn support explicitly."
+          },
+          "owning_issues": [
+            137,
+            138,
+            168
+          ]
+        },
+        {
+          "dimension": "Memory representations",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "OSS path has memory text/metadata, embeddings, entity linking and message/history storage. Coding plugin separately keeps local evidence and structured extraction inputs; remote memories can be project or personal.",
+              "sources": [
+                "M001",
+                "M003"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Activation/KV and parametric memory are not established here; neither raw-source absence nor platform graph behavior follows from the OSS main.py sample.",
+              "sources": [
+                "M001",
+                "M003"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Compare source and extracted views at the same product layer."
+          },
+          "owning_issues": [
+            168,
+            171
+          ]
+        },
+        {
+          "dimension": "Retrieval stack",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Current OSS search combines vector, BM25 and entity signals, with optional configured reranker; VectorStoreFactory selects the store. The plugin invokes the Platform search API rather than this local SDK retrieval pipeline.",
+              "sources": [
+                "M001",
+                "M003"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Managed Platform ranking internals and equal quality across stores were not verified; no vector vendor is selected for TESSERA.",
+              "sources": [
+                "M003"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Use version-specific hybrid-retrieval controls and separate optional reranking cost."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Temporal / evolution semantics",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "OSS memory has created_at/updated_at, change history and optional expiration_date filtering; plugin events/flushes have ingestion timestamps.",
+              "sources": [
+                "M001",
+                "M003"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Platform v3 temporal reasoning ranks by extracted event dates and supports search reference_date; the pinned page explicitly excludes the OSS SDK.",
+              "sources": [
+                "M007"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "A Graphiti-equivalent validity/invalidation interval contract is not established for the audited OSS path.",
+              "sources": [
+                "M001",
+                "M007"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Distinguish search-time temporal boosts from fact validity and supersession."
+          },
+          "owning_issues": [
+            15,
+            16
+          ]
+        },
+        {
+          "dimension": "Working context",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "First-prompt additionalContext is assembled from retrieved memories. Shared core records injected memory IDs and sidekick runs; adapter injects sidekick context on the scoped subagent-start event.",
+              "sources": [
+                "M002",
+                "M003",
+                "M005"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "A frozen cross-subagent packet with source-version validation and evidence-sufficiency semantics is not verified by these handoff records.",
+              "sources": [
+                "M003",
+                "M005"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Budgeted injection and subagent handoff need separate invariants from reusable frozen packets."
+          },
+          "owning_issues": [
+            167,
+            169
+          ]
+        },
+        {
+          "dimension": "Operational concerns",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "SQLite uses WAL/busy_timeout and BEGIN IMMEDIATE for flush preparation and duplicate Stop serialization. Atomic handoff renaming, stale-running recovery, limited relaunches, pending expiry and capped flush attempts bound retries. No API key yields local-only; redaction patterns and 0600 cached-key writes exist.",
+              "sources": [
+                "M003",
+                "M002"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "These mechanisms improve bounded recovery but expiry/gave-up states mean capture is not an unconditional remote durability promise. Regex redaction is not a complete secret-leak guarantee.",
+              "sources": [
+                "M003",
+                "M002"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Fail-open must expose local-only, retrying and gave-up states rather than imply saved."
+          },
+          "owning_issues": [
+            120,
+            177,
+            168,
+            178
+          ]
+        }
+      ]
+    },
+    {
+      "system": "MemOS",
+      "scope": "Cloud CLI native-hook adapters and OSS MemOS runtime/MemCube are distinct codebases; backend service parity is unverified.",
+      "dimensions": [
+        {
+          "dimension": "Capture lifecycle",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Cloud CLI maps search/add phases: Codex/Claude/Trae UserPromptSubmit\u2192Stop; Hermes pre_llm_call\u2192post_llm_call; Cursor beforeSubmitPrompt\u2192afterAgentResponse; Cline UserPromptSubmit\u2192TaskComplete; Copilot userPromptTransformed\u2192agentStop; OpenCode chat.message\u2192session.idle; OpenClaw before_prompt_build\u2192agent_end; Antigravity PreInvocation\u2192Stop; DeepSeek agent/pre-step\u2192agent/turn-stopping.",
+              "sources": [
+                "MS02",
+                "MS01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Dedicated session-start, tool-event and pre-compaction capture are not established by this two-phase registry.",
+              "sources": [
+                "MS02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Map host events to semantic phases while retaining host-specific coverage."
+          },
+          "owning_issues": [
+            177,
+            138
+          ]
+        },
+        {
+          "dimension": "Hook architecture",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "HookAgentSpec defines host event aliases, config/response style and installation mode. Installer removes owned stale entries and atomically writes configuration; uninstall targets managed hooks/plugins. JS/Python/file-hook adapters coexist with shared runner.",
+              "sources": [
+                "MS02",
+                "MS03"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Multi-file transactional rollback and preservation under concurrent external settings edits are not proved by individual atomic writes; installations were not executed.",
+              "sources": [
+                "MS03"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Treat event normalization, installer ownership and output protocol as separate contracts."
+          },
+          "owning_issues": [
+            177,
+            178
+          ]
+        },
+        {
+          "dimension": "Read-before-reasoning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Runner saves pending prompt state, searches configured backend with user/conversation scope (agent scope only for multi-view), and converts results to host-specific context. Cursor explicitly disables search injection while keeping prompt capture. Other outputs include additionalContext, modifiedTransformedPrompt, ephemeralMessage, contextModification or prependContext.",
+              "sources": [
+                "MS01",
+                "MS02"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "OSS MOS.chat independently searches accessible memory cubes and builds the system prompt before generation.",
+              "sources": [
+                "MS06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Document hosts that can capture prompts but cannot inject retrieved memory."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Write-after-learning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "CLI consumes saved turn state, combines user prompt and final assistant answer, and calls backend.add_memory(async_mode=True). Cancelled turns are skipped; missing final text can restore pending state. Antigravity waits for fullyIdle.",
+              "sources": [
+                "MS01"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "OSS tree memory add delegates to its memory manager, while MOS can submit scheduler messages when enabled.",
+              "sources": [
+                "MS08",
+                "MS06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Cloud service admission/dedup/extraction internals are not established by the OSS memory manager interface.",
+              "sources": [
+                "MS01",
+                "MS08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Do not confuse asynchronous remote acceptance with durable completion."
+          },
+          "owning_issues": [
+            168,
+            138
+          ]
+        },
+        {
+          "dimension": "Source preservation / lineage",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "OSS SourceMessage can hold role, chat_time, message_id, snippet, document path and file metadata; tree-memory metadata has multiple sources, file_ids and session identity. The CLI forwards a user/assistant pair and conversation scope.",
+              "sources": [
+                "MS09",
+                "MS01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Optional source fields do not prove a complete raw transcript archive or that every cloud-derived memory receives exact turn provenance.",
+              "sources": [
+                "MS09",
+                "MS01"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Make provenance optionality explicit and verify population, not only schema availability."
+          },
+          "owning_issues": [
+            137,
+            138
+          ]
+        },
+        {
+          "dimension": "Memory representations",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "GeneralMemCube loads/dumps configured text, activation, parametric and preference-memory components; uninitialized backends remain absent. Tree metadata distinguishes working, long-term, user, tool, raw-file, skill and other memory types.",
+              "sources": [
+                "MS05",
+                "MS09"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "MOS activation use is gated to HuggingFace backends and consumes a KV-cache memory when configured.",
+              "sources": [
+                "MS06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "The CLI does not demonstrate all these OSS modalities being active in its managed backend.",
+              "sources": [
+                "MS01",
+                "MS05"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Memory-type extensibility is distinct from TESSERA semantic drawers."
+          },
+          "owning_issues": [
+            168,
+            171
+          ]
+        },
+        {
+          "dimension": "Retrieval stack",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "OSS TreeTextMemory wires graph store, embedder, optional strategy-controlled BM25, reranker and extractor LLM; search delegates fast/fine behavior to a searcher, and subgraph search exposes embedding or fulltext modes.",
+              "sources": [
+                "MS08"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Cloud CLI simply calls backend search; its live vector store, reranking and planning stack are not proven to match OSS tree configuration.",
+              "sources": [
+                "MS01",
+                "MS08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Separate configurable retrieval composition from claims of default production quality."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Temporal / evolution semantics",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "OSS metadata exposes created_at/updated_at, version, status, evolve_to, history, working_binding and archived-memory pointers. Archived records have optional timespec and state/event form; SourceMessage has chat_time. CLI pending turn state has created_at and a default 24-hour TTL.",
+              "sources": [
+                "MS09",
+                "MS04"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "This schema audit does not validate all update paths or establish Graphiti-equivalent interval semantics in Cloud CLI.",
+              "sources": [
+                "MS09",
+                "MS01"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Version-history schemas need mutation-path tests before becoming preservation guarantees."
+          },
+          "owning_issues": [
+            15,
+            16,
+            137
+          ]
+        },
+        {
+          "dimension": "Working context",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "MOS builds a system prompt from retrieved memories plus chat history, with optional scheduler and activation-cache paths. CLI formats ephemeral host context; Cursor injection is disabled. WorkingMemory metadata and working_binding exist in the OSS model.",
+              "sources": [
+                "MS06",
+                "MS01",
+                "MS09"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Frozen reusable task packets with minimum-sufficiency checks are not established by these APIs.",
+              "sources": [
+                "MS06",
+                "MS09"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Evaluate context construction and scheduling without adopting a whole memory operating system."
+          },
+          "owning_issues": [
+            167,
+            169
+          ]
+        },
+        {
+          "dimension": "Operational concerns",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Hook state uses 0700 directories, 0600 atomic writes, session/turn hashed keys, TTL cleanup and atomic consume. Runner logs failures and continues. Remote add happens after consume; network-save failures do not restore that state (missing final text does).",
+              "sources": [
+                "MS04",
+                "MS01"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "Atomic consume reduces duplicate callback submissions but leaves a crash/network-loss window before durable remote acknowledgement; fail-open is not durable delivery.",
+              "sources": [
+                "MS01",
+                "MS04"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "End-to-end secret redaction, provider retries and offline durability beyond pending state were not verified.",
+              "sources": [
+                "MS01",
+                "MS04"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Test the loss/duplicate boundary between local atomic claims and remote submission."
+          },
+          "owning_issues": [
+            120,
+            177,
+            168,
+            178
+          ]
+        }
+      ]
+    },
+    {
+      "system": "Letta",
+      "scope": "Active letta-code snapshot. The letta repository main is a pointer; the V1 server is historical on archive.",
+      "dimensions": [
+        {
+          "dimension": "Capture lifecycle",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Current types define SessionStart/End, UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure, PreCompact, Stop, SubagentStop, PermissionRequest and Notification. Executor supports command hooks and supported prompt hooks.",
+              "sources": [
+                "LT03",
+                "LT04"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "The agent prompt describes automatic recall-history storage and background reflection; those descriptions are instructions, not verification of every persistence path.",
+              "sources": [
+                "LT06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Keep runtime hook availability distinct from automatic memory capture implementation."
+          },
+          "owning_issues": [
+            177,
+            138
+          ]
+        },
+        {
+          "dimension": "Hook architecture",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Letta Code owns hook types and execution; config supports disabled hooks and matcher-based tool events. MemFS separately installs Git pre-commit validation and post-commit mirroring hooks.",
+              "sources": [
+                "LT03",
+                "LT04",
+                "LT05"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Current README points to its terminal/App Server/desktop/web/channel surfaces.",
+              "sources": [
+                "LT01",
+                "LT02"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Claude-compatible type naming does not establish cross-harness installation or uniform uninstall/rollback semantics.",
+              "sources": [
+                "LT03",
+                "LT05"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "A native harness can expose familiar hooks without being an external wrapper."
+          },
+          "owning_issues": [
+            177,
+            178,
+            121
+          ]
+        },
+        {
+          "dimension": "Read-before-reasoning",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "Root MemFS Markdown files form core system-prompt memory; indexed child files and attached shared memory remain external. Prompt directs agents to recall/search missing history; recall is not automatically injected. Changes affect a later recompile, not the running turn.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Filesystem setup seeds root memory, initializes local/remote MemFS and explicitly invokes agents.recompile after enabling the remote git-memory tag.",
+              "sources": [
+                "LT07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "This sample does not prove automatic query-specific retrieval on every prompt.",
+              "sources": [
+                "LT06",
+                "LT07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Always-hot core context and retrieval-on-demand are distinct controls for a context compiler."
+          },
+          "owning_issues": [
+            169,
+            167,
+            121
+          ]
+        },
+        {
+          "dimension": "Write-after-learning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "commitMemoryWrite stages specified paths, commits them, and returns committed/SHA; local mode and remote preparation paths are distinct. Git pre-commit validates memory layout/frontmatter and protected read-only fields. Post-turn sync is handled separately.",
+              "sources": [
+                "LT08",
+                "LT05"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Prompt directs selective agent-owned updates and describes memory-worker worktrees/reflection.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Semantic correctness/dedup of every agent-written fact is not guaranteed by structural validation.",
+              "sources": [
+                "LT05",
+                "LT06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Separate agent-authored memory, validation, local commit and remote sync."
+          },
+          "owning_issues": [
+            168,
+            171,
+            121
+          ]
+        },
+        {
+          "dimension": "Source preservation / lineage",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "MemFS Git commits and paths preserve inspectable file revisions; sync code reports dirty/unpushed state and can preserve a backup ref before specific unrelated-history recovery.",
+              "sources": [
+                "LT08"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Recall history is described as immutable and automatically stored separately from editable memory.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Exact supporting-turn linkage for each authored memory and complete recall persistence were not verified in the sampled implementation.",
+              "sources": [
+                "LT06",
+                "LT08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Git derivation history is valuable but does not replace claim-to-source-turn evidence."
+          },
+          "owning_issues": [
+            137,
+            138,
+            168
+          ]
+        },
+        {
+          "dimension": "Memory representations",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "Current prompt separates recall experience, root core memory, indexed external files, skills and attached shared-memory repositories.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Filesystem scaffolding, root block initialization, rendering limits and Git-memory preparation are implemented.",
+              "sources": [
+                "LT07",
+                "LT08"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "KV/activation or parametric-learning guarantees are not inferred from this prompt/file architecture; the retired V1 server is not current implementation evidence.",
+              "sources": [
+                "LT01",
+                "LT07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Compare always-hot, external and historical memory without importing another system taxonomy."
+          },
+          "owning_issues": [
+            168,
+            171
+          ]
+        },
+        {
+          "dimension": "Retrieval stack",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "Current prompt recommends grep/file search and a recall subagent.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "MemFS code supplies bounded directory-tree rendering and Git-backed local projection.",
+              "sources": [
+                "LT07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "The active runtime recall vector store, lexical/vector fusion, graph ranking, reranker and LLM query-planner implementation were not audited; V1 archival-vector claims cannot fill these gaps.",
+              "sources": [
+                "LT01",
+                "LT06",
+                "LT07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Compare filesystem/recall behavior at the pinned active runtime, not remembered V1 architecture."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Temporal / evolution semantics",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Git commits identify memory revisions; sync tracks pending commits and recovery history.",
+              "sources": [
+                "LT08"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "Prompt says memory changes take effect on later recompile and suggests inspecting history with Git.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Per-fact event/reference time, valid_from/valid_to and semantic supersession are not established for the audited MemFS path.",
+              "sources": [
+                "LT07",
+                "LT08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Versioned memory history is not equivalent to event-time truth intervals."
+          },
+          "owning_issues": [
+            15,
+            16,
+            168
+          ]
+        },
+        {
+          "dimension": "Working context",
+          "claims": [
+            {
+              "confidence": "docs",
+              "claim": "Current-turn prompt remains compiled while edits prepare future state. Forked agents may inherit context, and memory workers use private worktrees. Shared memory is dynamically attachable and external to core prompt.",
+              "sources": [
+                "LT06"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Explicit recompile calls and bounded memory-tree projection exist.",
+              "sources": [
+                "LT07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No evidence-sufficiency score, minimum-sufficient task packet or equivalent immutable evidence manifest was verified. Prompt-level policy is not proof all subagent snapshot semantics hold.",
+              "sources": [
+                "LT06",
+                "LT07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "A compiled prompt snapshot is a relevant control; do not claim frozen context itself as novel."
+          },
+          "owning_issues": [
+            167,
+            169
+          ]
+        },
+        {
+          "dimension": "Operational concerns",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Hook executor uses timeouts, TERM then KILL, mapped exit codes and sequential/blocking versus parallel non-blocking execution. Git code retries classified transient errors, serializes config writes through a helper, redacts auth text, supports local-only writes and reports pending/conflicted sync. Some remote modes configure repository-local credential helpers.",
+              "sources": [
+                "LT04",
+                "LT08"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No exhaustive process-storm, offline-sync or credential-exposure audit was run; configuring a helper is not proof that secrets never reach local Git config.",
+              "sources": [
+                "LT08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Expose sync failures and scope credentials instead of treating commits as delivery."
+          },
+          "owning_issues": [
+            120,
+            177,
+            168,
+            178
+          ]
+        }
+      ]
+    },
+    {
+      "system": "Graphiti",
+      "scope": "Open-source core plus its MCP integration; no managed Zep backend equivalence is assumed.",
+      "dimensions": [
+        {
+          "dimension": "Capture lifecycle",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Graphiti exposes add_episode; MCP add_memory queues an episode with text/message/JSON source, scope and reference_time. The inspected MCP tools are calls, not host SessionStart/Prompt/Tool/PreCompact/Stop subscriptions.",
+              "sources": [
+                "GR01",
+                "GR07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Automatic lifecycle coverage in managed Zep or other client integrations is outside this source sample.",
+              "sources": [
+                "GR06",
+                "GR07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Treat explicit episode ingestion as a separate integration choice from automatic host hooks."
+          },
+          "owning_issues": [
+            177,
+            138
+          ]
+        },
+        {
+          "dimension": "Hook architecture",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "MCP server exposes search/ingest tools and scoped queue processing.",
+              "sources": [
+                "GR07",
+                "GR08"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "README describes HTTP/stdio and Claude Desktop/Cursor client configuration plus Cursor rules.",
+              "sources": [
+                "GR06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Host-hook installer idempotency, uninstall/rollback and cross-client event guarantees were not verified; managed Zep hooks are not inferred.",
+              "sources": [
+                "GR06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "MCP tools and client instructions are not automatic lifecycle delivery."
+          },
+          "owning_issues": [
+            120,
+            121,
+            177,
+            178
+          ]
+        },
+        {
+          "dimension": "Read-before-reasoning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Core search returns structured nodes/edges/episodes/communities according to configured searches and filters; MCP exposes search_nodes and search_memory_facts scoped by group.",
+              "sources": [
+                "GR04",
+                "GR07"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "MCP instructions guide the agent to search for context.",
+              "sources": [
+                "GR07"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Neither an MCP tool definition nor those instructions proves retrieval runs before every reasoning step or injects a precompiled task packet.",
+              "sources": [
+                "GR07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Preserve structured search evidence; make application-controlled invocation explicit."
+          },
+          "owning_issues": [
+            169,
+            171,
+            121
+          ]
+        },
+        {
+          "dimension": "Write-after-learning",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "add_episode orchestrates extraction, node/edge resolution and graph persistence; edge operations call LLM-based resolution/temporal extraction. MCP add_memory returns queued-for-processing after enqueue.",
+              "sources": [
+                "GR01",
+                "GR05",
+                "GR07"
+              ]
+            },
+            {
+              "confidence": "code",
+              "claim": "Queue worker logs processing exceptions and marks tasks done; this is not a synchronous durable-write receipt.",
+              "sources": [
+                "GR08"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No benchmark of extraction correctness or provider failure recovery was run.",
+              "sources": [
+                "GR05",
+                "GR08"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Distinguish queued acknowledgement, extraction, graph resolution and committed result."
+          },
+          "owning_issues": [
+            168,
+            138,
+            171
+          ]
+        },
+        {
+          "dimension": "Source preservation / lineage",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "EpisodicNode stores raw content, source/source_description, reference validity time and entity-edge IDs; EntityEdge lists originating episode IDs. Core store_raw_episode_content defaults true but can erase content before persistence when disabled.",
+              "sources": [
+                "GR03",
+                "GR02",
+                "GR01"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Episode references do not alone guarantee exact original turn spans or retained raw content under every configuration.",
+              "sources": [
+                "GR01",
+                "GR03"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Episode-backed graph provenance is an established baseline for lineage experiments."
+          },
+          "owning_issues": [
+            137,
+            138,
+            168
+          ]
+        },
+        {
+          "dimension": "Memory representations",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Models represent episodes, entities, fact edges, community nodes and saga state; facts/edges carry embeddings and provenance.",
+              "sources": [
+                "GR02",
+                "GR03"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "Activation/KV, parametric memory and always-hot core prompts were not established in these core/MCP paths. Managed Zep may have additional representations.",
+              "sources": [
+                "GR01",
+                "GR06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Graph summaries and episode evidence must stay distinguishable in memory responses."
+          },
+          "owning_issues": [
+            168,
+            171
+          ]
+        },
+        {
+          "dimension": "Retrieval stack",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Search configuration dispatches BM25/fulltext, cosine similarity and BFS graph expansion; selectable rerankers include RRF, MMR, node distance, episode mentions and cross-encoder. Query embedding is computed only when configured methods need it.",
+              "sources": [
+                "GR04"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "MCP README supports graph-database/provider configuration, including Neo4j/FalkorDB paths and local Ollama setup.",
+              "sources": [
+                "GR06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No TESSERA vector store choice or quality ranking follows from those supported backends.",
+              "sources": [
+                "GR04",
+                "GR06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Treat hybrid graph retrieval and selectable reranking as established controls."
+          },
+          "owning_issues": [
+            169,
+            171
+          ]
+        },
+        {
+          "dimension": "Temporal / evolution semantics",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Episode created_at is ingestion time and valid_at carries source/reference time. Entity edges include created_at, valid_at, invalid_at, expired_at and reference_time. Invalidation updates invalid_at and expired_at on old edges rather than inherently deleting them; optional raw content and explicit deletion APIs remain separate.",
+              "sources": [
+                "GR01",
+                "GR02",
+                "GR03",
+                "GR05"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "History-preserving invalidation is not an immutable-history guarantee against explicit deletion or changed retention settings.",
+              "sources": [
+                "GR01",
+                "GR02"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Use ingestion/event/validity/invalidation distinctions as temporal test controls."
+          },
+          "owning_issues": [
+            15,
+            16,
+            137
+          ]
+        },
+        {
+          "dimension": "Working context",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "Search returns configurable structured results. Episode ingestion can use prior episodes as context; saga/community summaries are graph state.",
+              "sources": [
+                "GR01",
+                "GR03",
+                "GR04"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "An always-hot agent prompt or disposable/frozen minimum-sufficient packet across subagents is not established in these core/MCP sources; Zep Context Lake claims were not audited.",
+              "sources": [
+                "GR06",
+                "GR07"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Retrieved graph context is not interchangeable with a frozen evidence-sufficient work packet."
+          },
+          "owning_issues": [
+            167,
+            169
+          ]
+        },
+        {
+          "dimension": "Operational concerns",
+          "claims": [
+            {
+              "confidence": "code",
+              "claim": "MCP queue uses in-memory asyncio queues per group; worker exceptions are logged and tasks marked done. Worker-running flag is set inside the launched task, not atomically at enqueue. Core search uses semaphore_gather.",
+              "sources": [
+                "GR08",
+                "GR04"
+              ]
+            },
+            {
+              "confidence": "inference",
+              "claim": "Queued acceptance is not restart-safe durable delivery in this queue implementation. Back-to-back enqueue before worker start warrants a race test; sequential intent is not a proved single-flight guarantee.",
+              "sources": [
+                "GR08"
+              ]
+            },
+            {
+              "confidence": "docs",
+              "claim": "README warns that ingestion fans out into multiple provider calls and documents concurrency tuning and provider credentials.",
+              "sources": [
+                "GR06"
+              ]
+            },
+            {
+              "confidence": "unknown",
+              "claim": "No concurrency race, offline behavior, crash test or security audit was executed.",
+              "sources": [
+                "GR08",
+                "GR06"
+              ]
+            }
+          ],
+          "lesson": {
+            "confidence": "inference",
+            "claim": "Audit queue durability and worker ownership independently of advertised sequential processing."
+          },
+          "owning_issues": [
+            120,
+            177,
+            168,
+            178
+          ]
+        }
+      ]
+    }
+  ]
+}

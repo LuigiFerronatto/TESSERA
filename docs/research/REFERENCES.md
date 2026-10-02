@@ -8,6 +8,10 @@
 > plus supplementary watchlist source S01. This does not redate verification of
 > unrelated entries or fast-moving product documentation.
 >
+> **Scoped lifecycle/source refresh:** 2026-10-02, [five-system source audit](MEMORY_LIFECYCLE_2026-10-02.md).
+> That audit pins current repository code and preserves product/release boundaries;
+> it does not redate the paper review or unrelated product entries.
+>
 > A source appearing here does **not** mean TESSERA implements or validates its claims.
 
 The [dated paper review](MEMORY_PAPERS_2026-09-07.md) connects this bibliography
@@ -924,6 +928,12 @@ Primary docs verified:
 
 Current-source caution:
 
+The [2026-10-02 audit](MEMORY_LIFECYCLE_2026-10-02.md#mem0) verifies OSS additive
+extraction separately from the coding plugin's redacted local EvidenceStore,
+first-prompt injection and background flush. Platform v3 temporal ranking remains
+documentation-only and is explicitly not an OSS feature. Source-preservation
+comparisons must not treat all Mem0 paths as extraction-only.
+
 Mem0 documentation reflects more than one architectural generation. A Graph Memory page describes entity/relationship extraction into an external graph backend beside vector retrieval. The newer OSS migration guide says external graph-store support was removed from the newer open-source algorithm and replaced with built-in entity linking, alongside semantic + BM25 + entity hybrid retrieval.
 
 Therefore do not summarize Mem0 as simply:
@@ -991,6 +1001,12 @@ Related: #12, #14, #15, #16, #25, #26, #27.
 
 Primary docs verified:
 - https://docs.letta.com/
+- [Current-source transition and pinned MemFS audit](MEMORY_LIFECYCLE_2026-10-02.md#letta)
+
+2026-10-02 boundary: `letta-ai/letta` main points to `letta-ai/letta-code`.
+The retired V1 server remains on `archive`; do not cite V1 archival internals
+as current code evidence. Current core/external/recall and Git-backed MemFS
+claims are individually labeled code or docs in the audit.
 
 Current positioning:
 - platform for stateful agents;
@@ -1056,10 +1072,14 @@ TESSERA distinction:
 
 ## MemPalace
 
-**Verified official public repository:**
-- https://github.com/bassemhalawani/memorypalace
+**Verified official public repository (2026-10-02 scoped refresh):**
+- https://github.com/MemPalace/mempalace
 
-Repository warning states the official sources are that repository, the PyPI package, and `mempalaceofficial.com` documentation.
+This supersedes the older `bassemhalawani/memorypalace` account reference. The
+[pinned source audit](MEMORY_LIFECYCLE_2026-10-02.md#mempalace) distinguishes the
+`develop` snapshot from released v3.6.0 and separates verbatim conversation
+storage from derived diary checkpoints. Its README identifies the repository,
+PyPI package and `mempalaceofficial.com` as official sources.
 
 Documented signals:
 - local-first;
