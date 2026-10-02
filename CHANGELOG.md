@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added an opt-in repository-only episode-boundary comparison harness for #138,
+  with unchanged E0, explicit-role E1/E3, lossless source memberships, separate
+  timeout traces and a frozen synthetic draft plus blinded annotation packet.
+  Human review and downstream quality gates remain pending; installed runtime
+  behavior and canonical turn models are unchanged.
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
