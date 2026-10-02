@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager, redirect_stderr
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, is_dataclass, replace
 import hashlib
 import io
 import json
@@ -88,6 +88,13 @@ def validate_operation_id(operation_id):
     if not isinstance(operation_id, str) or not _OPERATION.fullmatch(operation_id):
         raise ValueError("operation_id must be 1-128 portable ASCII identifier characters")
     return operation_id
+
+
+def _request_json_default(value):
+    """Normalize explicit typed request metadata without stringifying objects."""
+    if is_dataclass(value) and not isinstance(value, type):
+        return asdict(value)
+    raise TypeError(f"unsupported receipt request metadata: {type(value).__name__}")
 
 
 def _hash(data):
@@ -266,7 +273,9 @@ def _projection_contains(engine, receipt, ledger):
                    and item.get("source", {}).get("document_hash") == receipt.source_revision.removeprefix("sha256:")
                    for item in value["records"])
     checked = validate_memory_path(engine.storage_dir, receipt.memory_id)
-    relative = str(checked.destination.relative_to(Path(engine.storage_dir))).replace(os.sep, "/")
+    # The Engine owns physical source-key namespacing; it can differ from
+    # the logical memory path when a configured project also has a store.
+    relative = engine._relative_identity_path(str(checked.destination))
     manifest = json.loads(Path(engine.manifest_path).read_text(encoding="utf-8"))
     graph = json.loads(Path(engine.index_cache_json).read_text(encoding="utf-8"))
     return (manifest.get(relative, {}).get("file_hash") == receipt.source_revision.removeprefix("sha256:")
@@ -420,7 +429,7 @@ def _write_with_receipt(engine, arguments, operation_id):
     normalized["entities"] = [asdict(item) for item in arguments["entities"]]
     normalized["active_connections"] = [asdict(item) for item in (arguments["active_connections"] or [])]
     normalized["provenance_turns"] = arguments["provenance_turns"] or []
-    request_hash = _hash(json.dumps(normalized, sort_keys=True, ensure_ascii=False).encode())
+    request_hash = _hash(json.dumps(normalized, sort_keys=True, ensure_ascii=False, default=_request_json_default).encode())
     with _locked(engine):
         _reconcile_pending(engine)
         record = _load(engine, operation_id)

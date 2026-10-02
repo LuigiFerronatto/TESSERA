@@ -366,3 +366,40 @@ def test_missing_journal_does_not_allow_operation_reuse_for_another_memory(tmp_p
     with pytest.raises(ValueError, match="different request"):
         write(engine, mem_id="project/other")
     assert not (tmp_path / "project/other.md").exists()
+
+
+def test_receipt_inspection_uses_engine_owned_physical_source_keys(tmp_path,monkeypatch):
+    engine=TesseraEngine(str(tmp_path))
+    previous=engine._relative_identity_path
+    monkeypatch.setattr(engine,'_relative_identity_path',lambda path:'selected/'+previous(path))
+    first=write(engine,operation_id='physical-key')
+    assert first.write_receipt.indexed=='complete'
+    assert engine.inspect_write_receipt('physical-key').to_dict()==first.write_receipt.to_dict()
+    assert write(engine,operation_id='physical-key').write_receipt.to_dict()==first.write_receipt.to_dict()
+
+
+def test_receipt_request_hash_preserves_typed_metadata_without_lossy_strings(tmp_path,monkeypatch):
+    from dataclasses import dataclass
+    @dataclass
+    class SourceReference:
+        episode: str
+        positions: list
+    engine=TesseraEngine(str(tmp_path))
+    original=engine._write_memory_note_result
+    def extension_writer(**arguments):
+        arguments.pop('source_reference')
+        return original(**arguments)
+    monkeypatch.setattr(engine,'_write_memory_note_result',extension_writer)
+    arguments=dict(mem_id='project/note',mem_type='factual',episode_id='episode-1',
+        content=SECRET,tags=[],entities=[],description='',provenance_turns=None,
+        active_connections=None,persist_format='md',source_reference=SourceReference('ep',[1,3]))
+    first=receipts.write_with_receipt(engine,arguments,'typed-request')
+    assert first.persisted
+    assert receipts.write_with_receipt(engine,arguments,'typed-request').to_dict()==first.to_dict()
+    arguments['source_reference']=SourceReference('ep',[1,4])
+    with pytest.raises(ValueError,match='different request'):
+        receipts.write_with_receipt(engine,arguments,'typed-request')
+    with pytest.raises(TypeError,match='unsupported receipt'):
+        receipts._request_json_default(object())
+    with pytest.raises(TypeError,match='unsupported receipt'):
+        receipts._request_json_default(SourceReference)
