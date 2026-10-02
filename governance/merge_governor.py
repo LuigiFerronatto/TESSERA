@@ -11,7 +11,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Iterable, Optional
 
-from benchmarks.reporting.applicability import parse_applicability
+from benchmarks.reporting.applicability import benchmark_contract_check_name, parse_applicability
 
 REQUIRED_CI_JOBS = (
     "distribution (Python 3.9)",
@@ -100,9 +100,18 @@ def payload_from_pr(pr: dict, thread_pages: list[dict], review_pages: list[list[
     rollup = pr.get("statusCheckRollup") or []
     try:
         applicability = parse_applicability(pr.get("body"))["applicability"]
+        contract_check = benchmark_contract_check_name(pr.get("body"))
     except ValueError:
         applicability = None
-    benchmark_success = applicability is not None and check_is_green(rollup, BENCHMARK_JOB)
+        contract_check = None
+    # The terminal contract check certifies reporting and applicable dev-50
+    # success in one workflow run for this exact metadata. Old name-only green
+    # checks must not bridge a body edit while new jobs have not registered yet.
+    benchmark_success = (
+        contract_check is not None
+        and check_is_green(rollup, BENCHMARK_JOB)
+        and check_is_green(rollup, contract_check)
+    )
     if applicability == "REQUIRED":
         benchmark_success = benchmark_success and check_is_green(rollup, "longmemeval-v1-dev-50")
     return {
@@ -115,6 +124,21 @@ def payload_from_pr(pr: dict, thread_pages: list[dict], review_pages: list[list[
         "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
         "has_unresolved_threads": any(not thread["isResolved"] for thread in threads),
     }
+
+
+def recheck_benchmark_contract(result: GateResult, evaluated_body: str, current_body: str) -> GateResult:
+    """Fail closed if metadata changed between evidence gathering and publish."""
+    try:
+        unchanged = benchmark_contract_check_name(evaluated_body) == benchmark_contract_check_name(current_body)
+    except ValueError:
+        unchanged = False
+    if unchanged:
+        return result
+    return GateResult(
+        authorized=False,
+        reasons=[*result.reasons, "benchmark contract changed or is invalid at publication; fresh evidence is required"],
+        notes=list(result.notes),
+    )
 
 
 def evaluate_runtime_pr_gates(

@@ -44,6 +44,10 @@ GitHub aggregate approval plus a trusted non-bot human approval on the current
 head, no review blocks, no unresolved threads, non-draft status and no conflicts.
 Missing/ambiguous applicability or incomplete thread evidence fails closed.
 Old AI comments and provider state do not influence readiness.
+PR body edits refresh benchmark/governor evaluation. A terminal native benchmark
+check binds same-run reporting/dev-50 success to the parsed applicability, issue
+and rationale, so old green checks on an unchanged commit cannot satisfy newly
+changed metadata. Unrelated prose edits preserve the contract identity.
 
 ## Concrete example
 
@@ -51,12 +55,16 @@ A PR with all deterministic checks green and a current human approval can pass
 without an AI provider. One failing Python job, bot-only approval, stale approval,
 unresolved thread, or required dev-50 run still pending blocks it even if an old
 AI comment says KEEP.
+A change from NOT_APPLICABLE to REQUIRED remains blocked until the new contract
+has successful reporting and dev-50 evidence, even if older jobs were green.
 
 ## How was it validated?
 
-Run `python -m pytest tests/test_governance_workflows.py tests/test_deterministic_governor.py tests/test_plain_language_test_card_docs.py`.
+Run `python -m pytest tests/test_governance_workflows.py tests/test_deterministic_governor.py tests/test_plain_language_test_card_docs.py tests/test_benchmark_reporting.py`.
 These cover individual blocking conditions, exact names, review pagination,
-bot/stale/dismissed approvals, benchmark applicability and AI-workflow removal.
+bot/stale/dismissed approvals, benchmark applicability, same-head metadata edits,
+pending/failed terminal evidence, ignored title edits, publication-time contract
+races, same-run terminal shell gates and AI-workflow removal.
 The Fixer lock was compiled twice with checksum-verified gh-aw v0.87.10 and
 `--strict`; both outputs had identical bytes. Exact-head CI and full-suite counts
 are recorded in the implementation PR rather than inferred from these checks.

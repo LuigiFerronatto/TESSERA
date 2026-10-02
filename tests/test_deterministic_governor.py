@@ -20,11 +20,13 @@ def green_payload():
 
 
 def green_pr():
-    return dict(headRefOid='abc1234', isDraft=False, mergeable='MERGEABLE',
+    pr = dict(headRefOid='abc1234', isDraft=False, mergeable='MERGEABLE',
                 reviewDecision='APPROVED', author={'login': 'author'},
                 body='Benchmark applicability: NOT_APPLICABLE\nBenchmark rationale: governance only', statusCheckRollup=[
                     dict(name=n, conclusion='SUCCESS')
                     for n in (*mg.REQUIRED_CI_JOBS, mg.BENCHMARK_JOB)])
+    pr['statusCheckRollup'].append(dict(name=mg.benchmark_contract_check_name(pr['body']), conclusion='SUCCESS'))
+    return pr
 
 
 def human_review(**changes):
@@ -159,6 +161,7 @@ def test_fixer_requires_selected_human_findings():
 def test_required_benchmark_needs_dev50_success(state):
     pr = green_pr()
     pr['body'] = 'Benchmark applicability: REQUIRED\nBenchmark issue: #194'
+    pr['statusCheckRollup'].append(dict(name=mg.benchmark_contract_check_name(pr['body']), conclusion='SUCCESS'))
     if state:
         pr['statusCheckRollup'].append(dict(name='longmemeval-v1-dev-50', conclusion=state))
     assert not payload_from_pr(pr, [thread_page()])['benchmark_success']
@@ -196,3 +199,90 @@ def test_paginated_latest_human_verdict_and_comment_semantics():
     commented = human_review(id=3, state='COMMENTED', submitted_at='2026-10-02T00:02:00Z')
     assert payload_from_pr(green_pr(), [thread_page()], [[approval], [commented]])['has_required_approval']
     assert not payload_from_pr(green_pr(), [thread_page()], [])['has_required_approval']
+
+
+@pytest.mark.parametrize('body', [
+    'Benchmark applicability: REQUIRED\nBenchmark issue: #194',
+    'Benchmark applicability: SMOKE_ONLY\nBenchmark rationale: governance only',
+    'Benchmark applicability: NOT_APPLICABLE\nBenchmark rationale: changed rationale',
+    'Benchmark applicability: NOT_APPLICABLE\nBenchmark rationale: governance only\nBenchmark issue: #195',
+])
+def test_body_edit_cannot_reuse_old_green_before_new_jobs_register(body):
+    pr = green_pr()
+    # Even an older successful dev-50 job on this same SHA is insufficient.
+    pr['statusCheckRollup'].append(dict(name='longmemeval-v1-dev-50', conclusion='SUCCESS'))
+    pr['body'] = body
+    assert not payload_from_pr(pr, [thread_page()])['benchmark_success']
+    pr['statusCheckRollup'].append(dict(name=mg.benchmark_contract_check_name(body), conclusion='SUCCESS'))
+    assert payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+@pytest.mark.parametrize('state', ['', 'PENDING', 'FAILURE', 'CANCELLED', 'SKIPPED', 'NEUTRAL', 'TIMED_OUT'])
+def test_pending_or_failed_contract_check_blocks_even_with_old_success(state):
+    pr = green_pr()
+    pr['statusCheckRollup'].append(dict(name=mg.benchmark_contract_check_name(pr['body']), conclusion=state))
+    assert not payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+def test_completed_same_contract_evidence_survives_unrelated_prose_edits():
+    pr = green_pr()
+    pr['body'] += '\n\nA corrected explanation unrelated to benchmark metadata.'
+    assert payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+def test_ignored_title_edit_skips_do_not_replace_authoritative_evidence():
+    pr = green_pr()
+    pr['statusCheckRollup'].extend([
+        dict(name='benchmark-reporting (ignored edit)', conclusion='SKIPPED'),
+        dict(name='longmemeval-v1-dev-50 (ignored edit)', conclusion='SKIPPED'),
+        dict(name='benchmark-contract (invalid)', conclusion='SKIPPED'),
+    ])
+    assert payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+def test_required_issue_change_needs_new_terminal_evidence():
+    pr = green_pr()
+    pr['body'] = 'Benchmark applicability: REQUIRED\nBenchmark issue: #194'
+    pr['statusCheckRollup'].extend([
+        dict(name='longmemeval-v1-dev-50', conclusion='SUCCESS'),
+        dict(name=mg.benchmark_contract_check_name(pr['body']), conclusion='SUCCESS'),
+    ])
+    assert payload_from_pr(pr, [thread_page()])['benchmark_success']
+    pr['body'] = pr['body'].replace('#194', '#195')
+    assert not payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+def test_legacy_checks_without_contract_evidence_fail_closed():
+    pr = green_pr()
+    pr['statusCheckRollup'].pop()
+    assert not payload_from_pr(pr, [thread_page()])['benchmark_success']
+
+
+@pytest.mark.parametrize('current_body', [None, '', 'Benchmark applicability: REQUIRED\nBenchmark issue: #194'])
+def test_contract_edit_between_gather_and_publish_fails_closed(current_body):
+    result = mg.recheck_benchmark_contract(mg.GateResult(True), green_pr()['body'], current_body)
+    assert not result.authorized
+    assert any('publication' in reason for reason in result.reasons)
+
+
+def test_publication_contract_recheck_preserves_other_gate_failures_and_ignores_prose():
+    original = green_pr()['body']
+    blocked = mg.GateResult(False, ['required human review approval is missing'])
+    assert mg.recheck_benchmark_contract(blocked, original, original + '\nClarification') is blocked
+    ready = mg.GateResult(True)
+    assert mg.recheck_benchmark_contract(ready, original, original + '\nClarification') is ready
+
+
+def test_body_edit_triggers_and_ignored_edit_concurrency_are_explicit():
+    for filename in ('benchmark.yml', 'tessera-merge-governor.yml'):
+        text = (ROOT / '.github/workflows' / filename).read_text()
+        doc = yaml.load(text, Loader=yaml.BaseLoader)
+        assert 'edited' in doc['on']['pull_request']['types']
+        job = doc['jobs']['benchmark-reporting' if filename == 'benchmark.yml' else 'evaluate']
+        assert "github.event.action != 'edited' || github.event.changes.body != null" in job['if']
+        assert "github.event.changes.body == null && github.run_id" in doc['concurrency']['group']
+    governor = (ROOT / '.github/workflows/tessera-merge-governor.yml').read_text()
+    assert "github.event.inputs.pr_number || github.run_id" in governor
+    assert "|| 'manual'" not in governor
+    assert '--json headRefOid,body > current_pr.json' in governor
+    assert 'recheck_benchmark_contract' in governor

@@ -4,7 +4,7 @@ name: TESSERA Merge Governor
 # requires an AI audit, engine availability, or an AI-authored comment.
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft, labeled, unlabeled]
+    types: [opened, reopened, synchronize, edited, ready_for_review, converted_to_draft, labeled, unlabeled]
   pull_request_review:
     types: [submitted, dismissed]
   workflow_run:
@@ -22,13 +22,17 @@ permissions:
   checks: write
 
 concurrency:
-  group: tessera-merge-governor-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.inputs.pr_number || github.run_id }}
+  # Keep manual and event-driven evaluations serialized for each PR. Ignored
+  # title edits must not cancel an in-flight body/candidate evaluation.
+  group: tessera-merge-governor-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.inputs.pr_number || github.run_id }}-${{ github.event.action == 'edited' && github.event.changes.body == null && github.run_id || 'active' }}
   cancel-in-progress: true
 
 jobs:
   evaluate:
     name: Evaluate deterministic merge gates
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.pull_requests[0].number != null
+    if: >-
+      (github.event_name != 'workflow_run' || github.event.workflow_run.pull_requests[0].number != null) &&
+      (github.event.action != 'edited' || github.event.changes.body != null)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -124,14 +128,30 @@ jobs:
         run: |
           set -euo pipefail
           # Close the gather/publish race: never stamp a new head with old evidence.
-          current_head="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefOid --jq .headRefOid)"
+          gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefOid,body > current_pr.json
+          current_head="$(python -c 'import json;print(json.load(open("current_pr.json"))["headRefOid"])')"
           [[ "$HEAD_SHA" == "$current_head" ]] || { echo "PR head changed; skipping stale result."; exit 0; }
-          conclusion="failure"
-          [[ "$STATUS" == "0" ]] && conclusion="success"
-          summary="$(python - <<'PY'
+          python - <<'PY'
           import json
           import os
+          from governance.merge_governor import GateResult, recheck_benchmark_contract
           data = json.loads(os.environ["RESULT_JSON"])
+          with open("pr.json", encoding="utf-8") as fh:
+              evaluated = json.load(fh)
+          with open("current_pr.json", encoding="utf-8") as fh:
+              current = json.load(fh)
+          result = recheck_benchmark_contract(GateResult(**data), evaluated.get("body"), current.get("body"))
+          with open("publication.json", "w", encoding="utf-8") as fh:
+              json.dump(result.to_dict(), fh)
+          PY
+          conclusion="failure"
+          if [[ "$STATUS" == "0" && "$(python -c 'import json;print(json.load(open("publication.json"))["authorized"])')" == 'True' ]]; then
+            conclusion="success"
+          fi
+          summary="$(python - <<'PY'
+          import json
+          with open("publication.json", encoding="utf-8") as fh:
+              data = json.load(fh)
           print("\n".join(f"- {r}" for r in data["reasons"]) or "Deterministic gates and required human review are satisfied.")
           PY
           )"

@@ -19,9 +19,22 @@ pending, skipped or failed check evidence does not count as success. GraphQL thr
 pagination is complete or the gather step fails; missing data never means zero
 unresolved threads.
 
-The governor runs on PR/review changes and completion of TESSERA CI or the Benchmark
-Ledger. A completed workflow for a superseded head cannot publish readiness for a
-new head. The publish step rechecks the head immediately before writing its result.
+Benchmark readiness also requires a successful native `benchmark-contract (...)`
+check whose digest covers the parsed applicability, issue and rationale. The
+terminal job certifies that the offline check and any REQUIRED dev-50 job passed
+in the same workflow run. Check evidence is already bound to the candidate SHA;
+the digest prevents older green jobs on that SHA from satisfying changed metadata
+before replacement jobs appear. Evidence for unchanged metadata remains reusable,
+including after unrelated prose edits. No artifacts or extra token permissions
+are needed, and the terminal check is enforced by the existing governor rather
+than added as a variable-name branch-protection requirement.
+
+The governor and Benchmark Ledger react to PR body edits; title-only edits are
+ignored without replacing the authoritative check names or cancelling active
+evaluations. The governor also runs on PR/review changes and completion of TESSERA
+CI or the Benchmark Ledger. A completed workflow for a superseded head cannot
+publish readiness for a new head. The publish step rechecks the head and parsed
+benchmark contract immediately before writing its result.
 A workflow completion without an associated PR is ignored; `workflow_dispatch`
 with `pr_number` remains available for thread-only updates or manual reevaluation.
 
@@ -48,6 +61,11 @@ tessera-merge-governor
 Keep at least one approving human review, stale-review dismissal and resolved
 conversations. GitHub branch protection is the final authority. This PR does not
 claim settings were changed or authorize merging itself.
+
+Existing heads whose successful benchmark runs predate contract checks need a
+fresh Benchmark Ledger evaluation before the new governor can authorize them.
+The completion-triggered refresh becomes active once this workflow reaches the
+default branch; it does not retroactively reevaluate already completed runs.
 
 ## Retained, separately scoped automation
 
