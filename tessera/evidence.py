@@ -176,13 +176,27 @@ def evidence_for_text(
     )
 
 
-def ledger_from_graph(graph: Any) -> "EvidenceLedger":
+def ledger_from_graph(graph: Any, *, storage_dir: Optional[str] = None) -> "EvidenceLedger":
     """Rebuild document-level evidence records from an indexed TESSERA graph."""
     ledger = EvidenceLedger()
     for _node_id, data in graph.nodes(data=True):
         canonical = data.get("canonical_metadata")
         if isinstance(canonical, CanonicalMetadata):
             ledger.add(evidence_from_canonical(canonical))
+            if storage_dir is not None and canonical.lineage is not None:
+                from .lineage import supporting_evidence_records, validate_lineage
+
+                try:
+                    source = validate_lineage(storage_dir, canonical.identity.id, canonical.lineage)
+                except (OSError, ValueError, TypeError, AttributeError):
+                    # Stale pinned references remain visible in the result's
+                    # lineage diagnostics, never promoted to verified evidence.
+                    continue
+                ledger.add(evidence_from_canonical(source.canonical))
+                for record in supporting_evidence_records(
+                    source, canonical.identity.id, canonical.lineage.supporting_turns
+                ):
+                    ledger.add(record)
     return ledger
 
 
@@ -207,6 +221,10 @@ def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> 
 
         provenance = evidence_from_canonical(canonical)
         item["provenance"] = provenance.to_dict()
+        if canonical.lineage is not None:
+            from .lineage import inspect_lineage
+
+            item["lineage"] = inspect_lineage(engine.storage_dir, node_id, canonical.lineage)
 
         evidence_text = item.get("relevant_evidence")
         if evidence_text:

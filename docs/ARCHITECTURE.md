@@ -597,3 +597,13 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Source-episode lineage (#137 candidate)
+
+Automatic memory construction retains immutable, independently inspectable
+Markdown episode sources in the store, with no new semantic drawer. Ordered
+source turns and explicit supporting references share Canonical Metadata and
+the Evidence Ledger's source/version/span model. Rebuilds preserve lineage;
+source changes are diagnosed rather than silently rebound. See
+[EPISODE_LINEAGE.md](EPISODE_LINEAGE.md). This candidate does not establish
+QUMem extraction accuracy, episode boundary semantics or temporal state.

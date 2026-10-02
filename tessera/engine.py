@@ -11,6 +11,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 from .config import ResolvedConfiguration
+from .canonical import CanonicalMetadata
 
 # Preserve the engine module's existing public constants/types/functions for
 # callers that import them from ``tessera.engine``.
@@ -18,6 +19,7 @@ from .engine_core import *  # noqa: F401,F403
 from .engine_core import TesseraEngine as _CoreTesseraEngine
 from .evidence import (
     EvidenceLedger,
+    evidence_from_canonical,
     enrich_retrieval_results,
     ledger_from_graph,
     retrieval_results_contract,
@@ -64,12 +66,13 @@ class TesseraEngine(_CoreTesseraEngine):
         self.evidence_cache_json = os.path.join(self.index_cache_dir, "evidence.json")
 
     def _rebuild_evidence_ledger(self) -> None:
-        self.evidence_ledger = ledger_from_graph(self.graph)
+        self.evidence_ledger = ledger_from_graph(self.graph, storage_dir=self.storage_dir)
         for node_id, data in self.graph.nodes(data=True):
-            records = self.evidence_ledger.for_memory(node_id)
-            if records:
-                # Derived metadata only. Never written back into source files.
-                data["evidence_record"] = records[0].to_dict()
+            canonical = data.get("canonical_metadata")
+            if isinstance(canonical, CanonicalMetadata):
+                # The primary record still identifies the atomic note itself;
+                # supporting source-turn records must never replace it.
+                data["evidence_record"] = evidence_from_canonical(canonical).to_dict()
             else:
                 data.pop("evidence_record", None)
 

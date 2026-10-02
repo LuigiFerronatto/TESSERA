@@ -1,7 +1,7 @@
 """Domain models and custom exceptions for Tessera's atomic memory cards."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class InvalidFrontmatterError(Exception):
@@ -49,6 +49,30 @@ NODE_TYPE_TO_STORE = {
 STORE_TO_NODE_TYPE = {v: k for k, v in NODE_TYPE_TO_STORE.items()}
 
 
+@dataclass(frozen=True)
+class EpisodeTurn:
+    """An actual source interaction; position is a positive, episode-local order key.
+
+    Positions may be sparse and must be supplied by the source producer. Role
+    and timestamp are source metadata, not inferred from the turn's text.
+    """
+
+    position: int
+    role: str
+    content: str
+    timestamp: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if type(self.position) is not int or self.position < 1:
+            raise ValueError("turn position must be a positive integer")
+        if not isinstance(self.role, str) or not self.role.strip():
+            raise ValueError("turn role must be a nonempty source role")
+        if not isinstance(self.content, str) or not self.content.strip():
+            raise ValueError("turn content must be nonempty text")
+        if self.timestamp is not None and not isinstance(self.timestamp, str):
+            raise ValueError("turn timestamp must be source text or None")
+
+
 @dataclass
 class Episode:
     """
@@ -66,14 +90,33 @@ class Episode:
     beginning: str
     middle: str
     end: str
+    turns: Tuple[EpisodeTurn, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        if not all(isinstance(value, str) for value in (self.beginning, self.middle, self.end)):
+            raise ValueError("episode sections must be text")
+        self.turns = tuple(self.turns)
+        if not all(isinstance(turn, EpisodeTurn) for turn in self.turns):
+            raise ValueError("episode turns must be EpisodeTurn records")
+        positions = [turn.position for turn in self.turns]
+        if positions != sorted(set(positions)):
+            raise ValueError("episode turns must have unique, increasing positions")
+
+    @classmethod
+    def from_turns(cls, turns: List[EpisodeTurn]) -> "Episode":
+        """Keep actual turns without fabricating summaries or losing source roles."""
+        return cls("", "", "", tuple(turns))
 
     def to_markdown_body(self) -> str:
         """Renders the episode as a structured Markdown body (## sections)."""
-        return (
+        rendered = (
             f"## Início (contexto/gatilho)\n{self.beginning.strip()}\n\n"
             f"## Meio (o que aconteceu)\n{self.middle.strip()}\n\n"
             f"## Fim (resultado/aprendizado)\n{self.end.strip()}\n"
         )
+        for turn in self.turns:
+            rendered += f"\n## Turn {turn.position} ({turn.role})\n{turn.content}\n"
+        return rendered
 
     @staticmethod
     def from_markdown_body(body: str) -> "Episode":
@@ -153,10 +196,13 @@ class MemoryFrontmatter:
     reasons: List[str] = field(default_factory=list)
     original_hash: str = ""
     persisted_hash: str = ""
+    temporal_position: Optional[int] = None
+    episode_source: Optional[Dict[str, Any]] = None
+    source_evidence: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         desc = self.description if self.description else f"{self.memory_type.title()} memory note"
-        return {
+        payload = {
             "name": self.memory_id.split("/")[-1],
             "description": desc,
             "metadata": {
@@ -183,3 +229,8 @@ class MemoryFrontmatter:
                 "persisted_hash": self.persisted_hash,
             },
         }
+        if self.episode_source is not None:
+            payload["temporal_position"] = self.temporal_position
+            payload["episode_source"] = self.episode_source
+            payload["source_evidence"] = self.source_evidence
+        return payload

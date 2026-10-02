@@ -42,6 +42,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, List, Literal, Optional, Tuple
 
 from .models import Episode
+from .lineage import LineageValidationError, bind_lineage, validate_support
 
 LlmFn = Callable[[str, str], str]
 
@@ -54,7 +55,9 @@ DECOMPOSER_SYSTEM_PROMPT = (
     "'procedural_anchor' (aprendizado transferível, aplicável a situações "
     "futuras diferentes desta). Responda APENAS com um array JSON de objetos "
     "{\"type\": ..., \"content\": ...}, sem nenhum texto fora do array. Se "
-    "nada valer a pena persistir, responda com um array vazio []."
+    "nada valer a pena persistir, responda com um array vazio []. "
+    "When ordered source turns are supplied, also include supporting_turns with "
+    "their actual positions. Never invent turn IDs or infer validity time."
 )
 
 _HEURISTIC_TYPE_KEYWORDS = {
@@ -75,6 +78,12 @@ VALID_TYPES = {"factual", "preference", "procedural_anchor"}
 class DecomposedMemory:
     mem_type: str
     content: str
+    supporting_turns: Tuple[int, ...] = ()
+
+    @property
+    def temporal_position(self) -> Optional[int]:
+        """Last supporting source position, never a validity timestamp."""
+        return self.supporting_turns[-1] if self.supporting_turns else None
 
 
 @dataclass(frozen=True)
@@ -111,6 +120,7 @@ def decompose_episode_result(
     episode: Episode, llm_fn: Optional[LlmFn]
 ) -> DecompositionResult:
     """Return candidates and their actual extraction mode without persisting them."""
+    episode.__post_init__()
     assisted = _decompose_via_llm(episode, llm_fn)
     if assisted.memories is not None:
         return DecompositionResult(memories=assisted.memories, mode="assisted")
@@ -125,7 +135,7 @@ def decompose_episode(
     episode: Episode, llm_fn: Optional[LlmFn]
 ) -> List[DecomposedMemory]:
     """
-    Extracts zero or more atomic (type, content) memories from a raw
+    Extracts zero or more atomic type/content/support candidates from a raw
     episode. Pure function — does not write anything to disk. Pair with
     `TesseraEngine.write_fact/write_preference/write_insight` (or use
     `decompose_and_write()` below to do both steps in one call).
@@ -181,23 +191,35 @@ def decompose_and_write_result(
     extracted = decomposition.memories
     tags = tags or []
 
-    write_fn_by_type = {
-        "factual": engine.write_fact,
-        "preference": engine.write_preference,
-        "procedural_anchor": engine.write_insight,
-    }
+    # Preflight every candidate/path before retaining a source or any memory.
+    # The canonical writer still repeats its admission check at persistence.
+    from .models import WriteGatingViolationError
+    from .security import WriteAdmission, WriteResult, validate_memory_path
 
-    filepaths: List[str] = []
+    proposed = []
     counters = {t: 0 for t in VALID_TYPES}
     for mem in extracted:
-        if mem.mem_type not in VALID_TYPES:
-            continue
+        validate_support(episode, mem.supporting_turns)
         counters[mem.mem_type] += 1
         mem_id = f"{mem_id_prefix}/{mem.mem_type}-{counters[mem.mem_type]}"
-        write_fn = write_fn_by_type[mem.mem_type]
-        filepaths.append(
-            write_fn(mem_id=mem_id, episode_id=episode_id, content=mem.content, tags=tags)
-        )
+        path = validate_memory_path(engine.storage_dir, mem_id)
+        if not path.valid or mem_id.split("/")[0].casefold() == "_episodes":
+            decision = engine.gating_engine.reject_invalid_memory_id(mem.content)
+            raise WriteGatingViolationError(WriteResult(mem_id, None, False, decision))
+        decision = engine.gating_engine.evaluate(mem.content, tags)
+        if decision.admission in {WriteAdmission.REJECT, WriteAdmission.REVIEW}:
+            raise WriteGatingViolationError(WriteResult(mem_id, None, False, decision))
+        proposed.append((mem_id, mem))
+
+    filepaths: List[str] = []
+    if proposed:
+        source = engine.persist_source_episode(episode_id, episode)
+        for mem_id, mem in proposed:
+            filepaths.append(engine.write_memory_note(
+                mem_id=mem_id, mem_type=mem.mem_type, episode_id=episode_id,
+                content=mem.content, tags=tags, entities=[],
+                lineage=bind_lineage(source, mem_id, mem.supporting_turns),
+            ))
     return DecompositionWriteResult(tuple(filepaths), decomposition)
 
 
@@ -214,6 +236,19 @@ def _decompose_via_llm(
         f"## Fim (resultado/aprendizado)\n{episode.end.strip()}\n\n"
         "Return only the JSON array of atomic memories."
     )
+    if episode.turns:
+        user_prompt += "\nOrdered source turns (positions are source IDs, not array indexes):\n" + json.dumps([
+            {"position": turn.position, "role": turn.role, "timestamp": turn.timestamp, "content": turn.content}
+            for turn in episode.turns
+        ], ensure_ascii=False)
+        user_prompt += (
+            "\nEach candidate MUST include supporting_turns: a nonempty sorted, unique list "
+            "of actual source positions. Cite only turns that support the claim. Omit unsupported "
+            "inferences. Temporal position is computed from the final supporting position; "
+            "it is not validity time."
+        )
+    else:
+        user_prompt += "\nNo interaction turns were supplied. Do not invent supporting_turns."
     if llm_fn is None:
         return _AssistedOutcome(None, "provider_unavailable")
 
@@ -238,7 +273,14 @@ def _decompose_via_llm(
         content = raw_content.strip()
         if mem_type not in VALID_TYPES or not content:
             return _AssistedOutcome(None, "invalid_schema")
-        results.append(DecomposedMemory(mem_type=mem_type, content=content))
+        positions = validate_support(episode, item.get("supporting_turns", []))
+        if "temporal_position" in item and (
+            item["temporal_position"] != (positions[-1] if positions else None)
+            or (item["temporal_position"] is not None and type(item["temporal_position"]) is not int)
+        ):
+            raise LineageValidationError("temporal_position must equal the last supporting source position")
+        # Provider-supplied paths, evidence IDs or hashes are never trusted.
+        results.append(DecomposedMemory(mem_type, content, tuple(positions)))
     return _AssistedOutcome(tuple(results), None)
 
 
@@ -300,6 +342,15 @@ def _decompose_via_heuristic(episode: Episode) -> List[DecomposedMemory]:
             if any(kw in lowered for kw in keywords):
                 return mem_type
         return default_type
+
+    if episode.turns:
+        for turn in episode.turns:
+            default_type = "procedural_anchor" if turn is episode.turns[-1] else "factual"
+            for raw_line in turn.content.splitlines():
+                line = raw_line.strip("-* \t")
+                if line:
+                    results.append(DecomposedMemory(classify(line, default_type), line, (turn.position,)))
+        return results
 
     for section_text, default_type in (
         (episode.beginning, "factual"),

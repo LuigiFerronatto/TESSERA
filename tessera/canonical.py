@@ -87,6 +87,25 @@ class RelationMetadata:
 
 
 @dataclass
+class LineageMetadata:
+    """Source references for derived memories; never validity or truth claims.
+
+    Native fields remain episode_id/provenance_turns. This is their canonical
+    projection, not a second writable metadata schema. Evidence uses the same
+    version-aware records as the Evidence Ledger.
+    """
+
+    source_episode_id: str
+    supporting_turns: List[int] = field(default_factory=list)
+    temporal_position: Optional[int] = None
+    episode_source: Optional[Dict[str, Any]] = None
+    source_evidence: List[Dict[str, Any]] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class CanonicalMetadata:
     schema_version: int = 1
     identity: IdentityMetadata = field(default_factory=lambda: IdentityMetadata("", ""))
@@ -103,6 +122,7 @@ class CanonicalMetadata:
     superseded_at: Optional[str] = None
     utility: Optional[float] = None
     raw_frontmatter: Dict[str, Any] = field(default_factory=dict)
+    lineage: Optional[LineageMetadata] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -128,6 +148,8 @@ class CanonicalMetadata:
             other.temporal.valid_until,
             other.temporal.recorded_at,
         ):
+            return False
+        if self.lineage != other.lineage:
             return False
         if self.quality != other.quality:
             return False
@@ -495,6 +517,19 @@ def parse_and_normalize(
         except (TypeError, ValueError):
             utility = None
 
+    lineage = None
+    if frontmatter.get("episode_source") is not None:
+        # Structural normalization only. Runtime validation resolves the pinned
+        # source file/version; author-supplied metadata is never self-verifying.
+        lineage = LineageMetadata(
+            source_episode_id=frontmatter.get("episode_id"),
+            supporting_turns=frontmatter.get("provenance_turns", []),
+            temporal_position=frontmatter.get("temporal_position"),
+            episode_source=frontmatter["episode_source"],
+            source_evidence=frontmatter.get("source_evidence", []),
+        )
+        origin["lineage"] = "explicit"
+
     # Preserve exactly what the author supplied. Effective compatibility tags
     # are materialized below by the engine adapter, not written back here.
     canonical = CanonicalMetadata(
@@ -511,6 +546,7 @@ def parse_and_normalize(
         superseded_at=_first(frontmatter, "superseded_at"),
         utility=utility,
         raw_frontmatter=frontmatter,
+        lineage=lineage,
     )
     return canonical
 
