@@ -11,11 +11,13 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ### Experimental
 
 - Added opt-in, model-independent vector backend contracts, an exact-flat
-  correctness oracle and a dependency-free SQLite persistent candidate.
+  correctness oracle, a dependency-free SQLite persistent candidate and an
+  explicitly imported SciPy cKDTree exact/approximate candidate. A preregistered
+  synthetic size sweep records native RSS, cold/warm timings and ANN misses.
   Atomic/source/segment lanes retain canonical identity; typed filters,
   compatibility manifests, atomic source replacement and crash recovery are
   covered by frozen-vector mechanics tests. No semantic Engine default or
-  embedding provider is enabled; real-corpus/ANN selection remains an open
+  embedding provider is enabled; real-corpus/default selection remains an open
   experiment. ([#265](https://github.com/LuigiFerronatto/TESSERA/issues/265))
 
 ### Changed

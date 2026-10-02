@@ -20,3 +20,20 @@ Measured synthetic parity does not establish a preferred semantic encoder,
 ANN backend or real-corpus quality outcome. No claim closes #265 or unlocks
 unmerged downstream work. Human review and canonical post-merge reconciliation
 remain required.
+
+### Continued mechanics validation
+
+The same draft was extended with a preregistered synthetic size/dimension sweep,
+per-process native high-water/current RSS, and independently selected SciPy
+cKDTree exact and approximate candidates. The plan was fixed before the
+first measured run; its full SHA-256 is preserved in the report. Epsilon, frozen inputs, filters and budgets were
+not tuned after observing misses. Native memory includes the runtime, inputs,
+compiled libraries and backend; cold tree builds remain visible. The empirical
+scope remains synthetic and bounded. Real model/corpus semantics still require
+#158; no public default or canonical merge is inferred.
+
+An initial instrumentation pass was retained locally, then repeated with a
+fresh instance/derived namespace for the clean-rebuild check and explicit
+single-thread child-library environment limits. Frozen inputs, epsilon, query
+sets, dimensions, sizes and acceptance thresholds were unchanged. Reported
+results are from the corrected complete pass, including approximation misses.

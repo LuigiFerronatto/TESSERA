@@ -5,14 +5,14 @@
   "candidate_state": "unmerged draft; ITERATE",
   "python": "3.12.14",
   "focused_tests": {
-    "passed": 96,
-    "command": "python -m pytest tests/test_issue_265_vector_backends.py -q"
+    "passed": 112,
+    "command": "python -m pytest tests/test_issue_265_vector_backends.py tests/test_issue_265_ckdtree.py tests/test_issue_265_vector_sweep.py -q"
   },
   "full_tests": {
-    "passed": 658,
+    "passed": 674,
     "skipped": 8,
     "warnings": 14,
-    "seconds": 124.3,
+    "seconds": 121.37,
     "command": "python -m pytest -ra",
     "skip_reasons": [
       "5 gh-aw CLI extension unavailable",
@@ -20,22 +20,27 @@
     ]
   },
   "installed_wheel_focused_tests": {
-    "passed": 96,
+    "passed": 111,
     "outside_checkout": true,
-    "site_packages_import_verified": true
+    "site_packages_import_verified": true,
+    "scope": "both backend contract files; repository-only sweep generator test is excluded because benchmarks are not packaged"
   },
   "build": {
     "command": "python -m build --no-isolation",
     "wheel_and_sdist": true,
     "repository_only_files_excluded": true,
     "wheel_runtime_bytes_match_candidate": true,
-    "wheel_bytes": 153266,
-    "sdist_bytes": 146445,
+    "wheel_bytes": 155191,
+    "sdist_bytes": 147634,
     "new_dependencies": [],
     "vector_module_footprint": {
       "tessera/vector_backend.py": {
         "bytes": 15100,
         "compressed_bytes": 3996
+      },
+      "tessera/vector_ckdtree.py": {
+        "bytes": 4854,
+        "compressed_bytes": 1752
       },
       "tessera/vector_sqlite.py": {
         "bytes": 10458,
@@ -60,15 +65,26 @@
   "candidate_source_sha256": {
     "tessera/vector_backend.py": "edabed351bede6a237bd34f3bba9b81181b340c5fcf712b9140e8e1c0c9ae4a6",
     "tessera/vector_sqlite.py": "7068996ce37c8e248b6a1cf0cd6471d0ce76c80e2435fe6ca06e205680f046e6",
-    "benchmarks/vector_backends/evaluate.py": "bdea4aa0ab40beb033b785b3e2aaa61a7f4a6e1bfe40a81723326d26dfc012f3",
-    "benchmarks/vector_backends/frozen.json": "239122a76c2f66bc1b1eba6fb16a45beefb53f236940b4edc87321786a499b9f"
+    "tessera/vector_ckdtree.py": "932d3f5c00e45729721ddef1dc53ab4106dbb1bcf007108f397ada903c35b53b",
+    "benchmarks/vector_backends/scale_sweep.py": "26ecf794b5a6f141e396722cc02f883b154e62299ba8130a62d5bfec476b9b05"
   },
   "benchmark": "synthetic-mechanics.json",
-  "remote_ci": "Pending publication; exact-head runs tracked on the pull request",
+  "remote_ci": "Pending continued candidate publication; prior head b5c9229 engineering gates passed, with draft governance BLOCK",
   "limits": [
-    "No real semantic corpora or model quality claim",
-    "No ANN backend or default winner selected",
-    "No native peak RSS or production-scale claim",
+    "No real semantic corpora or model quality claim; #158 model route remains required",
+    "Bounded 256/2048/8192-record and 16/64-dimensional synthetic evidence; no production-default winner",
+    "Native RSS includes scientific runtime and input records; latency includes each adapter verification/cache policy",
     "Local optional MCP and gh-aw tests skipped as recorded; no local complete optional-integration pass claimed"
-  ]
+  ],
+  "scale_sweep": {
+    "file": "synthetic-scale-rss.json",
+    "cells": 24,
+    "all_mechanics_gates_passed": true,
+    "plan_sha256": "78a5cfe46beb33dcc11bb69beff8ba20fed6988ed9d959b27777719507584dc4",
+    "native_memory_method": "isolated subprocess ru_maxrss and Linux current RSS",
+    "independent_ann": "SciPy cKDTree epsilon 0.5; exact tree control epsilon 0",
+    "ann_queries_below_095_recall": 3,
+    "minimum_ann_query_recall": 0.9,
+    "max_ranked_unit_l2_distance_ratio": 1.0599160079358259
+  }
 }

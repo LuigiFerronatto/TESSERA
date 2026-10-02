@@ -13,8 +13,10 @@ owns embedding generation, compatibility fingerprints and candidate fusion.
 - `ExactFlatBackend`: non-persistent correctness reference with exact search
 - `tessera.vector_sqlite.SQLiteVectorBackend`: explicitly imported stdlib
   SQLite persistence with exact scanning, atomic transactions and recovery
+- `tessera.vector_ckdtree.CKDTreeVectorBackend`: explicitly imported in-memory
+  exact/approximate SciPy tree candidate with lazily constructed filtered trees
 
-Both candidates use the same exact scoring kernel. Analytic tests independently
+The flat/SQLite candidates use the same exact scoring kernel. Analytic tests independently
 check cosine, dot product and squared L2. Backend comparison measures storage,
 filtering and lifecycle parity, not independent ANN algorithms. SQLite is a
 practical dependency-free **small local candidate**, not a claim that exact
@@ -140,8 +142,69 @@ traced memory excludes native SQLite allocation and is not process peak RSS.
 Decision: **ITERATE**. Keep this slice as an opt-in correctness/lifecycle
 boundary; do not select a public default. Still required before closing the
 full #265 experiment: real English, Portuguese and mixed-corpus frozen vectors
-from #158, model/profile integration, a materially different ANN candidate,
-scale/peak-RSS measurements and quality/latency/footprint tradeoff evidence.
+from #158, model/profile integration and production-workload tradeoff evidence.
+The separate preregistered sweep below adds independent cKDTree ANN selection
+and bounded scale/native-RSS measurements.
 Candidate fusion, semantic Engine activation, downloads and hosted databases
 are not delivered here. Lexical retrieval continues unchanged even if this
 entire semantic directory is absent, corrupt or unused.
+
+## Independent cKDTree and native-memory experiment
+
+`CKDTreeVectorBackend` is a separate explicit-import, in-memory adapter using
+SciPy's compiled cKDTree neighbor selection. SciPy is already available through
+TESSERA's existing scientific dependency chain; this candidate adds no package
+requirement or model asset. Missing `scipy.spatial` produces an actionable error.
+`epsilon=0` uses exact tree traversal; fixed `epsilon=0.5` enables approximate
+nearest neighbors. Only cosine and L2 are supported. For cosine, vectors are
+normalized for Euclidean tree lookup and original cosine scores are recomputed
+for the returned candidates. The neighbor selector is independent of flat
+scanning, although returned-score arithmetic is intentionally shared.
+
+SciPy documents a `(1 + epsilon)` distance guarantee, not a recall guarantee;
+its docs also warn that KD trees may offer little advantage in higher
+dimensions (around 20 and above). These are reasons to measure, not to select a
+default. See the official [query contract](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.cKDTree.query.html)
+and [dimensionality caveat](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.cKDTree.html).
+
+Typed filters are applied before tree construction. Up to four filtered trees
+are cached; source mutations invalidate the cache. Initial and post-update
+queries therefore pay the full filtered-tree construction cost. Selected
+candidates are sorted by score and record ID, but a boundary tie can select a
+different equally distant subset from flat search. Exact equality under ties
+is not promised. Fixed-input repeated runs and explicit tie fixtures test
+repeatability. There is no persistence or background rebuild thread.
+
+The [preregistered sweep plan](../benchmarks/vector_backends/sweep-plan.json)
+fixes all sizes, dimensions, seed, query/filter sets, Top-10 budget, epsilon,
+repetitions and gates before measurement. Its [complete report](evidence/265-vectors/synthetic-scale-rss.json)
+covers 256, 2,048 and 8,192 records at 16 and 64 dimensions, for flat, SQLite,
+cKDTree exact and cKDTree approximate search. The swept metric is cosine;
+the reported approximation bound is Euclidean distance on unit-normalized
+coordinates. Deterministic synthetic inputs
+are generated once per size/dimension and the same frozen bytes/checksum are
+supplied to every adapter. Clustered and uniform vectors are mixed; no model
+or semantic corpus is involved.
+
+Each adapter/size/dimension cell runs in a fresh subprocess. Native high-water
+RSS uses `resource.getrusage(RUSAGE_SELF).ru_maxrss`, converted to bytes for the
+reported OS. Linux current RSS is sampled at baseline, materialization,
+ingestion, cold queries and warm queries. This includes compiled/native
+allocations, input records and the Python/scientific runtime. Absolute peak
+and peak above baseline are both shown; subtracting baselines is not precise
+allocation attribution. No Python-only `tracemalloc` is used in this sweep.
+
+Measurements separate import/open, record ingestion, cold filtered queries,
+warmed-query p50/p95, updates, post-update cold queries, clean rebuild and disk
+footprint. Full API latency includes checksum/verification/caching policy, so
+speed ratios cannot be attributed solely to the nearest-neighbor kernel.
+SQLite verifies/scans full snapshots; tree warm queries reuse the unchanged
+snapshot hash and filtered trees. Clean rebuild uses a fresh backend instance
+and derived namespace. All cells, approximation misses and gate failures are
+reported. Timing/RSS values are environment observations, not portability or
+production-service guarantees.
+
+This completes a bounded synthetic scale/native-memory and independent ANN
+mechanics experiment. Real English/Portuguese/mixed frozen model-vector parity
+and model/profile integration remain gated by #158. Larger/high-dimensional
+production workloads require separate evidence; no default is selected.

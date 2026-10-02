@@ -101,7 +101,7 @@ def evaluate():
              "benchmarks/vector_backends/evaluate.py", "benchmarks/vector_backends/frozen.json")
     return {"schema_version": 1, "issue": 265, "decision": "ITERATE",
             "scope": "frozen synthetic backend mechanics; no model or semantic-quality claim",
-            "base_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
+            "checkout_head_at_measurement": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
             "candidate_files_sha256": {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in files},
             "fixture_sha256": hashlib.sha256(fixture.read_bytes()).hexdigest(),
             "python": platform.python_version(), "platform": platform.platform(),
@@ -110,7 +110,7 @@ def evaluate():
             "limitations": ["SQLite and flat share an exact scoring kernel; analytic metric tests are the independent scoring oracle",
                             "tracemalloc excludes native SQLite allocations and is not process peak RSS",
                             "small fixture, serialized writes, O(ND) search, no ANN-scale claim",
-                            "real English/Portuguese/mixed corpora, model quality, ANN comparison and scale gates remain open"]}
+                            "real English/Portuguese/mixed corpora and model quality remain open; independent ANN and bounded native-RSS/scale observations are in the separate preregistered sweep"]}
 
 
 def main():

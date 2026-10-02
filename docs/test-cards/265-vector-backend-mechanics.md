@@ -5,7 +5,7 @@
 | Issue | [#265](https://github.com/LuigiFerronatto/TESSERA/issues/265) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` and `benchmark` |
-| Pull request | Draft candidate on `codex/issue-265-vector-backends`; see issue-linked PR |
+| Pull request | [Draft #293](https://github.com/LuigiFerronatto/TESSERA/pull/293) |
 | Head commit | Exact candidate and CI are recorded on the draft PR |
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
@@ -33,7 +33,8 @@ persistent semantic records or same-frozen-vector backend-mechanics evaluator.
 ## What changed or is being tested?
 
 The candidate adds immutable typed contracts, an exact-flat oracle, a stdlib
-SQLite persistent exact-search candidate, authoritative per-source replacement,
+SQLite persistent exact-search candidate, a separate SciPy cKDTree exact/ANN
+adapter, authoritative per-source replacement,
 atomic/source/segment identities, filtered Top-K, compatibility manifests and
 an offline frozen synthetic comparison. No embedding model, provider, Engine
 semantic activation or default backend choice is introduced.
@@ -72,24 +73,37 @@ source document A has atomic + source + segment vectors
   full-suite, package and sanity evidence, including skips and local limits
 - `.github/workflows/vector-backends.yml` reruns and uploads the same-vector
   comparison on the exact candidate; standard TESSERA CI runs aggregate and
-  artifact gates. CI status belongs to the exact head linked in the PR, not to
+  artifact gates. A preregistered 24-cell 256–8,192 record / 16–64 dimension
+  sweep additionally measures independent cKDTree selection and native RSS
+  in fresh processes; see the [complete report](../evidence/265-vectors/synthetic-scale-rss.json).
+  CI status belongs to the exact head linked in the PR, not to
   this pre-merge record
 
 ## What improved?
 
-Both candidates achieved 1.0 Recall@10 and exact score/order agreement, 1.0
-repeatability and filter correctness, zero deleted-source ghosts and identical
+The initial flat/SQLite fixture achieved 1.0 Recall@10 and exact score/order
+agreement, 1.0 repeatability and filter correctness, zero deleted-source ghosts and identical
 clean/incremental corpus hashes on the frozen synthetic fixture. This supports
 storage/lifecycle parity. SQLite persistence and rollback survive reopening
 and a terminated uncommitted write. Timing/memory observations in the report
 are environment-specific and are not evidence of semantic-quality improvement.
 
+The continued 24-cell size/dimension sweep found three approximate queries
+below the fixed 0.95 recall review threshold (minimum query Recall@10 0.9),
+while all ranked distance ratios stayed within the fixed 1.5 bound. Exact
+variants matched the oracle throughout. Native process peak RSS, cold-build
+and warm-query measurements are preserved in the
+[complete results summary](../evidence/265-vectors/synthetic-scale-summary.md).
+
 ## What remains unimplemented?
 
 Real English/Portuguese/mixed-corpus parity, embedding generation/profile
-resolution integration, ANN comparisons and production scale/peak-RSS tests
-remain open. Both implementations share the exact scorer, and SQLite scans
-and verifies the complete snapshot; it is not an ANN competitor. Sources must
+resolution integration and production-workload validation remain open. The
+preregistered synthetic sweep supplies independent cKDTree ANN selection and
+native RSS observations at bounded sizes; it does not establish semantic
+quality or a production winner. Returned-score arithmetic is shared, while
+cKDTree candidate selection is independent. SQLite scans and verifies the
+complete snapshot; it is not an ANN competitor. Sources must
 be supplied by the caller, with ordering serialized upstream for same-source
 writes. There is no automatic semantic Engine/CLI activation or candidate
 fusion. The full #265 card remains open with decision `ITERATE`.
@@ -106,7 +120,7 @@ silently incorporated. #153/#12 are already satisfied by canonical main.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#265](https://github.com/LuigiFerronatto/TESSERA/issues/265) |
-| Pull request | `codex/issue-265-vector-backends` draft |
+| Pull request | [Draft #293](https://github.com/LuigiFerronatto/TESSERA/pull/293) |
 | Merge commit | None |
 | Evidence/Learnings/Decision | [Contract](../VECTOR_BACKENDS.md), `ITERATE` |
 | Benchmark record | [Synthetic mechanics](../evidence/265-vectors/synthetic-mechanics.json) |
@@ -118,5 +132,5 @@ silently incorporated. #153/#12 are already satisfied by canonical main.
 canonical #153 derived ownership + #12 source lifecycle
 → this draft: replaceable vector contract and measured local mechanics
 → pending review/merge, full issue stays open
-→ real frozen-vector/ANN evaluation coordinated with #158
+→ real frozen-model-vector evaluation coordinated with #158
 ```

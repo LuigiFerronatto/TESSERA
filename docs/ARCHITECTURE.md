@@ -451,7 +451,8 @@ schema version forces older caches to rebuild.
 The optional [vector backend contract](VECTOR_BACKENDS.md) separates canonical
 identity, supplied embedding vectors and derived backend storage. Atomic,
 source and segment representations have distinct deterministic identities.
-An exact-flat reference and stdlib SQLite candidate expose typed filters,
+An exact-flat reference, stdlib SQLite candidate and explicit-import SciPy
+cKDTree exact/approximate candidate expose typed filters,
 profile/dimension compatibility, atomic source replacement and recovery.
 Neither is imported or activated by the deterministic retrieval pipeline.
 This pre-merge candidate does not select an encoder or public default backend;
