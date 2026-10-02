@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added opt-in query-aware one-hop graph expansion with node, edge-slot and
+  added-context budgets plus caller-owned decision traces. A frozen A0/A1/A2
+  ablation records quality and costs; current default expansion remains
+  unchanged because the candidate does not beat no expansion on quality.
+  ([#25](https://github.com/LuigiFerronatto/TESSERA/issues/25))
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

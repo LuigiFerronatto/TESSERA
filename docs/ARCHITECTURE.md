@@ -597,3 +597,19 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Experimental budgeted one-hop selection (#25)
+
+An opt-in Python `GraphExpansionPolicy` isolates expansion from the unchanged
+TF-IDF candidate generator and DWPR/multi-signal ranker. A0 uses only seeds;
+A1 preserves the current default; A2 selects query-relevant seed-incident edges
+under explicit node, edge-slot and added-context limits. Ordered adjacency is
+derived at index build/load and never becomes a source of truth. A2 retains
+seed-induced edges and only selected expansion edges; no selected neighbor is
+traversed recursively. Trace output is caller-owned, separate from evidence
+and does not imply relation confidence, authority or temporal truth.
+
+The [frozen experiment](../benchmarks/graph_expansion/README.md) currently
+supports **ITERATE**, not default promotion. Its quality matches no expansion,
+so bounded graph selection alone has not established the intended gain. A3
+remains conditional on #26; no schema-confidence field is invented here.

@@ -36,6 +36,9 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 ## Current records
 
+[#25: Budgeted graph expansion](25-budgeted-graph-expansion.md) is an open
+experiment with proposed `ITERATE`; it does not change the current default.
+
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
 | #87 License and contribution entrypoints | `IN_PROGRESS` | [87-license-contribution.md](87-license-contribution.md) | [Issue #87](https://github.com/LuigiFerronatto/TESSERA/issues/87), [PR Evolution Audit](../PR_EVOLUTION_87.md), Queue 6; owner confirmation and merge pending |

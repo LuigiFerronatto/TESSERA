@@ -21,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .conflict import ConflictResolver
+from .graph_expansion import ExpansionIndex, GraphExpansionPolicy, select_expansion
 from .models import (
     NODE_TYPE_TO_STORE,
     STORE_FACTS,
@@ -114,6 +115,7 @@ class TesseraEngine:
             Path(identity_root or self.storage_dir).expanduser().resolve(strict=False)
         )
         self.graph = nx.DiGraph()
+        self._expansion_index = ExpansionIndex(self.graph)
         self.file_registry: Dict[str, str] = {}
         self.processing_warnings: List[str] = []
         self.node_corpus: Dict[str, str] = {}
@@ -948,6 +950,7 @@ class TesseraEngine:
             corpus_texts = [self.node_corpus[nid] for nid in self.node_ids]
             self.tfidf_matrix = self.vectorizer.fit_transform(corpus_texts)
 
+        self._expansion_index = ExpansionIndex(self.graph)
         if persist:
             self.save_index()
 
@@ -1066,6 +1069,7 @@ class TesseraEngine:
         self.node_ids = snapshot["node_ids"]
         self.tfidf_matrix = snapshot["tfidf_matrix"]
         self.vectorizer = snapshot["vectorizer"]
+        self._expansion_index = ExpansionIndex(self.graph)
         return True
 
     def _segment_count(self) -> int:
@@ -1262,7 +1266,9 @@ class TesseraEngine:
     # Retrieval
     # ------------------------------------------------------------------
     def retrieve_context(
-        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None
+        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None,
+        *, graph_expansion: Optional[GraphExpansionPolicy] = None,
+        expansion_debug: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         End-to-end adaptive retrieval (QUMem & MemORAI style):
@@ -1273,6 +1279,12 @@ class TesseraEngine:
         5. Filters down to actual memory-note candidates using explainable multi-signal ranking.
         6. Applies non-destructive possible-conflict containment.
         """
+        policy = graph_expansion if graph_expansion is not None else GraphExpansionPolicy(mode="one_hop")
+        if not isinstance(policy, GraphExpansionPolicy):
+            raise TypeError("graph_expansion must be a GraphExpansionPolicy")
+        if expansion_debug is not None:
+            select_expansion(self.graph, self._expansion_index, query_text, [], {}, policy, expansion_debug)
+            expansion_debug.update({"subgraph_nodes": 0, "subgraph_edges": 0})
         if not self.graph or not self.node_corpus or self.tfidf_matrix is None:
             return []
 
@@ -1292,16 +1304,25 @@ class TesseraEngine:
         if not seed_nodes:
             return []
 
-        # 2. 1-hop subgraph expansion (MemORAI).
-        subgraph_nodes = set(seed_nodes)
-        for seed in seed_nodes:
-            subgraph_nodes.update(
-                node_id for node_id in self.graph.successors(seed)
-                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
-            )
-            subgraph_nodes.update(
-                node_id for node_id in self.graph.predecessors(seed)
-                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+        # Preserve the default A1 route exactly. Experimental policies change
+        # only expansion, using the same seeds, ranking and conflict handling.
+        allowed_expansion_edges = None
+        if policy.mode == "one_hop" and expansion_debug is None:
+            subgraph_nodes = set(seed_nodes)
+            for seed in seed_nodes:
+                subgraph_nodes.update(
+                    node_id for node_id in self.graph.successors(seed)
+                    if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+                )
+                subgraph_nodes.update(
+                    node_id for node_id in self.graph.predecessors(seed)
+                    if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+                )
+        else:
+            similarity_map = dict(zip(self.node_ids, similarities))
+            subgraph_nodes, allowed_expansion_edges = select_expansion(
+                self.graph, self._expansion_index, query_text, seed_nodes,
+                similarity_map, policy, expansion_debug,
             )
 
         # Rebuild the query subgraph in a stable order. NetworkX algorithms
@@ -1312,11 +1333,22 @@ class TesseraEngine:
         subgraph = nx.DiGraph()
         for node_id in sorted(subgraph_nodes):
             subgraph.add_node(node_id, **self.graph.nodes[node_id])
-        expanded = self.graph.subgraph(subgraph_nodes)
+        if allowed_expansion_edges is None:
+            expanded = self.graph.subgraph(subgraph_nodes)
+            edge_rows = expanded.edges(data=True)
+        else:
+            # Pair membership avoids enumerating an expanded high-degree node.
+            seed_edges = {(source, target) for source in seed_nodes for target in seed_nodes
+                          if self.graph.has_edge(source, target)}
+            edge_rows = [(source, target, self.graph[source][target])
+                         for source, target in seed_edges | allowed_expansion_edges]
         for source_id, target_id, edge_data in sorted(
-            expanded.edges(data=True), key=lambda item: (item[0], item[1])
+            edge_rows, key=lambda item: (item[0], item[1])
         ):
             subgraph.add_edge(source_id, target_id, **edge_data)
+        if expansion_debug is not None:
+            expansion_debug.update({"subgraph_nodes": subgraph.number_of_nodes(),
+                                    "subgraph_edges": subgraph.number_of_edges()})
 
         # 3. Dynamic edge weighting (DW-PR).
         all_sub_nodes = list(subgraph.nodes())
