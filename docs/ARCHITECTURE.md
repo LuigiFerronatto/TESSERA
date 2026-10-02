@@ -597,3 +597,10 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Instruction format adapters
+
+[Harness adapters](HARNESS_ADAPTERS.md) isolate filename-derived instruction
+classification and harness defaults behind an immutable registry. Explicit
+canonical metadata and source provenance remain authoritative. The registry
+does not change retrieval, discover more sources or decide instruction precedence.
