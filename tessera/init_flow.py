@@ -381,6 +381,10 @@ def build_initialization_plan(request: InitRequest) -> InitializationPlan:
         current_record = (
             {"id": existing.id, "path": existing.path} if existing else None
         )
+        if base.models.to_mapping():
+            proposed_record["models"] = base.models.to_mapping()
+            if current_record is not None:
+                current_record["models"] = base.models.to_mapping()
         config_changes = ()
         if existing is None:
             config_changes = ("create named global store",)
@@ -457,6 +461,7 @@ def build_initialization_plan(request: InitRequest) -> InitializationPlan:
             source_roots=current.resolved_sources(), index_dir=current.resolved_index().path,
             identity_root=str(root) if current.loaded_schema_version == PROJECT_SCHEMA_VERSION else current.store.path,
             config_schema_version=current.loaded_schema_version,
+            models=current.models,
         )
     discovery = discover_sources(root, configured)
     blocking = [warning for warning in discovery.warnings if warning.code in _BLOCKING_DISCOVERY_WARNINGS]
@@ -500,6 +505,7 @@ def build_initialization_plan(request: InitRequest) -> InitializationPlan:
     proposed = ProjectConfig(
         root, config_path, StoreRecord(provisional.store_id, str(store)), roots,
         IndexRecord(str(index_path)), PROJECT_SCHEMA_VERSION,
+        models=current.models if current else provisional.models,
     )
     proposed_mapping = proposed.to_mapping()
     current_mapping = current.to_mapping() if current else None
@@ -576,6 +582,7 @@ def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> Init
             registry_name=None, creates=base.creates, updates=base.updates,
             source_roots=plan.source_roots, index_dir=plan.index_path,
             identity_root=plan.project_root, deletes=(),
+            models=base.models,
         )
     config_applied = False
     ignore_applied = False
@@ -595,6 +602,7 @@ def apply_initialization_plan(plan: InitializationPlan, *, console=None) -> Init
                 source_roots=plan.source_roots, index_dir=plan.index_path,
                 identity_root=plan.generated_memory_store,
                 config_schema_version=1,
+                models=base.models,
             )
             Path(selection.storage_dir).mkdir(parents=True, exist_ok=True)
         else:
