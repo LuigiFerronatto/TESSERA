@@ -1044,7 +1044,7 @@ This map is routing, not permission to bypass each Issue/Test Card's Definition 
 ### #139 unmerged experimental candidate (2026-10-02)
 
 An opt-in N1/N2 information-needs contract and frozen controlled experiment are
-under review; see [the stage record](test-cards/139-bounded-information-needs.md).
+under review in [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); see [the stage record](test-cards/139-bounded-information-needs.md).
 This is candidate evidence, separate from the frozen canonical portfolio table
 above. N0 remains the default, full provider-backed semantic/quality evaluation
 is pending, and #140/#141 dependency completion is not claimed. The canonical

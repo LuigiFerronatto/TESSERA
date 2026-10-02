@@ -5,8 +5,8 @@
 | Issue | [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) |
 | Record status | `IN_PROGRESS` |
 | Capability type | Experimental assisted runtime and evaluation |
-| Pull request | Draft candidate on `codex/issue-139-bounded-information-needs` |
-| Head commit | Exact candidate recorded in the pull request and CI |
+| Pull request | [Draft #301](https://github.com/LuigiFerronatto/TESSERA/pull/301) |
+| Head commit | Runtime `c01016abf6afb93d3d2d146c608ee176f8797690`; final documentation head recorded by PR #301 and CI |
 | Merge commit | Not merged |
 | Decision | `ITERATE`; keep N0 default; full N2 quality decision blocked |
 | Benchmark applicability | `REQUIRED` |
@@ -51,6 +51,13 @@ it can return `no_memory_needed` and `needs: []`, without opening memory stores.
 These examples illustrate the contract, not an observed model-quality result.
 
 ## How was it validated?
+
+Local Python 3.12.14 suite: **622 passed, 8 skipped** (five gh-aw CLI, three
+optional MCP transport tests). Built wheel outside checkout: **53 passed** for
+needs/orchestrator tests. Wheel/sdist build passed. Deterministic sanity: Hit@1
+0.75, Hit@3/5 1.0, MRR 0.875, evidence hit rate 1.0, missing-evidence check passed.
+These results apply to runtime tree `880ae762d5535ee6eae2425b3a6c3c59a624e2ff`;
+subsequent publication documentation does not change runtime behavior.
 
 - `tests/test_information_needs.py`: strict schema, IDs, cardinality, input/output
   limits, lexical duplicate rejection, one-call failures, explicit empty early
