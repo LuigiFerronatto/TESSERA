@@ -16,7 +16,7 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer Audit recorded `KEEP` with no P0/P1 findings and the Merge Governor authorized the candidate. #70 is `VALIDATED / KEEP`; #13 and #71 had their final blocker satisfied and move to `READY`. Queue order selects #13 as the next implementation; #71 remains LATER / Queue 31.
 
-> #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress on `fix/durable-write-receipts`. #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
+> #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
 
 ## Status contract
 

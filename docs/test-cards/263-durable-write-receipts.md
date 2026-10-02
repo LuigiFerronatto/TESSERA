@@ -5,8 +5,8 @@
 | Issue | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | Candidate publication pending; see the linked issue |
-| Head commit | Candidate branch `fix/durable-write-receipts` |
+| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
+| Head commit | Runtime candidate `cc8f106a863c88dc5095a11b1430961f7cfc148f`; subsequent documentation-only head is recorded in PR #290 |
 | Merge commit | Not merged |
 | Decision | `PENDING` human review; proposed `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -53,6 +53,11 @@ the exact canonical bytes and revision fingerprint stay unchanged.
 
 ## How was it validated?
 
+- Runtime candidate `cc8f106a863c88dc5095a11b1430961f7cfc148f`: 599 tests
+  passed and 5 existing gh-aw CLI tests skipped on Python 3.12.14; installed
+  wheel passed all 19 MCP protocol checks outside the checkout. Offline
+  wheel/sdist builds, compileall and whitespace checks passed. Exact-head
+  remote CI remains distinct from this local evidence.
 - `tests/test_write_receipts.py`: pre-source failures, journal/index/ledger
   failures, real process crashes after replacement and after indexing,
   independent-process concurrent retries, corrupt/missing state, exact CRLF
@@ -96,7 +101,7 @@ unmerged incremental-index hardening PR #282.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
-| Pull request | Candidate publication pending |
+| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
 | Canonical base | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Failure-injection tests and smoke above; proposed KEEP, human decision pending |
