@@ -1,10 +1,21 @@
 # #191: Historical conversations become source evidence first
 
-- Status: `IN_PROGRESS` (source-only draft candidate; not merged)
-- Issue: [#191](https://github.com/LuigiFerronatto/TESSERA/issues/191)
-- Baseline: canonical `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
-- Decision proposed: `ITERATE` full #191; retain the bounded C0 slice for review
-- Canonical merge commit: none
+| Field | Value |
+|---|---|
+| Issue | [#191](https://github.com/LuigiFerronatto/TESSERA/issues/191) |
+| Record status | `IN_PROGRESS` source-only draft candidate |
+| Capability type | runtime |
+| Pull request | Draft publication pending |
+| Head commit | Exact published head and tree recorded in the PR |
+| Merge commit | Not merged |
+| Decision | `ITERATE` full scope; bounded C0 candidate for review |
+| Benchmark applicability | `REQUIRED` |
+| Last audited | 2026-10-02 |
+
+## In one sentence
+
+Explicit historical conversations become inspectable source evidence without
+being treated as durable memories.
 
 ## What problem existed?
 
@@ -12,13 +23,13 @@ Historical JSONL conversations could not enter the existing Markdown/plain-text
 source index without manual transformation. Treating every message as a factual
 memory would destroy the distinction between conversation evidence and truth.
 
-## How did it behave before?
+## How did TESSERA behave before?
 
 The source iterator supports text/Markdown and has no conversation-import or
 preview contract. Live lifecycle events, decomposition and memory writes are
 separate paths. No canonical historical session deduplication was provided.
 
-## What is being tested?
+## What changed or is being tested?
 
 An opt-in, exact-path importer prepares one independently inspectable source per
 session, preserving turn roles, order, timestamps, parent/tool references and raw
@@ -26,7 +37,9 @@ source locators. It exposes generic normalized JSONL v1 and a strict linear Clau
 Code subset; unsupported metadata shapes are diagnosed or rejected. The source
 export remains unchanged. Indexing is a separately invoked existing Engine step.
 
-## How does the candidate work?
+## How does it work now?
+
+TARGET — NOT YET ON MAIN.
 
 Preview reports sessions, sizes, turns, duplicates, exclusions and a plan hash.
 Apply revalidates it, uses bounded no-follow reads, applies a declared heuristic
@@ -52,7 +65,7 @@ null drawers, unchanged exports and byte-identical retries. Full regression,
 packaging/installed-wheel checks, sanity and exact-head CI are recorded in the PR;
 only clean, tested published heads are release evidence.
 
-## What improved in the candidate?
+## What improved?
 
 Previously unindexed generic conversation JSONL can become queryable source
 evidence without becoming memory. Preview, bounded scope and visible format
@@ -75,7 +88,7 @@ After shared contracts are merged and reviewed, prove exact live/history
 identity and supporting-turn derivations without collapsing delivery IDs,
 provider session IDs, memory identities or source-version hashes.
 
-## Evidence, rollback and lifecycle
+## Technical provenance
 
 - [Contract and commands](../CONVERSATION_IMPORT.md)
 - [Offline synthetic experiment](../../benchmarks/conversations/README.md)
@@ -87,3 +100,13 @@ source files, and rebuild derived indexes. Existing text ingestion is otherwise
 unchanged. No configuration mutation or migration of original exports occurs.
 Human review and exact-head required gates remain necessary; the issue is not
 closed and no PR is merged by this work.
+
+## Evolution
+
+Canonical `20814a47ec0f72d7bea0639e0b057df1ecf5cded` supports Markdown/plain text,
+including non-memory sources and structural segmentation, but no historical
+conversation importer. This source-only candidate adds explicit safe preparation.
+It depends on no unmerged runtime code. Full #191 remains ITERATE until expanded
+adapters, lineage, live integration and enrichment/admission are independently
+validated. Post-merge reconciliation is reserved for human review and the actual
+canonical merge; no such decision is claimed here.
