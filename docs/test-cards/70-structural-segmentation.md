@@ -1,5 +1,9 @@
 # 70 — Long sources expose precise evidence without becoming pseudo-memories
 
+This record describes the canonical delivery at the audit date below. Its
+downstream routing is historical; use [ROADMAP.md](../ROADMAP.md) for current
+readiness and selected work.
+
 | Field | Value |
 |---|---|
 | Issue | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) |
@@ -108,9 +112,9 @@ Corpus Doctor, as the next implementation. #71 remains later at Queue 31.
 | Issue/Test Card | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) |
 | Pull request | [#270](https://github.com/LuigiFerronatto/TESSERA/pull/270) |
 | Merge commit | [`8ca854f14f8f57443784e6cf3524419a953c2ce6`](https://github.com/LuigiFerronatto/TESSERA/commit/8ca854f14f8f57443784e6cf3524419a953c2ce6) |
-| Evidence/Learnings/Decision | Maintainer Audit `KEEP` on final candidate `e14ef92e`; PR #270 Evaluation Card |
+| Evidence/Learnings/Decision | [Maintainer Audit](https://github.com/LuigiFerronatto/TESSERA/pull/270#issuecomment-5684680369) `KEEP` on final candidate `e14ef92e`; PR #270 Evaluation Card |
 | Benchmark record | `REQUIRED`; LongMemEval V1 dev-50 passed on `e14ef92e` against parent `b4137120` |
-| PR Evolution Audit | Recorded in the [PR #270 body](https://github.com/LuigiFerronatto/TESSERA/pull/270) |
+| PR Evolution Audit | [Canonical delivery audit](../PR_EVOLUTION_70.md); [PR #270 body](https://github.com/LuigiFerronatto/TESSERA/pull/270) |
 
 ## Evolution
 

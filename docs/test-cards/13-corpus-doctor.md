@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
-| Record status | `IN_PROGRESS` |
+| Record status | `VALIDATED` |
 | Capability type | `runtime` |
 | Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
-| Head commit | Current head of PR #277; exact SHA is supplied by GitHub checks |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Head commit | `dbcf5e737c4bd365f38915ae9e70a527713e6aa5` (final candidate head) |
+| Merge commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
+| Decision | `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Benchmark rationale | The change adds a read-only diagnostic path and does not alter indexing, retrieval, ranking, evidence generation, or the frozen corpus. |
 | Last audited | 2026-09-15 |
@@ -47,7 +47,7 @@ bytes before and after the audit.
 
 ## How does it work now?
 
-**CANDIDATE — NOT YET ON `main`.** The default human report summarizes sources,
+**VALIDATED ON `main`.** The default human report summarizes sources,
 metadata, relations, derived state, errors, warnings, and source mutations.
 `--json` returns the same data under schema version 1. Errors return exit code
 1. Warning-only reports remain successful by default; `--strict` returns exit
@@ -82,8 +82,10 @@ machine-readable output, strict warning exit behavior, and symlink escape
 rejection. Related configuration, initialization, ingestion, segmentation, and
 CLI contract tests also run against the candidate.
 
-Exact-head CI, installed-distribution checks, the Benchmark Ledger, Maintainer
-Audit, and Merge Governor remain pending until the pull request is published.
+Exact-head CI and installed-distribution checks passed on Python 3.9 and 3.12.
+Smoke, sanity evaluation, and offline benchmark reporting passed. The
+Maintainer Audit recorded `KEEP` with no supported P0/P1 findings, and the
+Merge Governor authorized the exact candidate head before merge.
 
 ## What improved?
 
@@ -107,9 +109,10 @@ Audit, and Merge Governor remain pending until the pull request is published.
 
 ## What is unlocked next?
 
-A canonical `KEEP` merge would satisfy the Corpus Doctor dependency for #19 and
-provide the diagnostic primitive needed by future corpus-quality CI. No work is
-unlocked while this record remains `IN_PROGRESS`.
+The canonical `KEEP` merge satisfies the Corpus Doctor prerequisite for #19 and
+provides the diagnostic primitive needed by future corpus-quality CI. #19
+remains intentionally `DEFERRED` at Queue 45, and activating corpus-quality CI
+still requires its own Test Card.
 
 ## Technical provenance
 
@@ -117,16 +120,16 @@ unlocked while this record remains `IN_PROGRESS`.
 |---|---|
 | Issue/Test Card | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) |
 | Pull request | [#277](https://github.com/LuigiFerronatto/TESSERA/pull/277) |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; decision pending |
-| Benchmark record | `SMOKE_ONLY`; rationale above |
-| PR Evolution Audit | To be recorded in the pull-request body |
+| Merge commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
+| Evidence/Learnings/Decision | `tests/test_issue_13_corpus_doctor.py`; exact-head CI (test/distribution Python 3.9/3.12, smoke, sanity-eval, benchmark-reporting) green; [Maintainer Audit](https://github.com/LuigiFerronatto/TESSERA/pull/277#issuecomment-5685536995) recorded `KEEP`; Merge Governor succeeded |
+| Benchmark record | `SMOKE_ONLY`; `longmemeval-v1-dev-50` correctly skipped |
+| PR Evolution Audit | `docs/PR_EVOLUTION_13.md` |
 
 ## Evolution
 
 ```text
 index-time warnings and manual derived-state inspection
 -> #13 deterministic read-only Corpus Doctor candidate
--> current state: implementation under review, not yet on main
--> after canonical KEEP: #19 and corpus-quality CI prerequisites advance
+-> merged to main as 20814a47ec0f72d7bea0639e0b057df1ecf5cded
+-> VALIDATED / KEEP; #19 prerequisite satisfied, corpus-quality CI remains separate
 ```
