@@ -375,3 +375,13 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
+
+## Optional historical evidence lookup (#73 candidate)
+
+`revision_history=True` on the Python Engine preserves issued evidence IDs and
+full observed source revisions outside derived indexes. Current retrieval result
+fields and ranking are unchanged; historical versions are not live memories.
+`engine.revision_history.resolve_evidence(evidence_id)` separately returns the
+archived evidence record, source text and known span, or `None` for an unknown
+ID. `status: archived` denotes availability only, never freshness or temporal
+validity. See the [complete contract](REVISION_HISTORY.md).

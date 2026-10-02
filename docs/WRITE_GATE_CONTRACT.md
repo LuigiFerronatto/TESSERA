@@ -123,3 +123,14 @@ Path resolution rejects existing symlink escapes, but it does not defend
 against a privileged concurrent actor swapping filesystem components between
 validation and replacement. No quarantine store, LLM, network classifier,
 State Contamination benchmark, or evidence-aware admission policy is included.
+
+## Optional revision preservation (#73 candidate)
+
+Python callers can select `revision_history=True` on Engine. Gate rejection and
+unsupported formats still have no archive side effects. Accepted overwrites
+must preserve the existing source revision before replacement; failure blocks
+the replace. A failure archiving the new version after replacement raises
+`RevisionHistoryError(source_committed=True)` and does not claim the source was
+rolled back. This is separate from idempotent write receipts and semantic
+admission. See [revision history](REVISION_HISTORY.md) for opt-out, repair and
+observed-version limitations.

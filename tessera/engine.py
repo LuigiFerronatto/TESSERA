@@ -38,6 +38,7 @@ class TesseraEngine(_CoreTesseraEngine):
         weights: Optional[Dict[str, float]] = None,
         *,
         configuration: Optional[ResolvedConfiguration] = None,
+        revision_history: bool = False,
     ):
         if configuration is None and isinstance(storage_dir, ResolvedConfiguration):
             configuration = storage_dir
@@ -51,12 +52,13 @@ class TesseraEngine(_CoreTesseraEngine):
                 source_roots=configuration.source_roots,
                 index_dir=configuration.index_dir,
                 identity_root=configuration.identity_root,
+                revision_history=revision_history,
             )
             self.configuration = configuration
         else:
             if storage_dir is None:
                 raise TypeError("storage_dir or configuration is required")
-            super().__init__(storage_dir=storage_dir, weights=weights)
+            super().__init__(storage_dir=storage_dir, weights=weights, revision_history=revision_history)
             self.configuration = ResolvedConfiguration(
                 None, str(storage_dir), "legacy_storage_dir"
             )
@@ -95,6 +97,15 @@ class TesseraEngine(_CoreTesseraEngine):
         # We persist once after evidence has been attached, avoiding two graph
         # snapshots during a fresh build.
         super().build_index(recursive=recursive, use_cache=use_cache, persist=False)
+        if self.revision_history is not None:
+            # Enabling history over an existing cache must capture its bodies too.
+            for node_id, filepath in self.file_registry.items():
+                canonical = self.graph.nodes[node_id].get("canonical_metadata")
+                if canonical is not None and self.revision_history.get_revision(
+                    canonical.source.document_id, canonical.source.document_hash
+                ) is None:
+                    with open(filepath, "r", encoding="utf-8") as handle:
+                        self.revision_history.capture(canonical, handle.read())
         self._rebuild_evidence_ledger()
         if persist:
             super().save_index()
@@ -113,7 +124,13 @@ class TesseraEngine(_CoreTesseraEngine):
             resolve_conflicts=resolve_conflicts,
             weights=weights,
         )
-        return enrich_retrieval_results(self, results)
+        enriched = enrich_retrieval_results(self, results)
+        if self.revision_history is not None:
+            for item in enriched:
+                for field in ("provenance", "evidence"):
+                    if item.get(field) is not None:
+                        self.revision_history.record_evidence(item[field])
+        return enriched
 
     def retrieve_context_contract(self, *args: Any, **kwargs: Any) -> List[Dict[str, Any]]:
         """Return retrieval results in the shared Engine/CLI/MCP contract."""

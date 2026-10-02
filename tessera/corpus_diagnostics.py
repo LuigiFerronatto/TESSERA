@@ -19,6 +19,7 @@ _EXCLUDED_DIRECTORY_NAMES = {
     ".browser-harness",
     ".git",
     ".tessera_index",
+    ".tessera_history",
     ".venv-browser-agent",
     "Tessera",
     "node_modules",
@@ -157,7 +158,10 @@ def _configured_sources(
                         )
                     )
                     continue
-                if any(part in {".git", ".tessera_index"} for part in relative_to_root.parts[:-1]):
+                history_root = Path(configuration.storage_dir) / ".tessera_history"
+                if resolved == history_root or history_root in resolved.parents:
+                    continue
+                if any(part in {".git", ".tessera_index", ".tessera_history"} for part in relative_to_root.parts[:-1]):
                     continue
                 has_wildcard = any(character in pattern for character in "*?[")
                 if has_wildcard and any(

@@ -212,8 +212,17 @@ def enrich_retrieval_results(engine: Any, results: Iterable[Dict[str, Any]]) -> 
         if evidence_text:
             filepath = node_data.get("filepath") or item.get("filepath")
             try:
-                with open(filepath, "r", encoding="utf-8") as handle:
-                    raw_text = handle.read()
+                history = getattr(engine, "revision_history", None)
+                revision = history.get_revision(
+                    canonical.source.document_id, canonical.source.document_hash
+                ) if history is not None else None
+                if revision is not None:
+                    # A source can change after indexing. Locate spans in the
+                    # exact indexed revision, never in a newer unrelated body.
+                    raw_text = revision["raw_text"]
+                else:
+                    with open(filepath, "r", encoding="utf-8") as handle:
+                        raw_text = handle.read()
                 evidence_info = item.get("evidence_info") or {}
                 explicit_span = evidence_info.get("span") or {}
                 if explicit_span.get("start_line") is not None and explicit_span.get("end_line") is not None:

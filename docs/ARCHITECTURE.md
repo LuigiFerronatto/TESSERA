@@ -331,7 +331,14 @@ source.path        SAME
 content_hash       CHANGED
 ```
 
-Source revision history beyond the current version is a separate experiment (#73); stable hashes alone are not presented as a full immutable history.
+The opt-in #73 candidate adds a separate durable observed-source archive,
+`store/.tessera_history/revisions.sqlite3`, through Python
+`TesseraEngine(..., revision_history=True)`. It stores full text and issued
+evidence, survives deletion of the derived index, and never enters live
+retrieval. Stable hashes alone remain insufficient without captured bodies.
+See [revision-history contract](REVISION_HISTORY.md) for failure boundaries,
+backup requirements and the distinction from temporal validity. Default
+behavior remains current-source-only.
 
 # 3. Graph representation
 

@@ -8,6 +8,15 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Added opt-in Python `revision_history=True`: durable observed full-source
+  revisions and issued evidence IDs outside the disposable index, with old-body
+  preservation before overwrites and explicit archive failures. Historical
+  revisions do not become live memories. See [revision history](docs/REVISION_HISTORY.md)
+  and [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73); temporal validity
+  and default activation remain separate decisions.
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their
