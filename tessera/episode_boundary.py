@@ -1,31 +1,14 @@
 """
-Episode boundary detection — a lightweight stand-in for QUMem's fine-tuned
-turn-by-turn continuity classifier (f_θ).
+Experimental timeout and lexical episode-boundary heuristic.
 
-QUMem's paper trains a small binary classifier that looks at consecutive
-user turns and decides "same episode" vs. "new episode starts here",
-letting episode boundaries emerge dynamically from a live conversation
-instead of being delimited by hand. Tessera previously had NO equivalent at
-all — `Episode(beginning, middle, end)` (see `models.py`) was always
-populated explicitly by the caller, with zero automatic boundary logic
-anywhere in the codebase.
+This QUMem-inspired baseline compares a new turn's text with accumulated
+TF-IDF episode text and checks elapsed time. It does not distinguish user and
+assistant roles or implement the paper's adjacent-user continuity classifier.
+The returned Beginning/Middle/End Episode is a TESSERA-specific representation.
 
-Training/shipping an actual fine-tuned classifier is disproportionate to
-Tessera's current scale, so this module implements a **cheap, dependency-free
-heuristic** that approximates the same job:
-
-    1. Timeout: if more than `timeout_minutes` elapsed since the last turn,
-       the current episode is closed and a new one starts — a long gap
-       almost always means the user moved on to something else.
-    2. Topical drift: if the new turn's TF-IDF cosine similarity against
-       the episode-so-far's accumulated text drops below
-       `similarity_threshold`, the topic likely changed — close the
-       episode here too.
-
-This is intentionally simple (no fine-tuning, reuses the same TF-IDF
-machinery `TesseraEngine` already depends on for retrieval) — see
-`Tessera/docs/QUMEM-GAP-ANALYSIS.md` for the full rationale and why a bigger
-classifier isn't justified yet.
+Issue #138 owns reviewed boundary fixtures and role-aware continuity evaluation.
+No quality/cost superiority is established by this implementation. See
+docs/QUMEM-GAP-ANALYSIS.md for the current source-to-implementation map.
 """
 
 import datetime

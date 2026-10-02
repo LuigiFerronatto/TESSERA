@@ -150,7 +150,7 @@ These documents can still be useful, but they are narrower and may contain termi
 | [CODE_EXPLANATION.md](CODE_EXPLANATION.md) | Code-oriented explanation. May lag module refactors; verify against current source. |
 | [PROCEDURAL_ANCHORS.md](PROCEDURAL_ANCHORS.md) | Historical/current detail on procedural-anchor concept and skills. Do not infer that it creates a fourth semantic drawer. |
 | [CHEATSHEET.md](CHEATSHEET.md) | Operational/reference cheat sheet; verify commands/contracts against current CLI. |
-| [QUMEM-GAP-ANALYSIS.md](QUMEM-GAP-ANALYSIS.md) | Research/design gap analysis that influenced TESSERA. Treat as decision history, not current feature list. |
+| [QUMEM-GAP-ANALYSIS.md](QUMEM-GAP-ANALYSIS.md) | Canonical source-to-implementation fidelity map with dated code baseline, validation owners and preserved historical lessons. |
 
 ---
 
