@@ -5,8 +5,9 @@
 | Issue | [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` configuration / optional adapter boundary |
-| Pull request | Draft candidate; linked in the issue/PR record |
-| Head commit | Candidate branch `fix/157-typed-model-profiles`; exact published head and CI recorded in the PR |
+| Pull request | [Draft PR #286](https://github.com/LuigiFerronatto/TESSERA/pull/286) |
+| Head commit | [Current PR head and exact-head checks](https://github.com/LuigiFerronatto/TESSERA/pull/286/commits) |
+| Tested runtime commit | [`f113460`](https://github.com/LuigiFerronatto/TESSERA/commit/f113460cf0cf3b061daae7414cd58d1020740d53); subsequent change only adds these PR links |
 | Merge commit | Not merged |
 | Decision | `PENDING`; proposed KEEP of the bounded schema experiment |
 | Benchmark applicability | `SMOKE_ONLY` |
@@ -128,7 +129,7 @@ card is implemented here.
 | Baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Configuration prerequisite | #153 / PR #173 / canonical `2508676d472088733702b6ed920fc829df9a7681` |
 | Core boundary prerequisite | #74 / [ADR 0001](../adr/0001-core-vs-optional-llm-boundary.md) |
-| PR / exact head / CI | Linked from the draft PR; not merged |
+| PR / exact head / CI | [PR #286 checks](https://github.com/LuigiFerronatto/TESSERA/pull/286/checks); not merged |
 | Evidence/Learnings/Decision | This record and PR validation; decision pending |
 | Benchmark record | SMOKE_ONLY; deterministic sanity, no model-quality claim |
 
