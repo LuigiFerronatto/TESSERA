@@ -5,7 +5,7 @@
 > claims follow [the dated source/runtime audit](QUMEM-GAP-ANALYSIS.md), not
 > anecdotal demonstrations or older implementation descriptions.
 
-> Testado ao vivo em 2026-08-25 dentro do próprio repo `lab-autonomous-officer`.
+> Historical demo recorded on 2026-08-25 in an external project; the project name and path below are neutral placeholders.
 > Todos os comandos abaixo rodam de verdade — copie e cole durante a gravação.
 
 ---
@@ -85,7 +85,7 @@ slide/README aberto):
 > funciona bem, onde ela para de funcionar, e onde o Tessera entra."
 
 ```bash
-cd ~/Desktop/Workspace/lab-autonomous-officer
+cd /path/to/example-project
 clear
 tessera list .claude/memory | grep "notas indexadas"
 ```

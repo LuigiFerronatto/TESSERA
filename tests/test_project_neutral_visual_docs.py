@@ -33,7 +33,8 @@ def test_all_six_diagrams_are_deterministic_and_mapped():
 def test_private_project_narratives_and_assets_are_absent():
     legacy=''.join(('L','A','O'))
     company=''.join(('B','l','i','p'))
-    forbidden=re.compile(r'(?i)(?<![a-z])'+legacy+r'(?:\b|_)|'+company)
+    private_slug='-'.join(('lab','autonomous','officer'))
+    forbidden=re.compile(r'(?i)(?<![a-z])'+legacy+r'(?:\b|_)|'+company+'|'+re.escape(private_slug))
     for family in ('docs','archive'):
         for p in (ROOT/family).rglob('*'):
             if not p.is_file():continue
