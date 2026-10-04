@@ -152,7 +152,7 @@ jobs:
           import json
           with open("publication.json", encoding="utf-8") as fh:
               data = json.load(fh)
-          print("\n".join(f"- {r}" for r in data["reasons"]) or "Deterministic gates and required human review are satisfied.")
+          print("\n".join(f"- {r}" for r in data["reasons"]) or "Deterministic gates pass and no blocking reviews or threads remain.")
           PY
           )"
           gh api "repos/$REPO/check-runs" \

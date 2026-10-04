@@ -6,15 +6,19 @@ Pull-request CI uses deterministic tests, builds, smoke checks and the offline
 Benchmark Ledger. Automatic AI Maintainer Audit review has been retired, including
 its generated detection and model-evaluation jobs. No AI comment, KEEP label,
 provider quota, model alias or engine-failure override is a merge prerequisite.
-Human review remains required. Nothing in this repository automatically merges PRs.
+Positive human approval is not required. Active review objections still block
+readiness. Nothing in this repository automatically merges PRs.
 
 The deterministic Merge Governor verifies the current PR head, non-draft status,
-conflict-free mergeability, each named CI job, the offline benchmark check, required
-human approval, no requested changes, and no unresolved review threads. REQUIRED
+conflict-free mergeability, each named CI job, the offline benchmark check,
+no requested changes, and no unresolved review threads. REQUIRED
 benchmark applicability also requires `longmemeval-v1-dev-50` success; missing or
-malformed applicability is blocking. Approval requires both GitHub aggregate
-approval and a trusted non-bot human approval on the current head, accounting
-for dismissed or superseding verdicts across every review page. Missing,
+malformed applicability is blocking. The governor checks both GitHub aggregate
+requested changes and active objections from trusted, non-author human reviewers
+across every review page. This works even when GitHub returns an empty aggregate
+decision because required approvals are disabled. A later approval or dismissal
+clears that reviewer's objection; a comment or new head alone does not. Empty
+review history is valid; missing review evidence fails closed. Missing,
 pending, skipped or failed check evidence does not count as success. GraphQL thread
 pagination is complete or the gather step fails; missing data never means zero
 unresolved threads.
@@ -44,8 +48,9 @@ Workflow changes do not edit GitHub repository settings. At investigation time,
 `main` required the obsolete `TESSERA Maintainer Audit` check as well as the eight
 checks below. An authorized administrator must remove **only** that AI check from
 required checks for the new policy to take effect without a permanently pending
-requirement. Do not remove the deterministic governor, human review, strict
-up-to-date requirement or conversation-resolution protection.
+requirement. The owner additionally authorized removal of mandatory positive
+human approval on 2026-10-04. Retain the deterministic governor, strict
+up-to-date requirement and conversation-resolution protection.
 
 ```text
 distribution (Python 3.9)
@@ -58,9 +63,11 @@ benchmark-reporting (offline)
 tessera-merge-governor
 ```
 
-Keep at least one approving human review, stale-review dismissal and resolved
-conversations. GitHub branch protection is the final authority. This PR does not
-claim settings were changed or authorize merging itself.
+Remove the mandatory approving-review requirement separately in repository
+settings; retain resolved conversations and every required check listed above.
+Active requested changes remain a governor blocker. GitHub branch protection
+is the final authority. This PR does not claim settings were changed or
+authorize merging itself.
 
 Existing heads whose successful benchmark runs predate contract checks need a
 fresh Benchmark Ledger evaluation before the new governor can authorize them.
@@ -85,7 +92,8 @@ scheduled documentation work or reconfigure provider billing.
 The opt-in fixer now requires findings explicitly selected by a human maintainer.
 Missing or ambiguous findings result in a report without a fix commit. An old AI
 audit comment alone cannot authorize new work. Every pushed fix still requires
-human review and deterministic CI.
+deterministic CI and resolution of active review blocks; positive approval is
+optional. The fixer still cannot approve or merge its own changes.
 
 ## Maintenance and validation
 
@@ -100,7 +108,7 @@ explicit operation input. No cleanup settings change is part of this transition.
 
 Run `python -m pytest tests/test_governance_workflows.py` for static workflow
 boundaries and `python -m pytest tests/test_deterministic_governor.py` for gate,
-check-name, human-review, pagination and CLI regressions. Full deterministic CI and
+check-name, review-objection, pagination and CLI regressions. Full deterministic CI and
 Benchmark Ledger must run on the published candidate head.
 
 ## Evidence and history

@@ -49,30 +49,42 @@ def check_is_green(rollup: Iterable[dict], name: str) -> bool:
     )
 
 
-def has_current_human_approval(pr: dict, review_pages: list[list[dict]]) -> bool:
-    """Require GitHub aggregate approval plus a current, trusted human verdict.
+def has_requested_changes(pr: dict, review_pages: list[list[dict]]) -> bool:
+    """Keep active trusted-human objections even without required approvals.
 
-    REST review pages are chronological, but sort explicitly by submission and ID.
-    A later dismissal/requested-changes supersedes the same reviewer's approval;
-    a COMMENTED review does not revoke a prior approval. Stale approvals never count.
+    GitHub's aggregate reviewDecision may be empty when approving reviews are
+    not required. Read every REST review page as well; later approval/dismissal
+    clears that reviewer's objection, while COMMENTED does not. A new commit
+    alone does not clear requested changes. AI/bot reviews remain non-binding.
     """
-    if pr.get("reviewDecision") != "APPROVED" or not review_pages:
-        return False
+    if not review_pages or any(not isinstance(page, list) for page in review_pages):
+        raise ValueError("review evidence is missing or malformed")
     latest = {}
     reviews = [review for page in review_pages for review in page]
+    for review in reviews:
+        if (
+            not isinstance(review, dict)
+            or review.get("state") not in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED", "COMMENTED", "PENDING"}
+            or not isinstance(review.get("user"), dict)
+            or not isinstance(review["user"].get("login"), str)
+            or not review["user"]["login"]
+            or not isinstance(review["user"].get("type"), str)
+            or not isinstance(review.get("author_association"), str)
+            or not review["author_association"]
+        ):
+            raise ValueError("review evidence is malformed")
     for review in sorted(reviews, key=lambda value: (value.get("submitted_at") or "", value.get("id") or 0)):
         user = review.get("user") or {}
         login = user.get("login")
         state = review.get("state")
         if not login or state not in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}:
             continue
-        latest[login] = review
-    return any(
-        review.get("state") == "APPROVED"
-        and review.get("commit_id") == pr.get("headRefOid")
+        latest[login.lower()] = review
+    return pr.get("reviewDecision") == "CHANGES_REQUESTED" or any(
+        review.get("state") == "CHANGES_REQUESTED"
         and (review.get("user") or {}).get("type") == "User"
-        and not login.lower().endswith("[bot]")
-        and login != (pr.get("author") or {}).get("login")
+        and not login.endswith("[bot]")
+        and login != ((pr.get("author") or {}).get("login") or "").lower()
         and review.get("author_association") in {"OWNER", "MEMBER", "COLLABORATOR"}
         for login, review in latest.items()
     )
@@ -120,8 +132,7 @@ def payload_from_pr(pr: dict, thread_pages: list[dict], review_pages: list[list[
         "mergeable_state": {"MERGEABLE": "clean", "CONFLICTING": "conflicting"}.get(pr.get("mergeable")),
         "ci_success": all(check_is_green(rollup, name) for name in REQUIRED_CI_JOBS),
         "benchmark_success": benchmark_success,
-        "has_required_approval": has_current_human_approval(pr, review_pages),
-        "has_requested_changes": pr.get("reviewDecision") == "CHANGES_REQUESTED",
+        "has_requested_changes": has_requested_changes(pr, review_pages),
         "has_unresolved_threads": any(not thread["isResolved"] for thread in threads),
     }
 
@@ -148,15 +159,14 @@ def evaluate_runtime_pr_gates(
     mergeable_state: Optional[str],
     ci_success: bool,
     benchmark_success: bool,
-    has_required_approval: bool,
     has_requested_changes: bool,
     has_unresolved_threads: bool,
     required_checks_satisfied: bool = True,
 ) -> GateResult:
-    """Require deterministic evidence and human review for the current PR head.
+    """Require deterministic evidence and no active review blocks for this head.
 
     No AI audit, provider status, label or break-glass comment participates.
-    GitHub must still enforce strict required checks and review requirements.
+    No positive approval is required. GitHub remains the final merge authority.
     """
     reasons = []
     if not current_head_sha:
@@ -171,8 +181,6 @@ def evaluate_runtime_pr_gates(
         reasons.append("TESSERA CI is not green on the current head")
     if not benchmark_success:
         reasons.append("Benchmark Ledger is not green/appropriate on the current head")
-    if not has_required_approval:
-        reasons.append("required human review approval is missing")
     if has_requested_changes:
         reasons.append("a reviewer has requested changes")
     if has_unresolved_threads:
@@ -234,8 +242,7 @@ def _main(argv: Optional[list[str]] = None) -> int:
         mergeable_state=data.get("mergeable_state"),
         ci_success=data.get("ci_success", False),
         benchmark_success=data.get("benchmark_success", False),
-        has_required_approval=data.get("has_required_approval", False),
-        has_requested_changes=data.get("has_requested_changes", False),
+        has_requested_changes=data.get("has_requested_changes") is not False,
         has_unresolved_threads=data.get("has_unresolved_threads", True),
         required_checks_satisfied=data.get("required_checks_satisfied", True),
     )

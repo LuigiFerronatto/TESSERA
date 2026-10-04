@@ -15,13 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def green_payload():
     return dict(current_head_sha='abc1234', is_draft=False,
                 mergeable_state='clean', ci_success=True, benchmark_success=True,
-                has_required_approval=True, has_requested_changes=False,
+                has_requested_changes=False,
                 has_unresolved_threads=False)
 
 
 def green_pr():
     pr = dict(headRefOid='abc1234', isDraft=False, mergeable='MERGEABLE',
-                reviewDecision='APPROVED', author={'login': 'author'},
+                reviewDecision='', author={'login': 'author'},
                 body='Benchmark applicability: NOT_APPLICABLE\nBenchmark rationale: governance only', statusCheckRollup=[
                     dict(name=n, conclusion='SUCCESS')
                     for n in (*mg.REQUIRED_CI_JOBS, mg.BENCHMARK_JOB)])
@@ -38,7 +38,7 @@ def human_review(**changes):
 
 
 def payload_from_pr(pr, threads, reviews=None):
-    return mg.payload_from_pr(pr, threads, [[human_review()]] if reviews is None else reviews)
+    return mg.payload_from_pr(pr, threads, [[]] if reviews is None else reviews)
 
 
 def thread_page(resolved=(), more=False):
@@ -59,7 +59,6 @@ def test_ready_without_ai_audit():
     ('mergeable_state', None, 'could not be determined'),
     ('ci_success', False, 'CI is not green'),
     ('benchmark_success', False, 'Benchmark Ledger'),
-    ('has_required_approval', False, 'human review approval'),
     ('has_requested_changes', True, 'requested changes'),
     ('has_unresolved_threads', True, 'unresolved review threads'),
     ('required_checks_satisfied', False, 'branch-protection'),
@@ -89,11 +88,19 @@ def test_exact_job_names_and_all_matching_jobs_must_pass():
     assert not mg.check_is_green([], mg.BENCHMARK_JOB)
 
 
-@pytest.mark.parametrize('decision', [None, '', 'REVIEW_REQUIRED', 'CHANGES_REQUESTED'])
-def test_required_human_review_is_never_inferred(decision):
+@pytest.mark.parametrize('decision', [None, '', 'REVIEW_REQUIRED', 'APPROVED'])
+def test_no_positive_approval_is_required(decision):
     pr = green_pr()
     pr['reviewDecision'] = decision
-    assert not payload_from_pr(pr, [thread_page()])['has_required_approval']
+    payload = payload_from_pr(pr, [thread_page()], [[]])
+    assert 'has_required_approval' not in payload
+    assert mg.evaluate_runtime_pr_gates(**payload).authorized
+
+
+def test_aggregate_requested_changes_still_blocks():
+    pr = green_pr()
+    pr['reviewDecision'] = 'CHANGES_REQUESTED'
+    assert not mg.evaluate_runtime_pr_gates(**payload_from_pr(pr, [thread_page()])).authorized
 
 
 def test_unresolved_thread_on_later_page_blocks():
@@ -154,7 +161,7 @@ def test_fixer_requires_selected_human_findings():
     assert 'findings are missing or ambiguous' in source
     assert 'without\n   pushing changes' in source
     assert 'old AI audit comment' in source
-    assert 'requires human review and deterministic CI' in source
+    assert 'positive approving review is not required' in source
 
 
 @pytest.mark.parametrize('state', ['', 'FAILURE', 'PENDING', 'SKIPPED', 'CANCELLED'])
@@ -181,24 +188,62 @@ def test_missing_malformed_or_ambiguous_applicability_blocks(body):
 
 @pytest.mark.parametrize('review', [
     human_review(user={'login': 'copilot[bot]', 'type': 'Bot'}),
-    human_review(user={'login': 'copilot[bot]', 'type': 'User'}),
-    human_review(user={'login': 'author', 'type': 'User'}),
     human_review(commit_id='oldhead'),
     human_review(state='DISMISSED'),
-    human_review(state='CHANGES_REQUESTED'),
     human_review(author_association='CONTRIBUTOR'),
 ])
-def test_bot_stale_dismissed_or_untrusted_approval_does_not_count(review):
-    assert not payload_from_pr(green_pr(), [thread_page()], [[review]])['has_required_approval']
+def test_no_approval_quality_requirement_remains(review):
+    assert mg.evaluate_runtime_pr_gates(**payload_from_pr(green_pr(), [thread_page()], [[review]])).authorized
 
 
-def test_paginated_latest_human_verdict_and_comment_semantics():
-    approval = human_review()
-    revoked = human_review(id=2, state='CHANGES_REQUESTED', submitted_at='2026-10-02T00:01:00Z')
-    assert not payload_from_pr(green_pr(), [thread_page()], [[approval], [revoked]])['has_required_approval']
-    commented = human_review(id=3, state='COMMENTED', submitted_at='2026-10-02T00:02:00Z')
-    assert payload_from_pr(green_pr(), [thread_page()], [[approval], [commented]])['has_required_approval']
-    assert not payload_from_pr(green_pr(), [thread_page()], [])['has_required_approval']
+@pytest.mark.parametrize('decision', [None, '', 'REVIEW_REQUIRED', 'APPROVED'])
+@pytest.mark.parametrize('commit', ['abc1234', 'oldhead'])
+def test_requested_changes_block_without_aggregate_or_current_head_review(decision, commit):
+    pr = green_pr()
+    pr['reviewDecision'] = decision
+    review = human_review(state='CHANGES_REQUESTED', commit_id=commit)
+    payload = payload_from_pr(pr, [thread_page()], [[], [review]])
+    assert payload['has_requested_changes']
+    assert not mg.evaluate_runtime_pr_gates(**payload).authorized
+
+
+@pytest.mark.parametrize('state,blocked', [('COMMENTED', True), ('APPROVED', False), ('DISMISSED', False)])
+def test_latest_paginated_verdict_supersedes_changes_but_comments_do_not(state, blocked):
+    objection = human_review(state='CHANGES_REQUESTED')
+    later = human_review(id=2, state=state, submitted_at='2026-10-02T00:01:00Z')
+    # Deliberately unordered input exercises explicit chronological reduction.
+    assert payload_from_pr(green_pr(), [thread_page()], [[later], [objection]])['has_requested_changes'] is blocked
+
+
+def test_another_reviewers_approval_does_not_clear_objection():
+    objection = human_review(state='CHANGES_REQUESTED')
+    approval = human_review(id=2, user={'login': 'other', 'type': 'User'})
+    assert payload_from_pr(green_pr(), [thread_page()], [[objection], [approval]])['has_requested_changes']
+
+
+@pytest.mark.parametrize('changes', [
+    {'user': {'login': 'copilot[bot]', 'type': 'Bot'}},
+    {'user': {'login': 'copilot[bot]', 'type': 'User'}},
+    {'user': {'login': 'author', 'type': 'User'}},
+    {'author_association': 'CONTRIBUTOR'},
+])
+def test_ai_author_and_untrusted_reviews_cannot_add_objection(changes):
+    review = human_review(state='CHANGES_REQUESTED', **changes)
+    assert not payload_from_pr(green_pr(), [thread_page()], [[review]])['has_requested_changes']
+
+
+@pytest.mark.parametrize('pages', [[], None, [{}], [None], [[{}]], [[human_review(author_association=None)]], [[human_review(user={})]], [[human_review(state='UNKNOWN')]]])
+def test_missing_or_malformed_review_evidence_fails_closed(pages):
+    with pytest.raises(ValueError):
+        mg.payload_from_pr(green_pr(), [thread_page()], pages)
+
+
+def test_cli_ignores_legacy_positive_approval_field():
+    payload = green_payload()
+    payload['has_required_approval'] = False
+    result = subprocess.run([sys.executable, '-m', 'governance.merge_governor', '--payload', json.dumps(payload)],
+                            cwd=ROOT, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
 
 
 @pytest.mark.parametrize('body', [
@@ -267,7 +312,7 @@ def test_contract_edit_between_gather_and_publish_fails_closed(current_body):
 
 def test_publication_contract_recheck_preserves_other_gate_failures_and_ignores_prose():
     original = green_pr()['body']
-    blocked = mg.GateResult(False, ['required human review approval is missing'])
+    blocked = mg.GateResult(False, ['a reviewer has requested changes'])
     assert mg.recheck_benchmark_contract(blocked, original, original + '\nClarification') is blocked
     ready = mg.GateResult(True)
     assert mg.recheck_benchmark_contract(ready, original, original + '\nClarification') is ready
@@ -286,3 +331,21 @@ def test_body_edit_triggers_and_ignored_edit_concurrency_are_explicit():
     assert "|| 'manual'" not in governor
     assert '--json headRefOid,body > current_pr.json' in governor
     assert 'recheck_benchmark_contract' in governor
+
+
+def test_cli_missing_objection_evidence_fails_closed():
+    payload = green_payload()
+    del payload['has_requested_changes']
+    result = subprocess.run([sys.executable, '-m', 'governance.merge_governor', '--payload', json.dumps(payload)],
+                            cwd=ROOT, text=True, capture_output=True)
+    assert result.returncode == 1
+    assert 'a reviewer has requested changes' in json.loads(result.stdout)['reasons']
+
+
+@pytest.mark.parametrize('value', [None, 0, '', 'false'])
+def test_cli_invalid_objection_evidence_fails_closed(value):
+    payload = green_payload()
+    payload['has_requested_changes'] = value
+    result = subprocess.run([sys.executable, '-m', 'governance.merge_governor', '--payload', json.dumps(payload)],
+                            cwd=ROOT, text=True, capture_output=True)
+    assert result.returncode == 1
