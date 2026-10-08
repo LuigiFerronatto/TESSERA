@@ -414,6 +414,19 @@ class GlobalRegistry:
         }
 
 
+def source_identity_base(storage_dir: str, identity_root: str, source_roots: Tuple[Any, ...]) -> str:
+    """One physical-path namespace, retaining store-only compatibility.
+
+    A project corpus uses its configured identity root for every source,
+    including generated memories. Legacy and store-only corpora retain their
+    store-relative source paths.
+    """
+    store = Path(storage_dir).resolve(strict=False)
+    if all(_is_relative_to(Path(item.path).resolve(strict=False), store) for item in source_roots):
+        return str(store)
+    return str(Path(identity_root).resolve(strict=False))
+
+
 @dataclass(frozen=True)
 class ResolvedConfiguration:
     """The sole runtime source of truth for write, read, and derived paths."""
@@ -439,6 +452,10 @@ class ResolvedConfiguration:
         object.__setattr__(self, "source_roots", tuple(roots))
         object.__setattr__(self, "index_dir", str(Path(index).resolve(strict=False)))
         object.__setattr__(self, "identity_root", str(Path(identity).resolve(strict=False)))
+
+    @property
+    def source_identity_root(self) -> str:
+        return source_identity_base(self.storage_dir, self.identity_root, self.source_roots)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
