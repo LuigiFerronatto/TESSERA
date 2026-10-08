@@ -908,7 +908,9 @@ External work changes the next experiment; citation does not equal implementatio
 | QUMem | #145 / #135–#144 | Which construction/planning/state mechanisms improve TESSERA while preserving provenance/core independence? |
 | Personalized-memory benchmarks | #143 | Do additions improve preference evolution/current-state tasks, not only factual recall? |
 
-#146 owns broader QUMem paper-fidelity documentation truth.
+#146 owns broader QUMem paper-fidelity documentation truth. The candidate
+[paper-to-runtime map](QUMEM-GAP-ANALYSIS.md) distinguishes current heuristics
+from source-paper behavior; it promotes no child capability.
 
 ---
 
