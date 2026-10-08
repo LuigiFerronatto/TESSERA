@@ -158,6 +158,11 @@ phase and reports failed assistance before any fallback write. Diagnostics disti
 `deterministic_fallback` without changing the compatibility list-returning
 Python API.
 
+The [QUMem source-to-runtime audit](QUMEM-GAP-ANALYSIS.md) records the
+current timeout/TF-IDF boundary heuristic, one-pass decomposition, single-query
+planning and free-text consolidation. These are not a validated reproduction
+of the full paper pipeline.
+
 This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
 `insights`, and all candidates use the same existing write gate.

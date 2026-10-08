@@ -1,5 +1,10 @@
 # Tessera — Como Funciona e Próximas Evoluções
 
+> Historical design narrative, not the current implementation contract.
+> QUMem-fidelity and temporal/state claims below are superseded by the
+> [dated source-to-runtime audit](QUMEM-GAP-ANALYSIS.md). Heuristic behavior
+> and illustrative provider results do not establish paper fidelity.
+
 > Compartilhado no `#lao-innovation-lab` em 2026-08-25, como thread de
 > detalhamento do post de evolução da memória do LAO.
 > Iniciativa criada por **@LuigiFerronatto**.

@@ -462,6 +462,10 @@ TESSERA is research-driven, but a cited paper is a **reference signal**, not pro
 | [Mem0 paper](https://arxiv.org/abs/2504.19413) | Scalable long-term memory and hybrid retrieval comparison |
 | [Zep / Graphiti paper](https://arxiv.org/abs/2501.13956) | Temporal context graphs, fact validity, provenance, incremental graph updates |
 
+For QUMem specifically, see the [paper-to-runtime fidelity map](docs/QUMEM-GAP-ANALYSIS.md).
+Current heuristics and optional one-pass/single-query assistance are not a
+validated reproduction of the paper's full pipeline.
+
 ## Acknowledgements
 
 TESSERA is informed by a broader ecosystem of memory systems, agent runtimes, benchmarks, and retrieval architectures. In addition to the papers above, the project actively studies and compares ideas from:

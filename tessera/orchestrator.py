@@ -1,31 +1,16 @@
 """
-TesseraOrchestrator — a 3-agent retrieval pipeline (QUMem-style) on top of TesseraEngine.
+Optional QUMem-inspired retrieval/consolidation baseline.
 
-Rather than letting a single generic agent both search memory and answer,
-this orchestrator splits the job into three specialized reasoning steps —
-a trio of "detective" agents that inspects the 3 typed stores (facts /
-preferences / insights) before the main agent ever acts:
+Three application-supplied prompt calls identify one free-text information
+need, rewrite one query, and consolidate retrieved evidence into free text.
+Store selection remains keyword-based. This is not the paper's bounded
+multi-query planner or structured Fq/Tq/Iq reconstruction.
 
-    1. Information-Need Agent   — analyzes the task and reasons about what
-       history it actually needs: "what do I need to find out from past
-       memory to answer/do this?"
-    2. Retrieval Planner Agent  — turns that need into a focused search plan,
-       decides which typed store(s) (facts / preferences / insights) are
-       relevant, and pulls candidates from each via
-       TesseraEngine.retrieve_from_store (DW-PR + non-destructive conflict
-       containment).
-    3. User-State Inference Agent — joins the clues found across stores,
-       receives the preserved candidate evidence and produces an assisted
-       summary for the main agent. It must not assume that newer evidence
-       automatically supersedes older evidence.
-
-Each "agent" step is a prompt template plus a call to an explicitly supplied
-`llm_fn`. Pass an application-owned callable of
-`(system_prompt, user_prompt) -> str`; deterministic Engine retrieval remains
-available independently and needs no provider.
-
-See `tessera.hooks` for the mechanism that *automatically* intercepts a task and
-triggers this pipeline (rather than the caller invoking it by hand).
+Issue #139 owns multiple needs, #140 retrieval planning and #141 structured
+state. Conflict containment preserves candidates without proving supersession.
+Deterministic Engine retrieval remains independent and needs no provider.
+Hooks are explicit library entrypoints, not an automatically installed runtime
+integration. See docs/QUMEM-GAP-ANALYSIS.md and ADR 0001.
 """
 
 import re

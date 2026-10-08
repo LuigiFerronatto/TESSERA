@@ -52,7 +52,9 @@ STORE_TO_NODE_TYPE = {v: k for k, v in NODE_TYPE_TO_STORE.items()}
 @dataclass
 class Episode:
     """
-    An episodic memory: a task execution broken into beginning / middle / end,
+    A TESSERA-specific task narrative, not QUMem episode membership.
+
+    A task execution is broken into beginning / middle / end,
     instead of one undifferentiated block of text. This lets retrieval and
     consolidation distinguish "what was the goal" from "what happened" from
     "what was the outcome/learning" — which is what actually differs between

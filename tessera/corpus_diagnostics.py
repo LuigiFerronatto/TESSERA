@@ -353,7 +353,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
         )
 
     for path in source_paths:
-        source_path = _relative(path, _identity_base(path, configuration))
+        source_path = _relative(path, Path(configuration.source_identity_root))
         try:
             raw_bytes = path.read_bytes()
             before_hashes[str(path)] = hashlib.sha256(raw_bytes).hexdigest()
@@ -375,6 +375,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 persistent_id=persistent_id,
                 persistent_doc_id=persistent_doc_id,
             )
+            metadata.source.path = source_path
         except ValueError as exc:
             report.findings.append(
                 CorpusFinding(
@@ -444,7 +445,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 )
 
     current_paths = {
-        _relative(path, _identity_base(path, configuration)) for path in source_paths
+        _relative(path, Path(configuration.source_identity_root)) for path in source_paths
     }
     for stale_path in sorted(set(manifest) - current_paths):
         report.findings.append(
