@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `documentation` |
-| Pull request | Candidate branch `docs/146-qumem-fidelity` |
-| Merge commit | Not merged |
-| Decision | `PENDING` independent review |
+| Pull request | [#284](https://github.com/LuigiFerronatto/TESSERA/pull/284), final candidate `b5381e93df68006b02a32bf410398f0cfc49dc4c` |
+| Merge commit | `0a4a22c3b356c191a6f30c555eb01677ac2b85a4` (canonical implementation merge; not yet `VALIDATED`) |
+| Decision | `PENDING` (no independent decision recorded in PR #284) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-02 |
 
@@ -29,7 +29,7 @@ One dated source-to-runtime table assigns each gap to its owning Test Card;
 references and non-executable docstrings use the same distinctions.
 
 ## How does it work now?
-TARGET — NOT YET ON MAIN: the candidate explains the current heuristic,
+Merged on main (#284): the documentation explains the current heuristic,
 one-pass, single-query and free-text baseline. It preserves historical lessons
 without promoting experiments or changing runtime behavior.
 
