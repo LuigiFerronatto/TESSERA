@@ -4,6 +4,12 @@
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
+> #157 candidate (2026-10-02): typed model profiles are being implemented in a
+> draft candidate selected by the repository owner. The earlier WIP deferral is
+> historical for this candidate. No model execution, pipeline activation or
+> dependent capability is delivered on `main`; dependency states remain pending
+> canonical merge. See [the candidate stage record](test-cards/157-typed-model-profiles.md).
+
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
 > #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #134 is blocked only by #87.
