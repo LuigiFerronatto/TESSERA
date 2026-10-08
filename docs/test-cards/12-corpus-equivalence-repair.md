@@ -3,18 +3,18 @@
 | Field | Value |
 |---|---|
 | Issue | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12), reliability follow-up to the delivered index contract |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; canonical-merge CI/benchmark not yet recorded, so not `VALIDATED`) |
 | Capability type | `runtime` |
-| Pull request | [Draft PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282) |
-| Head commit | Runtime candidate `51a8c3c281470bd290829beb94202405a61befc4`; final head/CI in PR #282 |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Pull request | [PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282) |
+| Head commit | Runtime candidate `51a8c3c281470bd290829beb94202405a61befc4`; final candidate head `879ad1f54ecd08f0895c3040743ac8c8b13291ae` |
+| Merge commit | `89dec1e444e15bfa8b1361683a9b88a89402888e` |
+| Decision | `PENDING` (maintainer decision not yet recorded; PR carried `audit/keep`) |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
 
 ## In one sentence
 
-This repair candidate makes fresh, cached and incremental builds respect the
+This repair makes fresh, cached and incremental builds respect the
 same selected sources and retain valid source versions and relations.
 
 ## What problem existed?
@@ -46,7 +46,7 @@ unchanged.
 
 ## How does it work now?
 
-**TARGET — NOT YET ON MAIN.** Project documents and generated memories have
+**IMPLEMENTED ON MAIN (merge `89dec1e444e15bfa8b1361683a9b88a89402888e`).** Project documents and generated memories have
 distinct physical paths and document identities; edits appear after indexing.
 Source-backed relations survive target updates. Both recursion settings retain
 the configured source selection, and cache reuse respects the requested mode.
@@ -89,8 +89,8 @@ outside this repair. No merge or release is implied by a passing local test.
 
 ## What is unlocked next?
 
-No roadmap dependency is promoted by this unmerged candidate. After review and
-required exact-head CI, a maintainer may decide whether to merge the repair.
+No roadmap dependency is promoted by this repair. Lifecycle `VALIDATED` status
+awaits CI/benchmark evidence for the canonical merge commit.
 
 ## Technical provenance
 
@@ -104,7 +104,7 @@ required exact-head CI, a maintainer may decide whether to merge the repair.
 | Regression tests | `tests/test_index_corpus_equivalence.py` |
 | Benchmark record | Exact-head PR CI; pending until completed |
 | Evidence/Learnings/Decision | Repair PR; `PENDING`, with baseline and candidate distinguished |
-| Merge commit | Not merged |
+| Merge commit | `89dec1e444e15bfa8b1361683a9b88a89402888e` |
 
 ## Evolution
 
