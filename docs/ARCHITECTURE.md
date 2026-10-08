@@ -547,16 +547,21 @@ Evidence Ledger / provenance
 basic heuristic write-side sanitization
 CI + sanity evaluation
 Test Card governance
+#12 incremental/idempotent indexing (VALIDATED; PR #246)
+#69 body-only plain-text ingestion (VALIDATED; PR #264)
+#70 structural segmentation with parent-only retrieval (VALIDATED; PR #270)
+#13 read-only Corpus Doctor (VALIDATED; PR #277)
 ```
+
+The final candidate and canonical merge SHAs, recorded `KEEP` decisions,
+and exact-head validation evidence for these four deliveries are linked from
+[their stage records](test-cards/README.md). These are historical delivery
+decisions, not new decisions made by this documentation reconciliation.
 
 Planned / experimental:
 
 ```text
 #68 Engine / CLI / MCP direct-query contract parity (implemented)
-#12 incremental/idempotent indexing
-#69 text ingestion coverage
-#70 structural segmentation
-#13 metadata doctor
 #14/#25/#26 controlled relations/graph intelligence
 #15 temporal model + state keys
 #71/#72 harness adapters + instruction resolver

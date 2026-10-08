@@ -21,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .conflict import ConflictResolver
+from .config import source_identity_base
 from .models import (
     NODE_TYPE_TO_STORE,
     STORE_FACTS,
@@ -36,7 +37,6 @@ from .models import (
 )
 from .security import WriteAdmission, WriteGatingEngine, WriteResult, validate_memory_path
 from .source_formats import (
-    NON_RECURSIVE_SOURCE_PATTERNS,
     RECURSIVE_SOURCE_PATTERNS,
     is_supported_source_path,
     source_format_for_path,
@@ -72,7 +72,7 @@ SEED_NODE_LIMIT = 30
 SEED_NODE_MIN_SIMILARITY = 0.01
 
 MEMORY_NODE_TYPES = {"factual", "preference", "procedural_anchor"}
-INDEX_SCHEMA_VERSION = 2
+INDEX_SCHEMA_VERSION = 3
 SCORE_DECIMAL_PLACES = 12
 
 # Tessera's native schema expects `id` / `node_type` / `tags` / `entities`.
@@ -113,12 +113,16 @@ class TesseraEngine:
         self.identity_root = str(
             Path(identity_root or self.storage_dir).expanduser().resolve(strict=False)
         )
+        self.source_identity_root = source_identity_base(
+            self.storage_dir, self.identity_root, self.source_roots
+        )
         self.graph = nx.DiGraph()
         self.file_registry: Dict[str, str] = {}
         self.processing_warnings: List[str] = []
         self.node_corpus: Dict[str, str] = {}
         self.node_ids: List[str] = []
         self.last_index_stats: Dict[str, Any] = {}
+        self._index_recursive = True
         self.tfidf_matrix = None
         self.vectorizer = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b")
         self.gating_engine = WriteGatingEngine()
@@ -169,10 +173,95 @@ class TesseraEngine:
             try:
                 import json
                 with open(self.manifest_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    manifest = json.load(f)
+                return self._migrate_identity_manifest(manifest)
             except Exception:
                 pass
         return {}
+
+    def _migrate_identity_manifest(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
+        """Retain provable identities while migrating old mixed path bases.
+
+        Previous manifests used store-relative paths for generated memories
+        and project-relative paths for other sources. A full graph rebuild is
+        required by the new cache schema, but that must not rename healthy
+        memories. Ambiguous old entries are only reused when their exact file
+        hash identifies one of the candidate sources.
+        """
+        import hashlib
+
+        migrated = {}
+        selected_paths = None
+        for relative, entry in manifest.items():
+            source_root = entry.get("source_root")
+            store_relative = entry.get("store_relative_path")
+            if (
+                isinstance(store_relative, str)
+                and not Path(store_relative).is_absolute()
+                and ".." not in Path(store_relative).parts
+            ):
+                # A project can relocate independently of an external store.
+                # Recover that source from its stable store-relative origin,
+                # not the former project-relative physical key.
+                candidates = {os.path.join(self.storage_dir, store_relative)}
+            elif source_root in {"store", "project"}:
+                base = self.storage_dir if source_root == "store" else self.identity_root
+                candidates = {os.path.join(base, relative)}
+            else:
+                if selected_paths is None:
+                    selected_paths = {
+                        os.path.normpath(path)
+                        for path in self._iter_source_files(recursive=True)
+                    }
+                candidates = {
+                    os.path.join(self.storage_dir, relative),
+                    os.path.join(self.identity_root, relative),
+                }
+                existing = {path for path in candidates if os.path.isfile(path)}
+                if len(existing) > 1:
+                    matching = set()
+                    for path in existing:
+                        if os.path.normpath(path) not in selected_paths:
+                            continue
+                        try:
+                            with open(path, "rb") as handle:
+                                digest = hashlib.sha256(handle.read()).hexdigest()
+                        except OSError:
+                            continue
+                        if digest == entry.get("file_hash"):
+                            matching.add(path)
+                    if len(matching) != 1:
+                        continue
+                    candidates = matching
+                elif existing:
+                    candidates = existing
+                else:
+                    # Missing legacy sources may have just moved. Retain the
+                    # entry for content-based rename detection without claiming
+                    # that its old physical origin can be recovered.
+                    candidates = {os.path.join(self.storage_dir, relative)}
+            path = next(iter(candidates))
+            key = self._relative_identity_path(path)
+            migrated[key] = dict(entry, source_root=self._source_root_kind())
+        return migrated
+
+    def _source_root_kind(self) -> str:
+        return "store" if self.source_identity_root == self.storage_dir else "project"
+
+    def _document_id(self, relative: str, preferred: Optional[str] = None, previous: Optional[str] = None) -> str:
+        """Keep healthy document IDs; separate IDs conflated by old caches."""
+        from .canonical import compute_sha256
+
+        occupied = {
+            entry.get("document_id") for path, entry in self.identity_manifest.items()
+            if path not in {relative, previous}
+        }
+        candidate = preferred or f"doc_{compute_sha256(relative)[:12]}"
+        counter = 0
+        while candidate in occupied:
+            counter += 1
+            candidate = f"doc_{compute_sha256(f'{relative}#{counter}')[:12]}"
+        return candidate
 
     def _save_identity_manifest(self) -> None:
         """Saves the stable identity manifest to disk."""
@@ -202,7 +291,7 @@ class TesseraEngine:
         if rel_path in self.identity_manifest:
             entry = self.identity_manifest[rel_path]
             mem_id = explicit_id or entry["id"]
-            doc_id = entry.get("document_id") or f"doc_{compute_sha256(rel_path)[:12]}"
+            doc_id = self._document_id(rel_path, entry.get("document_id"))
             return str(mem_id).strip(), doc_id
             
         # 4. Look up in identity manifest by content_hash to detect Rename/Move! (F5)
@@ -211,30 +300,36 @@ class TesseraEngine:
         for path, entry in self.identity_manifest.items():
             if entry["content_hash"] == content_hash:
                 relative = path.replace("/", os.sep)
-                possible_old_paths = {
-                    os.path.join(self.storage_dir, relative),
-                    os.path.join(self.identity_root, relative),
-                }
-                if not any(os.path.exists(item) for item in possible_old_paths):
+                if not os.path.exists(os.path.join(self.source_identity_root, relative)):
                     candidates.append((path, entry))
                     
         if len(candidates) == 1:
             # Unambiguous move/rename detected!
             old_path, entry = candidates[0]
             mem_id = explicit_id or entry["id"]
-            doc_id = entry.get("document_id") or f"doc_{compute_sha256(old_path)[:12]}"
+            doc_id = self._document_id(rel_path, entry.get("document_id"), previous=old_path)
             return str(mem_id).strip(), doc_id
             
         # 5. Not found -> generate a new stable ID (clean path slug based)
         if explicit_id:
             mem_id = str(explicit_id).strip()
         else:
-            slug = os.path.splitext(rel_path)[0]
+            slug = os.path.splitext(self._logical_identity_path(filepath))[0]
             slug = re.sub(r'^\.+/', '', slug)
             slug = re.sub(r'/+', '/', slug)
             mem_id = slug.strip("/")
+            # Rebuild order must not let a newly selected project source take
+            # an existing generated memory's logical ID before it is parsed.
+            reserved_ids = {entry.get("id") for entry in self.identity_manifest.values()}
+            if mem_id in reserved_ids:
+                base = f"{mem_id}__{compute_sha256(rel_path)[:6]}"
+                mem_id = base
+                counter = 1
+                while mem_id in reserved_ids:
+                    counter += 1
+                    mem_id = f"{base}_{counter}"
             
-        doc_id = f"doc_{compute_sha256(rel_path)[:12]}"
+        doc_id = self._document_id(rel_path)
         return mem_id, doc_id
 
     def _update_identity_manifest(self, filepath: str, canonical_meta: Any, raw_text: str = "") -> None:
@@ -251,10 +346,17 @@ class TesseraEngine:
         self.identity_manifest[rel_path] = {
             "id": stable_id,
             "document_id": doc_id,
+            "source_root": self._source_root_kind(),
             "content_hash": canonical_meta.source.content_hash,
             "file_hash": __import__("hashlib").sha256(raw_text.encode("utf-8")).hexdigest(),
             "updated_at": datetime.datetime.now().isoformat()
         }
+        try:
+            store_relative = Path(filepath).resolve(strict=False).relative_to(Path(self.storage_dir))
+        except ValueError:
+            pass
+        else:
+            self.identity_manifest[rel_path]["store_relative_path"] = store_relative.as_posix()
 
     # ------------------------------------------------------------------
     # Write path
@@ -653,7 +755,8 @@ class TesseraEngine:
                 ``.tessera_index/`` (pickle for fast reload + a human-readable
                 JSON summary) once the scan finishes.
         """
-        if use_cache and self._load_index_if_fresh():
+        self._index_recursive = recursive
+        if use_cache and self._load_index_if_fresh(recursive=recursive):
             scanned = len(list(self._iter_source_files(recursive=recursive)))
             self.last_index_stats = {
                 "scanned": scanned,
@@ -679,7 +782,10 @@ class TesseraEngine:
                 import pickle
                 with open(self.index_cache_pkl, "rb") as handle:
                     previous = pickle.load(handle)
-                if previous.get("index_schema_version") == INDEX_SCHEMA_VERSION:
+                if (
+                    previous.get("index_schema_version") == INDEX_SCHEMA_VERSION
+                    and previous.get("source_spec") == self._source_spec()
+                ):
                     self.graph = previous.get("graph", self.graph)
                     self.file_registry = previous.get("file_registry", {})
                     self.node_corpus = previous.get("node_corpus", {})
@@ -763,7 +869,6 @@ class TesseraEngine:
             self.processing_warnings.clear()
 
         self.processing_warnings.clear()
-        pending_connections = []
 
         if not os.path.exists(self.storage_dir) and not self.source_roots:
             return
@@ -786,6 +891,9 @@ class TesseraEngine:
                     raw_text, filepath, self._identity_base_for(filepath),
                     persistent_id=persistent_id, persistent_doc_id=persistent_doc_id
                 )
+                # Logical IDs/relative links retain their historical base;
+                # physical source paths use one unambiguous corpus namespace.
+                canonical_meta.source.path = self._relative_identity_path(filepath)
                 mem_id = canonical_meta.identity.id
                 if not mem_id:
                     continue
@@ -906,15 +1014,6 @@ class TesseraEngine:
 
                     self.graph.add_edge(mem_id, tag_id, relation_type="tagged_with")
 
-                # Add relations (explicit links, wikilinks, etc.) (F7)
-                for rel in canonical_meta.relations:
-                    # Ignore tag/entity connections that we already added above
-                    if rel.target.startswith(("tag_", "ent_")):
-                        continue
-                    pending_connections.append(
-                        (mem_id, rel.target, rel.type)
-                    )
-
             except Exception as e:
                 # Re-raise explicit collisions to fail build_index properly
                 if isinstance(e, ValueError) and (
@@ -936,12 +1035,19 @@ class TesseraEngine:
                 if data.get("node_type") in {"entity", "tag"} and self.graph.degree(node_id) == 0:
                     self.graph.remove_node(node_id)
                     self.node_corpus.pop(node_id, None)
-            for old_rel in set(self.identity_manifest) - set(current_paths):
-                self.identity_manifest.pop(old_rel, None)
+        for old_rel in set(self.identity_manifest) - set(current_paths):
+            self.identity_manifest.pop(old_rel, None)
 
-        for src, dest, rel in pending_connections:
-            if src in self.graph and dest in self.graph:
-                self.graph.add_edge(src, dest, relation_type=rel)
+        # Removing a changed target also removes incoming edges from unchanged
+        # sources. Replay all retained source relations, including previously
+        # unresolved links whose target has just been added.
+        for mem_id, data in list(self.graph.nodes(data=True)):
+            canonical_meta = data.get("canonical_metadata")
+            if canonical_meta is None:
+                continue
+            for rel in canonical_meta.relations:
+                if not rel.target.startswith(("tag_", "ent_")) and rel.target in self.graph:
+                    self.graph.add_edge(mem_id, rel.target, relation_type=rel.type)
 
         if self.node_corpus:
             self.node_ids = list(self.node_corpus.keys())
@@ -987,6 +1093,7 @@ class TesseraEngine:
             "index_schema_version": INDEX_SCHEMA_VERSION,
             "storage_dir": os.path.abspath(self.storage_dir),
             "source_spec": self._source_spec(),
+            "recursive": self._index_recursive,
             "graph": self.graph,
             "file_registry": self.file_registry,
             "node_corpus": self.node_corpus,
@@ -1020,7 +1127,7 @@ class TesseraEngine:
         with open(self.index_cache_json, "w", encoding="utf-8") as f:
             json.dump(readable, f, indent=2, ensure_ascii=False)
 
-    def _load_index_if_fresh(self) -> bool:
+    def _load_index_if_fresh(self, recursive: bool = True) -> bool:
         """
         Load ``graph.pkl`` only when every current path and source hash matches
         the identity manifest. The older count/latest-mtime shortcut could miss
@@ -1041,9 +1148,11 @@ class TesseraEngine:
             return False
         if snapshot.get("source_spec") != self._source_spec():
             return False
+        if snapshot.get("recursive") != recursive:
+            return False
         current_paths = {
             self._relative_identity_path(path): path
-            for path in self._iter_source_files(recursive=True)
+            for path in self._iter_source_files(recursive=recursive)
         }
         if set(current_paths) != set(self.identity_manifest):
             return False
@@ -1088,9 +1197,11 @@ class TesseraEngine:
                 root = Path(source.path).expanduser().resolve(strict=False)
                 if not root.exists():
                     continue
-                patterns = tuple(source.include) if recursive else NON_RECURSIVE_SOURCE_PATTERNS
+                patterns = tuple(source.include)
                 for pattern in patterns:
                     for candidate in root.glob(pattern):
+                        if not recursive and candidate.parent != root:
+                            continue
                         if not candidate.is_file() or not is_supported_source_path(candidate):
                             continue
                         resolved = candidate.resolve(strict=False)
@@ -1169,6 +1280,9 @@ class TesseraEngine:
             return self.identity_root
 
     def _relative_identity_path(self, filepath: str) -> str:
+        return os.path.relpath(filepath, self.source_identity_root).replace(os.sep, "/")
+
+    def _logical_identity_path(self, filepath: str) -> str:
         return os.path.relpath(
             filepath, self._identity_base_for(filepath)
         ).replace(os.sep, "/")
