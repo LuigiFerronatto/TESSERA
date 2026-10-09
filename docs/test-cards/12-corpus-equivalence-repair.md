@@ -3,18 +3,18 @@
 | Field | Value |
 |---|---|
 | Issue | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12), reliability follow-up to the delivered index contract |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; canonical-merge CI/benchmark cancelled, so not `VALIDATED`) |
 | Capability type | `runtime` |
-| Pull request | [Draft PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282) |
-| Head commit | Runtime candidate `51a8c3c281470bd290829beb94202405a61befc4`; final head/CI in PR #282 |
-| Merge commit | Not merged |
-| Decision | `PENDING` |
+| Pull request | [PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282) |
+| Head commit | Runtime candidate `51a8c3c281470bd290829beb94202405a61befc4`; final candidate head `879ad1f54ecd08f0895c3040743ac8c8b13291ae` |
+| Merge commit | `89dec1e444e15bfa8b1361683a9b88a89402888e` |
+| Decision | `KEEP` ([exact-head independent audit](https://github.com/LuigiFerronatto/TESSERA/pull/282#issuecomment-5957192591)) |
 | Benchmark applicability | `REQUIRED` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-09 |
 
 ## In one sentence
 
-This repair candidate makes fresh, cached and incremental builds respect the
+This repair makes fresh, cached and incremental builds respect the
 same selected sources and retain valid source versions and relations.
 
 ## What problem existed?
@@ -46,7 +46,7 @@ unchanged.
 
 ## How does it work now?
 
-**TARGET — NOT YET ON MAIN.** Project documents and generated memories have
+**IMPLEMENTED ON MAIN (merge `89dec1e444e15bfa8b1361683a9b88a89402888e`).** Project documents and generated memories have
 distinct physical paths and document identities; edits appear after indexing.
 Source-backed relations survive target updates. Both recursion settings retain
 the configured source selection, and cache reuse respects the requested mode.
@@ -71,9 +71,19 @@ original probes, 37 API/CLI checks and 18 real stdio MCP groups. Another 125
 mutation/reload cycles matched cleanly reparsed graphs and identities.
 Four-query sanity remained Hit@1=0.75, Hit@3=1.0, MRR=0.875.
 [PR #282 checks](https://github.com/LuigiFerronatto/TESSERA/pull/282/checks)
-record the final remote CI and required benchmark. Required benchmark results
-must be recorded before a merge decision; an unrun or blocked benchmark is
-never treated as a pass.
+record the final candidate CI and required benchmark. The
+[independent KEEP audit](https://github.com/LuigiFerronatto/TESSERA/pull/282#issuecomment-5957192591)
+covers final candidate `879ad1f54ecd08f0895c3040743ac8c8b13291ae`.
+
+After merge, [canonical CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849491343)
+and the [canonical Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849491372)
+were cancelled on `89dec1e444e15bfa8b1361683a9b88a89402888e`.
+Subsequent-main [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849579311)
+and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849579474)
+passed on `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`, which includes this repair.
+Those later results are integration evidence, not a pass on the earlier merge
+SHA. The repair remains `IMPLEMENTED`, not `VALIDATED`; a cancelled or unrun
+gate is never treated as a pass.
 
 ## What improved?
 
@@ -85,12 +95,13 @@ freshness rather than testing only whether a query returned some text.
 
 Semantic retrieval, temporal truth arbitration, source revision history,
 crash-durability guarantees and multi-process writer coordination remain
-outside this repair. No merge or release is implied by a passing local test.
+outside this repair. The recorded merge does not imply a release or validation
+of these out-of-scope capabilities.
 
 ## What is unlocked next?
 
-No roadmap dependency is promoted by this unmerged candidate. After review and
-required exact-head CI, a maintainer may decide whether to merge the repair.
+No roadmap dependency is promoted by this repair. Lifecycle `VALIDATED` status
+awaits CI/benchmark evidence for the canonical merge commit.
 
 ## Technical provenance
 
@@ -102,18 +113,19 @@ required exact-head CI, a maintainer may decide whether to merge the repair.
 | Source segmentation/cache context | [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), merge `8ca854f14f8f57443784e6cf3524419a953c2ce6` |
 | Baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Regression tests | `tests/test_index_corpus_equivalence.py` |
-| Benchmark record | Exact-head PR CI; pending until completed |
-| Evidence/Learnings/Decision | Repair PR; `PENDING`, with baseline and candidate distinguished |
-| Merge commit | Not merged |
+| Benchmark record | Final candidate passed per exact-head audit; canonical merge runs cancelled; subsequent-main integration passed (links above) |
+| Evidence/Learnings/Decision | Repair PR; recorded exact-head `KEEP`, with candidate, canonical merge and subsequent-main evidence distinguished |
+| Merge commit | `89dec1e444e15bfa8b1361683a9b88a89402888e` |
 
 ## Evolution
 
 ```text
 #153 selected-source boundary + #12 incremental index + #70 exact-hash cache
 → four reproduced transition defects
-→ this repair candidate and targeted coverage
-→ exact-head review/CI/benchmark decision, then post-merge reconciliation
+→ repair candidate and targeted coverage
+→ exact-head KEEP and canonical merge
+→ post-merge reconciliation; canonical validation remains incomplete
 ```
 
 The historical #12 validation record remains intact. This page records its
-unmerged repair follow-up and does not reopen or close the original issue.
+merged repair follow-up and does not reopen or close the original issue.
