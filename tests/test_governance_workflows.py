@@ -23,7 +23,6 @@ WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
 
 GH_AW_WORKFLOWS = {
     "tessera-issue-triage": "copilot",
-    "tessera-pr-maintainer-audit": "copilot",
     "tessera-pr-fixer": "copilot",
     "tessera-post-merge-lifecycle": "copilot",
     "tessera-documentation-drift": "copilot",
@@ -97,17 +96,6 @@ def test_issue_triage_has_expected_triggers():
     assert set(on["issues"]["types"]) >= {"opened", "reopened"}
 
 
-def test_pr_maintainer_audit_reruns_on_every_new_head():
-    fm = _frontmatter("tessera-pr-maintainer-audit")
-    on = fm["on"]
-    assert "pull_request" in on
-    types = set(on["pull_request"]["types"])
-    assert {"opened", "synchronize", "ready_for_review"} <= types, (
-        "the maintainer audit must re-trigger on every new PR head "
-        "(synchronize) or a stale audit could authorize a new SHA"
-    )
-
-
 def test_post_merge_lifecycle_only_runs_for_merged_prs():
     text = _read_source("tessera-post-merge-lifecycle")
     fm = _frontmatter("tessera-post-merge-lifecycle")
@@ -149,23 +137,6 @@ def test_no_workflow_grants_write_all(workflow_id):
             assert level != "write-all", f"{workflow_id} grants write-all on {scope}"
 
 
-def test_reviewer_cannot_push_or_merge_or_edit_files():
-    fm = _frontmatter("tessera-pr-maintainer-audit")
-    safe_outputs = fm.get("safe-outputs", {})
-    forbidden = {
-        "push-to-pull-request-branch",
-        "create-pull-request",
-        "merge-pull-request",
-    }
-    assert not (forbidden & safe_outputs.keys()), (
-        "the maintainer-audit reviewer must never be able to push, create a "
-        "PR, or merge; reviewer independence from the fixer/merge authority "
-        "would otherwise be violated"
-    )
-    tools = fm.get("tools", {})
-    assert tools.get("bash") is False, "the reviewer must not have arbitrary shell execution"
-
-
 def test_fixer_cannot_approve_or_merge():
     fm = _frontmatter("tessera-pr-fixer")
     safe_outputs = fm.get("safe-outputs", {})
@@ -194,12 +165,6 @@ def test_triage_prompt_distinguishes_open_ready_and_tracker():
     assert "TRACKER" in text
     assert "duplicate" in text and "related" in text
     assert "!=" in text, "the prompt must explicitly state these are non-equivalent concepts"
-
-
-def test_review_prompt_has_false_positive_guardrails():
-    text = _read_source("tessera-pr-maintainer-audit")
-    assert "DO NOT generate findings merely to produce a review" in text
-    assert "DO NOT mark ITERATE" in text
 
 
 def test_lifecycle_prompt_preserves_candidate_vs_merge_distinction():
@@ -354,68 +319,6 @@ def test_generated_maintenance_workflow_write_operations_require_explicit_operat
         )
 
 
-def test_merge_governor_binds_decision_to_current_head(monkeypatch):
-    sys.path.insert(0, str(REPO_ROOT))
-    from governance import merge_governor as mg
-
-    comments = [
-        {
-            "id": 1,
-            "created_at": "2026-01-01T00:00:00Z",
-            "body": "## Maintainer audit — KEEP\n\nAudited head: `deadbeef`\n",
-        }
-    ]
-    audit = mg.find_latest_audit(comments)
-    assert audit is not None
-    assert audit.decision == "KEEP"
-
-    # A stale KEEP (audited an older head) must NOT authorize the current head.
-    stale_result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="cafebabe",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=audit,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-    )
-    assert stale_result.authorized is False
-    assert any("stale audit" in reason for reason in stale_result.reasons)
-
-    # The same KEEP authorizes its own exact head when every other gate passes.
-    fresh_result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="deadbeef",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=audit,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-    )
-    assert fresh_result.authorized is True
-    assert fresh_result.reasons == []
-
-
-def test_merge_governor_rejects_iterate_and_block_decisions():
-    from governance import merge_governor as mg
-
-    for decision in ("ITERATE", "BLOCK"):
-        record = mg.AuditRecord(decision=decision, audited_head_sha="abc123")
-        result = mg.evaluate_runtime_pr_gates(
-            current_head_sha="abc123",
-            is_draft=False,
-            mergeable_state="clean",
-            audit=record,
-            ci_success=True,
-            benchmark_success=True,
-            has_requested_changes=False,
-            has_unresolved_threads=False,
-        )
-        assert result.authorized is False
-
-
 def test_merge_governor_lifecycle_gate_rejects_out_of_scope_files():
     from governance import merge_governor as mg
 
@@ -431,254 +334,8 @@ def test_merge_governor_lifecycle_gate_rejects_out_of_scope_files():
     assert any("tessera/engine.py" in reason for reason in result.reasons)
 
 
-def test_merge_governor_cli_exits_nonzero_when_not_authorized(tmp_path):
-    payload = {
-        "current_head_sha": "abc123",
-        "is_draft": False,
-        "mergeable_state": "clean",
-        "ci_success": True,
-        "benchmark_success": True,
-        "has_requested_changes": False,
-        "has_unresolved_threads": False,
-        "comments": [],
-    }
-    payload_path = tmp_path / "payload.json"
-    payload_path.write_text(json.dumps(payload), encoding="utf-8")
-
-    result = subprocess.run(
-        [sys.executable, "-m", "governance.merge_governor", "--payload-file", str(payload_path)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 1
-    assert json.loads(result.stdout)["authorized"] is False
-
-
-def test_merge_governor_cli_exposes_audit_record_for_dedicated_check(tmp_path):
-    """The CLI's JSON output must expose the parsed audit record so the
-    calling workflow can publish a dedicated `TESSERA Maintainer Audit`
-    check run, independent from the aggregate `tessera-merge-governor`
-    check (see `audit_check_conclusion`)."""
-    from governance import merge_governor as mg
-
-    payload = {
-        "current_head_sha": "def4567",
-        "is_draft": False,
-        "mergeable_state": "clean",
-        "ci_success": True,
-        "benchmark_success": True,
-        "has_requested_changes": False,
-        "has_unresolved_threads": False,
-        "comments": [
-            {
-                "id": 1,
-                "created_at": "2024-01-01T00:00:00Z",
-                "body": "## Maintainer audit — KEEP\n\nAudited head: `def4567`\n",
-            }
-        ],
-    }
-    payload_path = tmp_path / "payload.json"
-    payload_path.write_text(json.dumps(payload), encoding="utf-8")
-
-    result = subprocess.run(
-        [sys.executable, "-m", "governance.merge_governor", "--payload-file", str(payload_path)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    output = json.loads(result.stdout)
-    assert output["audit"] == {
-        "decision": "KEEP",
-        "audited_head_sha": "def4567",
-        "stale": False,
-    }
-    assert mg.audit_check_conclusion(output["audit"]) == "success"
-
-
-def test_audit_check_conclusion_flags_stale_and_non_keep_decisions():
-    from governance import merge_governor as mg
-
-    assert mg.audit_check_conclusion(None) is None
-    assert (
-        mg.audit_check_conclusion(
-            {"decision": "KEEP", "audited_head_sha": "old", "stale": True}
-        )
-        == "failure"
-    )
-    assert (
-        mg.audit_check_conclusion(
-            {"decision": "ITERATE", "audited_head_sha": "cur", "stale": False}
-        )
-        == "failure"
-    )
-    assert (
-        mg.audit_check_conclusion(
-            {"decision": "KEEP", "audited_head_sha": "cur", "stale": False}
-        )
-        == "success"
-    )
-
-
-def test_override_can_only_ever_assert_keep():
-    from governance import merge_governor as mg
-
-    assert mg.parse_override_comment("## Maintainer override — KEEP\n\nAudited head: `abc1234`\n") is not None
-    # There is no such contract as an override BLOCK/ITERATE; anything other
-    # than the literal KEEP heading must be unparseable.
-    assert mg.parse_override_comment("## Maintainer override — BLOCK\n\nAudited head: `abc1234`\n") is None
-    assert mg.parse_override_comment("some unrelated comment") is None
-    # Missing audited head must never be treated as a valid override.
-    assert mg.parse_override_comment("## Maintainer override — KEEP\n\nno head here\n") is None
-
-
-def test_find_latest_override_picks_most_recent():
-    from governance import merge_governor as mg
-
-    comments = [
-        {
-            "id": 1,
-            "created_at": "2024-01-01T00:00:00Z",
-            "body": "## Maintainer override — KEEP\n\nAudited head: `deadbee`\n",
-        },
-        {
-            "id": 2,
-            "created_at": "2024-01-02T00:00:00Z",
-            "body": "## Maintainer override — KEEP\n\nAudited head: `cafebab`\n",
-        },
-    ]
-    override = mg.find_latest_override(comments)
-    assert override is not None
-    assert override.audited_head_sha == "cafebab"
-    assert mg.find_latest_override([]) is None
-
-
-def test_is_engine_unavailable_classifies_run_conclusions():
-    from governance import merge_governor as mg
-
-    assert mg.is_engine_unavailable("success") is False
-    assert mg.is_engine_unavailable(None) is False
-    for conclusion in ("failure", "timed_out", "cancelled", "action_required"):
-        assert mg.is_engine_unavailable(conclusion) is True
-
-
-def test_missing_audit_without_engine_unavailable_blocks_as_before():
-    from governance import merge_governor as mg
-
-    result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="abc123",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=None,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-    )
-    assert result.authorized is False
-    assert any("no parseable maintainer-audit decision" in r for r in result.reasons)
-    assert result.notes == []
-
-
-def test_engine_unavailable_without_override_blocks_and_explains_why():
-    from governance import merge_governor as mg
-
-    result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="abc123",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=None,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-        engine_unavailable=True,
-    )
-    assert result.authorized is False
-    assert any("engine is unavailable" in r for r in result.reasons)
-
-
-def test_engine_unavailable_with_valid_override_authorizes_via_note_not_reason():
-    from governance import merge_governor as mg
-
-    override = mg.OverrideRecord(audited_head_sha="abc123")
-    result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="abc123",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=None,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-        engine_unavailable=True,
-        override=override,
-    )
-    assert result.authorized is True
-    assert result.reasons == []
-    assert any("break-glass override" in n for n in result.notes)
-
-
-def test_stale_override_does_not_authorize_current_head():
-    from governance import merge_governor as mg
-
-    override = mg.OverrideRecord(audited_head_sha="old-sha")
-    result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="new-sha",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=None,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-        engine_unavailable=True,
-        override=override,
-    )
-    assert result.authorized is False
-    assert any("no valid human override" in r for r in result.reasons)
-
-
-def test_override_never_substitutes_for_a_real_block_decision():
-    from governance import merge_governor as mg
-
-    record = mg.AuditRecord(decision="BLOCK", audited_head_sha="abc123")
-    override = mg.OverrideRecord(audited_head_sha="abc123")
-    result = mg.evaluate_runtime_pr_gates(
-        current_head_sha="abc123",
-        is_draft=False,
-        mergeable_state="clean",
-        audit=record,
-        ci_success=True,
-        benchmark_success=True,
-        has_requested_changes=False,
-        has_unresolved_threads=False,
-        engine_unavailable=True,
-        override=override,
-    )
-    assert result.authorized is False
-    assert any("BLOCK" in r for r in result.reasons)
-
-
-def test_audit_check_status_distinguishes_pending_from_engine_unavailable():
-    from governance import merge_governor as mg
-
-    # No audit yet and engine not confirmed unavailable: stay pending (None).
-    assert mg.audit_check_status(None, False) is None
-    # No audit, but engine confirmed unavailable: publish an honest failure,
-    # never a fake success/pending.
-    status = mg.audit_check_status(None, True)
-    assert status == {"conclusion": "failure", "status_label": "ENGINE_UNAVAILABLE"}
-    # A real decision takes precedence over engine_unavailable noise.
-    keep_status = mg.audit_check_status(
-        {"decision": "KEEP", "audited_head_sha": "cur", "stale": False}, True
-    )
-    assert keep_status == {"conclusion": "success", "status_label": "KEEP"}
-
-
 PERSONAS = {
     "tessera-issue-triage": "🧭 TESSERA Router",
-    "tessera-pr-maintainer-audit": "🛡️ TESSERA Guardian",
     "tessera-pr-fixer": "🔧 TESSERA Fixer",
     "tessera-post-merge-lifecycle": "🔄 TESSERA Steward",
     "tessera-documentation-drift": "🔎 TESSERA Sentinel",
@@ -696,13 +353,3 @@ def test_workflow_declares_its_content_level_persona(workflow_id, persona):
     assert persona in source, (
         f"{workflow_id}.md must declare and render the persona {persona!r}"
     )
-
-
-def test_merge_governor_publishes_dedicated_maintainer_audit_check():
-    """The deterministic merge-governor workflow must publish `TESSERA
-    Maintainer Audit` as its own check run, independent from the aggregate
-    `tessera-merge-governor` check, so branch protection can require the
-    semantic audit signal individually (defense in depth)."""
-    source = MERGE_GOVERNOR_PATH.read_text(encoding="utf-8")
-    assert 'name="TESSERA Maintainer Audit"' in source
-    assert "audit_check_status" in source

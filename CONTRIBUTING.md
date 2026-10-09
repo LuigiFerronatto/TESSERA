@@ -52,8 +52,11 @@ retrieval-quality improvement. Record a changelog entry or a reason it is not
 needed under the [change policy](docs/CHANGE_POLICY.md), and update affected docs
 and the [plain-language stage record](docs/test-cards/README.md).
 
-The [CI workflow](.github/workflows/tessera-ci.yml), independent Maintainer Audit
-and Merge Governor check the exact candidate. Human review remains required.
+The [CI workflow](.github/workflows/tessera-ci.yml), Benchmark Ledger and
+deterministic Merge Governor check the exact candidate. Positive human approval
+is not required; active requested changes, unresolved review threads, drafts and
+conflicts still block readiness. Automatic AI maintainer reviews are no longer
+part of PR CI.
 After merge, record the canonical commit and complete the
 [lifecycle reconciliation](docs/AGENTIC_GOVERNANCE.md) before starting dependent
 work from fresh `main`.

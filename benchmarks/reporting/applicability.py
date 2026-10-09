@@ -1,6 +1,8 @@
 """Parse and validate the PR benchmark-applicability declaration safely."""
 
 import argparse
+import hashlib
+import json
 import os
 import re
 from pathlib import Path
@@ -15,6 +17,7 @@ DECLARATION_RE = re.compile(
 RATIONALE_RE = re.compile(r"^\s*Benchmark rationale:\s*(.+?)\s*$", re.MULTILINE)
 ISSUE_RE = re.compile(r"^\s*Benchmark issue:\s*#([1-9][0-9]*)\s*$", re.MULTILINE)
 ISSUE_PREFIX_RE = re.compile(r"^\s*Benchmark issue\s*:", re.MULTILINE | re.IGNORECASE)
+CONTRACT_CHECK_PREFIX = "benchmark-contract ("
 
 
 def parse_applicability(body: str) -> Dict[str, Any]:
@@ -61,6 +64,18 @@ def parse_applicability(body: str) -> Dict[str, Any]:
     }
 
 
+def benchmark_contract_check_name(body: str) -> str:
+    """Bind benchmark evidence to validated metadata, not unrelated PR prose.
+
+    GitHub already binds the native check to its candidate commit. The versioned
+    digest additionally distinguishes applicability, issue and rationale changes
+    on that same commit, including the window before replacement jobs exist.
+    """
+    contract = {"version": 1, **parse_applicability(body)}
+    encoded = json.dumps(contract, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return CONTRACT_CHECK_PREFIX + hashlib.sha256(encoded).hexdigest() + ")"
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
@@ -82,6 +97,7 @@ def main() -> None:
         with args.github_output.open("a", encoding="utf-8") as handle:
             handle.write(f"applicability={parsed['applicability']}\n")
             handle.write(f"benchmark_issue={parsed['benchmark_issue'] or 0}\n")
+            handle.write(f"contract_check={benchmark_contract_check_name(body)}\n")
     print(parsed["applicability"])
 
 
