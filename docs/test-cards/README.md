@@ -41,6 +41,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #204 OKF exchange experiment | `IN_PROGRESS` | [204-okf-exchange.md](204-okf-exchange.md) | [Issue #204](https://github.com/LuigiFerronatto/TESSERA/issues/204), `ITERATE`, synthetic evidence only |
 | #191 Conversation source import | `IN_PROGRESS` source-only candidate | [191-conversation-source-import.md](191-conversation-source-import.md) | [Issue #191](https://github.com/LuigiFerronatto/TESSERA/issues/191); expanded runtime/enrichment scope remains open |
 | #139 Bounded information needs | `IN_PROGRESS` | [139-bounded-information-needs.md](139-bounded-information-needs.md) | [Issue #139](https://github.com/LuigiFerronatto/TESSERA/issues/139), [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); empirical quality gate pending |
 | #265 Vector backend mechanics | `IN_PROGRESS` | [265-vector-backend-mechanics.md](265-vector-backend-mechanics.md) | [Issue #265](https://github.com/LuigiFerronatto/TESSERA/issues/265), [audit](../PR_EVOLUTION_265.md), opt-in draft; real semantic/ANN gates remain open |
