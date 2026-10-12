@@ -31,6 +31,7 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [CONCEPTS.md](CONCEPTS.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical current-main architecture and module/pipeline boundaries. |
 | [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
+| [LONG_TERM_MEMORY.md](LONG_TERM_MEMORY.md) | Proposed durable-memory boundary; current and target ownership are explicit, no runtime promotion. |
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
 | [test-cards/README.md](test-cards/README.md) | Plain-language stage records: what changed, how it works, evidence, limitations and next work. |

@@ -655,3 +655,10 @@ This is roadmap architecture, not current runtime behavior. Individual layers ma
 classification and harness defaults behind an immutable registry. Explicit
 canonical metadata and source provenance remain authoritative. The registry
 does not change retrieval, discover more sources or decide instruction precedence.
+
+## Durable memory versus ephemeral context
+
+The [proposed Long-Term Memory boundary](LONG_TERM_MEMORY.md) names canonical
+source ownership separately from disposable indexes, generated state and Working
+Context. It inventories current contracts and reserves future admission, revision
+and context-invalidation work to their owning Test Cards; it activates no behavior.

@@ -77,6 +77,8 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | #121 Official agent Skills | `IN_PROGRESS` | [121-official-agent-skills.md](121-official-agent-skills.md) | Five thin current-capability instructions and artifact tests |
 
+| #168 Long-Term Memory boundary | `IN_PROGRESS` | [168-long-term-memory-boundary.md](168-long-term-memory-boundary.md) | Proposed current/target ownership; no runtime activation |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
