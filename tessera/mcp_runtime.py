@@ -76,7 +76,14 @@ class MCPRuntime:
                 if storage.exists() and not storage.is_dir():
                     raise RuntimeFailure("STARTUP_FAILED", "Configured store must be a directory.")
                 engine = TesseraEngine(configuration=self.configuration)
-                engine.build_index()
+                try:
+                    engine.build_index()
+                except (AttributeError, KeyError, TypeError):
+                    # Structurally invalid derived caches must not make the
+                    # receipt inspection/repair tools unreachable at startup.
+                    # Rebuild exclusively from canonical sources; source-level
+                    # failures still propagate and fail startup truthfully.
+                    engine.build_index(force_rebuild=True)
                 self.engine = engine
                 self.state = "ready"
             return self.engine
@@ -209,7 +216,7 @@ class MCPRuntime:
             return await self._assisted(partial(functions[name], **arguments), deadline, snapshot)
         result = await self._serialized(
             partial(functions[name], **arguments), deadline,
-            mutating=name in {"write_memory", "rebuild_index", "run_doctor"}
+            mutating=name in {"write_memory", "rebuild_index", "run_doctor", "repair_write_receipt"}
             or (name == "run_quickstart" and arguments.get("apply", False)),
         )
         # Pure reads may discard an overdue result. Mutating operations report

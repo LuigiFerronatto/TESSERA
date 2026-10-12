@@ -107,10 +107,11 @@ Inspect `tessera/models.py`, `episode_boundary.py`, `decomposer.py`,
 Run:
 
 ```bash
-python -m pytest tests/test_decomposer.py tests/test_conflict_containment.py -q
+python -m pytest tests/test_qumem_fidelity_docs.py tests/test_decomposer.py tests/test_conflict_containment.py -q
 ```
 
-Dedicated documentation regression checks are carried by [PR #284](https://github.com/LuigiFerronatto/TESSERA/pull/284). This cleanup does not assume that candidate is merged. They do not measure semantic boundary quality, extraction fidelity,
+Documentation regression checks verify the source/runtime separation and owning
+cards. They do not measure semantic boundary quality, extraction fidelity,
 preference reconstruction, or the unimplemented full regression suite.
 
 Benchmark applicability: NOT_APPLICABLE. This change corrects prose and
