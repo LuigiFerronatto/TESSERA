@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | Issue | [#121](https://github.com/LuigiFerronatto/TESSERA/issues/121) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime` |
-| Pull request | Candidate branch `feat/121-official-agent-skills` |
-| Merge commit | Not merged |
+| Pull request | [#292](https://github.com/LuigiFerronatto/TESSERA/pull/292) (final candidate `47ed30bcd8ce8fe4ea80246a64af6e1581de77b3`) |
+| Merge commit | `77a2fe9a347e4862e9532153513a5a44a436194a` (canonical CI/Benchmark Ledger evidence pending) |
 | Decision | `PENDING` review |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |
