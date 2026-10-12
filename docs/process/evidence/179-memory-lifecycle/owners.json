@@ -1,0 +1,90 @@
+{
+  "audited_on": "2026-10-02",
+  "scope": "Existing owners from #179; issue state only, not proof of delivery. #120 remains closed and is a contract/regression reference, not reopened work.",
+  "owners": [
+    {
+      "issue": 120,
+      "title": "[M1 MCP] Refactor MCP startup, contracts and operational robustness",
+      "state": "closed",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/120",
+      "updated_at": "2026-09-09T19:10:41Z"
+    },
+    {
+      "issue": 121,
+      "title": "[M1 Skills] Define and package official TESSERA Skills",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/121",
+      "updated_at": "2026-09-15T02:36:00Z"
+    },
+    {
+      "issue": 137,
+      "title": "[QUMem P1] Preserve source episode, supporting turns and temporal position for atomic memories",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/137",
+      "updated_at": "2026-09-05T03:15:46Z"
+    },
+    {
+      "issue": 138,
+      "title": "[QUMem P1] Make dynamic episode construction role-aware and continuity-driven",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/138",
+      "updated_at": "2026-09-04T13:57:06Z"
+    },
+    {
+      "issue": 167,
+      "title": "[M2 Context] Add agent working-context bootstrap and task-state packets",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/167",
+      "updated_at": "2026-09-15T02:33:31Z"
+    },
+    {
+      "issue": 168,
+      "title": "[M2 Memory] Define the Long-Term Memory layer and durable-agent-memory contract",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/168",
+      "updated_at": "2026-09-04T13:57:31Z"
+    },
+    {
+      "issue": 169,
+      "title": "[M2 Context] Build the Context Compiler for minimum-sufficient agent state",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/169",
+      "updated_at": "2026-09-15T02:33:43Z"
+    },
+    {
+      "issue": 171,
+      "title": "[M2 Agent API] Define the minimal agent-facing memory surface (search / context / evidence / remember / inspect)",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/171",
+      "updated_at": "2026-09-15T02:33:56Z"
+    },
+    {
+      "issue": 177,
+      "title": "[M2 Integrations] Add CLI lifecycle hook adapters and normalized agent event capture",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/177",
+      "updated_at": "2026-09-15T02:33:21Z"
+    },
+    {
+      "issue": 178,
+      "title": "[UX Epic] End-to-end TESSERA onboarding, integration and memory lifecycle experience",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/178",
+      "updated_at": "2026-09-15T02:36:29Z"
+    },
+    {
+      "issue": 15,
+      "title": "[Temporal P1] Temporal model and state keys",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/15",
+      "updated_at": "2026-09-04T13:57:09Z"
+    },
+    {
+      "issue": 16,
+      "title": "[Temporal P1] Conflict resolution and supersession",
+      "state": "open",
+      "url": "https://github.com/LuigiFerronatto/TESSERA/issues/16",
+      "updated_at": "2026-09-06T00:03:06Z"
+    }
+  ]
+}

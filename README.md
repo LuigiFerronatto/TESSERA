@@ -27,13 +27,13 @@ CLI remain `tessera`.
 Install the released package with:
 
 ```bash
-python -m pip install "tessera-agent-memory==0.0.3"
+python -m pip install "tessera-agent-memory==0.0.4"
 ```
 
 Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 
 ```bash
-uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.3"
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.4"
 ```
 
 To upgrade from PyPI:
@@ -43,7 +43,7 @@ uv pip install \
   --index-url https://pypi.org/simple \
   --refresh \
   --upgrade \
-  tessera-agent-memory==0.0.3
+  tessera-agent-memory==0.0.4
 ```
 
 If you do not have an environment yet, create one first with `uv venv`.
@@ -67,10 +67,10 @@ checkout:
 
 ```bash
 uv build
-python -m pip install ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
-python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
+python -m pip install ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
 python -m pip uninstall tessera-agent-memory
 ```
 
@@ -82,6 +82,11 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 
 
 ## Quickstart
+
+Experimental runtime setup previews are documented in
+[Integration setup plans](docs/guides/integration-setup.md). Direct and guided commands
+share one preview-by-default plan; explicit JSON mutation requires its exact hash.
+Real client/version/OS acceptance remains pending.
 
 Configure this project, write one fact, index it, and query it. The config is
 human-readable and contains no credential:
@@ -440,6 +445,13 @@ For implementation details, see [`docs/architecture/architecture.md`](docs/archi
 TESSERA is an evolving Foundation. The current implementation is usable, but several long-term-memory capabilities are still being tested.
 See [`docs/process/roadmap.md`](docs/process/roadmap.md) for the experimental sequence and linked Test Cards.
 
+## Responsibility boundary
+
+![Agent and TESSERA responsibility boundary](docs/assets/architecture/agent-boundary.svg)
+
+See the [diagram guide](docs/architecture/architecture-diagrams.md) for current lifecycle,
+structured evidence and explicitly experimental targets.
+
 ## Research references
 
 TESSERA is research-driven, but a cited paper is a **reference signal**, not proof that its approach is implemented or validated here. The detailed source → interpretation → Test Card trace lives in [`docs/research/references.md`](docs/research/references.md).
@@ -521,3 +533,11 @@ copyright and license notices supplied with third-party code and assets.
 TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
 
 See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
+
+### CLI presentation and automation
+
+Run `tessera` or `tessera status` for a read-only project dashboard. All commands
+support `--json`, `--plain`, `--no-color`, `--quiet`, `--verbose`, and `--debug`.
+Query JSON retains complete evidence; human results use compact previews with
+`--full` and `--explain` for detail. See the [CLI output contract](docs/reference/cli-output.md)
+for error categories, compatibility exceptions and safe non-interactive usage.

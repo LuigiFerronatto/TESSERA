@@ -19,6 +19,7 @@ _EXCLUDED_DIRECTORY_NAMES = {
     ".browser-harness",
     ".git",
     ".tessera_index",
+    ".tessera_history",
     ".venv-browser-agent",
     "Tessera",
     "node_modules",
@@ -157,7 +158,10 @@ def _configured_sources(
                         )
                     )
                     continue
-                if any(part in {".git", ".tessera_index"} for part in relative_to_root.parts[:-1]):
+                history_root = Path(configuration.storage_dir) / ".tessera_history"
+                if resolved == history_root or history_root in resolved.parents:
+                    continue
+                if any(part in {".git", ".tessera_index", ".tessera_history"} for part in relative_to_root.parts[:-1]):
                     continue
                 has_wildcard = any(character in pattern for character in "*?[")
                 if has_wildcard and any(
@@ -609,6 +613,29 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 f"{report.source_files_modified} source file(s) changed during the read-only audit.",
             )
         )
+
+    # Receipt inventory is operational metadata only; keep doctor read-only.
+    from types import SimpleNamespace
+    from .write_receipts import inspect_write_receipts
+    receipt_view = SimpleNamespace(
+        storage_dir=configuration.storage_dir,
+        index_cache_pkl=str(Path(configuration.index_dir) / "graph.pkl"),
+        index_cache_json=str(Path(configuration.index_dir) / "graph.json"),
+        manifest_path=str(Path(configuration.index_dir) / "identity_manifest.json"),
+        evidence_cache_json=str(Path(configuration.index_dir) / "evidence.json"),
+        _iter_source_files=lambda recursive: source_paths,
+    )
+    try:
+        receipts = inspect_write_receipts(receipt_view)
+    except ValueError:
+        receipts = [{"status": "corrupt", "repair_required": True}]
+    for receipt in receipts:
+        if receipt.get("repair_required") or receipt.get("retry_required"):
+            report.findings.append(CorpusFinding(
+                "incomplete_write_receipt", "warning",
+                "A write has incomplete or unverifiable derived state.",
+                hint="Run `tessera receipt inspect`, then `tessera receipt repair --operation-id ID`.",
+            ))
 
     report.sources.sort(key=lambda item: item.path)
     report.findings.sort(

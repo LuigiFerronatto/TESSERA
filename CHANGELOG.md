@@ -8,6 +8,121 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.0.4 — 2026-10-12
+
+### Experimental
+
+- Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
+  with explicit scope/store bindings, strict Claude/Gemini/Copilot JSON adapters,
+  hash-bound CLI apply/remove/semantic rollback, and byte-exact in-process
+  rollback tested only on synthetic configs. Codex exposes a verified user-scope
+  native command plan without TOML rewrites or client execution. Real provider/
+  version acceptance and semantic/lifecycle hooks remain unverified. (#190)
+- Added repository-only frozen-evidence capture/replay controls for R0 raw,
+  R1 selected-span/provenance and R2 structured presentation. Deterministic
+  offline budgets expose evidence/provenance retention and overhead without
+  provider calls or changes to default retrieval. Synthetic controls do not
+  establish downstream QA benefit; renderer selection remains `ITERATE`.
+  ([#28](https://github.com/LuigiFerronatto/TESSERA/issues/28))
+- Add explicitly opt-in D0/D1/D2 typed decomposition experiments with versioned
+  F/P/I semantics, strict one-pass/three-pass contracts and canonical write
+  admission. Add a draft annotation packet and human-review-gated capture,
+  replay and scoring harness. Existing defaults remain unchanged; no provider
+  quality result or default adoption is claimed. ([#136](https://github.com/LuigiFerronatto/TESSERA/issues/136))
+- Added an opt-in repository-only episode-boundary comparison harness for #138,
+  with unchanged E0, explicit-role E1/E3, lossless source memberships, separate
+  timeout traces and a frozen synthetic draft plus blinded annotation packet.
+  Human review and downstream quality gates remain pending; installed runtime
+  behavior and canonical turn models are unchanged.
+- Add opt-in Open Knowledge Format import/export plans, explicit standalone
+  source-copy/export transactions and a pinned
+  synthetic round-trip experiment. Typed relations, temporal truth and provenance
+  use a namespaced canonical extension; imported attestations never execute.
+  Transactions use reviewed source/destination hashes, the current security
+  gate and atomic no-overwrite publication; semantic admission and promotion
+  remain pending (#204). Versioned JSON, human Markdown, target-safe Obsidian
+  and explicitly lossy CSV projections share canonical records and explicit
+  selection/manifests; no encryption/access-control policy is inferred.
+- Explicit historical conversation files can be previewed and imported into
+  inspectable, redacted source evidence, with ordered roles/timestamps/tool
+  references, stable session identity and idempotent retries. Generic JSONL v1
+  and a strict linear Claude Code JSONL subset are opt-in; no home scanning,
+  provider calls or durable-memory admission occurs. Indexing is a separate
+  explicit step. Full runtime discovery, live convergence and enrichment remain
+  unimplemented. ([#191](https://github.com/LuigiFerronatto/TESSERA/issues/191))
+- Added an opt-in, read-only typed recipe composition experiment with explicit
+  effects, bounded validation, dry-run plans and structured partial outcomes.
+  Adoption is `ITERATE`; direct APIs remain the default and canonical writes,
+  providers, automatic discovery and checkpoint resume remain unavailable.
+  ([#258](https://github.com/LuigiFerronatto/TESSERA/issues/258))
+- Add a provider-neutral lifecycle Hook Core SDK with explicit project/run
+  identity, redacted bounded ephemeral capture, prepared-context budgets and
+  frozen Claude/Codex/Gemini/Copilot mappings. Response boundaries never save
+  memory; downstream handlers and installation remain unimplemented. Includes
+  an offline semantic parity experiment. ([#196](https://github.com/LuigiFerronatto/TESSERA/issues/196))
+- Added opt-in bounded N1/N2 historical information needs to the assisted
+  orchestrator, with strict validation, explicit no-memory/ambiguous empty
+  outcomes and inspectable generation measurements. N0 remains the default;
+  deterministic retrieval is unchanged. The frozen controlled experiment and
+  exact-prompt capture/replay support mechanics evaluation, while provider-backed
+  semantic/quality and consumer-effort gates remain pending. (#139)
+- Added opt-in query-aware one-hop graph expansion with node, edge-slot and
+  added-context budgets plus caller-owned decision traces. A frozen A0/A1/A2
+  ablation records quality and costs; current default expansion remains
+  unchanged because the candidate does not beat no expansion on quality.
+  ([#25](https://github.com/LuigiFerronatto/TESSERA/issues/25))
+### CLI presentation (#166 / #119)
+
+- Added shared human/plain/JSON presentation, global output flags, structured
+  operational errors and read-only no-args/status dashboards. Empty query JSON
+  now returns `[]`; existing successful JSON payloads remain intact.
+- Human queries default to compact evidence previews, with `--full` and
+  `--explain` for detail. Existing init foregrounds the saved configuration and
+  preserves it through an explicit Keep/update choice.
+- Added safe literal terminal rendering, English-only catalog selection,
+  delayed line-based progress and PTY/ASCII/cancellation coverage. Ordinary
+  commands no longer perform advisory update checks; use `update --check`.
+- Documented versioned exit-code compatibility and remaining integration,
+  intelligence, enrichment and review boundaries in `docs/reference/cli-output.md`.
+### Experimental
+
+- Automatic decomposition retains an independently inspectable Markdown source
+  episode, validated supporting-turn references, exact source-version/span
+  evidence and episode-local temporal position through write/index/rebuild.
+  Legacy section-only inputs remain usable with explicitly unavailable turn
+  support; no semantic entailment, validity time or state accuracy is claimed.
+  ([#137](https://github.com/LuigiFerronatto/TESSERA/issues/137))
+- Added opt-in, model-independent vector backend contracts, an exact-flat
+  correctness oracle, a dependency-free SQLite persistent candidate and an
+  explicitly imported SciPy cKDTree exact/approximate candidate. A preregistered
+  synthetic size sweep records native RSS, cold/warm timings and ANN misses.
+  Atomic/source/segment lanes retain canonical identity; typed filters,
+  compatibility manifests, atomic source replacement and crash recovery are
+  covered by frozen-vector mechanics tests. No semantic Engine default or
+  embedding provider is enabled; real-corpus/default selection remains an open
+  experiment. ([#265](https://github.com/LuigiFerronatto/TESSERA/issues/265))
+### Added
+- Package five provider-neutral agent Skills for existing init, write, query, read-only corpus diagnostics and benchmark workflows, with a read-only resource API; keep procedural-anchor notes separate. ([#121](https://github.com/LuigiFerronatto/TESSERA/issues/121))
+
+
+### Experimental
+
+- Added opt-in Python `revision_history=True`: durable observed full-source
+  revisions and issued evidence IDs outside the disposable index, with old-body
+  preservation before overwrites and explicit archive failures. Historical
+  revisions do not become live memories. See [revision history](docs/reference/revision-history.md)
+  and [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73); temporal validity
+  and default activation remain separate decisions.
+### Added
+
+- Opt-in operation IDs provide versioned, content-free single-write receipts
+  across Python, CLI and MCP. Retries and crash recovery preserve canonical
+  bytes; deterministic local inspection/repair reports and rebuilds incomplete
+  index/graph/manifest and Evidence Ledger stages without provider calls.
+  Existing calls without operation IDs retain their behavior.
+  ([#263](https://github.com/LuigiFerronatto/TESSERA/issues/263))
 ### Experimental
 - Add an immutable instruction-format adapter registry with inspectable filename defaults and generic fallback; preserve existing canonical metadata and retrieval semantics. ([#71](https://github.com/LuigiFerronatto/TESSERA/issues/71))
 

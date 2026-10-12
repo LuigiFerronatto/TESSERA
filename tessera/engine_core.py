@@ -21,7 +21,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .conflict import ConflictResolver
+from .canonical import LineageMetadata
 from .config import source_identity_base
+from .graph_expansion import ExpansionIndex, GraphExpansionPolicy, select_expansion
 from .models import (
     NODE_TYPE_TO_STORE,
     STORE_FACTS,
@@ -43,10 +45,12 @@ from .source_formats import (
     split_source,
 )
 from .segmentation import SEGMENT_NODE_TYPE, SEGMENTATION_SCHEMA_VERSION, segment_source_document
+from .revisions import HISTORY_DIRECTORY, RevisionHistory, RevisionHistoryError
 
 
 _BUILTIN_EXCLUDED_SOURCE_DIRS = {
     ".tessera_index",
+    HISTORY_DIRECTORY,
     ".git",
     "node_modules",
     "venv",
@@ -107,6 +111,7 @@ class TesseraEngine:
         source_roots: Optional[Tuple[Any, ...]] = None,
         index_dir: Optional[str] = None,
         identity_root: Optional[str] = None,
+        revision_history: bool = False,
     ):
         self.storage_dir = str(Path(storage_dir).expanduser().resolve(strict=False))
         self.source_roots = tuple(source_roots or ())
@@ -117,6 +122,7 @@ class TesseraEngine:
             self.storage_dir, self.identity_root, self.source_roots
         )
         self.graph = nx.DiGraph()
+        self._expansion_index = ExpansionIndex(self.graph)
         self.file_registry: Dict[str, str] = {}
         self.processing_warnings: List[str] = []
         self.node_corpus: Dict[str, str] = {}
@@ -156,6 +162,9 @@ class TesseraEngine:
         self.index_cache_json = os.path.join(self.index_cache_dir, "graph.json")
         self.manifest_path = os.path.join(self.index_cache_dir, "identity_manifest.json")
         self.identity_manifest = self._load_identity_manifest()
+        self.revision_history = (
+            RevisionHistory(self.storage_dir, self.index_cache_dir) if revision_history else None
+        )
 
     def set_today_provider(self, provider: Any) -> None:
         """Injects a custom provider to fetch 'today's date for determinism in testing."""
@@ -287,9 +296,12 @@ class TesseraEngine:
         # 2. Extract content hash
         content_hash = compute_sha256(body)
         
+        # Durable observations retain identity when the disposable cache is removed.
+        identities = self.revision_history.identity_entries() if self.revision_history else {}
+        identities.update(self.identity_manifest)
         # 3. Look up in identity manifest by path
-        if rel_path in self.identity_manifest:
-            entry = self.identity_manifest[rel_path]
+        if rel_path in identities:
+            entry = identities[rel_path]
             mem_id = explicit_id or entry["id"]
             doc_id = self._document_id(rel_path, entry.get("document_id"))
             return str(mem_id).strip(), doc_id
@@ -297,12 +309,18 @@ class TesseraEngine:
         # 4. Look up in identity manifest by content_hash to detect Rename/Move! (F5)
         # Verify old path no longer exists on disk to distinguish rename from copy/duplicates (F5)
         candidates = []
-        for path, entry in self.identity_manifest.items():
+        for path, entry in identities.items():
+            if self.revision_history is not None and explicit_id and str(explicit_id).strip() != entry["id"]:
+                # A distinct explicit identity at a new location is an independent
+                # memory, not an inferred rename of a deleted historical source.
+                continue
             if entry["content_hash"] == content_hash:
                 relative = path.replace("/", os.sep)
                 if not os.path.exists(os.path.join(self.source_identity_root, relative)):
                     candidates.append((path, entry))
                     
+        # Multiple historical locations of one document are still one candidate.
+        candidates = list({entry.get("document_id", path): (path, entry) for path, entry in candidates}.values())
         if len(candidates) == 1:
             # Unambiguous move/rename detected!
             old_path, entry = candidates[0]
@@ -358,6 +376,24 @@ class TesseraEngine:
         else:
             self.identity_manifest[rel_path]["store_relative_path"] = store_relative.as_posix()
 
+    def _archive_source(self, filepath: str, raw_text: Optional[str] = None) -> None:
+        if self.revision_history is None:
+            return
+        from .canonical import parse_and_normalize
+        if raw_text is None:
+            with open(filepath, "r", encoding="utf-8") as handle:
+                raw_text = handle.read()
+        else:
+            # Match the universal-newline text view used by source indexing.
+            # Do not invent a second revision when a CRLF write is first indexed.
+            raw_text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
+        memory_id, document_id = self._resolve_persistent_id(filepath, raw_text)
+        metadata = parse_and_normalize(
+            raw_text, filepath, self._identity_base_for(filepath),
+            persistent_id=memory_id, persistent_doc_id=document_id,
+        )
+        self.revision_history.capture(metadata, raw_text)
+
     # ------------------------------------------------------------------
     # Write path
     # ------------------------------------------------------------------
@@ -373,6 +409,55 @@ class TesseraEngine:
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
+        operation_id: Optional[str] = None,
+        *,
+        lineage: Optional[LineageMetadata] = None,
+    ) -> WriteResult:
+        """Write with an optional durable operation ID and shared outcome receipt.
+
+        Omitting operation_id preserves the legacy persistence-only contract.
+        """
+        arguments = dict(mem_id=mem_id, mem_type=mem_type, episode_id=episode_id,
+                         content=content, tags=tags, entities=entities, description=description,
+                         provenance_turns=provenance_turns, active_connections=active_connections,
+                         persist_format=persist_format)
+        if lineage is not None:
+            arguments["lineage"] = lineage
+        if operation_id is None:
+            return self._write_memory_note_result(**arguments)
+        from .write_receipts import write_with_receipt
+        return write_with_receipt(self, arguments, operation_id)
+
+    def inspect_write_receipt(self, operation_id):
+        from .write_receipts import inspect_write_receipt
+        return inspect_write_receipt(self, operation_id)
+
+    def inspect_write_receipts(self):
+        from .write_receipts import inspect_write_receipts
+        return inspect_write_receipts(self)
+
+    def repair_write_receipt(self, operation_id):
+        from .write_receipts import repair_write_receipt
+        return repair_write_receipt(self, operation_id)
+
+    def _write_receipt_index(self):
+        TesseraEngine.build_index(self, use_cache=False, persist=False, force_rebuild=True)
+
+    def _write_memory_note_result(
+        self,
+        mem_id: str,
+        mem_type: str,
+        episode_id: str,
+        content: str,
+        tags: List[str],
+        entities: List[Entity],
+        description: str = "",
+        provenance_turns: Optional[List[int]] = None,
+        active_connections: Optional[List[Connection]] = None,
+        persist_format: Literal["md"] = "md",
+        _write_operation=None,
+        _before_persist=None,
+        lineage: Optional[LineageMetadata] = None,
     ) -> WriteResult:
         """
         Canonical write flow returning the complete gate/persistence contract.
@@ -397,10 +482,23 @@ class TesseraEngine:
             )
 
         path_validation = validate_memory_path(self.storage_dir, mem_id)
-        if not path_validation.valid or path_validation.destination is None:
+        if (not path_validation.valid or path_validation.destination is None
+                or HISTORY_DIRECTORY in mem_id.split("/")[:-1]):
             decision = self.gating_engine.reject_invalid_memory_id(content)
             return WriteResult(mem_id, None, False, decision)
 
+        episode_root = (Path(self.storage_dir) / "_episodes").resolve(strict=False)
+        if mem_id.split("/")[0].casefold() == "_episodes" or episode_root in path_validation.destination.parents:
+            raise ValueError("_episodes is reserved for immutable source episode records")
+        if lineage is not None:
+            from .lineage import validate_lineage
+
+            validate_lineage(self.storage_dir, mem_id, lineage)
+            if lineage.source_episode_id != episode_id:
+                raise ValueError("episode_id conflicts with source episode lineage")
+            if provenance_turns is not None and list(provenance_turns) != lineage.supporting_turns:
+                raise ValueError("provenance_turns conflicts with source episode lineage")
+            provenance_turns = list(lineage.supporting_turns)
         provenance_turns = provenance_turns or []
         active_connections = active_connections or []
         decision = self.gating_engine.evaluate(content, tags)
@@ -450,13 +548,20 @@ class TesseraEngine:
             reasons=list(decision.reasons),
             original_hash=decision.original_hash,
             persisted_hash=decision.persisted_hash or "",
+            temporal_position=lineage.temporal_position if lineage else None,
+            episode_source=lineage.episode_source if lineage else None,
+            source_evidence=lineage.source_evidence if lineage else [],
         )
 
         frontmatter_dict = frontmatter_data.to_dict()
+        if _write_operation is not None:
+            frontmatter_dict["write_operation"] = _write_operation
         yaml_frontmatter = yaml.dump(
             frontmatter_dict, default_flow_style=False, sort_keys=False, allow_unicode=True
         )
         markdown_body = f"---\n{yaml_frontmatter}---\n\n{persistence_candidate}"
+        if _before_persist is not None:
+            _before_persist(markdown_body)
         filepath = str(path_validation.destination)
         parent = os.path.dirname(filepath)
         missing_parents = []
@@ -467,6 +572,13 @@ class TesseraEngine:
             if next_cursor == cursor:
                 break
             cursor = next_cursor
+
+        # Preserve the old body durably BEFORE the destructive replace. Archive
+        # failure is fatal; an enabled policy never silently becomes overwrite-only.
+        if self.revision_history is not None:
+            self.revision_history.check_available()
+            if os.path.exists(filepath):
+                self._archive_source(filepath)
 
         descriptor = None
         temporary_path = None
@@ -492,6 +604,14 @@ class TesseraEngine:
                     pass
             raise
 
+        if self.revision_history is not None:
+            try:
+                self._archive_source(filepath, markdown_body)
+            except Exception as exc:
+                raise RevisionHistoryError(
+                    "source was committed, but its new revision could not be archived; "
+                    "the prior version remains preserved", source_committed=True,
+                ) from exc
         self.file_registry[mem_id] = filepath
         return WriteResult(mem_id, filepath, True, decision)
 
@@ -507,6 +627,8 @@ class TesseraEngine:
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
+        *,
+        lineage: Optional[LineageMetadata] = None,
     ) -> str:
         """Compatibility API returning a filepath for accepted writes.
 
@@ -525,6 +647,7 @@ class TesseraEngine:
             provenance_turns=provenance_turns,
             active_connections=active_connections,
             persist_format=persist_format,
+            lineage=lineage,
         )
         if not result.persisted:
             raise WriteGatingViolationError(result)
@@ -555,7 +678,7 @@ class TesseraEngine:
         entities: Optional[List[Entity]] = None,
         active_connections: Optional[List[Connection]] = None,
     ) -> str:
-        """Writes a concrete, immutable fact to the `facts` store."""
+        """Writes a concrete factual record to the `facts` store."""
         return self.write_memory_note(
             mem_id=mem_id,
             mem_type="factual",
@@ -653,6 +776,18 @@ class TesseraEngine:
             active_connections=active_connections,
         )
 
+    def persist_source_episode(self, episode_id: str, episode: Episode) -> Any:
+        """Persist a no-overwrite source record independently of atomic memories."""
+        from .lineage import persist_source_episode
+
+        return persist_source_episode(self, episode_id, episode)
+
+    def inspect_source_episode(self, episode_id: str) -> Dict[str, Any]:
+        """Read ordered source turns, roles, timestamps and exact version evidence."""
+        from .lineage import inspect_source_episode
+
+        return inspect_source_episode(self.storage_dir, episode_id).to_dict()
+
     def decompose_and_write_episode(
         self,
         mem_id_prefix: str,
@@ -736,7 +871,7 @@ class TesseraEngine:
     # ------------------------------------------------------------------
     # Index build
     # ------------------------------------------------------------------
-    def build_index(self, recursive: bool = True, use_cache: bool = True, persist: bool = True) -> None:
+    def build_index(self, recursive: bool = True, use_cache: bool = True, persist: bool = True, *, force_rebuild: bool = False) -> None:
         """
         Scans the storage directory and (re)builds the heterogeneous
         knowledge graph in memory: memory notes, entities, tags, and their
@@ -756,7 +891,7 @@ class TesseraEngine:
                 JSON summary) once the scan finishes.
         """
         self._index_recursive = recursive
-        if use_cache and self._load_index_if_fresh(recursive=recursive):
+        if use_cache and not force_rebuild and self._load_index_if_fresh(recursive=recursive):
             scanned = len(list(self._iter_source_files(recursive=recursive)))
             self.last_index_stats = {
                 "scanned": scanned,
@@ -775,9 +910,22 @@ class TesseraEngine:
         # Reuse the previous graph when a persisted snapshot exists. Source
         # nodes whose content/path changed are removed and reparsed below;
         # unchanged nodes remain in place. TF-IDF is still refit globally.
-        previous_manifest = dict(self.identity_manifest)
+        if force_rebuild:
+            self.graph.clear()
+            self.file_registry.clear()
+            self.node_corpus.clear()
+            self.node_ids.clear()
+            self.tfidf_matrix = None
+            self.processing_warnings.clear()
+            # Malformed derived manifests must not prevent rebuilding sources.
+            if not isinstance(self.identity_manifest, dict) or any(
+                not isinstance(entry, dict) or not {"id", "content_hash"} <= set(entry)
+                for entry in self.identity_manifest.values()
+            ):
+                self.identity_manifest = {}
+        previous_manifest = {} if force_rebuild else dict(self.identity_manifest)
         previous_registry = dict(self.file_registry)
-        if not previous_registry and os.path.exists(self.index_cache_pkl):
+        if not force_rebuild and not previous_registry and os.path.exists(self.index_cache_pkl):
             try:
                 import pickle
                 with open(self.index_cache_pkl, "rb") as handle:
@@ -880,7 +1028,7 @@ class TesseraEngine:
             if incremental and filename in unchanged_paths:
                 continue
             try:
-                with open(filepath, "r", encoding="utf-8") as f:
+                with open(filepath, "r", encoding="utf-8", newline="" if force_rebuild else None) as f:
                     raw_text = f.read()
 
                 # Integrate Canonical Metadata Model (F2/F3/F4/F5/F7)
@@ -918,6 +1066,8 @@ class TesseraEngine:
                     mem_id = f"{mem_id}__{suffix}"
 
                 canonical_meta.identity.id = mem_id
+                if self.revision_history is not None:
+                    self.revision_history.capture(canonical_meta, raw_text)
                 self._update_identity_manifest(filepath, canonical_meta, raw_text)
 
                 self.file_registry[mem_id] = filepath
@@ -1015,6 +1165,8 @@ class TesseraEngine:
                     self.graph.add_edge(mem_id, tag_id, relation_type="tagged_with")
 
             except Exception as e:
+                if isinstance(e, RevisionHistoryError):
+                    raise
                 # Re-raise explicit collisions to fail build_index properly
                 if isinstance(e, ValueError) and (
                     "Collision de IDs Explícitos" in str(e)
@@ -1054,6 +1206,7 @@ class TesseraEngine:
             corpus_texts = [self.node_corpus[nid] for nid in self.node_ids]
             self.tfidf_matrix = self.vectorizer.fit_transform(corpus_texts)
 
+        self._expansion_index = ExpansionIndex(self.graph)
         if persist:
             self.save_index()
 
@@ -1120,6 +1273,8 @@ class TesseraEngine:
                     "document_id": data.get("document_id"),
                     "source_span": data.get("source_span"),
                     "heading": data.get("heading"),
+                    "lineage": data["canonical_metadata"].lineage.to_dict()
+                    if data.get("canonical_metadata") and data["canonical_metadata"].lineage else None,
                 }
                 for node_id, data in self.graph.nodes(data=True)
             },
@@ -1175,6 +1330,7 @@ class TesseraEngine:
         self.node_ids = snapshot["node_ids"]
         self.tfidf_matrix = snapshot["tfidf_matrix"]
         self.vectorizer = snapshot["vectorizer"]
+        self._expansion_index = ExpansionIndex(self.graph)
         return True
 
     def _segment_count(self) -> int:
@@ -1211,8 +1367,11 @@ class TesseraEngine:
                             raise ValueError(
                                 f"configured source escapes its root through a symlink: {candidate}"
                             ) from exc
+                        history_root = Path(self.storage_dir) / HISTORY_DIRECTORY
+                        if resolved == history_root or history_root in resolved.parents:
+                            continue
                         relative_parts = resolved.relative_to(root).parts[:-1]
-                        mandatory_parts = {".git", ".tessera_index"}
+                        mandatory_parts = {".git", ".tessera_index", HISTORY_DIRECTORY}
                         if any(part in mandatory_parts for part in relative_parts):
                             continue
                         has_wildcard = any(character in pattern for character in "*?[")
@@ -1376,7 +1535,9 @@ class TesseraEngine:
     # Retrieval
     # ------------------------------------------------------------------
     def retrieve_context(
-        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None
+        self, query_text: str, top_n: int = 7, resolve_conflicts: bool = True, weights: Optional[Dict[str, float]] = None,
+        *, graph_expansion: Optional[GraphExpansionPolicy] = None,
+        expansion_debug: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         End-to-end adaptive retrieval (QUMem & MemORAI style):
@@ -1387,6 +1548,12 @@ class TesseraEngine:
         5. Filters down to actual memory-note candidates using explainable multi-signal ranking.
         6. Applies non-destructive possible-conflict containment.
         """
+        policy = graph_expansion if graph_expansion is not None else GraphExpansionPolicy(mode="one_hop")
+        if not isinstance(policy, GraphExpansionPolicy):
+            raise TypeError("graph_expansion must be a GraphExpansionPolicy")
+        if expansion_debug is not None:
+            select_expansion(self.graph, self._expansion_index, query_text, [], {}, policy, expansion_debug)
+            expansion_debug.update({"subgraph_nodes": 0, "subgraph_edges": 0})
         if not self.graph or not self.node_corpus or self.tfidf_matrix is None:
             return []
 
@@ -1406,16 +1573,25 @@ class TesseraEngine:
         if not seed_nodes:
             return []
 
-        # 2. 1-hop subgraph expansion (MemORAI).
-        subgraph_nodes = set(seed_nodes)
-        for seed in seed_nodes:
-            subgraph_nodes.update(
-                node_id for node_id in self.graph.successors(seed)
-                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
-            )
-            subgraph_nodes.update(
-                node_id for node_id in self.graph.predecessors(seed)
-                if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+        # Preserve the default A1 route exactly. Experimental policies change
+        # only expansion, using the same seeds, ranking and conflict handling.
+        allowed_expansion_edges = None
+        if policy.mode == "one_hop" and expansion_debug is None:
+            subgraph_nodes = set(seed_nodes)
+            for seed in seed_nodes:
+                subgraph_nodes.update(
+                    node_id for node_id in self.graph.successors(seed)
+                    if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+                )
+                subgraph_nodes.update(
+                    node_id for node_id in self.graph.predecessors(seed)
+                    if self.graph.nodes[node_id].get("node_type") != SEGMENT_NODE_TYPE
+                )
+        else:
+            similarity_map = dict(zip(self.node_ids, similarities))
+            subgraph_nodes, allowed_expansion_edges = select_expansion(
+                self.graph, self._expansion_index, query_text, seed_nodes,
+                similarity_map, policy, expansion_debug,
             )
 
         # Rebuild the query subgraph in a stable order. NetworkX algorithms
@@ -1426,11 +1602,22 @@ class TesseraEngine:
         subgraph = nx.DiGraph()
         for node_id in sorted(subgraph_nodes):
             subgraph.add_node(node_id, **self.graph.nodes[node_id])
-        expanded = self.graph.subgraph(subgraph_nodes)
+        if allowed_expansion_edges is None:
+            expanded = self.graph.subgraph(subgraph_nodes)
+            edge_rows = expanded.edges(data=True)
+        else:
+            # Pair membership avoids enumerating an expanded high-degree node.
+            seed_edges = {(source, target) for source in seed_nodes for target in seed_nodes
+                          if self.graph.has_edge(source, target)}
+            edge_rows = [(source, target, self.graph[source][target])
+                         for source, target in seed_edges | allowed_expansion_edges]
         for source_id, target_id, edge_data in sorted(
-            expanded.edges(data=True), key=lambda item: (item[0], item[1])
+            edge_rows, key=lambda item: (item[0], item[1])
         ):
             subgraph.add_edge(source_id, target_id, **edge_data)
+        if expansion_debug is not None:
+            expansion_debug.update({"subgraph_nodes": subgraph.number_of_nodes(),
+                                    "subgraph_edges": subgraph.number_of_edges()})
 
         # 3. Dynamic edge weighting (DW-PR).
         all_sub_nodes = list(subgraph.nodes())

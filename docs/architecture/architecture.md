@@ -167,6 +167,16 @@ This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
 `insights`, and all candidates use the same existing write gate.
 
+## Opt-in single-write operational receipts
+
+The #263 candidate adds an explicit `operation_id` lifecycle around the existing
+canonical writer. Content-free intents/receipts live outside the disposable
+index, and source frontmatter carries an operation marker for crash recovery.
+A store lock serializes participating writers; index and Evidence Ledger
+outcomes are checkpointed separately. Repair rebuilds from source without
+rewriting it. See [WRITE_RECEIPTS.md](../reference/write-receipts.md). Legacy calls, admission,
+retrieval relevance, optional hooks and future HTTP remain separate contracts.
+
 ## Current read / retrieval pipeline
 
 ```text
@@ -348,7 +358,14 @@ source.path        SAME
 content_hash       CHANGED
 ```
 
-Source revision history beyond the current version is a separate experiment (#73); stable hashes alone are not presented as a full immutable history.
+The opt-in #73 candidate adds a separate durable observed-source archive,
+`store/.tessera_history/revisions.sqlite3`, through Python
+`TesseraEngine(..., revision_history=True)`. It stores full text and issued
+evidence, survives deletion of the derived index, and never enters live
+retrieval. Stable hashes alone remain insufficient without captured bodies.
+See [revision-history contract](../reference/revision-history.md) for failure boundaries,
+backup requirements and the distinction from temporal validity. Default
+behavior remains current-source-only.
 
 # 3. Graph representation
 
@@ -462,6 +479,18 @@ back to the parent document and exposes the matched segment through
 `evidence_info`; they never become semantic drawer entries or standalone memory
 results. Changed/deleted sources retract their derived segments, and the index
 schema version forces older caches to rebuild.
+
+## Experimental vector mechanics (#265 candidate)
+
+The optional [vector backend contract](../reference/vector-backends.md) separates canonical
+identity, supplied embedding vectors and derived backend storage. Atomic,
+source and segment representations have distinct deterministic identities.
+An exact-flat reference, stdlib SQLite candidate and explicit-import SciPy
+cKDTree exact/approximate candidate expose typed filters,
+profile/dimension compatibility, atomic source replacement and recovery.
+Neither is imported or activated by the deterministic retrieval pipeline.
+This pre-merge candidate does not select an encoder or public default backend;
+#158/#17 continue to own generation quality and candidate fusion.
 
 # 8. Interface boundary
 
@@ -626,3 +655,56 @@ This is roadmap architecture, not current runtime behavior. Individual layers ma
 classification and harness defaults behind an immutable registry. Explicit
 canonical metadata and source provenance remain authoritative. The registry
 does not change retrieval, discover more sources or decide instruction precedence.
+
+## Durable memory versus ephemeral context
+
+The [proposed Long-Term Memory boundary](long-term-memory.md) names canonical
+source ownership separately from disposable indexes, generated state and Working
+Context. It inventories current contracts and reserves future admission, revision
+and context-invalidation work to their owning Test Cards; it activates no behavior.
+
+## Source-episode lineage (#137 candidate)
+
+Automatic memory construction retains immutable, independently inspectable
+Markdown episode sources in the store, with no new semantic drawer. Ordered
+source turns and explicit supporting references share Canonical Metadata and
+the Evidence Ledger's source/version/span model. Rebuilds preserve lineage;
+source changes are diagnosed rather than silently rebound. See
+[EPISODE_LINEAGE.md](../reference/episode-lineage.md). This candidate does not establish
+QUMem extraction accuracy, episode boundary semantics or temporal state.
+
+## Experimental budgeted one-hop selection (#25)
+
+An opt-in Python `GraphExpansionPolicy` isolates expansion from the unchanged
+TF-IDF candidate generator and DWPR/multi-signal ranker. A0 uses only seeds;
+A1 preserves the current default; A2 selects query-relevant seed-incident edges
+under explicit node, edge-slot and added-context limits. Ordered adjacency is
+derived at index build/load and never becomes a source of truth. A2 retains
+seed-induced edges and only selected expansion edges; no selected neighbor is
+traversed recursively. Trace output is caller-owned, separate from evidence
+and does not imply relation confidence, authority or temporal truth.
+
+The [frozen experiment](../../benchmarks/graph_expansion/README.md) currently
+supports **ITERATE**, not default promotion. Its quality matches no expansion,
+so bounded graph selection alone has not established the intended gain. A3
+remains conditional on #26; no schema-confidence field is invented here.
+
+## Experimental lifecycle SDK candidate (#196)
+
+[Hook Core](../reference/hook-core.md) separates frozen provider wire mappings from canonical
+lifecycle milestones, explicit project/run identity, redacted bounded ephemeral
+evidence and prepared-context budgets. It never invokes a writer, admission,
+model or index refresh. Existing `TesseraTaskHook` remains unchanged. Candidate
+boundaries are inputs for future episode work, not automatic task completion.
+This unmerged experiment has required semantic-parity evidence and explicit
+unimplemented downstream effects; it is not a delivered integration.
+
+## Historical conversation source boundary (candidate #191)
+
+The experimental `conversations preview/import` workflow reads only declared,
+bounded JSONL paths into inspectable `conversation` sources with `drawer: null`.
+It never calls the memory writer, decomposition or provider adapters. Original
+source hashes and ordered turn/tool locators remain separate from the normalized
+Markdown's canonical Engine evidence spans. Indexing is an explicit subsequent
+step; revisions, supporting-turn derivations, live-history convergence and
+admission remain separate contracts. See [Conversation import](../reference/conversation-import.md).

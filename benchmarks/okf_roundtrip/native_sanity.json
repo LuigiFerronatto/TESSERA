@@ -1,0 +1,23 @@
+{
+  "base_commit": "20814a47ec0f72d7bea0639e0b057df1ecf5cded",
+  "baseline": {
+    "evidence_hit_rate": 1.0,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "missing_evidence_check": "passed",
+    "mrr": 0.875,
+    "queries": 4
+  },
+  "candidate": {
+    "evidence_hit_rate": 1.0,
+    "hit_at_1": 0.75,
+    "hit_at_3": 1.0,
+    "hit_at_5": 1.0,
+    "missing_evidence_check": "passed",
+    "mrr": 0.875,
+    "queries": 4
+  },
+  "decision": "ITERATE",
+  "retrieval_quality_claim": "none; synthetic regression only"
+}

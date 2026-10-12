@@ -525,6 +525,9 @@ def discover_sources(
             is_derived = any(pure == item or item in pure.parents for item in mandatory_paths)
             if relative == ".tessera_index" or relative.startswith(".tessera_index/"):
                 is_derived = True
+            if ".tessera_history" in pure.parts:
+                candidates.append(_directory_candidate(relative, SourceClassification.FORBIDDEN, SourceReason.MANDATORY_EXCLUSION))
+                continue
             if pure == PurePosixPath(".git") or PurePosixPath(".git") in pure.parents:
                 candidates.append(_directory_candidate(relative, SourceClassification.FORBIDDEN, SourceReason.MANDATORY_EXCLUSION))
                 continue

@@ -44,7 +44,6 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
         "#143": "`BLOCKED`",
         "#144": "`BLOCKED`",
         "#145": "`TRACKER`",
-        "#146": "`READY`",
     }
 
     for issue, status in expected.items():
@@ -52,6 +51,13 @@ def test_roadmap_tracks_qumem_epic_and_child_statuses_without_claiming_delivery(
         assert status in row
         assert "`VALIDATED`" not in row
         assert "`IMPLEMENTED`" not in row
+
+    # The prose repair is merged; scientific/runtime children stay unpromoted.
+    issue_146 = _markdown_table_row(text, "#146")
+    assert "| `IMPLEMENTED` | DOCUMENTATION |" in issue_146
+    assert "0a4a22c3b356c191a6f30c555eb01677ac2b85a4" in issue_146
+    assert "decision still pending" in issue_146
+    assert "not `VALIDATED`" in issue_146
 
     issue_135 = _markdown_table_row(text, "#135")
     assert "closed" in issue_135

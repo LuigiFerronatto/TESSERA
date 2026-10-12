@@ -41,10 +41,12 @@ concepts/overview → concepts/features + concepts/concepts → architecture/arc
 | [concepts/concepts.md](concepts/concepts.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
 | [concepts/procedural-anchors.md](concepts/procedural-anchors.md) | Procedural-anchor concept and skills. It does not create a fourth semantic drawer. |
 | [architecture/architecture.md](architecture/architecture.md) | Technical current-main architecture and module/pipeline boundaries. |
+| [architecture/long-term-memory.md](architecture/long-term-memory.md) | Proposed durable-memory boundary; current and target ownership are explicit, no runtime promotion. |
 | [architecture/code-explanation.md](architecture/code-explanation.md) | Code-oriented walkthrough. May lag module refactors; verify against current source. |
 | [architecture/adr/README.md](architecture/adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
 | [reference/output-contract.md](reference/output-contract.md) | Machine-facing semantic retrieval-result contract. |
 | [reference/write-gate-contract.md](reference/write-gate-contract.md) | Write-gate contract: what may be stored and how. |
+| [architecture/architecture-diagrams.md](architecture/architecture-diagrams.md) | Versioned current/experimental SVG diagrams and source mappings. |
 | [reference/harness-adapters.md](reference/harness-adapters.md) | Harness adapter registry: how instruction files (AGENTS.md, CLAUDE.md, …) are classified, and how to register a custom adapter (#71). |
 
 Current binding decision: [ADR 0001 — Core vs Optional LLM Orchestrator Boundary](architecture/adr/0001-core-vs-optional-llm-boundary.md).
@@ -79,6 +81,7 @@ Use the roadmap for sequencing, but the linked Issue is the living experiment re
 |---|---|
 | [`../CHANGELOG.md`](../CHANGELOG.md) | **What changed** in the product/public contract? |
 | [research/decision-trace.md](research/decision-trace.md) | **Why** did a research/architecture signal influence a decision? |
+| [research/memory-lifecycle-2026-10-02.md](research/memory-lifecycle-2026-10-02.md) | Versioned five-system × ten-dimension lifecycle matrix, pinned code/docs claims, bounded unknowns and existing-system comparisons. |
 | [process/roadmap.md](process/roadmap.md) + linked Issues/Test Cards | **What are we trying to prove next?** |
 | [process/test-cards/](process/test-cards/) | **What does each stage mean in plain language, and what remains unfinished?** |
 | [history/pr-evolution/](history/pr-evolution/) | **How did an issue evolve** across its PRs and reviews? |
@@ -128,6 +131,8 @@ Not the current product/architecture source of truth:
 | [history/pr-evolution/](history/pr-evolution/) | Per-issue evolution audits, e.g. [#120](history/pr-evolution/120.md). |
 | [guides/how-it-works-pt.md](guides/how-it-works-pt.md) | Portuguese project narrative; may describe older roadmap assumptions. |
 | [research/references-pt.md](research/references-pt.md) | Older compact Portuguese reference list; prefer [research/references.md](research/references.md). |
+
+Historical docs should preserve useful decision history, but they must not define the current public product contract. Legacy examples are project-neutral. Exact prior identifiers and presentation artwork remain available through pinned Git-history links; historical claims never override current contracts.
 
 ---
 
