@@ -77,6 +77,18 @@ that explicit packaging cannot prevent. It is not an architectural default.
 | `pyproject.toml` | `BUILD_CONFIGURATION`; the only authoritative distribution declaration |
 | root `tessera_mcp_server.py` | `ACTIVE_COMPATIBILITY` candidate; deprecate and eventually delete only through #120 after usage/migration evidence |
 
+## Amendment — 2026-10-12 (maintainer decision)
+
+- `docs/slides/` was **removed** from this public repository. It was built on a
+  third-party corporate brand kit (logos, a commercial typeface and mascot art)
+  that must not be redistributed publicly; it is kept privately outside this
+  repository.
+- The root `tessera_mcp_server.py` shim was **removed** without a deprecation
+  step. The supported way to run the MCP server is the packaged console entry
+  point `tessera-mcp` (after `pip install -e ".[mcp]"`).
+- The optional `sites/tessera-memory-mobile` submodule (hosted outside GitHub,
+  `update = none`) was removed; the project site remains in `website/`.
+
 ## Target dependency rules
 
 1. Runtime may import only runtime or declared third-party dependencies. It must

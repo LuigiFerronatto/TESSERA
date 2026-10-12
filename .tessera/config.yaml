@@ -56,7 +56,6 @@ sources:
     - docs/research/REFERENCES.md
     - docs/ROADMAP.md
     - docs/ROTEIRO-DEMO-VIDEO.md
-    - docs/slides/README.md
     - docs/test-cards/100-benchmark-ledger-and-ci.md
     - docs/test-cards/112-tessera-ascii-banner.md
     - docs/test-cards/114-evolution-auditable-templates.md

@@ -17,3 +17,9 @@ artifacts/benchmark-reporting/
 
 # Local agent-skill lockfiles (tooling on the developer machine, not part of the product)
 skills-lock.json
+
+# Personal editor settings
+.vscode/
+
+# Local checkout of the optional mobile site (former submodule, hosted outside GitHub)
+sites/

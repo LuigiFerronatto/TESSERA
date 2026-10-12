@@ -60,8 +60,11 @@ def test_existing_claude_memory_is_not_discovered_but_explicit_path_is_valid(tmp
 def test_alias_warning_stays_off_machine_readable_stdout(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("TESSERA_STORAGE_DIR", raising=False)
     monkeypatch.setenv("LAO_MEM_DIR", str(tmp_path))
+    # Run outside the repository with an explicit store, so the write never lands in
+    # this repo's real store (config discovery would otherwise find .tessera/config.yaml).
+    monkeypatch.chdir(tmp_path)
     result = main([
-        "write", "--id", "project/json-contract", "--type", "factual",
+        "write", "--store", str(tmp_path), "--id", "project/json-contract", "--type", "factual",
         "--episode", "ep-95", "--content", "Machine output stays valid.", "--json",
     ])
     captured = capsys.readouterr()
@@ -210,9 +213,6 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         "docs/CODE_EXPLANATION.md", "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md",
         "docs/PROCEDURAL_ANCHORS.md", "docs/QUMEM-GAP-ANALYSIS.md",
         "docs/ROTEIRO-DEMO-VIDEO.md", "docs/adr/0001-core-vs-optional-llm-boundary.md",
-        "docs/slides/README.md", "docs/slides/tessera-apresentacao.html",
-        "docs/slides/assets/LOGO_PRIMARIA_fundo_claro.svg",
-        "docs/slides/assets/LOGO_SECUNDARIA_fundo_escuro.svg",
         "docs/test-cards/112-tessera-ascii-banner.md",
         "docs/test-cards/93-storage-configuration-parity.md",
         "docs/test-cards/95-remove-legacy-runtime-coupling.md",
@@ -228,7 +228,10 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         "tests/test_issue_154_source_discovery.py",
     }
     unexpected = []
-    for path in ROOT.rglob("*"):
+    # Scan what the repository ships (tracked files), not local environments or
+    # caches such as .venv/, build/ or .benchmark-data/ that only exist on one machine.
+    tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split("\n")
+    for path in (ROOT / name for name in tracked if name):
         if not path.is_file() or ".git" in path.parts or ".codex" in path.parts:
             continue
         relative = path.relative_to(ROOT).as_posix()
@@ -239,7 +242,7 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         # compatibility inventory covered by this test.
         if relative.startswith("website/"):
             continue
-        if relative.startswith("archive/") or relative.startswith("docs/slides/assets/mascots/"):
+        if relative.startswith("archive/"):
             continue
         try:
             text = path.read_text(encoding="utf-8")
