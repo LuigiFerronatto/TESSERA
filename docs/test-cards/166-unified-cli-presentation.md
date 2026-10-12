@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166), parent [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; not yet `VALIDATED`) |
 | Capability type | `runtime`, CLI presentation |
 | Pull request | [Draft PR #298](https://github.com/LuigiFerronatto/TESSERA/pull/298) |
 | Head commit | Implementation candidate [`1ab9d1f`](https://github.com/LuigiFerronatto/TESSERA/commit/1ab9d1fd0627fc5087aaa4729594cf49f8b890b7); latest documentation/review head in PR #298 |
-| Merge commit | Not merged |
+| Merge commit | `7566fc701a5227de18995cd8c01e556547bf886a` (PR #298 merged 2026-10-12; final candidate `d40833c2a3293fc52ad508509936e5b98a207f3a`) |
 | Decision | `PENDING` human review |
 | Benchmark applicability | `SMOKE_ONLY`, no retrieval/storage semantics changed |
 | Last audited | 2026-10-02 |
@@ -106,7 +106,7 @@ result/event contract, while #119 retains its cross-capability taxonomy work.
 | Prior Corpus Doctor delivery | [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), canonical base above |
 | Output and scope contracts | [CLI_OUTPUT.md](../CLI_OUTPUT.md) |
 | Terminal evidence | [captures](../evidence/166/terminal-snapshots.txt), [inventory](../evidence/166/command-inventory.json) |
-| Decision / canonical merge | Pending review / not merged |
+| Decision / canonical merge | Decision pending maintainer confirmation / `7566fc701a5227de18995cd8c01e556547bf886a` |
 
 ## Evolution
 
