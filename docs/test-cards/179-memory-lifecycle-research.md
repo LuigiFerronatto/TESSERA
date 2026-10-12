@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#179](https://github.com/LuigiFerronatto/TESSERA/issues/179) |
-| Record status | `IN_PROGRESS` research candidate |
+| Record status | `IMPLEMENTED` research baseline merged; not lifecycle `VALIDATED`; maintainer decision pending |
 | Capability type | documentation / comparative research |
-| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), draft |
-| Head commit | Latest [PR #311 head](https://github.com/LuigiFerronatto/TESSERA/pull/311); source-audit anchor [`9923678`](https://github.com/LuigiFerronatto/TESSERA/commit/9923678b74724a714c8aec3b17e1cdda9e40c1f9), followed only by publication-metadata sync |
-| Merge commit | Not merged |
+| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), merged 2026-10-12 |
+| Head commit | Final candidate `687eb0a0cac802932609047e61724bfd06e051ba`; source-audit anchor [`9923678`](https://github.com/LuigiFerronatto/TESSERA/commit/9923678b74724a714c8aec3b17e1cdda9e40c1f9), followed only by publication-metadata sync |
+| Merge commit | [`c05c09e`](https://github.com/LuigiFerronatto/TESSERA/commit/c05c09ec600c1268150ff4428e20b22b0609a8de) |
 | Decision | `PENDING`; proposal: KEEP research baseline, ITERATE bounded unknowns |
 | Benchmark applicability | `NOT_APPLICABLE` — no retrieval/runtime change or external quality experiment |
 | Last audited | 2026-10-02 |
@@ -30,7 +30,7 @@ The candidate adds a dated report, machine-readable matrix, required wide CSV, 4
 
 ## How does it work now?
 
-**TARGET — NOT YET ON MAIN.** Readers can inspect the [audit](../research/MEMORY_LIFECYCLE_2026-10-02.md), follow immutable source links, and distinguish implemented external patterns from proposed TESSERA experiments. Runtime behavior is unchanged. #120 remains a closed contract reference; no owner is reopened or declared delivered.
+**MERGED TO MAIN (research only).** Readers can inspect the [audit](../research/MEMORY_LIFECYCLE_2026-10-02.md), follow immutable source links, and distinguish implemented external patterns from proposed TESSERA experiments. Runtime behavior is unchanged. #120 remains a closed contract reference; no owner is reopened or declared delivered.
 
 ## Concrete example
 
@@ -77,9 +77,9 @@ No dependency completion or WIP-selection state changes. Existing owners receive
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#179](https://github.com/LuigiFerronatto/TESSERA/issues/179) |
-| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), draft |
+| Pull request | [#311](https://github.com/LuigiFerronatto/TESSERA/pull/311), merged 2026-10-12 |
 | Canonical baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
-| Merge commit | Not merged |
+| Merge commit | [`c05c09e`](https://github.com/LuigiFerronatto/TESSERA/commit/c05c09ec600c1268150ff4428e20b22b0609a8de) |
 | Evidence/Learnings/Decision | [Dated audit](../research/MEMORY_LIFECYCLE_2026-10-02.md), [matrix](../evidence/179-memory-lifecycle/matrix.json), [source manifest](../evidence/179-memory-lifecycle/sources.json) |
 | Benchmark record | NOT_APPLICABLE; no external performance claims tested |
 | PR Evolution Audit | Canonical baseline contained broad research notes; this isolated candidate adds documentation and structural tests only. PR #277 was the baseline Corpus Doctor merge, not a #179 delivery |
@@ -89,3 +89,7 @@ No dependency completion or WIP-selection state changes. Existing owners receive
 August documented emphasis → October pinned code/docs matrix candidate → maintainer research decision pending → owner-specific experiments only if selected.
 
 Post-merge reconciliation must record the actual canonical merge, issue decision and stage status. No merge, issue closure, roadmap promotion or release is performed by this candidate. Roll back by reverting this documentation/test PR; no user data or index migration is involved. Changelog N/A: repository research and source-reference corrections do not change product behavior or promote a capability.
+
+## Post-merge reconciliation
+
+PR #311 merged into `main` as `c05c09ec600c1268150ff4428e20b22b0609a8de` (final candidate `687eb0a0cac802932609047e61724bfd06e051ba`). Issue #179 remains open; the maintainer research decision is still `PENDING`. Hosted CI/benchmark evidence for the canonical merge SHA was not verified by this reconciliation, so the record is `IMPLEMENTED`, not `VALIDATED`. The pre-merge sections above are historical candidate wording.
