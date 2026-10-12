@@ -1,6 +1,6 @@
 # ADR 0008: MCP handshake is independent of index readiness
 
-- Status: Proposed
+- Status: Accepted (owner decision recorded in PR #369 on 2026-10-12)
 - Date: 2026-10-12
 - Issue: [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361)
 - Amends: the startup contract delivered by #120 / PR #229 and documented in
@@ -73,7 +73,7 @@ always answerable, in every state.
 
 ### 4. Tool calls before `ready`
 
-Proposed (option A): read and write tools called while `state` is `created`
+Decision (option A): read and write tools called while `state` is `created`
 or `indexing` **wait for readiness up to the request timeout**, then fail with
 the existing `NOT_READY` code, whose message and data now carry the state and
 progress. In `failed`, they fail immediately with `NOT_READY` plus
@@ -85,7 +85,7 @@ the common case into one successful call instead of an error-and-retry loop,
 while the timeout keeps the call bounded. Option B (fail immediately with
 `NOT_READY`) is simpler but pushes polling logic into every consuming agent.
 
-This is the sub-decision the owner must confirm at review.
+The owner chose option A.
 
 ### 5. Source-level failures do not kill the process
 

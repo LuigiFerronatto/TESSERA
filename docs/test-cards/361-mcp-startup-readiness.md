@@ -5,10 +5,10 @@
 | Issue | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `architecture decision` |
-| Pull request | Open (ADR 0008, Proposed) |
+| Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) (ADR 0008, Accepted) |
 | Head commit | See the pull request |
 | Merge commit | Not merged |
-| Decision | `PENDING` |
+| Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
 
@@ -39,7 +39,8 @@ tessera-mcp --project .   (18 MB corpus)
 This stage records an architecture decision only. ADR 0008 proposes answering
 the protocol handshake right away, building the index in a background worker,
 exposing readiness and progress through the health tool, letting tool calls
-wait for readiness within their timeout (pending owner confirmation), keeping
+wait for readiness within their timeout and then answer `NOT_READY`
+(owner-confirmed), keeping
 the process alive when indexing fails, and a sub-second budget for the
 handshake. No runtime code changes in this stage.
 
@@ -72,21 +73,19 @@ contract for #362.
 ## What remains unimplemented?
 
 All runtime behaviour remains unimplemented and is owned by #362, including the
-`docs/MCP_RUNTIME.md` update. The pre-ready tool-call policy (wait within the
-timeout versus fail immediately) remains open until the owner confirms it at
-review. Indexing speed itself is not addressed here.
+`docs/MCP_RUNTIME.md` update. Indexing speed itself is not addressed here.
 
 ## What is unlocked next?
 
-Nothing is unlocked until this ADR is accepted. Acceptance unblocks #362 and
-lets #190 rely on default client timeouts.
+Once this ADR merges, #362 is unblocked and #190 can rely on default client
+timeouts.
 
 ## Technical provenance
 
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
-| Pull request | Open |
+| Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Issue #361 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
@@ -97,6 +96,6 @@ lets #190 rely on default client timeouts.
 ```text
 #120 startup contract: build the index before tools can run
 → ADR 0008 proposed: handshake first, background indexing, explicit readiness
-→ current state: Proposed, runtime unchanged
+→ current state: Accepted in review, runtime unchanged
 → next validated dependency: #362 implementation
 ```
