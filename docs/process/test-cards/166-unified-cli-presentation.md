@@ -114,3 +114,28 @@ result/event contract, while #119 retains its cross-capability taxonomy work.
 → this presentation candidate
 → human review and exact-head CI
 → canonical lifecycle reconciliation before dependent capability adoption
+
+
+## 2026-10-12 follow-up: prompt cancellation race
+
+A synthetic controlling-PTY stress check found a real cancellation race after
+`Selection [1]:` was visible: 6/100 baseline invocations echoed Ctrl+C but stayed
+blocked in terminal input. A one-thread control reproduced 4/30 failures, so CPU
+contention and numerical-library thread count do not explain away the defect.
+The baseline was `6228ecb4f88deff1e1c445b10c29250108a8ccb6`, Python 3.12.14 on
+Linux. Separate full-suite baseline runs passed, confirming that a single green
+suite does not exclude the timing window.
+
+The follow-up candidate keeps POSIX canonical-terminal reads nonblocking and
+returns to Python at most every 100 ms while waiting for input. This lets pending
+interrupts run even at the prompt/read boundary. It preserves the descriptor's
+original blocking state in a `finally` block, reads only the current input line,
+and leaves terminal editing, echo, signal handlers and init mutation semantics
+unchanged. Windows and streams without a native terminal descriptor retain the
+existing input adapter. Existing PTY deadlines and cancellation assertions are
+unchanged.
+
+Focused coverage adds UTF-8, repeated lines, EOF, blocking/nonblocking descriptor
+restoration, interruption at prompt/wait/read boundaries, and input flushed after
+readiness. This candidate does not assert a new portfolio decision or close #166.
+Exact candidate validation and CI are recorded in the focused follow-up PR.

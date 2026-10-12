@@ -438,3 +438,86 @@ def test_dashboard_honors_environment_precedence_without_inventing_project(tmp_p
     assert result["project"] is None and result["config_path"] is None
     assert result["storage_dir"] == str(env_store)
     assert bytes_in(tmp_path) == before and not env_store.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+@pytest.mark.parametrize("initial_blocking", [True, False])
+def test_terminal_input_preserves_lines_encoding_and_descriptor_state(monkeypatch, capsys, initial_blocking):
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        os.set_blocking(reader, initial_blocking)
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        os.write(writer, "ação\nsecond\n".encode())
+        os.close(writer)
+        writer = None
+        assert _terminal_input("First: ") == "ação"
+        assert os.get_blocking(reader) is initial_blocking
+        assert _terminal_input("Second: ") == "second"
+        with pytest.raises(EOFError):
+            _terminal_input("EOF: ")
+        assert os.get_blocking(reader) is initial_blocking
+        assert capsys.readouterr().out == "First: Second: EOF: "
+    finally:
+        os.close(reader)
+        if writer is not None:
+            os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+@pytest.mark.parametrize("boundary", ["prompt", "wait", "read"])
+def test_terminal_input_cancellation_restores_descriptor_at_every_boundary(monkeypatch, capsys, boundary):
+    import select
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        def interrupt(*args, **kwargs):
+            assert not os.get_blocking(reader)
+            raise KeyboardInterrupt()
+        if boundary == "prompt":
+            monkeypatch.setattr("builtins.print", interrupt)
+        elif boundary == "wait":
+            monkeypatch.setattr(select, "select", interrupt)
+        else:
+            os.write(writer, b"1\n")
+            monkeypatch.setattr(os, "read", interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            _terminal_input("Selection: ")
+        assert os.get_blocking(reader)
+    finally:
+        os.close(reader)
+        os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+def test_terminal_input_handles_readiness_flushed_before_read(monkeypatch):
+    import select
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        os.write(writer, b"yes\n")
+        real_read = os.read
+        calls = []
+        def flushed_once(fd, count):
+            calls.append(fd)
+            if len(calls) == 1:
+                raise BlockingIOError()
+            return real_read(fd, count)
+        monkeypatch.setattr(os, "read", flushed_once)
+        assert _terminal_input("Continue: ") == "yes"
+        assert len(calls) == 5
+        assert os.get_blocking(reader)
+    finally:
+        os.close(reader)
+        os.close(writer)
