@@ -10,4 +10,6 @@ architecture; it does not make a proposed runtime capability current.
 | [0002](0002-repository-layout-and-distribution-boundary.md) | Accepted | Preserve the root package, separate distributable runtime from repository tooling, and migrate in owned stages |
 | [0003](0003-configuration-and-store-discovery.md) | Accepted candidate | Versioned project config, named global registry, deterministic store selection, and explicit migration |
 | [0004](0004-safe-project-source-discovery.md) | Accepted candidate | Root-bounded, explainable, no-mutation source discovery and `.tessera-ignore` policy |
+| [0005](0005-single-source-selection-authority.md) | Accepted | One source-selection authority shared by index, query, MCP, doctor and init; persisted selections are patterns |
+| [0006](0006-explicit-id-collision-diagnostics.md) | Accepted | Explicit-ID collisions become complete, deterministic diagnostics; identical copies resolve canonically, conflicts are quarantined, `--strict` fails fast |
 | [0008](0008-mcp-startup-readiness.md) | Accepted | MCP handshake independent of index readiness; background indexing with explicit readiness states |
