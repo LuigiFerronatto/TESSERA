@@ -420,3 +420,36 @@ note itself. It does not alter relevance scores or imply validity/entailment.
 Legacy manual notes omit this field; section-only automatic inputs report
 `episode_only_no_source_turns` rather than inventing IDs. See the complete
 [episode lineage contract](EPISODE_LINEAGE.md) for fields and failure semantics.
+
+## Experimental graph expansion (#25)
+
+Python callers can opt into an A0/A1/A2 experiment without changing the shared
+result shape or the current CLI/MCP defaults:
+
+```python
+from tessera import GraphExpansionPolicy
+
+trace = {}
+hits = engine.retrieve_context_contract(
+    "What is the current runtime strategy?",
+    graph_expansion=GraphExpansionPolicy(mode="query_aware"),
+    expansion_debug=trace,
+)
+```
+
+Omitting `graph_expansion` preserves current indiscriminate one-hop behavior.
+`none` disables expansion but retains seed-induced graph ranking; `one_hop`
+explicitly selects the baseline. A2 `query_aware` defaults to max_hops=1,
+max_expansions=5, max_edges=128, token_budget=1500, min_edge_score=0.45.
+Invalid policies fail before retrieval. These budgets constrain added nodes
+and whitespace-token estimates, not seed evidence or the total returned context.
+
+`expansion_debug` is an optional caller-owned dict, reset for every call,
+including empty results. It records policy, seed IDs, source/target direction,
+relation utility (not confidence), score, token estimate, decision/rejection
+reason, selected IDs, actual expansion visits, truncation, added context and
+selected-subgraph size. It is separate from hit serialization and is not saved
+to source files or caches. Rebuild/load the Engine index after source changes;
+mutating the internal NetworkX graph directly bypasses derived-index contracts.
+See the [frozen ablation](../benchmarks/graph_expansion/README.md) and
+[open stage record](test-cards/25-budgeted-graph-expansion.md) for limits/results.

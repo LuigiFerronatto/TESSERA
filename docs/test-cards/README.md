@@ -36,6 +36,9 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 ## Current records
 
+[#25: Budgeted graph expansion](25-budgeted-graph-expansion.md) is an open
+experiment with proposed `ITERATE`; it does not change the current default.
+
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
 | #265 Vector backend mechanics | `IN_PROGRESS` | [265-vector-backend-mechanics.md](265-vector-backend-mechanics.md) | [Issue #265](https://github.com/LuigiFerronatto/TESSERA/issues/265), [audit](../PR_EVOLUTION_265.md), opt-in draft; real semantic/ANN gates remain open |
