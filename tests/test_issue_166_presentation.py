@@ -521,3 +521,68 @@ def test_terminal_input_handles_readiness_flushed_before_read(monkeypatch):
     finally:
         os.close(reader)
         os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX controlling terminal")
+@pytest.mark.parametrize("reader", ["input", "_terminal_input"])
+@pytest.mark.parametrize("payload,expected", [
+    (b"\x04", ["EOF"]),
+    (b"yes\x04\n", ['RESULT "yes"']),
+    ("ação\nsecond\n".encode(), ['RESULT "a\\u00e7\\u00e3o"', 'RESULT "second"']),
+])
+def test_real_pty_terminal_eof_and_pasted_lines_match_input(reader, payload, expected):
+    import pty
+    import select
+
+    # Compare with input() on the actual canonical line discipline. A pipe
+    # closing its writer does not model terminal VEOF, especially after text.
+    # input() keeps a partial VEOF record until Enter (or a later, separately
+    # delivered VEOF); consecutive EOF bytes in one write can coalesce.
+    program = (
+        "import json, os\n"
+        "from tessera.presentation import _terminal_input\n"
+        f"reader = {reader}\n"
+        "before = os.get_blocking(0)\n"
+        "try:\n"
+        f" for _ in range({len(expected)}):\n"
+        "  print('RESULT ' + json.dumps(reader('PROMPT: ')), flush=True)\n"
+        "except EOFError:\n"
+        " print('EOF', flush=True)\n"
+        "finally:\n"
+        " print('RESTORED ' + str(os.get_blocking(0) == before), flush=True)\n"
+    )
+    pid, master = pty.fork()
+    if pid == 0:
+        os.execv(sys.executable, [sys.executable, "-c", program])
+    output = bytearray()
+    reaped = False
+    try:
+        deadline = time.monotonic() + 20
+        while b"PROMPT: " not in output and time.monotonic() < deadline:
+            if select.select([master], [], [], 0.1)[0]:
+                output.extend(os.read(master, 65536))
+        assert b"PROMPT: " in output
+        os.write(master, payload)
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            if select.select([master], [], [], 0.1)[0]:
+                try:
+                    output.extend(os.read(master, 65536))
+                except OSError as exc:
+                    if exc.errno != errno.EIO:
+                        raise
+            waited, status = os.waitpid(pid, os.WNOHANG)
+            if waited:
+                reaped = True
+                assert os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+                break
+        assert reaped, output.decode(errors="replace")
+        text = output.decode()
+        for result in expected:
+            assert result in text
+        assert "RESTORED True" in text
+    finally:
+        if not reaped:
+            os.kill(pid, signal.SIGKILL)
+            os.waitpid(pid, 0)
+        os.close(master)
