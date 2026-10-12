@@ -507,7 +507,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 #69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
  -> #70 structural segmentation (VALIDATED; PR #270, `8ca854f1...`)
      -> #13 corpus doctor (VALIDATED; `KEEP`; PR #277, `20814a47...`)
-     -> #71 harness adapter registry (READY / LATER)
+     -> #71 harness adapter registry (IMPLEMENTED; PR #289, `f149ff29...`)
 
 #19 admission and #21 utility remain later layers.
 ```
@@ -695,7 +695,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) | open | `DEFERRED` | EXECUTABLE | Graph | #96 baseline complete. The previous "#25 graph-expansion card DoR completion" gate is superseded by live routing; technically executable but parked by WIP. |
 | [#26](https://github.com/LuigiFerronatto/TESSERA/issues/26) | open | `BLOCKED` | EXECUTABLE | Graph | Requires a frozen #25 baseline; relation confidence separate from relevance. |
 | [#32](https://github.com/LuigiFerronatto/TESSERA/issues/32) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #71; source authority/scope/precedence. |
-| [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) | open | `READY` | EXECUTABLE | Trust | #69/#70 dependencies satisfied; harness adapter registry remains LATER at Queue 31. |
+| [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) | open | `IMPLEMENTED` | EXECUTABLE | Trust | PR #289 merged as `f149ff292238e2a6f5cdd95894e9c11c365457f2` (final candidate `973a1e75ae1c024edcdd9acef54d840227bc801b`); not yet `VALIDATED` (canonical CI/Benchmark Ledger evidence and maintainer decision pending). Issue still open. |
 | [#72](https://github.com/LuigiFerronatto/TESSERA/issues/72) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #71/#32; deterministic instruction resolver. |
 | [#27](https://github.com/LuigiFerronatto/TESSERA/issues/27) | open | `BLOCKED` | EXECUTABLE | Trust | Depends on #15/#16/#32/#72/#96; cross-source Evidence Arbitration. |
 | [#20](https://github.com/LuigiFerronatto/TESSERA/issues/20) | open | `BLOCKED` | EXECUTABLE | Trust | Owns `sufficient / insufficient / conflicting / ambiguous`; state reconstruction belongs #141. |

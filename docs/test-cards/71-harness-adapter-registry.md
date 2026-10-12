@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#71](https://github.com/LuigiFerronatto/TESSERA/issues/71) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime` |
-| Pull request | Candidate branch `feat/71-harness-adapter-registry` |
-| Merge commit | Not merged |
-| Decision | `PENDING` independent review |
+| Pull request | [#289](https://github.com/LuigiFerronatto/TESSERA/pull/289) (final candidate `973a1e75ae1c024edcdd9acef54d840227bc801b`) |
+| Merge commit | `f149ff292238e2a6f5cdd95894e9c11c365457f2` |
+| Decision | `PENDING` — no `KEEP` recorded; the only Maintainer Audit comment (on an earlier head) is `BLOCK` |
 | Benchmark applicability | `SMOKE_ONLY` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 Recognize textual instruction conventions in one small registry while preserving source metadata and retrieval behavior.
@@ -27,7 +27,7 @@ Immutable adapter declarations and a deterministic registry own those defaults.
 Duplicate names and ambiguous matches fail explicitly; generic fallback survives.
 
 ## How does it work now?
-TARGET — NOT YET ON MAIN: Engine normalization uses the built-ins. Explicit
+On `main` (PR #289): Engine normalization uses the built-ins. Explicit
 consumer registries can be passed to parse_and_normalize without mutating global
 state. Source frontmatter, hashes, spans and classification provenance retain
 their existing ownership. See [contract](../HARNESS_ADAPTERS.md).
