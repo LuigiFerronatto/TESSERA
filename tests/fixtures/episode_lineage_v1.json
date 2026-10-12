@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "fixture_kind": "frozen_synthetic_structural_contract_not_reviewed_semantic_labels",
+  "episodes": [
+    {
+      "id": "dialogue/rationale",
+      "turns": [
+        {"position": 31, "role": "user", "timestamp": "2026-01-01T12:00:00Z", "content": "The project database is SQLite."},
+        {"position": 32, "role": "assistant", "timestamp": null, "content": "A short weekly summary would reduce reading time."},
+        {"position": 34, "role": "user", "timestamp": "2026-01-01T12:01:00Z", "content": "Yes, I prefer that short weekly summary."},
+        {"position": 40, "role": "user", "timestamp": null, "content": "The deployment region is west."}
+      ],
+      "candidates": [
+        {"type": "factual", "content": "The project database is SQLite.", "supporting_turns": [31]},
+        {"type": "preference", "content": "The user prefers short weekly summaries to reduce reading time.", "supporting_turns": [32, 34]},
+        {"type": "factual", "content": "The deployment region is west.", "supporting_turns": [40]}
+      ],
+      "unsupported_candidate": {"type": "preference", "content": "The user prefers daily meetings.", "supporting_turns": [99]}
+    },
+    {
+      "id": "dialogue/older-preference",
+      "turns": [{"position": 1, "role": "user", "timestamp": "2025-12-01T12:00:00Z", "content": "I prefer detailed reports."}],
+      "candidates": [{"type": "preference", "content": "The user prefers detailed reports.", "supporting_turns": [1]}]
+    },
+    {
+      "id": "dialogue/newer-preference",
+      "turns": [{"position": 1, "role": "user", "timestamp": "2026-02-01T12:00:00Z", "content": "I now prefer short reports."}],
+      "candidates": [{"type": "preference", "content": "The user now prefers short reports.", "supporting_turns": [1]}]
+    }
+  ]
+}

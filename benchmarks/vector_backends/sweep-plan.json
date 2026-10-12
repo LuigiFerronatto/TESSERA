@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "registered_at_utc": "2026-10-02T06:33:28Z",
+  "scope": "bounded synthetic backend mechanics; no embedding model or semantic-quality claim",
+  "sizes": [256, 2048, 8192],
+  "dimensions": [16, 64],
+  "backends": ["exact-flat", "sqlite-exact", "ckdtree-exact", "ckdtree-ann"],
+  "ann_epsilon": 0.5,
+  "ckdtree_leafsize": 16,
+  "seed": 2652026,
+  "queries_per_filter": 12,
+  "filters": ["all", "atomic", "scoped-source"],
+  "top_k": 10,
+  "warm_repetitions": 2,
+  "child_timeout_seconds": 600,
+  "data_generator": "sha256 deterministic coordinates; four clustered centers plus uniform points; lane is row index modulo 3; unique numeric vectors",
+  "memory_method": "isolated subprocess per backend/size/dimension; resource.getrusage(RUSAGE_SELF).ru_maxrss converted to bytes; includes native allocations and baseline runtime; no tracemalloc",
+  "timing_method": "perf_counter; import/open, materialization, ingest, each cold filtered-tree build and warmed query p50/p95 measured separately; worker count 1",
+  "correctness_gates": {
+    "exact_candidate_recall_at_10": 1.0,
+    "filter_correctness": 1.0,
+    "repeatability": 1.0,
+    "ghost_vectors": 0,
+    "clean_incremental_equivalence": true,
+    "ann_l2_distance_bound_factor": 1.5,
+    "ann_recall_review_threshold": 0.95,
+    "score_absolute_tolerance": 1e-12
+  },
+  "decision_rule": "Report all cells, misses, ties, timeouts and failures. No performance pass threshold or default winner. ANN recall below 0.95 triggers ITERATE, never query/budget/epsilon tuning. Real-corpus quality remains gated by #158."
+}

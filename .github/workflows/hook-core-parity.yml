@@ -1,0 +1,47 @@
+name: TESSERA Hook Core Parity
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hook-core-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+      - name: Install deterministic test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Validate frozen mappings and lifecycle invariants
+        run: python -m pytest tests/test_issue_196_hook_core.py -q
+      - name: Compare equivalent semantic runs twice
+        run: python -m benchmarks.hooks.run --output artifacts/hooks-parity.json
+      - name: Verify measured candidate identity
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+          report = json.loads(Path('artifacts/hooks-parity.json').read_text())
+          assert report['measured_commit'] == subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          assert report['worktree_dirty'] is False
+          assert report['passed']
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hooks-parity-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/hooks-parity.json
+          if-no-files-found: error
+          retention-days: 7

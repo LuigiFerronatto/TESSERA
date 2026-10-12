@@ -1,0 +1,89 @@
+{
+  "fixture_sha256": "c3ac0e48f95fd41af259dc25441dc7d563a5a14b97e7fa5e555786d3562e8a87",
+  "review_status": "PENDING",
+  "reviewer_id": null,
+  "reviewed_at": null,
+  "reviewer_is_human": null,
+  "blinded_to_variant_predictions": null,
+  "instructions": "Complete independently. Null labels are not no-boundary labels. Do not copy draft labels.",
+  "dialogues": [
+    {
+      "dialogue_id": "dialogue-01",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-02",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-03",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-04",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-05",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-06",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-07",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-08",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-09",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-10",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-11",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-12",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-13",
+      "boundary_ids": null,
+      "rationale": null,
+      "ambiguous_turn_ids": []
+    }
+  ]
+}
