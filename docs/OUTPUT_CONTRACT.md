@@ -453,3 +453,11 @@ to source files or caches. Rebuild/load the Engine index after source changes;
 mutating the internal NetworkX graph directly bypasses derived-index contracts.
 See the [frozen ablation](../benchmarks/graph_expansion/README.md) and
 [open stage record](test-cards/25-budgeted-graph-expansion.md) for limits/results.
+
+## Optional assisted information needs
+
+Opt-in N1/N2 orchestrator results add `information_needs` with validated bounded
+needs, status, reason and call measurements. This is derived assisted analysis,
+not a field on deterministic retrieval hits. N0 serialization remains unchanged.
+See [the experimental contract](INFORMATION_NEEDS.md); no semantic deduplication
+or downstream quality improvement has been established by the offline fixtures.
