@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (architecture decision only) |
 | Capability type | `architecture decision` |
 | Pull request | [#366](https://github.com/LuigiFerronatto/TESSERA/pull/366) (ADR 0005, Accepted) |
-| Head commit | See the pull request |
-| Merge commit | Not merged |
+| Head commit | `cf16d539afca0e903ef611a564d7de53bea3aa58` (final candidate) |
+| Merge commit | `b486e6f2c47b367fc686ae84e00b6afdd5a4f9e7` |
 | Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
@@ -37,7 +37,7 @@ tessera index         -> notes/d.md is parsed and indexed
 
 ## What changed or is being tested?
 
-This stage records an architecture decision only. ADR 0005 proposes that one
+This stage records an architecture decision only. ADR 0005 adopts that one
 selected-source set, derived from the ADR 0004 discovery policy, is the only
 input for every corpus reader; that `.tessera-ignore` is the single exclusion
 authority; that symlinks are skipped everywhere with severity depending on how
@@ -47,7 +47,7 @@ that a root `.gitignore` participates as a convenience-ignore layer
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. Until the implementation cards merge, the indexer
+The ADR is accepted and merged on `main`; its runtime target is not implemented. Until the implementation cards merge, the indexer
 keeps its independent file walk.
 
 ## Concrete example
@@ -59,11 +59,18 @@ target: indexer reads ['notes/a.md', 'notes/b.md', 'notes/c.md']   # same as dis
 
 ## How was it validated?
 
-The current behaviour was reproduced on canonical `main` 7e7b20e with the
-fixture recorded in [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349)
-and the `_iter_source_files()` versus `discover_sources_for_configuration()`
-comparison quoted in ADR 0005. The decision itself is validated by review;
-documentation consistency is covered by the existing docs test suite.
+The baseline observations above were recorded in issue #349 on `main`
+`7e7b20e`; they are historical evidence, not a new runtime measurement.
+The [owner decision](https://github.com/LuigiFerronatto/TESSERA/issues/349#issuecomment-6118666384)
+records `KEEP`. PR #366's merge and final candidate were verified against
+GitHub and the merge's second parent; the candidate and merge trees match.
+
+[Final-candidate CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217185375)
+failed the unrelated ledger concurrent-initialization test on Python 3.12; no source-selection test failed. Later ADR candidates #368/#369 passed CI on the same runtime. This does not erase the historical failure.
+[Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217185692)
+passed with documentation-only `NOT_APPLICABLE` applicability. This record
+uses `IMPLEMENTED`, not a claim that the proposed runtime or its performance
+has been validated. No new human approval is inferred from merge or CI.
 
 ## What improved?
 
@@ -78,8 +85,9 @@ persistence in `init` (#354), including the `.gitignore` layer.
 
 ## What is unlocked next?
 
-Once this ADR merges, #352, #353 and #354 are unblocked, and #357 has its
-persistence contract.
+The ADR prerequisite for #352, #353 and #354 is satisfied; #357 has its
+persistence contract. Implementation selection and shared-code coordination
+remain separate from acceptance. No runtime delivery is claimed.
 
 ## Technical provenance
 
@@ -87,16 +95,16 @@ persistence contract.
 |---|---|
 | Issue/Test Card | [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349) |
 | Pull request | [#366](https://github.com/LuigiFerronatto/TESSERA/pull/366) |
-| Merge commit | Not merged |
+| Merge commit | `b486e6f2c47b367fc686ae84e00b6afdd5a4f9e7` |
 | Evidence/Learnings/Decision | Issue #349 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
-| PR Evolution Audit | Pull request body |
+| PR Evolution Audit | [Verified delivery](../../history/pr-evolution/349.md) |
 
 ## Evolution
 
 ```text
 ADR 0004 discovery policy (discovery only)
 → ADR 0005 proposed: one selected-source set for every reader
-→ current state: Accepted in review, runtime unchanged
-→ next validated dependency: #352 single-authority implementation
+→ current state: Accepted and merged on main, runtime unchanged
+→ next implementation: #352 single-authority implementation
 ```

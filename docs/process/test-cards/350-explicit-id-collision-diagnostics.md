@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (architecture decision only) |
 | Capability type | `architecture decision` |
 | Pull request | [#368](https://github.com/LuigiFerronatto/TESSERA/pull/368) (ADR 0006, Accepted) |
-| Head commit | See the pull request |
-| Merge commit | Not merged |
+| Head commit | `b8ce5f72244c731700ca224da998704c65a4a876` (final candidate) |
+| Merge commit | `16152d78b20c1ee37a4b808f5c4d6b55b2bd4e68` |
 | Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
@@ -37,7 +37,7 @@ tessera index -> Error [internal_error]; 0 notes queryable
 
 ## What changed or is being tested?
 
-This stage records an architecture decision only. ADR 0006 proposes collecting
+This stage records an architecture decision only. ADR 0006 adopts collecting
 all identity claims before admitting notes, letting explicit IDs win over
 path-derived ones, keeping one canonical copy of byte-identical duplicates,
 quarantining genuinely conflicting copies (owner-confirmed), listing
@@ -46,7 +46,7 @@ fail-fast behaviour for CI. No runtime code changes in this stage.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. Until #355 merges, the first explicit-ID collision
+The ADR is accepted and merged on `main`; its runtime target is not implemented. Until #355 merges, the first explicit-ID collision
 still aborts the build.
 
 ## Concrete example
@@ -60,11 +60,18 @@ tessera index --strict -> fails with index.explicit_id_collision listing both
 
 ## How was it validated?
 
-The current behaviour, including the explicit-versus-inferred abort in both
-processing orders, was reproduced on canonical `main` 7e7b20e with the fixture
-recorded in [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350). The
-decision is validated by review; documentation consistency is covered by the
-existing docs test suite.
+The baseline observations above were recorded in issue #350 on `main`
+`7e7b20e`; they are historical evidence, not a new runtime measurement.
+The [owner decision](https://github.com/LuigiFerronatto/TESSERA/issues/350#issuecomment-6118666771)
+records `KEEP`. PR #368's merge and final candidate were verified against
+GitHub and the merge's second parent; the candidate and merge trees match.
+
+[Final-candidate CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217337767)
+passed.
+[Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217337695)
+passed with documentation-only `NOT_APPLICABLE` applicability. This record
+uses `IMPLEMENTED`, not a claim that the proposed runtime or its performance
+has been validated. No new human approval is inferred from merge or CI.
 
 ## What improved?
 
@@ -77,8 +84,9 @@ All runtime behaviour remains unimplemented and is owned by #355.
 
 ## What is unlocked next?
 
-Once this ADR merges, #355 is unblocked and the collision error code that
-#356 renders is fixed.
+The ADR prerequisite for #355 is satisfied. The collision contract that
+#356 must render is decided, but the runtime error code is not implemented.
+Coordinate source-selection integration with #352/#353 before delivery.
 
 ## Technical provenance
 
@@ -86,16 +94,16 @@ Once this ADR merges, #355 is unblocked and the collision error code that
 |---|---|
 | Issue/Test Card | [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350) |
 | Pull request | [#368](https://github.com/LuigiFerronatto/TESSERA/pull/368) |
-| Merge commit | Not merged |
+| Merge commit | `16152d78b20c1ee37a4b808f5c4d6b55b2bd4e68` |
 | Evidence/Learnings/Decision | Issue #350 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
-| PR Evolution Audit | Pull request body |
+| PR Evolution Audit | [Verified delivery](../../history/pr-evolution/350.md) |
 
 ## Evolution
 
 ```text
 F3 explicit identity enforced by aborting the build
 → ADR 0006 proposed: complete diagnostics, canonical copies, quarantined conflicts, --strict
-→ current state: Accepted in review, runtime unchanged
-→ next validated dependency: #355 implementation
+→ current state: Accepted and merged on main, runtime unchanged
+→ next implementation: #355 implementation
 ```

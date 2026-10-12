@@ -26,6 +26,30 @@ Plain-language stage records live under `docs/process/test-cards/`; their index 
 
 > #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
 
+## Accepted ADR reconciliation (2026-10-12)
+
+This focused update records merged decisions missing from the older portfolio
+matrix. It does not recalculate historical WIP counts or select implementation.
+All three owning issues are closed with recorded owner `KEEP` decisions.
+
+| Issue | Lifecycle | Canonical delivery | Remaining runtime |
+|---|---|---|---|
+| #349 | `IMPLEMENTED` architecture decision | [PR #366](https://github.com/LuigiFerronatto/TESSERA/pull/366), `b486e6f2c47b367fc686ae84e00b6afdd5a4f9e7`; [audit](../history/pr-evolution/349.md) | #352/#353 source safety; #354 init patterns |
+| #350 | `IMPLEMENTED` architecture decision | [PR #368](https://github.com/LuigiFerronatto/TESSERA/pull/368), `16152d78b20c1ee37a4b808f5c4d6b55b2bd4e68`; [audit](../history/pr-evolution/350.md) | #355 collision admission and diagnostics |
+| #361 | `IMPLEMENTED` architecture decision | [PR #369](https://github.com/LuigiFerronatto/TESSERA/pull/369), `6228ecb4f88deff1e1c445b10c29250108a8ccb6`; [audit](../history/pr-evolution/361.md) | #362 background startup/readiness |
+
+ADR 0005 adopts the `.gitignore` convenience layer; ADR 0006 adopts option A
+(quarantine conflicting IDs); ADR 0008 adopts option A (wait within the request
+timeout, then `NOT_READY`). Their ADR acceptance prerequisites are satisfied.
+#352/#353 share source-selection code; #355 must integrate with that source set;
+#362 coordinates collision/error behavior with #355/#356. Runtime selection,
+integration and acceptance tests remain separate work. #190's default-timeout
+startup benefit is still a target, not delivered by ADR 0008.
+
+The #349 candidate CI recorded an unrelated ledger concurrency failure; the
+#350/#361 candidate CI and all three Benchmark Ledgers passed. See linked audits
+for exact evidence. No proposed runtime capability is promoted to `VALIDATED`.
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.
