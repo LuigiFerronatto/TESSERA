@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) |
-| Record status | `IN_PROGRESS` preparation; reviewed-fixture readiness remains `BLOCKED` |
+| Record status | `IMPLEMENTED` preparation (merged; CI/benchmark evidence for the canonical SHA not yet verified); reviewed-fixture readiness remains `BLOCKED` |
 | Capability type | `benchmark` |
 | Pull request | [#312](https://github.com/LuigiFerronatto/TESSERA/pull/312) |
 | Head commit | Implementation source [09156dc](https://github.com/LuigiFerronatto/TESSERA/commit/09156dc64f2d748f4c6ac7322039b7b4c3c92254); later link/evidence-only edits do not change executable bytes |
-| Merge commit | Not merged |
+| Merge commit | [`1a02fd8`](https://github.com/LuigiFerronatto/TESSERA/commit/1a02fd83760c0b49319fcc40d63ff709ca7f9ceb) (canonical, #312 merged 2026-10-12) |
 | Decision | `PENDING`; no new default selected |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
@@ -109,8 +109,8 @@ downloads were used. See #312 for current exact-head CI.
 The REQUIRED dev-50 retrieval gate is separate and cannot prove episode quality.
 After human review, score reviewed boundaries and holdout cases, then compare
 fixed downstream decomposition. Only a reviewed decision can select a runtime
-variant. No merges or issue closures are part of this preparation. After a future
-merge, record its canonical SHA and reconcile the roadmap/lifecycle explicitly.
+variant. #312 merged as the canonical preparation (see merge commit above); no issue closure is part of it. Any further
+runtime change must record its own canonical SHA and reconcile the lifecycle explicitly.
 
 ## Technical provenance
 
@@ -119,7 +119,7 @@ merge, record its canonical SHA and reconcile the roadmap/lifecycle explicitly.
 | Canonical baseline | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
 | Issue/Test Card | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) |
 | Pull request | [#312](https://github.com/LuigiFerronatto/TESSERA/pull/312) |
-| Merge commit | Not merged |
+| Merge commit | [`1a02fd8`](https://github.com/LuigiFerronatto/TESSERA/commit/1a02fd83760c0b49319fcc40d63ff709ca7f9ceb) (canonical, #312 merged 2026-10-12) |
 | Evidence/Learnings/Decision | [Draft diagnostics](../evidence/138/local-diagnostics.json); human metrics null; `PENDING` |
 | Benchmark record | REQUIRED exact-head dev-50 pending; distinct from human segmentation quality |
 | PR Evolution Audit | Current E0 baseline; this benchmark-only candidate; [#297](https://github.com/LuigiFerronatto/TESSERA/pull/297) remains an unmerged independent lineage draft |
@@ -128,4 +128,4 @@ merge, record its canonical SHA and reconcile the roadmap/lifecycle explicitly.
 
 Untyped E0 on canonical main → opt-in E1/E3 and unreviewed synthetic preparation
 → independent human annotation and downstream comparison → later reviewed
-runtime decision. No stage is presented as merged or empirically validated.
+runtime decision. The preparation is merged; no stage is presented as empirically validated.
