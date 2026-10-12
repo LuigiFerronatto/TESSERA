@@ -716,7 +716,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#134](https://github.com/LuigiFerronatto/TESSERA/issues/134) | open | `READY` | RELEASE_GATE | Productization | #87 legal prerequisite satisfied; next release gate. #117/#118 are satisfied; #153/#154/#155 are canonically validated. Publication still requires #134's own checks. |
 | [#135](https://github.com/LuigiFerronatto/TESSERA/issues/135) | closed | `VALIDATED` | FOUNDATION | QUMem | PR #216 canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`; `KEEP`; see `PR_EVOLUTION_135.md`. |
 | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) and #74 (VALIDATED) dependencies satisfied; F/P/I fidelity + 1-pass vs 3-pass. |
-| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `READY` | EXECUTABLE | QUMem | #135 (VALIDATED) dependency satisfied; source episode/supporting turns/temporal position. |
+| [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) | open | `IMPLEMENTED` | EXECUTABLE | QUMem | Merged via #297 (`afd5322f210456798f3c845643768ac23acfdf54`); VALIDATED pending CI/benchmark evidence and maintainer decision; source episode/supporting turns/temporal position. |
 | [#138](https://github.com/LuigiFerronatto/TESSERA/issues/138) | open | `BLOCKED` | EXECUTABLE | QUMem | #74 satisfied; DoR still requires frozen reviewed episode-boundary fixture. |
 | [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) | open | `DEFERRED` | EXECUTABLE | QUMem | Hard dependency #74 is satisfied; intentionally parked while release/safety lane is selected. |
 | [#140](https://github.com/LuigiFerronatto/TESSERA/issues/140) | open | `BLOCKED` | EXECUTABLE | QUMem | Depends on #139/#74/#96; owns WHAT subqueries/stores retrieve evidence. |
@@ -1076,3 +1076,5 @@ existing canonical queue/status rows remain unchanged until merge and lifecycle
 reconciliation; #136/#138/#15 and dependent state/quality cards are not unlocked
 by an unmerged candidate. Supporting-turn semantic precision/recall and
 preference-state accuracy remain unmeasured.
+
+> Lifecycle note: #297 merged as `afd5322f210456798f3c845643768ac23acfdf54`; #137 is IMPLEMENTED, not VALIDATED. Dependents (#136/#138/#15/#141/#143) are not unlocked until validation.

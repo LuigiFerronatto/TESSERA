@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | Issue | [#137](https://github.com/LuigiFerronatto/TESSERA/issues/137) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime` |
-| Pull request | [Draft #297](https://github.com/LuigiFerronatto/TESSERA/pull/297) |
-| Merge commit | Not merged |
+| Pull request | [Merged #297](https://github.com/LuigiFerronatto/TESSERA/pull/297) |
+| Merge commit | `afd5322f210456798f3c845643768ac23acfdf54` (final candidate head `e08d15d3f77e8a0c8f4d29d9f94bd83e13ded795`) |
 | Decision | `PENDING` |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
