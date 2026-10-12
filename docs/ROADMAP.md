@@ -4,6 +4,12 @@
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
+> #157 candidate (2026-10-02): typed model profiles are being implemented in a
+> draft candidate selected by the repository owner. The earlier WIP deferral is
+> historical for this candidate. No model execution, pipeline activation or
+> dependent capability is delivered on `main`; dependency states remain pending
+> canonical merge. See [the candidate stage record](test-cards/157-typed-model-profiles.md).
+
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
 > #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #134 is blocked only by #87.
@@ -17,6 +23,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 > #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer Audit recorded `KEEP` with no P0/P1 findings and the Merge Governor authorized the candidate. #70 is `VALIDATED / KEEP`; #13 and #71 had their final blocker satisfied and move to `READY`. Queue order selects #13 as the next implementation; #71 remains LATER / Queue 31.
 
 > #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. The Maintainer Audit recorded `KEEP` with no supported P0/P1 findings and the Merge Governor authorized the exact candidate head. #13 is `VALIDATED / KEEP`. #19 has its #13 prerequisite satisfied but remains intentionally `DEFERRED` at Queue 45; no other issue was blocked solely on #13.
+
+> #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
 
 ## Status contract
 
@@ -717,7 +725,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#143](https://github.com/LuigiFerronatto/TESSERA/issues/143) | open | `BLOCKED` | BENCHMARK | QUMem | Personalized-memory/preference-evolution benchmark after #136/#137/#138/#140/#141/#142/#96. |
 | [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Expose only validated assisted contracts across Python/CLI/MCP; coordinate #120/#171. |
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
-| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
+| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `IMPLEMENTED` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. PR #284 final candidate `b5381e93df68006b02a32bf410398f0cfc49dc4c`, canonical merge `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`; decision still pending, not `VALIDATED`. |
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
 | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
 | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | closed | `VALIDATED` | EXECUTABLE | Productization | Init UX delivered by #210 (`4c112195f1572bf352d1cc6a1042c69711381da8`), lifecycle #212. `KEEP`; no active blocker remains. |
@@ -908,7 +916,9 @@ External work changes the next experiment; citation does not equal implementatio
 | QUMem | #145 / #135–#144 | Which construction/planning/state mechanisms improve TESSERA while preserving provenance/core independence? |
 | Personalized-memory benchmarks | #143 | Do additions improve preference evolution/current-state tasks, not only factual recall? |
 
-#146 owns broader QUMem paper-fidelity documentation truth.
+#146 owns broader QUMem paper-fidelity documentation truth. The candidate
+[paper-to-runtime map](QUMEM-GAP-ANALYSIS.md) distinguishes current heuristics
+from source-paper behavior; it promotes no child capability.
 
 ---
 

@@ -1,5 +1,10 @@
 # Roteiro de Demo — Tessera no Terminal (para gravar e postar no Slack)
 
+> Historical design narrative, not the current implementation contract.
+> QUMem-fidelity and temporal/state claims below are superseded by the
+> [dated source-to-runtime audit](QUMEM-GAP-ANALYSIS.md). Heuristic behavior
+> and illustrative provider results do not establish paper fidelity.
+
 > Testado ao vivo em 2026-08-25 dentro do próprio repo `lab-autonomous-officer`.
 > Todos os comandos abaixo rodam de verdade — copie e cole durante a gravação.
 

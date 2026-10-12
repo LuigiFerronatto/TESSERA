@@ -225,6 +225,27 @@ which exact source version?
 which canonical source span?
 ```
 
+### Physical source paths and freshness
+
+`source.path` is relative to `ResolvedConfiguration.source_identity_root`
+(or `engine.source_identity_root`). A configured project corpus uses one
+project-root namespace for documents and generated memories, so `docs/guide.md`
+and `memories/docs/guide.md` are distinct sources. Legacy and store-only corpora
+retain their store-relative paths. Logical memory IDs and explicit relation
+targets remain independent of these physical keys.
+
+For freshness checks on a project corpus, pass its resolved configuration to
+`verify_evidence_freshness(record, configuration)`. A directory string remains
+supported and is treated as the explicit source-path base. Use
+`configuration.source_identity_root` when passing a string; do not assume every
+project source path is relative to the generated-memory store.
+
+Derived graph cache schema 3 invalidates older snapshots and reparses sources.
+Manifest identities are retained when their physical source can be recovered
+unambiguously. Previously conflated source identities are separated; an
+ambiguous legacy entry is not treated as proof that two sources are identical.
+Source files are never rewritten during this repair.
+
 ## `evidence`
 
 Query-specific record created only when `relevant_evidence` exists:

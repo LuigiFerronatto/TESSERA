@@ -121,6 +121,18 @@ durable memories remain indexable, while selected existing project sources are
 stored as exact allow-list entries. The derived index is written only after
 confirmation and config persistence. Source bytes are never rewritten.
 
+## Typed model profile candidate (#157)
+
+The opt-in [model profile contract](MODEL_PROFILES.md) adds immutable, distinct
+embedding/generation/reranking identities to the resolved configuration. A
+`ModelReference` selects one capability and profile, independently of provider.
+Project and named-global profiles stay with their selected configuration and
+never merge corpus state. Parsing and inspection load no SDK, read no provider
+credential and enable no stage. Explicit application factory preparation is the
+only new optional adapter boundary; concrete execution and pipeline wiring
+remain separate cards. Existing deterministic retrieval and evidence contracts
+are unchanged. This section describes the candidate, not a merged capability.
+
 ## Episode decomposition failure boundary
 
 Episode decomposition is a pure candidate-producing step before persistence:
@@ -146,9 +158,24 @@ phase and reports failed assistance before any fallback write. Diagnostics disti
 `deterministic_fallback` without changing the compatibility list-returning
 Python API.
 
+The [QUMem source-to-runtime audit](QUMEM-GAP-ANALYSIS.md) records the
+current timeout/TF-IDF boundary heuristic, one-pass decomposition, single-query
+planning and free-text consolidation. These are not a validated reproduction
+of the full paper pipeline.
+
 This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
 `insights`, and all candidates use the same existing write gate.
+
+## Opt-in single-write operational receipts
+
+The #263 candidate adds an explicit `operation_id` lifecycle around the existing
+canonical writer. Content-free intents/receipts live outside the disposable
+index, and source frontmatter carries an operation marker for crash recovery.
+A store lock serializes participating writers; index and Evidence Ledger
+outcomes are checkpointed separately. Repair rebuilds from source without
+rewriting it. See [WRITE_RECEIPTS.md](WRITE_RECEIPTS.md). Legacy calls, admission,
+retrieval relevance, optional hooks and future HTTP remain separate contracts.
 
 ## Current read / retrieval pipeline
 
@@ -609,3 +636,10 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Instruction format adapters
+
+[Harness adapters](HARNESS_ADAPTERS.md) isolate filename-derived instruction
+classification and harness defaults behind an immutable registry. Explicit
+canonical metadata and source provenance remain authoritative. The registry
+does not change retrieval, discover more sources or decide instruction precedence.

@@ -91,12 +91,13 @@ class TesseraEngine(_CoreTesseraEngine):
         recursive: bool = True,
         use_cache: bool = True,
         persist: bool = True,
+        *, force_rebuild: bool = False,
     ) -> None:
         # Let the unchanged core handle parsing/indexing/cache semantics, then
         # derive evidence from the canonical metadata already attached to nodes.
         # We persist once after evidence has been attached, avoiding two graph
         # snapshots during a fresh build.
-        super().build_index(recursive=recursive, use_cache=use_cache, persist=False)
+        super().build_index(recursive=recursive, use_cache=use_cache, persist=False, force_rebuild=force_rebuild)
         if self.revision_history is not None:
             # Enabling history over an existing cache must capture its bodies too.
             for node_id, filepath in self.file_registry.items():

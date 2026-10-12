@@ -357,7 +357,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
         )
 
     for path in source_paths:
-        source_path = _relative(path, _identity_base(path, configuration))
+        source_path = _relative(path, Path(configuration.source_identity_root))
         try:
             raw_bytes = path.read_bytes()
             before_hashes[str(path)] = hashlib.sha256(raw_bytes).hexdigest()
@@ -379,6 +379,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 persistent_id=persistent_id,
                 persistent_doc_id=persistent_doc_id,
             )
+            metadata.source.path = source_path
         except ValueError as exc:
             report.findings.append(
                 CorpusFinding(
@@ -448,7 +449,7 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 )
 
     current_paths = {
-        _relative(path, _identity_base(path, configuration)) for path in source_paths
+        _relative(path, Path(configuration.source_identity_root)) for path in source_paths
     }
     for stale_path in sorted(set(manifest) - current_paths):
         report.findings.append(
@@ -612,6 +613,29 @@ def run_corpus_doctor(configuration: ResolvedConfiguration) -> CorpusDoctorRepor
                 f"{report.source_files_modified} source file(s) changed during the read-only audit.",
             )
         )
+
+    # Receipt inventory is operational metadata only; keep doctor read-only.
+    from types import SimpleNamespace
+    from .write_receipts import inspect_write_receipts
+    receipt_view = SimpleNamespace(
+        storage_dir=configuration.storage_dir,
+        index_cache_pkl=str(Path(configuration.index_dir) / "graph.pkl"),
+        index_cache_json=str(Path(configuration.index_dir) / "graph.json"),
+        manifest_path=str(Path(configuration.index_dir) / "identity_manifest.json"),
+        evidence_cache_json=str(Path(configuration.index_dir) / "evidence.json"),
+        _iter_source_files=lambda recursive: source_paths,
+    )
+    try:
+        receipts = inspect_write_receipts(receipt_view)
+    except ValueError:
+        receipts = [{"status": "corrupt", "repair_required": True}]
+    for receipt in receipts:
+        if receipt.get("repair_required") or receipt.get("retry_required"):
+            report.findings.append(CorpusFinding(
+                "incomplete_write_receipt", "warning",
+                "A write has incomplete or unverifiable derived state.",
+                hint="Run `tessera receipt inspect`, then `tessera receipt repair --operation-id ID`.",
+            ))
 
     report.sources.sort(key=lambda item: item.path)
     report.findings.sort(

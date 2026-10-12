@@ -1,5 +1,10 @@
 # Guia Técnico de Explicação de Código: Tessera
 
+> Historical design narrative, not the current implementation contract.
+> QUMem-fidelity and temporal/state claims below are superseded by the
+> [dated source-to-runtime audit](QUMEM-GAP-ANALYSIS.md). Heuristic behavior
+> and illustrative provider results do not establish paper fidelity.
+
 > Nota (reorganização): este guia foi originalmente escrito sobre o arquivo
 > monolítico `memory_graph_retrieval_v2.py`. O código de produção atual vive
 > no pacote instalável `tessera/`, dividido em módulos (`models.py`,
