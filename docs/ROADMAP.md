@@ -245,7 +245,7 @@ THEN — Trust and context
 -> Minimum sufficient, trusted current state.
 
 THEN — Agent integration
-#258 Typed recipe composition: opt-in read-only experiment, proposed ITERATE;
+#258 Typed recipe composition: opt-in read-only experiment merged (64033d8), decision ITERATE;
      no canonical write/candidate recipes or automatic adoption.
      [Evidence and boundaries](test-cards/258-typed-recipes.md).
 38 #171 Agent-facing semantic API (search/context/evidence/remember/inspect)

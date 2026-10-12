@@ -6,9 +6,9 @@
 | Record status | `IN_PROGRESS` |
 | Capability type | Opt-in architecture/runtime experiment |
 | Pull request | [#306](https://github.com/LuigiFerronatto/TESSERA/pull/306) |
-| Head commit | Exact current head is recorded by PR #306 checks |
-| Merge commit | Not merged |
-| Decision | `ITERATE` (proposed) |
+| Head commit | `141d5ab25f2ec2b831b7c7b3556f008630497752` (final PR #306 head) |
+| Merge commit | `64033d839750624540b12faa11e18466e5b5c02f` (PR #306, merged 2026-10-12) |
+| Decision | `ITERATE` (inherited from PR #306; issue remains open) |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |
 
@@ -208,7 +208,7 @@ before describing this as implemented or using it as a dependency.
 
 ## What is unlocked next?
 
-No dependent card is unlocked by an unmerged experiment. Maintainers can decide
+No dependent card is unlocked by this merged experiment (decision ITERATE, not adopted). Maintainers can decide
 whether a real caller warrants another bounded iteration; no grammar expansion
 or default integration is selected here.
 
@@ -221,7 +221,7 @@ or default integration is selected here.
 - Existing canonical contracts: [output](../OUTPUT_CONTRACT.md),
   [write gate](../WRITE_GATE_CONTRACT.md), [MCP](../MCP_RUNTIME.md)
 - Independent design; no upstream AGPL implementation copied
-- Exact head CI and benchmark results are recorded on PR #306; merge not performed
+- Merged to main as `64033d839750624540b12faa11e18466e5b5c02f`; CI/benchmark evidence for that merge SHA is not yet confirmed, so no VALIDATED claim
 
 ## Evolution
 
