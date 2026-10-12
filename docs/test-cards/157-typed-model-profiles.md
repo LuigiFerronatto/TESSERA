@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (not yet `VALIDATED`; canonical CI/benchmark evidence pending) |
 | Capability type | `runtime` configuration / optional adapter boundary |
 | Pull request | [Draft PR #286](https://github.com/LuigiFerronatto/TESSERA/pull/286) |
 | Head commit | [Current PR head and exact-head checks](https://github.com/LuigiFerronatto/TESSERA/pull/286/commits) |
 | Tested runtime commit | [`f113460`](https://github.com/LuigiFerronatto/TESSERA/commit/f113460cf0cf3b061daae7414cd58d1020740d53); subsequent change only adds these PR links |
-| Merge commit | Not merged |
+| Merge commit | [`50f7e6dab552e46029922510cb3806efa39d27a4`](https://github.com/LuigiFerronatto/TESSERA/commit/50f7e6dab552e46029922510cb3806efa39d27a4) (PR #286) |
 | Decision | `PENDING`; proposed KEEP of the bounded schema experiment |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |

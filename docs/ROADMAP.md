@@ -4,7 +4,7 @@
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
-> #157 candidate (2026-10-02): typed model profiles are being implemented in a
+> #157 (2026-10-12): PR #286 merged as canonical `50f7e6dab552e46029922510cb3806efa39d27a4`; status is `IMPLEMENTED`, pending canonical CI/benchmark evidence before `VALIDATED`. Historical candidate note (2026-10-02): typed model profiles were implemented in a
 > draft candidate selected by the repository owner. The earlier WIP deferral is
 > historical for this candidate. No model execution, pipeline activation or
 > dependent capability is delivered on `main`; dependency states remain pending
@@ -727,7 +727,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
 | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
 | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | closed | `VALIDATED` | EXECUTABLE | Productization | Init UX delivered by #210 (`4c112195f1572bf352d1cc6a1042c69711381da8`), lifecycle #212. `KEEP`; no active blocker remains. |
-| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `DEFERRED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while #87 still gates release after #120 validation. |
+| [#157](https://github.com/LuigiFerronatto/TESSERA/issues/157) | open | `IMPLEMENTED` | EXECUTABLE | Intelligence | #153 and #74 are satisfied; no hard dependency remains, but typed model profiles are deliberately parked under portfolio WIP while #87 still gates release after #120 validation. |
 | [#158](https://github.com/LuigiFerronatto/TESSERA/issues/158) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#153/#96; optional semantic embeddings + versioned semantic index. |
 | [#159](https://github.com/LuigiFerronatto/TESSERA/issues/159) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#158/#96; reranking over frozen candidates. |
 | [#160](https://github.com/LuigiFerronatto/TESSERA/issues/160) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157/#74; capability-level pipeline modes/fallbacks. |
