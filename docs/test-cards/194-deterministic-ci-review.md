@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#194](https://github.com/LuigiFerronatto/TESSERA/issues/194), operational tracker only; not closed by this PR |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; main CI/benchmark evidence for canonical SHA not yet confirmed, so not VALIDATED) |
 | Capability type | `governance` |
-| Pull request | Implementation draft; link recorded in PR metadata |
-| Head commit | Exact candidate recorded in the implementation PR |
-| Merge commit | Not merged |
-| Decision | `PENDING` exact-head CI and canonical adoption |
+| Pull request | [#287](https://github.com/LuigiFerronatto/TESSERA/pull/287) (merged) |
+| Head commit | Final candidate `1482ded02de7465b40e0fccd5cb19f337ea6c197` |
+| Merge commit | `107663b107994c9d98fee96493a6bd18baee6cf3` (canonical implementation merge) |
+| Decision | `KEEP` (branch-protection migration remains a separate administrator action) |
 | Benchmark applicability | `NOT_APPLICABLE` — governance only; no runtime/retrieval change |
-| Last audited | 2026-10-04 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -39,7 +39,7 @@ including their existing security controls on agent write outputs.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. The governor requires successful exact-name CI checks,
+Merged to main in #287. The governor requires successful exact-name CI checks,
 offline reporting, dev-50 success when the PR declares REQUIRED applicability,
 no active requested changes, no unresolved threads, non-draft status and no
 conflicts. Positive human approval is optional. All review pages are checked
@@ -97,8 +97,8 @@ capability or roadmap dependency is promoted by this governance change.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [Detection Runs #194](https://github.com/LuigiFerronatto/TESSERA/issues/194); owner-requested CI policy change |
-| Pull request | Implementation draft for this record |
-| Merge commit | Not merged; base `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
+| Pull request | [#287](https://github.com/LuigiFerronatto/TESSERA/pull/287) (merged) |
+| Merge commit | `107663b107994c9d98fee96493a6bd18baee6cf3` (canonical implementation merge) |
 | Evidence/Learnings/Decision | Run `36966868340`; model alias failure; `PENDING` candidate validation |
 | Benchmark record | NOT_APPLICABLE for this change; offline reporting retained |
 | PR Evolution Audit | Original Stage A merged as `c349bac48c5fb1427f15615fc26e4fbc748ed320`; this candidate supersedes automatic PR AI review and mandatory positive approval |
