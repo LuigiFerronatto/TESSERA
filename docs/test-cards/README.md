@@ -41,6 +41,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #179 Cross-system lifecycle research | `IN_PROGRESS` research candidate | [179-memory-lifecycle-research.md](179-memory-lifecycle-research.md) | [Issue #179](https://github.com/LuigiFerronatto/TESSERA/issues/179), [PR #311](https://github.com/LuigiFerronatto/TESSERA/pull/311), [pinned audit](../research/MEMORY_LIFECYCLE_2026-10-02.md); no runtime promotion, decision pending |
 | #204 OKF exchange experiment | `IN_PROGRESS` | [204-okf-exchange.md](204-okf-exchange.md) | [Issue #204](https://github.com/LuigiFerronatto/TESSERA/issues/204), `ITERATE`, synthetic evidence only |
 | #191 Conversation source import | `IN_PROGRESS` source-only candidate | [191-conversation-source-import.md](191-conversation-source-import.md) | [Issue #191](https://github.com/LuigiFerronatto/TESSERA/issues/191); expanded runtime/enrichment scope remains open |
 | #139 Bounded information needs | `IN_PROGRESS` | [139-bounded-information-needs.md](139-bounded-information-needs.md) | [Issue #139](https://github.com/LuigiFerronatto/TESSERA/issues/139), [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); empirical quality gate pending |
