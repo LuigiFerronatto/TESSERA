@@ -8,6 +8,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Added
+- Package five provider-neutral agent Skills for existing init, write, query, read-only corpus diagnostics and benchmark workflows, with a read-only resource API; keep procedural-anchor notes separate. ([#121](https://github.com/LuigiFerronatto/TESSERA/issues/121))
+
+
 ### Experimental
 
 - Added opt-in Python `revision_history=True`: durable observed full-source

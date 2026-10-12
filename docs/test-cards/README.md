@@ -74,6 +74,8 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | #71 Harness adapter registry | `IN_PROGRESS` | [71-harness-adapter-registry.md](71-harness-adapter-registry.md) | Immutable format defaults; no authority/precedence change |
 
+| #121 Official agent Skills | `IN_PROGRESS` | [121-official-agent-skills.md](121-official-agent-skills.md) | Five thin current-capability instructions and artifact tests |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
