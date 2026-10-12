@@ -8,6 +8,10 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.0.4 — 2026-10-12
+
 ### Experimental
 
 - Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
