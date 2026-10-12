@@ -121,6 +121,18 @@ durable memories remain indexable, while selected existing project sources are
 stored as exact allow-list entries. The derived index is written only after
 confirmation and config persistence. Source bytes are never rewritten.
 
+## Typed model profile candidate (#157)
+
+The opt-in [model profile contract](MODEL_PROFILES.md) adds immutable, distinct
+embedding/generation/reranking identities to the resolved configuration. A
+`ModelReference` selects one capability and profile, independently of provider.
+Project and named-global profiles stay with their selected configuration and
+never merge corpus state. Parsing and inspection load no SDK, read no provider
+credential and enable no stage. Explicit application factory preparation is the
+only new optional adapter boundary; concrete execution and pipeline wiring
+remain separate cards. Existing deterministic retrieval and evidence contracts
+are unchanged. This section describes the candidate, not a merged capability.
+
 ## Episode decomposition failure boundary
 
 Episode decomposition is a pure candidate-producing step before persistence:
@@ -145,6 +157,11 @@ the same implementation. MCP #120 uses pure decomposition before its commit
 phase and reports failed assistance before any fallback write. Diagnostics distinguish `assisted` from
 `deterministic_fallback` without changing the compatibility list-returning
 Python API.
+
+The [QUMem source-to-runtime audit](QUMEM-GAP-ANALYSIS.md) records the
+current timeout/TF-IDF boundary heuristic, one-pass decomposition, single-query
+planning and free-text consolidation. These are not a validated reproduction
+of the full paper pipeline.
 
 This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
@@ -542,16 +559,21 @@ Evidence Ledger / provenance
 basic heuristic write-side sanitization
 CI + sanity evaluation
 Test Card governance
+#12 incremental/idempotent indexing (VALIDATED; PR #246)
+#69 body-only plain-text ingestion (VALIDATED; PR #264)
+#70 structural segmentation with parent-only retrieval (VALIDATED; PR #270)
+#13 read-only Corpus Doctor (VALIDATED; PR #277)
 ```
+
+The final candidate and canonical merge SHAs, recorded `KEEP` decisions,
+and exact-head validation evidence for these four deliveries are linked from
+[their stage records](test-cards/README.md). These are historical delivery
+decisions, not new decisions made by this documentation reconciliation.
 
 Planned / experimental:
 
 ```text
 #68 Engine / CLI / MCP direct-query contract parity (implemented)
-#12 incremental/idempotent indexing
-#69 text ingestion coverage
-#70 structural segmentation
-#13 metadata doctor
 #14/#25/#26 controlled relations/graph intelligence
 #15 temporal model + state keys
 #71/#72 harness adapters + instruction resolver
