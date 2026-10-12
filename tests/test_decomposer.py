@@ -240,7 +240,8 @@ def test_cli_uses_canonical_fallback_and_reports_truthful_mode(
     assert result == 0
     assert "decomposition_mode=deterministic_fallback" in captured.err
     assert "fallback_reason=provider_error" in captured.err
-    assert len(list((tmp_path / "store").rglob("*.md"))) == 3
+    assert len(list((tmp_path / "store" / "project").rglob("*.md"))) == 3
+    assert len(list((tmp_path / "store" / "_episodes").glob("*.md"))) == 1
 
 
 def _import_mcp_server(monkeypatch, storage_dir):

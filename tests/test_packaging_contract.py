@@ -30,7 +30,7 @@ def test_distribution_declares_only_the_runtime_package() -> None:
     assert setuptools["packages"] == ["tessera"]
     assert setuptools["include-package-data"] is False
     assert config["tool"]["setuptools"]["package-data"]["tessera"] == [
-        "skills_library/*.md"
+        "skills_library/*.md", "agent_skills/*/SKILL.md"
     ]
 
 

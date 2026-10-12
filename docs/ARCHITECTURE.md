@@ -121,6 +121,18 @@ durable memories remain indexable, while selected existing project sources are
 stored as exact allow-list entries. The derived index is written only after
 confirmation and config persistence. Source bytes are never rewritten.
 
+## Typed model profile candidate (#157)
+
+The opt-in [model profile contract](MODEL_PROFILES.md) adds immutable, distinct
+embedding/generation/reranking identities to the resolved configuration. A
+`ModelReference` selects one capability and profile, independently of provider.
+Project and named-global profiles stay with their selected configuration and
+never merge corpus state. Parsing and inspection load no SDK, read no provider
+credential and enable no stage. Explicit application factory preparation is the
+only new optional adapter boundary; concrete execution and pipeline wiring
+remain separate cards. Existing deterministic retrieval and evidence contracts
+are unchanged. This section describes the candidate, not a merged capability.
+
 ## Episode decomposition failure boundary
 
 Episode decomposition is a pure candidate-producing step before persistence:
@@ -146,9 +158,24 @@ phase and reports failed assistance before any fallback write. Diagnostics disti
 `deterministic_fallback` without changing the compatibility list-returning
 Python API.
 
+The [QUMem source-to-runtime audit](QUMEM-GAP-ANALYSIS.md) records the
+current timeout/TF-IDF boundary heuristic, one-pass decomposition, single-query
+planning and free-text consolidation. These are not a validated reproduction
+of the full paper pipeline.
+
 This repair does not redefine QUMem F/P/I semantics, episode construction or
 lineage. The three canonical drawers remain `facts`, `preferences` and
 `insights`, and all candidates use the same existing write gate.
+
+## Opt-in single-write operational receipts
+
+The #263 candidate adds an explicit `operation_id` lifecycle around the existing
+canonical writer. Content-free intents/receipts live outside the disposable
+index, and source frontmatter carries an operation marker for crash recovery.
+A store lock serializes participating writers; index and Evidence Ledger
+outcomes are checkpointed separately. Repair rebuilds from source without
+rewriting it. See [WRITE_RECEIPTS.md](WRITE_RECEIPTS.md). Legacy calls, admission,
+retrieval relevance, optional hooks and future HTTP remain separate contracts.
 
 ## Current read / retrieval pipeline
 
@@ -331,7 +358,14 @@ source.path        SAME
 content_hash       CHANGED
 ```
 
-Source revision history beyond the current version is a separate experiment (#73); stable hashes alone are not presented as a full immutable history.
+The opt-in #73 candidate adds a separate durable observed-source archive,
+`store/.tessera_history/revisions.sqlite3`, through Python
+`TesseraEngine(..., revision_history=True)`. It stores full text and issued
+evidence, survives deletion of the derived index, and never enters live
+retrieval. Stable hashes alone remain insufficient without captured bodies.
+See [revision-history contract](REVISION_HISTORY.md) for failure boundaries,
+backup requirements and the distinction from temporal validity. Default
+behavior remains current-source-only.
 
 # 3. Graph representation
 
@@ -446,6 +480,18 @@ back to the parent document and exposes the matched segment through
 results. Changed/deleted sources retract their derived segments, and the index
 schema version forces older caches to rebuild.
 
+## Experimental vector mechanics (#265 candidate)
+
+The optional [vector backend contract](VECTOR_BACKENDS.md) separates canonical
+identity, supplied embedding vectors and derived backend storage. Atomic,
+source and segment representations have distinct deterministic identities.
+An exact-flat reference, stdlib SQLite candidate and explicit-import SciPy
+cKDTree exact/approximate candidate expose typed filters,
+profile/dimension compatibility, atomic source replacement and recovery.
+Neither is imported or activated by the deterministic retrieval pipeline.
+This pre-merge candidate does not select an encoder or public default backend;
+#158/#17 continue to own generation quality and candidate fusion.
+
 # 8. Interface boundary
 
 The Python engine is the semantic source of retrieval results. CLI and MCP are transports/renderers around that contract.
@@ -542,16 +588,21 @@ Evidence Ledger / provenance
 basic heuristic write-side sanitization
 CI + sanity evaluation
 Test Card governance
+#12 incremental/idempotent indexing (VALIDATED; PR #246)
+#69 body-only plain-text ingestion (VALIDATED; PR #264)
+#70 structural segmentation with parent-only retrieval (VALIDATED; PR #270)
+#13 read-only Corpus Doctor (VALIDATED; PR #277)
 ```
+
+The final candidate and canonical merge SHAs, recorded `KEEP` decisions,
+and exact-head validation evidence for these four deliveries are linked from
+[their stage records](test-cards/README.md). These are historical delivery
+decisions, not new decisions made by this documentation reconciliation.
 
 Planned / experimental:
 
 ```text
 #68 Engine / CLI / MCP direct-query contract parity (implemented)
-#12 incremental/idempotent indexing
-#69 text ingestion coverage
-#70 structural segmentation
-#13 metadata doctor
 #14/#25/#26 controlled relations/graph intelligence
 #15 temporal model + state keys
 #71/#72 harness adapters + instruction resolver
@@ -597,6 +648,46 @@ CONSUMING AGENT
 ```
 
 This is roadmap architecture, not current runtime behavior. Individual layers may be simplified or dropped if their Test Cards do not show measurable value.
+
+## Instruction format adapters
+
+[Harness adapters](HARNESS_ADAPTERS.md) isolate filename-derived instruction
+classification and harness defaults behind an immutable registry. Explicit
+canonical metadata and source provenance remain authoritative. The registry
+does not change retrieval, discover more sources or decide instruction precedence.
+
+## Durable memory versus ephemeral context
+
+The [proposed Long-Term Memory boundary](LONG_TERM_MEMORY.md) names canonical
+source ownership separately from disposable indexes, generated state and Working
+Context. It inventories current contracts and reserves future admission, revision
+and context-invalidation work to their owning Test Cards; it activates no behavior.
+
+## Source-episode lineage (#137 candidate)
+
+Automatic memory construction retains immutable, independently inspectable
+Markdown episode sources in the store, with no new semantic drawer. Ordered
+source turns and explicit supporting references share Canonical Metadata and
+the Evidence Ledger's source/version/span model. Rebuilds preserve lineage;
+source changes are diagnosed rather than silently rebound. See
+[EPISODE_LINEAGE.md](EPISODE_LINEAGE.md). This candidate does not establish
+QUMem extraction accuracy, episode boundary semantics or temporal state.
+
+## Experimental budgeted one-hop selection (#25)
+
+An opt-in Python `GraphExpansionPolicy` isolates expansion from the unchanged
+TF-IDF candidate generator and DWPR/multi-signal ranker. A0 uses only seeds;
+A1 preserves the current default; A2 selects query-relevant seed-incident edges
+under explicit node, edge-slot and added-context limits. Ordered adjacency is
+derived at index build/load and never becomes a source of truth. A2 retains
+seed-induced edges and only selected expansion edges; no selected neighbor is
+traversed recursively. Trace output is caller-owned, separate from evidence
+and does not imply relation confidence, authority or temporal truth.
+
+The [frozen experiment](../benchmarks/graph_expansion/README.md) currently
+supports **ITERATE**, not default promotion. Its quality matches no expansion,
+so bounded graph selection alone has not established the intended gain. A3
+remains conditional on #26; no schema-confidence field is invented here.
 
 ## Experimental lifecycle SDK candidate (#196)
 

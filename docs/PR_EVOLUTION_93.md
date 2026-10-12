@@ -1,5 +1,9 @@
 # PR Evolution Audit — Issue #93 storage configuration parity
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/PR_EVOLUTION_93.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 Audited starting main:
 `5d43a2d4cdda0c17be6516f47920121070339d0f`, the canonical lifecycle merge
 from PR #127. It includes the canonical #95 implementation merge
@@ -23,7 +27,7 @@ decision remains `KEEP`, and #93 is `VALIDATED`.
 ## Previous capability state
 
 The historical Issue #93 baseline was true when written: quickstart emitted
-`LAO_MEM_DIR`, CLI preferred it, and MCP read `TESSERA_STORAGE_DIR`. PR #126
+`<legacy storage variable>`, CLI preferred it, and MCP read `TESSERA_STORAGE_DIR`. PR #126
 later superseded that baseline for #95. Current main already has one shared
 resolver, canonical-over-legacy precedence, a warning-backed compatibility
 alias, generic `./memories`, canonical quickstart output, no implicit
@@ -64,7 +68,7 @@ public resolver contract, whose fallback spelling is `./memories`.
 | explicit path only | explicit path | explicit path | canonical env containing that absolute path | generated canonical env selects it | none |
 | `TESSERA_STORAGE_DIR` only | canonical path | canonical path | same canonical absolute path | canonical path | none |
 | canonical + legacy | canonical path | canonical path | canonical only | canonical path | none |
-| `LAO_MEM_DIR` only | legacy path | legacy path | translated to canonical key | legacy path | exactly one per resolving surface |
+| `<legacy storage variable>` only | legacy path | legacy path | translated to canonical key | legacy path | exactly one per resolving surface |
 | neither variable | `./memories` under current project | same | absolute `<project>/memories` | same via generated config | none |
 | existing `.claude/memory`, not selected | ignored; `./memories` | ignored | `<project>/memories` | same | none |
 | explicit `.claude/memory` | accepted | accepted | canonical env containing explicit absolute path | same | none |
