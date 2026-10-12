@@ -35,3 +35,24 @@ def test_recent_merge_index_matches_stage_records_without_promoting_children():
     original = (RECORDS / "12-incremental-idempotent-indexing.md").read_text(encoding="utf-8")
     assert "| Record status | `VALIDATED` |" in original
     assert "971801cd89b6ce7b890df9ceb43b6afff9fa0964" in original
+
+
+def test_harness_registry_reconciliation_preserves_exact_head_and_timing():
+    text = (RECORDS / "71-harness-adapter-registry.md").read_text(encoding="utf-8")
+    assert "| Record status | `IMPLEMENTED` |" in text
+    assert "973a1e75ae1c024edcdd9acef54d840227bc801b" in text
+    assert "f149ff292238e2a6f5cdd95894e9c11c365457f2" in text
+    for run in ("38191615200", "38191615264", "38201483965", "38201483988"):
+        assert run in text
+    assert "six seconds after merge" in text
+    assert "not evidence of a pre-merge failure" in text
+    assert "no final-head formal review or KEEP is claimed" in text
+    assert "TARGET — NOT YET ON MAIN" not in text
+    assert "Not merged" not in text
+    assert "#72 remains blocked on #32" in text
+    index = (RECORDS / "README.md").read_text(encoding="utf-8")
+    row = next(line for line in index.splitlines() if "| #71 " in line)
+    assert "`IMPLEMENTED`" in row and "f149ff29" in row
+    roadmap = (ROOT / "docs/process/roadmap.md").read_text(encoding="utf-8")
+    assert "Depends only on #71 lifecycle completion" in roadmap
+    assert "#71 harness adapter registry (READY / LATER)" not in roadmap
