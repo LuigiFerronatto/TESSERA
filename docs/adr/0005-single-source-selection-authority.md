@@ -1,6 +1,6 @@
 # ADR 0005: One source-selection authority for every corpus reader
 
-- Status: Proposed
+- Status: Accepted (owner decision recorded in PR #366 on 2026-10-12)
 - Date: 2026-10-12
 - Issue: [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349)
 - Amends: [ADR 0004](0004-safe-project-source-discovery.md) (consumption only;
@@ -109,7 +109,7 @@ configurations remain valid and are never rewritten automatically.
 
 ### 5. `.gitignore` participation
 
-Proposed: a root `.gitignore` participates as a convenience-ignore layer
+Decision: a root `.gitignore` participates as a convenience-ignore layer
 evaluated **before** `.tessera-ignore`, parsed with the same documented ADR
 0004 subset (no `git` subprocess, no full gitignore grammar). Unsupported
 gitignore lines are reported as diagnostics and skipped. Any path it ignores
@@ -117,9 +117,7 @@ can be re-included with `!` in `.tessera-ignore`; mandatory exclusions remain
 non-overridable. Nested `.gitignore` files, `.git/info/exclude` and global
 excludes are out of scope.
 
-This is the one sub-decision the owner must confirm at review (see
-Alternatives). If it is rejected, sections 1-4 stand unchanged and
-`.gitignore` remains non-participating, as in ADR 0004.
+The owner chose option (a) of the `.gitignore` alternatives below.
 
 ### 6. Parity invariant
 
@@ -152,7 +150,7 @@ of an 18.8 s build.
 3. **`include` overrides `.tessera-ignore`.** Rejected: two exclusion
    authorities with opposite precedence are hard to explain, and ADR 0004
    already provides `!` for intentional re-inclusion.
-4. **`.gitignore` options.** (a) adopt as proposed; (b) adopt behind an
+4. **`.gitignore` options.** (a) adopt as decided in §5 (chosen); (b) adopt behind an
    opt-in config key, which needs a schema version bump; (c) defer and keep
    ADR 0004 as is; (d) shell out to `git check-ignore`, rejected because it
    adds a runtime dependency on a `git` binary and on repository state.

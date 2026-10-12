@@ -5,10 +5,10 @@
 | Issue | [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `architecture decision` |
-| Pull request | Open (ADR 0005, Proposed) |
+| Pull request | [#366](https://github.com/LuigiFerronatto/TESSERA/pull/366) (ADR 0005, Accepted) |
 | Head commit | See the pull request |
 | Merge commit | Not merged |
-| Decision | `PENDING` |
+| Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
 
@@ -42,8 +42,8 @@ selected-source set, derived from the ADR 0004 discovery policy, is the only
 input for every corpus reader; that `.tessera-ignore` is the single exclusion
 authority; that symlinks are skipped everywhere with severity depending on how
 they were selected; that `init` persists patterns instead of file lists; and,
-pending owner confirmation, that a root `.gitignore` participates as a
-convenience-ignore layer. No runtime code changes in this stage.
+that a root `.gitignore` participates as a convenience-ignore layer
+(owner-confirmed). No runtime code changes in this stage.
 
 ## How does it work now?
 
@@ -74,20 +74,19 @@ implementation cards can test against.
 
 All runtime behaviour remains unimplemented: single-authority selection and
 ignore enforcement (#352), symlink parity and severity (#353), and pattern
-persistence in `init` (#354). The `.gitignore` sub-decision remains open until
-the owner confirms it at review.
+persistence in `init` (#354), including the `.gitignore` layer.
 
 ## What is unlocked next?
 
-Nothing is unlocked until this ADR is accepted. Acceptance unblocks #352,
-#353 and #354, and gives #357 its persistence contract.
+Once this ADR merges, #352, #353 and #354 are unblocked, and #357 has its
+persistence contract.
 
 ## Technical provenance
 
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#349](https://github.com/LuigiFerronatto/TESSERA/issues/349) |
-| Pull request | Open |
+| Pull request | [#366](https://github.com/LuigiFerronatto/TESSERA/pull/366) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Issue #349 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
@@ -98,6 +97,6 @@ Nothing is unlocked until this ADR is accepted. Acceptance unblocks #352,
 ```text
 ADR 0004 discovery policy (discovery only)
 → ADR 0005 proposed: one selected-source set for every reader
-→ current state: Proposed, runtime unchanged
+→ current state: Accepted in review, runtime unchanged
 → next validated dependency: #352 single-authority implementation
 ```
