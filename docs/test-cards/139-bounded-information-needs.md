@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#139](https://github.com/LuigiFerronatto/TESSERA/issues/139) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; not yet lifecycle `VALIDATED`) |
 | Capability type | Experimental assisted runtime and evaluation |
-| Pull request | [Draft #301](https://github.com/LuigiFerronatto/TESSERA/pull/301) |
+| Pull request | [Merged #301](https://github.com/LuigiFerronatto/TESSERA/pull/301) |
 | Head commit | Runtime `c01016abf6afb93d3d2d146c608ee176f8797690`; final documentation head recorded by PR #301 and CI |
-| Merge commit | Not merged |
+| Merge commit | Canonical implementation merge `7e7b20ea6da6c7e258f7c4c09e71aa12f12f4d64` (PR #301) |
 | Decision | `ITERATE`; keep N0 default; full N2 quality decision blocked |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |

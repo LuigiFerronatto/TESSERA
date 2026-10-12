@@ -1077,10 +1077,10 @@ reconciliation; #136/#138/#15 and dependent state/quality cards are not unlocked
 by an unmerged candidate. Supporting-turn semantic precision/recall and
 preference-state accuracy remain unmeasured.
 
-### #139 unmerged experimental candidate (2026-10-02)
+### #139 merged experimental implementation (2026-10-12)
 
 An opt-in N1/N2 information-needs contract and frozen controlled experiment are
-under review in [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); see [the stage record](test-cards/139-bounded-information-needs.md).
+merged to `main` as `7e7b20ea6da6c7e258f7c4c09e71aa12f12f4d64` via [PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); see [the stage record](test-cards/139-bounded-information-needs.md).
 This is candidate evidence, separate from the frozen canonical portfolio table
 above. N0 remains the default, full provider-backed semantic/quality evaluation
 is pending, and #140/#141 dependency completion is not claimed. The canonical
