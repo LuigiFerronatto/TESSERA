@@ -41,6 +41,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #28 Frozen evidence renderers | `IN_PROGRESS` | [28-frozen-evidence-renderers.md](28-frozen-evidence-renderers.md) | [Issue #28](https://github.com/LuigiFerronatto/TESSERA/issues/28), offline candidate only; reader-quality gate remains open, `ITERATE` |
 | #138 Role-aware episode experiment | `IN_PROGRESS` preparation / `BLOCKED` review | [138-role-aware-episodes.md](138-role-aware-episodes.md) | [Issue #138](https://github.com/LuigiFerronatto/TESSERA/issues/138); opt-in E1/E3 harness, unreviewed synthetic fixture, human gate pending |
 | #179 Cross-system lifecycle research | `IN_PROGRESS` research candidate | [179-memory-lifecycle-research.md](179-memory-lifecycle-research.md) | [Issue #179](https://github.com/LuigiFerronatto/TESSERA/issues/179), [PR #311](https://github.com/LuigiFerronatto/TESSERA/pull/311), [pinned audit](../research/MEMORY_LIFECYCLE_2026-10-02.md); no runtime promotion, decision pending |
 | #204 OKF exchange experiment | `IN_PROGRESS` | [204-okf-exchange.md](204-okf-exchange.md) | [Issue #204](https://github.com/LuigiFerronatto/TESSERA/issues/204), `ITERATE`, synthetic evidence only |

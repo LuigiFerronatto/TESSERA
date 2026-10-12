@@ -10,6 +10,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
+- Added repository-only frozen-evidence capture/replay controls for R0 raw,
+  R1 selected-span/provenance and R2 structured presentation. Deterministic
+  offline budgets expose evidence/provenance retention and overhead without
+  provider calls or changes to default retrieval. Synthetic controls do not
+  establish downstream QA benefit; renderer selection remains `ITERATE`.
+  ([#28](https://github.com/LuigiFerronatto/TESSERA/issues/28))
 - Add explicitly opt-in D0/D1/D2 typed decomposition experiments with versioned
   F/P/I semantics, strict one-pass/three-pass contracts and canonical write
   admission. Add a draft annotation packet and human-review-gated capture,
