@@ -5,9 +5,9 @@ Verified 2026-09-05 against local HEAD and freshly fetched origin/main, both `70
 | Published claim | Implementation and contract evidence |
 | --- | --- |
 | Text-first memory and evidence layer for agents | README introduction; `tessera/engine.py:TesseraEngine`; `examples/quickstart.py` |
-| Markdown sources remain authoritative | `docs/ARCHITECTURE.md`; `tessera/engine_core.py:build_index`; `tests/test_canonical_compatibility.py` |
+| Markdown sources remain authoritative | `docs/architecture/architecture.md`; `tessera/engine_core.py:build_index`; `tests/test_canonical_compatibility.py` |
 | Read/index sources, writable memory store, rebuildable index have different roles | README Quickstart; `tessera/config.py:ResolvedConfiguration`; `tests/test_issue_153_configuration_v2.py`; ADR 0003 |
-| Relevant excerpts plus original content | `docs/OUTPUT_CONTRACT.md`; `tessera/engine_core.py:retrieve_context`; `tests/test_retrieval_ranking_evidence.py` |
+| Relevant excerpts plus original content | `docs/reference/output-contract.md`; `tessera/engine_core.py:retrieve_context`; `tests/test_retrieval_ranking_evidence.py` |
 | Source identity, version hashes, exact spans where provable | `tessera/evidence.py`; `tessera/engine.py`; `tests/test_evidence_ledger.py` |
 | Inspectable relevance signals; score is not truth/confidence | OUTPUT_CONTRACT score semantics; `tests/test_retrieval_ranking_evidence.py` |
 | Explicit links and related memory IDs | `tessera/models.py:Connection`; `engine_core.py:retrieve_context`; `examples/quickstart.py` |

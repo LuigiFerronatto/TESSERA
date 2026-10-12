@@ -65,13 +65,13 @@ Compare actual canonical `main` behavior/contracts against:
 
 ```text
 README.md
-docs/ROADMAP.md
-docs/CHANGE_POLICY.md
-docs/ARCHITECTURE.md
-docs/OVERVIEW.md
-docs/test-cards/**
-docs/PR_EVOLUTION_*.md
-docs/adr/**
+docs/process/roadmap.md
+docs/process/change-policy.md
+docs/architecture/architecture.md
+docs/concepts/overview.md
+docs/process/test-cards/**
+docs/history/pr-evolution/*.md
+docs/architecture/adr/**
 open and recently-closed issues
 ```
 
@@ -84,7 +84,7 @@ Benchmark Ledger results — not in an open issue or PR description alone.
 ```text
 documentation says a feature is future, but canonical main implements it
 documentation claims implementation, but no canonical code/evidence exists
-docs/ROADMAP.md says an issue is blocked by an already-VALIDATED prerequisite
+docs/process/roadmap.md says an issue is blocked by an already-VALIDATED prerequisite
 an issue or Test Card still says IN_PROGRESS after lifecycle completion
 a Test Card treats an old candidate SHA as the final canonical delivery
 README describes behavior the runtime does not support

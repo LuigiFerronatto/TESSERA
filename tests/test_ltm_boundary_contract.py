@@ -73,7 +73,7 @@ def test_source_version_change_marks_old_evidence_stale_not_false(tmp_path):
 
 
 def test_document_keeps_current_and_target_ownership_distinct():
-    text = (ROOT/'docs/LONG_TERM_MEMORY.md').read_text()
+    text = (ROOT/'docs/architecture/long-term-memory.md').read_text()
     assert 'PROPOSED contract candidate' in text
     assert 'What exists on the audited main' in text
     for issue in [19,21,73,15,16,137,196,177,138,135,136,169,167,171,263]:

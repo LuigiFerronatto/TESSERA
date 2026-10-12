@@ -403,3 +403,15 @@ def test_receipt_request_hash_preserves_typed_metadata_without_lossy_strings(tmp
         receipts._request_json_default(object())
     with pytest.raises(TypeError,match='unsupported receipt'):
         receipts._request_json_default(SourceReference)
+
+
+def test_receipt_cli_lists_and_inspects_without_crashing(tmp_path, capsys):
+    from tessera.cli import main
+    engine = TesseraEngine(str(tmp_path))
+    assert write(engine, operation_id='cli-op').persisted
+    capsys.readouterr()
+    assert main(['receipt', 'inspect', str(tmp_path)]) == 0
+    listed = json.loads(capsys.readouterr().out)
+    assert [item['operation_id'] for item in listed['receipts']] == ['cli-op']
+    assert main(['receipt', 'inspect', str(tmp_path), '--operation-id', 'cli-op']) == 0
+    assert json.loads(capsys.readouterr().out)['operation_id'] == 'cli-op'
