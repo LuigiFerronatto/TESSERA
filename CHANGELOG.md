@@ -8,6 +8,24 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Experimental
+
+- Add opt-in, capability-typed embedding, generation and reranking profiles to
+  project and named-global configuration, with environment-only credential
+  references, inspectable model identity and explicit application adapter
+  resolution. No default model, provider SDK, download or retrieval change is
+  introduced. ([#157](https://github.com/LuigiFerronatto/TESSERA/issues/157))
+
+### Fixed
+
+- Keep configured source allow lists and recursion boundaries intact across
+  fresh, cached and incremental builds. Updating a relation target now restores
+  inbound links from unchanged sources. Project documents and generated-memory
+  files use distinct physical source keys, preventing path collisions from
+  hiding edits or conflating provenance. The derived graph cache moves to
+  schema 3 and rebuilds automatically; legacy store-only source paths and
+  logical memory IDs retain their existing conventions.
+
 ### Changed
 
 - Long or structurally headed Markdown/plain-text sources now retain their

@@ -10,9 +10,10 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import hashlib
 import os
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from .canonical import CanonicalMetadata, compute_sha256
+from .config import ResolvedConfiguration
 
 
 EVIDENCE_SCHEMA_VERSION = 1
@@ -271,14 +272,22 @@ def _split_body_for_hash(raw_text: str, source_format: str = "markdown") -> str:
 
 def verify_evidence_freshness(
     record: EvidenceRecord,
-    storage_dir: str,
+    storage_dir: Union[str, ResolvedConfiguration],
 ) -> EvidenceFreshness:
     """Verify whether evidence still points to the same exact source version.
 
     Statuses: ``fresh``, ``metadata_changed``, ``content_changed``,
     ``missing_source``.
+
+    Pass the resolved configuration for project corpora so paths are resolved
+    against their shared source identity root. A string retains the legacy
+    behavior of using that directory as the source-path base.
     """
-    full_path = os.path.join(storage_dir, record.source.path.replace("/", os.sep))
+    source_root = (
+        storage_dir.source_identity_root
+        if isinstance(storage_dir, ResolvedConfiguration) else storage_dir
+    )
+    full_path = os.path.join(source_root, record.source.path.replace("/", os.sep))
     if not os.path.exists(full_path):
         return EvidenceFreshness(
             evidence_id=record.evidence_id,
