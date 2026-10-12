@@ -131,3 +131,14 @@ Supplying `operation_id` to the result API or transport enables the versioned
 return `persisted: false` on pre-source storage failure, or `persisted: true`
 with failed/pending derived components. Admission and operational completion
 are separate. Calls without an operation ID retain the compatibility behavior.
+
+## Optional revision preservation (#73 candidate)
+
+Python callers can select `revision_history=True` on Engine. Gate rejection and
+unsupported formats still have no archive side effects. Accepted overwrites
+must preserve the existing source revision before replacement; failure blocks
+the replace. A failure archiving the new version after replacement raises
+`RevisionHistoryError(source_committed=True)` and does not claim the source was
+rolled back. This is separate from idempotent write receipts and semantic
+admission. See [revision history](REVISION_HISTORY.md) for opt-out, repair and
+observed-version limitations.
