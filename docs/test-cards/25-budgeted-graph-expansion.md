@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime / benchmark experiment` |
-| Pull request | [Draft PR #300](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
-| Head commit | See exact-head PR checks |
-| Merge commit | Not merged |
-| Decision | `ITERATE` proposed; default remains A1 |
+| Pull request | [PR #300 (merged)](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
+| Head commit | `525cc18d57f698d1cc2cd86753344afa5f4ea5e3` (final candidate) |
+| Merge commit | `b7ce92d3d9b05764eeeff7a969fca17f93f744e0` (canonical implementation merge) |
+| Decision | `ITERATE`; default remains A1 |
 | Benchmark applicability | `REQUIRED` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -100,8 +100,8 @@ work is declared unblocked or merged by this candidate.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#25](https://github.com/LuigiFerronatto/TESSERA/issues/25) |
-| Pull request | [Draft PR #300](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
-| Merge commit | Not merged |
+| Pull request | [PR #300 (merged)](https://github.com/LuigiFerronatto/TESSERA/pull/300) |
+| Merge commit | `b7ce92d3d9b05764eeeff7a969fca17f93f744e0` (canonical implementation merge) |
 | Evidence/Learnings/Decision | Frozen fixture and benchmark runner; proposed `ITERATE` |
 | Benchmark record | [Local ablation aggregates](../evidence/25-graph-expansion/local-ablation.json); PR exact-head Benchmark Ledger artifacts |
 | PR Evolution Audit | #96/#99 established measurement; canonical base `20814a4` retains existing A1 |
