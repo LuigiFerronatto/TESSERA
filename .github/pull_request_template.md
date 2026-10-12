@@ -70,7 +70,7 @@ Closes #
 **Documentation impact:** `YES | NO`
 <!-- Link changed docs or explain why no documentation is needed. -->
 
-**Plain-language stage record:** `docs/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
+**Plain-language stage record:** `docs/process/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
 <!-- Update status, PR/head evidence, before/after behavior, validation, and limitations. -->
 
 ## PR Evolution Audit
@@ -143,7 +143,7 @@ Benchmark rationale:
 **Changelog category:** `Added | Changed | Fixed | Experimental | Deprecated | Removed | N/A`
 
 **Rationale / entry:**
-<!-- Required even for N/A. Follow docs/CHANGE_POLICY.md. -->
+<!-- Required even for N/A. Follow docs/process/change-policy.md. -->
 
 ## Learnings
 

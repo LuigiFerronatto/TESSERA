@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tessera-agent-memory"
-version = "0.0.3"
+version = "0.0.4"
 description = "TESSERA — Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories: a text-first, auditable memory and evidence layer for AI agents."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,6 +23,7 @@ dependencies = [
     "PyYAML>=6.0",
     "scikit-learn>=1.2",
     "rich>=13.0",
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]
