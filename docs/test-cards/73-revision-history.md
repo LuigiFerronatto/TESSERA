@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (canonical CI/Benchmark Ledger evidence for the merge commit pending; not yet `VALIDATED`) |
 | Capability type | `opt-in runtime experiment` |
-| Pull request | [#291](https://github.com/LuigiFerronatto/TESSERA/pull/291) (draft) |
-| Merge commit | Not merged |
+| Pull request | [#291](https://github.com/LuigiFerronatto/TESSERA/pull/291) (merged; final candidate head `121ff0a2ce8b67647a91dc5e8b47e1e53a63cd70`) |
+| Merge commit | `3a9e9b892604a69a30de44efe8980ef6682b8042` (canonical, 2026-10-12) |
 | Decision | `KEEP opt-in R2`; defer full R3 temporal validity to #15 |
 | Benchmark applicability | `SMOKE_ONLY` plus dedicated lifecycle experiment |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -87,4 +87,5 @@ by this unmerged stage record.
 Current-only source text and disposable fingerprints
 → opt-in observed full-source/evidence history
 → candidate durability evidence with measured overhead
-→ review and merge before downstream temporal decisions
+→ merged as `3a9e9b8` (`IMPLEMENTED`)
+→ canonical CI/benchmark evidence, then `VALIDATED`, before downstream temporal decisions

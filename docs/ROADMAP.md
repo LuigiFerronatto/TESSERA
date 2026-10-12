@@ -22,6 +22,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer Audit recorded `KEEP` with no P0/P1 findings and the Merge Governor authorized the candidate. #70 is `VALIDATED / KEEP`; #13 and #71 had their final blocker satisfied and move to `READY`. Queue order selects #13 as the next implementation; #71 remains LATER / Queue 31.
 
+> #73 post-merge reconciliation (2026-10-12): PR #291 merged as canonical merge commit `3a9e9b892604a69a30de44efe8980ef6682b8042` (final candidate head `121ff0a2ce8b67647a91dc5e8b47e1e53a63cd70`). Decision `KEEP` opt-in R2. #73 is `IMPLEMENTED`, not yet `VALIDATED`: canonical-SHA CI/Benchmark Ledger evidence is required first. #15 (and full #16) stay `BLOCKED` until #73 is `VALIDATED`.
+
 > #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. The Maintainer Audit recorded `KEEP` with no supported P0/P1 findings and the Merge Governor authorized the exact candidate head. #13 is `VALIDATED / KEEP`. #19 has its #13 prerequisite satisfied but remains intentionally `DEFERRED` at Queue 45; no other issue was blocked solely on #13.
 
 > #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
@@ -502,7 +504,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 ```text
 #67 (VALIDATED; PR #245)
  -> #12 incremental/idempotent indexing (VALIDATED; PR #246, `971801cd...`)
-     -> #73 revision history (READY)
+     -> #73 revision history (IMPLEMENTED; PR #291, `3a9e9b89...`)
          -> #15 temporal/state semantics
              -> #16 full supersession
 
@@ -689,7 +691,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
 | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; deterministic structural segmentation with parent-only retrieval. |
 | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; PR #277 merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI, Maintainer Audit, and Merge Governor passed. |
-| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
+| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `IMPLEMENTED` | EXECUTABLE | Storage | PR #291 merged as canonical `3a9e9b892604a69a30de44efe8980ef6682b8042` (final candidate `121ff0a2ce8b67647a91dc5e8b47e1e53a63cd70`, opt-in R2, `KEEP`); awaiting canonical CI/Benchmark Ledger evidence before `VALIDATED`. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
 | [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Utility/experience learning after admission/state become trustworthy. |
