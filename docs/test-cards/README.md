@@ -41,7 +41,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
-| #350 Explicit-ID collision diagnostics (ADR 0006) | `IN_PROGRESS` architecture decision | [350-explicit-id-collision-diagnostics.md](350-explicit-id-collision-diagnostics.md) | [Issue #350](https://github.com/LuigiFerronatto/TESSERA/issues/350), [ADR 0006](../adr/0006-explicit-id-collision-diagnostics.md); Proposed, owner decision on conflicting copies pending |
+| #350 Explicit-ID collision diagnostics (ADR 0006) | `IN_PROGRESS` architecture decision | [350-explicit-id-collision-diagnostics.md](350-explicit-id-collision-diagnostics.md) | [Issue #350](https://github.com/LuigiFerronatto/TESSERA/issues/350), [ADR 0006](../adr/0006-explicit-id-collision-diagnostics.md); Accepted; conflicting copies are quarantined; runtime pending #355 |
 | #139 Bounded information needs | `IN_PROGRESS` | [139-bounded-information-needs.md](139-bounded-information-needs.md) | [Issue #139](https://github.com/LuigiFerronatto/TESSERA/issues/139), [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); empirical quality gate pending |
 | #265 Vector backend mechanics | `IN_PROGRESS` | [265-vector-backend-mechanics.md](265-vector-backend-mechanics.md) | [Issue #265](https://github.com/LuigiFerronatto/TESSERA/issues/265), [audit](../PR_EVOLUTION_265.md), opt-in draft; real semantic/ANN gates remain open |
 | #263 Durable single-write receipts | `IN_PROGRESS` | [263-durable-write-receipts.md](263-durable-write-receipts.md) | [Issue #263](https://github.com/LuigiFerronatto/TESSERA/issues/263), [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290); opt-in candidate, not merged |

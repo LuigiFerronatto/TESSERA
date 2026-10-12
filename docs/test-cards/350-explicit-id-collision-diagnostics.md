@@ -5,10 +5,10 @@
 | Issue | [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `architecture decision` |
-| Pull request | Open (ADR 0006, Proposed) |
+| Pull request | [#368](https://github.com/LuigiFerronatto/TESSERA/pull/368) (ADR 0006, Accepted) |
 | Head commit | See the pull request |
 | Merge commit | Not merged |
-| Decision | `PENDING` |
+| Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
 
@@ -40,7 +40,7 @@ tessera index -> Error [internal_error]; 0 notes queryable
 This stage records an architecture decision only. ADR 0006 proposes collecting
 all identity claims before admitting notes, letting explicit IDs win over
 path-derived ones, keeping one canonical copy of byte-identical duplicates,
-quarantining genuinely conflicting copies (pending owner confirmation), listing
+quarantining genuinely conflicting copies (owner-confirmed), listing
 every clash in one structured report, and offering `--strict` to keep today's
 fail-fast behaviour for CI. No runtime code changes in this stage.
 
@@ -73,21 +73,19 @@ contract for #355.
 
 ## What remains unimplemented?
 
-All runtime behaviour remains unimplemented and is owned by #355. The
-conflicting-copy policy (quarantine versus path-qualified IDs) remains open
-until the owner confirms it at review.
+All runtime behaviour remains unimplemented and is owned by #355.
 
 ## What is unlocked next?
 
-Nothing is unlocked until this ADR is accepted. Acceptance unblocks #355 and
-fixes the collision error code that #356 renders.
+Once this ADR merges, #355 is unblocked and the collision error code that
+#356 renders is fixed.
 
 ## Technical provenance
 
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350) |
-| Pull request | Open |
+| Pull request | [#368](https://github.com/LuigiFerronatto/TESSERA/pull/368) |
 | Merge commit | Not merged |
 | Evidence/Learnings/Decision | Issue #350 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
@@ -98,6 +96,6 @@ fixes the collision error code that #356 renders.
 ```text
 F3 explicit identity enforced by aborting the build
 → ADR 0006 proposed: complete diagnostics, canonical copies, quarantined conflicts, --strict
-→ current state: Proposed, runtime unchanged
+→ current state: Accepted in review, runtime unchanged
 → next validated dependency: #355 implementation
 ```

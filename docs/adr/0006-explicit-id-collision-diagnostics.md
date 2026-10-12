@@ -1,6 +1,6 @@
 # ADR 0006: Explicit-ID collisions are complete, deterministic index diagnostics
 
-- Status: Proposed
+- Status: Accepted (owner decision recorded in PR #368 on 2026-10-12)
 - Date: 2026-10-12
 - Issue: [#350](https://github.com/LuigiFerronatto/TESSERA/issues/350)
 
@@ -63,7 +63,7 @@ rebuilds.
 
 ### 4. Conflicting explicit duplicates
 
-Proposed (option A): when copies differ, **no copy is admitted under the
+Decision (option A): when copies differ, **no copy is admitted under the
 contested ID**. All claimants are reported as `explicit_id_conflict`
 (quarantined), relations that target the ID resolve to nothing and are
 reported, and the rest of the corpus is indexed normally.
@@ -75,7 +75,7 @@ while looking healthy. Quarantine keeps the F3 guarantee — an explicit ID neve
 resolves to content its author may not have meant — and keeps the corpus
 available.
 
-This is the sub-decision the owner must confirm at review.
+The owner chose option A.
 
 ### 5. Complete diagnostics
 
