@@ -8,7 +8,12 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ## Unreleased
 
-_Nothing yet._
+### Fixed
+
+- Avoid false unsafe-path errors during concurrent operational-ledger bootstrap by
+  bounded rechecks, and revalidate zero-link rollback-journal snapshots during
+  concurrent unlink, while retaining hardlink refusal and rejecting bootstrap inode swaps (#259).
+
 
 ## 0.0.4 — 2026-10-12
 

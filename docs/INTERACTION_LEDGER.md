@@ -174,3 +174,14 @@ latencies; it establishes no production overhead SLA or retrieval-quality gain.
 Session resume/compaction, subagent lineage, context packets, HTTP parity,
 end-to-end failure classification and diagnostic-time reduction remain untested
 and gated. See the [stage record](process/test-cards/259-private-operational-ledger.md).
+
+### Concurrent bootstrap safety
+
+Initial publication briefly has two names for the same completed SQLite file.
+Path validation waits up to 250 ms using a monotonic deadline for the temporary
+link to disappear, without opening a multiply linked file. Persistent links,
+nonregular files and inode replacements fail closed. A stalled/crashed publisher
+can still cause an explicit `unsafe_ledger_path` error; no link is deleted by a
+reader. SQLite write contention retains its separate 250 ms busy timeout.
+A zero-link rollback-journal stat snapshot can also occur during SQLite unlink;
+validation obtains one fresh snapshot and applies all normal path checks to it.
