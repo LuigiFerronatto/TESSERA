@@ -24,7 +24,7 @@ Plain-language stage records live under `docs/process/test-cards/`; their index 
 
 > #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. The Maintainer Audit recorded `KEEP` with no supported P0/P1 findings and the Merge Governor authorized the exact candidate head. #13 is `VALIDATED / KEEP`. #19 has its #13 prerequisite satisfied but remains intentionally `DEFERRED` at Queue 45; no other issue was blocked solely on #13.
 
-> #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
+> #263 canonical delivery (2026-10-12): [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) merged opt-in single-write receipts as `4b8606112d26b9294f295edcd988af41082ea415`. Exact candidate and canonical CI/Benchmark Ledger passed; lifecycle adoption remains pending. No downstream capability is promoted; see [stage record](test-cards/263-durable-write-receipts.md).
 
 ## Status contract
 
@@ -61,7 +61,7 @@ Current reconciliation-matrix counts:
 
 ```text
 NOW executable                 0
-READY                          9 total / 5 executable
+READY                          8 total / 4 executable
 BLOCKED                        27 full cards + #16 full phase
 TRACKER                        5 non-executable epics
 ```
@@ -279,14 +279,14 @@ present in the `Full execution queue` above at the position it resumes from;
 #21  utility / experience learning             -> queue #47
 #25  query-aware graph expansion               -> queue #27
 #28  structured-evidence rendering ablation    -> benchmark, enters with #25/#26/#159 evidence
-#119 broad CLI redesign umbrella               -> not yet queued; needs #166 first
+#119 broad CLI redesign umbrella               -> remainder separate from merged #166
 #139 QUMem information-needs implementation    -> queue #25
 #157 typed model profiles                      -> queue #13
-#166 unified CLI presentation system           -> not yet queued
+#166 unified CLI presentation system           -> IMPLEMENTED; adoption pending
 #80  architecture/roadmap visual assets        -> documentation-only, no dependency gate
 ```
 
-`#25`, `#28`, `#139`, `#157` and `#166` have technically executable or
+`#25`, `#28`, `#139` and `#157` have technically executable or
 previously `READY` definitions, but this portfolio intentionally parks them
 until the active release/safety foundations reduce WIP or their surrounding
 semantics stabilize.
@@ -492,7 +492,7 @@ Parallel product surfaces:
   -> #121 official Skills    READY / LATER / Queue 43
 
 #119 broad CLI umbrella      DEFERRED
-#166 presentation child      DEFERRED
+#166 presentation child      IMPLEMENTED; adoption pending
 ```
 
 #116/#117/#153/#154/#155/#118 are canonically satisfied. #118 validated the
@@ -511,7 +511,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 ```text
 #67 (VALIDATED; PR #245)
  -> #12 incremental/idempotent indexing (VALIDATED; PR #246, `971801cd...`)
-     -> #73 revision history (READY)
+     -> #73 revision history (IMPLEMENTED; canonical CI cancelled)
          -> #15 temporal/state semantics
              -> #16 full supersession
 
@@ -698,7 +698,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
 | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; deterministic structural segmentation with parent-only retrieval. |
 | [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; PR #277 merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI, Maintainer Audit, and Merge Governor passed. |
-| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
+| [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `IMPLEMENTED` | EXECUTABLE | Storage | PR #291 canonical `3a9e9b892604a69a30de44efe8980ef6682b8042`; opt-in R2 only. Final-candidate checks passed, canonical CI cancelled; adoption pending, #15/#16/#19 not promoted. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
 | [#21](https://github.com/LuigiFerronatto/TESSERA/issues/21) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Utility/experience learning after admission/state become trustworthy. |
@@ -747,7 +747,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#163](https://github.com/LuigiFerronatto/TESSERA/issues/163) | open | `BLOCKED` | EXECUTABLE | Intelligence | Depends on #157; explicit local model artifact/cache/device/offline lifecycle. |
 | [#164](https://github.com/LuigiFerronatto/TESSERA/issues/164) | open | `TRACKER` | TRACKER | Intelligence | Provider-agnostic Intelligence epic; child cards #157–#163/#165 own decisions. |
 | [#165](https://github.com/LuigiFerronatto/TESSERA/issues/165) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#160/#163; local generative memory organization/reasoning. |
-| [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `DEFERRED` | EXECUTABLE | CLI | Technically executable from validated #112/#116/#117, but parked until #155 semantics stabilize. |
+| [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `IMPLEMENTED` | EXECUTABLE | CLI | PR #298 canonical `7566fc701a5227de18995cd8c01e556547bf886a`; candidate/canonical CI and Ledger passed, adoption pending. #119 remainder, #356 errors and #351/#357 picker remain separate. |
 | [#167](https://github.com/LuigiFerronatto/TESSERA/issues/167) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Working Context packet identity/bootstrap/reuse/freshness; depends on #169 and #20 as applicable; consumes #168. |
 | [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) | open | `READY` | ARCHITECTURE | Cognitive Continuity | Long-Term Memory durable boundary; validated foundation satisfied; implementation behavior remains dependency-routed to child cards. |
 | [#169](https://github.com/LuigiFerronatto/TESSERA/issues/169) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Context Compiler; depends on #139/#140/#141/#20 and consumes #168. |
@@ -1040,7 +1040,7 @@ PRODUCTIZATION / RELEASE
 #87 ADMIN VALIDATED / KEEP (historical) --^
 
 #120 VALIDATED -> #121 READY (LATER / Queue 43)
-#119/#166 DEFERRED
+#119 DEFERRED umbrella; #166 IMPLEMENTED presentation
 
 INTELLIGENCE EPIC #164                             TRACKER
 #153 VALIDATED -> #157 DEFERRED -> #158/#160/#163 -> #159/#162/#165
@@ -1068,6 +1068,31 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+## Canonical core lifecycle reconciliation — 2026-10-12
+
+#73, #263 and #166 are merged deliveries, not unmerged work or new READY slots.
+Their stage records separate candidate checks, canonical checks and adoption:
+
+| Issue | GitHub state | Lifecycle | Class | Lane | Canonical evidence and remaining boundary |
+|---|---|---|---|---|---|
+| [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) | open | `IMPLEMENTED` | EXECUTABLE | Reliability | PR #290 canonical `4b8606112d26b9294f295edcd988af41082ea415`; exact candidate/canonical CI and Ledger passed; opt-in single-write outcomes only, adoption pending. |
+
+- [#73 revision history](test-cards/73-revision-history.md): final candidate
+  `121ff0a2ce8b67647a91dc5e8b47e1e53a63cd70`; canonical
+  `3a9e9b892604a69a30de44efe8980ef6682b8042`. Canonical CI was cancelled;
+  its successful Ledger is not a substitute. #15/#16/#19 remain unpromoted.
+- [#263 receipts](test-cards/263-durable-write-receipts.md): final candidate
+  `894464179c669d876f4d2f1f314f4699559ae49a`; canonical
+  `4b8606112d26b9294f295edcd988af41082ea415`. Both exact CI/Ledger pairs passed.
+- [#166 presentation](test-cards/166-unified-cli-presentation.md): final candidate
+  `d40833c2a3293fc52ad508509936e5b98a207f3a`; canonical
+  `7566fc701a5227de18995cd8c01e556547bf886a`. Both exact CI/Ledger pairs passed.
+
+None of these records invents a final-head approval or KEEP. Current governance
+requires no positive human/AI approval; the pending state records capability
+adoption, not a restored retired-audit gate. #119 remains a broader product
+umbrella. This factual correction selects no new executable WIP.
 
 ## Long-Term Memory boundary candidate
 

@@ -121,7 +121,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 5, ready_executable
+    assert len(ready_executable) == 4, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
@@ -199,7 +199,7 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
-    assert "READY                          9 total / 5 executable" in text
+    assert "READY                          8 total / 4 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
     assert len(blocked_full_cards) == 27
     assert "BLOCKED                        27 full cards + #16 full phase" in text

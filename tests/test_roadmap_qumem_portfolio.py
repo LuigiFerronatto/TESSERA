@@ -96,7 +96,7 @@ def test_roadmap_parks_parallel_experiments_under_bounded_wip() -> None:
 
     assert "`DEFERRED`" in _markdown_table_row(text, "#25")
     assert "`DEFERRED`" in _markdown_table_row(text, "#28")
-    assert "`DEFERRED`" in _markdown_table_row(text, "#166")
+    assert "`IMPLEMENTED`" in _markdown_table_row(text, "#166")
     assert "#25 graph-expansion card DoR completion" in text
     assert "superseded by live routing" in _markdown_table_row(text, "#25")
 

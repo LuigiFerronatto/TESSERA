@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime` |
-| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
-| Head commit | Runtime candidate `cc8f106a863c88dc5095a11b1430961f7cfc148f`; subsequent documentation-only head is recorded in PR #290 |
-| Merge commit | Not merged |
-| Decision | `PENDING` human review; proposed `KEEP` |
+| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (merged) |
+| Head commit | Final candidate `894464179c669d876f4d2f1f314f4699559ae49a` |
+| Merge commit | `4b8606112d26b9294f295edcd988af41082ea415` |
+| Decision | `PENDING` lifecycle adoption; proposed `KEEP` |
 | Benchmark applicability | `SMOKE_ONLY` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -38,7 +38,7 @@ Admission rules, retrieval scoring and canonical Markdown bodies are unchanged.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. The [receipt contract](../../reference/write-receipts.md) specifies
+IMPLEMENTED ON `main`. The [receipt contract](../../reference/write-receipts.md) specifies
 opt-in, outcomes, recovery, supported filesystems, journal retention and privacy.
 A clean local repair bypasses stale in-memory state and pickle loading, then
 rebuilds derived graph/index/manifest and evidence from canonical sources.
@@ -76,6 +76,26 @@ the exact canonical bytes and revision fingerprint stay unchanged.
 Latency is informational for this temporary local filesystem, not a production
 SLO. Full-suite and exact-head CI evidence belong in the PR. No provider was used.
 
+## Canonical delivery and check evidence
+
+[PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) merged on 2026-10-12. Final candidate
+`894464179c669d876f4d2f1f314f4699559ae49a` and canonical merge
+`4b8606112d26b9294f295edcd988af41082ea415` are distinct identities for one delivery.
+
+- Final-candidate [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38203173850)
+  and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38203173845)
+  completed successfully on `894464179c669d876f4d2f1f314f4699559ae49a`.
+- Exact-canonical [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38203671135)
+  and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38203671143)
+  completed successfully on `4b8606112d26b9294f295edcd988af41082ea415`.
+
+These are historical engineering checks, not newly run benchmarks. The reviewed
+PR discussion has no final-head formal reviews or accepted final-head KEEP
+record. Earlier automatic BLOCK comments concern older candidates and are not
+current-head defects. Current governance does not require a positive human or
+automatic AI review. This correction records delivery and available validation;
+it does not invent a retrospective approval or a new capability-adoption decision.
+
 ## What improved?
 
 Injected post-source failures retain the successful persistence truth. Real
@@ -92,27 +112,27 @@ participate in the new lock. A superseded/deleted source is never restored.
 
 ## What is unlocked next?
 
-No dependency is promoted before merge and lifecycle reconciliation. #92, #12
-and #11 are canonical prerequisites; this candidate does not depend on the
-unmerged incremental-index hardening PR #282.
+The bounded receipt implementation is canonical. #92, #12 and #11 were its
+prerequisites; it did not depend on then-unmerged PR #282. No downstream card
+is promoted by this correction while its own scope and adoption remain separate.
 
 ## Technical provenance
 
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
-| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
+| Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (merged) |
 | Canonical base | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
-| Merge commit | Not merged |
-| Evidence/Learnings/Decision | Failure-injection tests and smoke above; proposed KEEP, human decision pending |
+| Merge commit | `4b8606112d26b9294f295edcd988af41082ea415` |
+| Evidence/Learnings/Decision | Failure-injection tests and smoke above; proposed KEEP, lifecycle adoption pending |
 | Benchmark record | [Offline local smoke](evidence/263-write-receipts-smoke.json) |
-| PR Evolution Audit | #108 write safety, #246 indexing, #229 MCP; this PR adds opt-in receipts without claiming a new canonical delivery |
+| PR Evolution Audit | #108 write safety, #246 indexing, #229 MCP; PR #290 is the single canonical opt-in receipt delivery; this record only reconciles it |
 
 ## Evolution
 
 ```text
 canonical file saved but derived outcome can be lost
 → opt-in operation ID and truthful stage receipt
-→ idempotent retry plus deterministic local repair candidate
-→ human review, canonical merge, and lifecycle reconciliation still required
+→ canonical idempotent retry plus deterministic local repair
+→ exact candidate/canonical checks passed; adoption remains pending
 ```
