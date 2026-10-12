@@ -8,6 +8,14 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ## Unreleased
 
+### Added
+
+- Opt-in operation IDs provide versioned, content-free single-write receipts
+  across Python, CLI and MCP. Retries and crash recovery preserve canonical
+  bytes; deterministic local inspection/repair reports and rebuilds incomplete
+  index/graph/manifest and Evidence Ledger stages without provider calls.
+  Existing calls without operation IDs retain their behavior.
+  ([#263](https://github.com/LuigiFerronatto/TESSERA/issues/263))
 ### Experimental
 - Add an immutable instruction-format adapter registry with inspectable filename defaults and generic fallback; preserve existing canonical metadata and retrieval semantics. ([#71](https://github.com/LuigiFerronatto/TESSERA/issues/71))
 

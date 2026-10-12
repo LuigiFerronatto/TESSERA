@@ -123,3 +123,11 @@ Path resolution rejects existing symlink escapes, but it does not defend
 against a privileged concurrent actor swapping filesystem components between
 validation and replacement. No quarantine store, LLM, network classifier,
 State Contamination benchmark, or evidence-aware admission policy is included.
+
+## Opt-in durable outcome lifecycle
+
+Supplying `operation_id` to the result API or transport enables the versioned
+[write receipt contract](WRITE_RECEIPTS.md). An accepted admission can then
+return `persisted: false` on pre-source storage failure, or `persisted: true`
+with failed/pending derived components. Admission and operational completion
+are separate. Calls without an operation ID retain the compatibility behavior.
