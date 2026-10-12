@@ -268,3 +268,8 @@
 {"id":"dependency_routing","question":"Did the workflow correctly reconcile directly affected downstream dependency state?","answer":"YES","model":"evals","timestamp":"2026-10-12T06:32:17.134Z","runid":"38212667368"}
 {"id":"no_runtime","question":"Did the proposed lifecycle correction avoid unrelated runtime implementation?","answer":"YES","model":"evals","timestamp":"2026-10-12T06:32:17.134Z","runid":"38212667368"}
 {"id":"documentation_truth","question":"Does the proposed documentation describe canonical main rather than the old candidate state?","answer":"YES","model":"evals","timestamp":"2026-10-12T06:32:17.134Z","runid":"38212667368"}
+{"id":"operational_value","question":"Did the workflow make TESSERA lifecycle documentation converge to the actual canonical merged state?","answer":"UNKNOWN","model":"evals","timestamp":"2026-10-12T06:48:13.202Z","runid":"38214026189"}
+{"id":"canonical_merge","question":"Did the workflow identify and record the actual canonical implementation merge SHA?","answer":"NO","model":"evals","timestamp":"2026-10-12T06:48:13.202Z","runid":"38214026189"}
+{"id":"dependency_routing","question":"Did the workflow correctly reconcile directly affected downstream dependency state?","answer":"YES","model":"evals","timestamp":"2026-10-12T06:48:13.202Z","runid":"38214026189"}
+{"id":"no_runtime","question":"Did the proposed lifecycle correction avoid unrelated runtime implementation?","answer":"YES","model":"evals","timestamp":"2026-10-12T06:48:13.202Z","runid":"38214026189"}
+{"id":"documentation_truth","question":"Does the proposed documentation describe canonical main rather than the old candidate state?","answer":"UNKNOWN","model":"evals","timestamp":"2026-10-12T06:48:13.202Z","runid":"38214026189"}
