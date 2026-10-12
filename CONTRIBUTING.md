@@ -13,7 +13,7 @@ evidence.
 
 For a behavior change, use the [Test Card template](.github/ISSUE_TEMPLATE/test-card.md)
 to define one hypothesis, its baseline and its success criteria. Check the
-[roadmap](docs/ROADMAP.md) for existing ownership, dependencies and selected work;
+[roadmap](docs/process/roadmap.md) for existing ownership, dependencies and selected work;
 an open or READY card is not automatically selected for implementation.
 
 ## Develop and test
@@ -35,8 +35,8 @@ checks on Python 3.9 and 3.12, and the installed MCP protocol checks on 3.12.
 
 Start with tests that reproduce the affected behavior. Keep fixtures small,
 deterministic and project-agnostic. Basic retrieval does not require provider
-credentials. Follow the [architecture](docs/ARCHITECTURE.md) and
-[output contract](docs/OUTPUT_CONTRACT.md) when changing public behavior.
+credentials. Follow the [architecture](docs/architecture/architecture.md) and
+[output contract](docs/reference/output-contract.md) when changing public behavior.
 
 ## Submit a pull request
 
@@ -46,16 +46,19 @@ reproducible evidence, limitations and the proposed decision. Keep unrelated
 changes in separate issues.
 
 Declare `Benchmark applicability: REQUIRED`, `SMOKE_ONLY` or `NOT_APPLICABLE`
-with a rationale under the [Benchmark Ledger contract](docs/BENCHMARK_CI.md).
+with a rationale under the [Benchmark Ledger contract](docs/process/benchmark-ci.md).
 Run the relevant evaluation; a green unit suite alone does not establish a
 retrieval-quality improvement. Record a changelog entry or a reason it is not
-needed under the [change policy](docs/CHANGE_POLICY.md), and update affected docs
-and the [plain-language stage record](docs/test-cards/README.md).
+needed under the [change policy](docs/process/change-policy.md), and update affected docs
+and the [plain-language stage record](docs/process/test-cards/README.md).
 
-The [CI workflow](.github/workflows/tessera-ci.yml), independent Maintainer Audit
-and Merge Governor check the exact candidate. Human review remains required.
+The [CI workflow](.github/workflows/tessera-ci.yml), Benchmark Ledger and
+deterministic Merge Governor check the exact candidate. Positive human approval
+is not required; active requested changes, unresolved review threads, drafts and
+conflicts still block readiness. Automatic AI maintainer reviews are no longer
+part of PR CI.
 After merge, record the canonical commit and complete the
-[lifecycle reconciliation](docs/AGENTIC_GOVERNANCE.md) before starting dependent
+[lifecycle reconciliation](docs/process/agentic-governance.md) before starting dependent
 work from fresh `main`.
 
 ## License and third-party material

@@ -329,4 +329,4 @@ def test_config_list_doctor_unregister_json_and_p24_runtime_doctor_quickstart(tm
     assert removed["store_deleted"] is False
     assert store.is_dir()
     assert cli.main(["config", "show", "--global", "research", "--json"]) == 2
-    assert "not registered" in capsys.readouterr().err
+    assert "not registered" in json.loads(capsys.readouterr().out)["error"]["message"]

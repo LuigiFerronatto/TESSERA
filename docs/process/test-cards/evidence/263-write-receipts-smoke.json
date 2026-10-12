@@ -1,0 +1,19 @@
+{
+  "benchmark_applicability": "SMOKE_ONLY",
+  "duplicate_write_or_revision_count": 0,
+  "false_success_count": 0,
+  "generative_model_required": false,
+  "issue": 263,
+  "latency_scope": "local temporary filesystem, one-note writes and two-note repair; informational only",
+  "median_ms": {
+    "legacy_persist_only_ms": 0.945,
+    "legacy_write_and_refresh_ms": 5.724,
+    "receipt_write_and_refresh_ms": 7.817,
+    "repair_ms": 11.5
+  },
+  "network_required": false,
+  "repair_attempts": 12,
+  "samples_per_mode": 12,
+  "schema_version": 1,
+  "successful_repairs": 12
+}

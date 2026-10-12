@@ -2,16 +2,16 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ADR = ROOT / "docs" / "adr" / "0001-core-vs-optional-llm-boundary.md"
-ROADMAP = ROOT / "docs" / "ROADMAP.md"
-ISSUE_95_AUDIT = ROOT / "docs" / "PR_EVOLUTION_95.md"
-ISSUE_115_AUDIT = ROOT / "docs" / "PR_EVOLUTION_115.md"
-ISSUE_116_AUDIT = ROOT / "docs" / "PR_EVOLUTION_116.md"
-LAYOUT_ADR = ROOT / "docs" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
-ISSUE_93_AUDIT = ROOT / "docs" / "PR_EVOLUTION_93.md"
-ISSUE_153_AUDIT = ROOT / "docs" / "PR_EVOLUTION_153.md"
-ISSUE_154_AUDIT = ROOT / "docs" / "PR_EVOLUTION_154.md"
-SOURCE_DISCOVERY_ADR = ROOT / "docs" / "adr" / "0004-safe-project-source-discovery.md"
+ADR = ROOT / "docs" / "architecture" / "adr" / "0001-core-vs-optional-llm-boundary.md"
+ROADMAP = ROOT / "docs" / "process" / "roadmap.md"
+ISSUE_95_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "95.md"
+ISSUE_115_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "115.md"
+ISSUE_116_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "116.md"
+LAYOUT_ADR = ROOT / "docs" / "architecture" / "adr" / "0002-repository-layout-and-distribution-boundary.md"
+ISSUE_93_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "93.md"
+ISSUE_153_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "153.md"
+ISSUE_154_AUDIT = ROOT / "docs" / "history" / "pr-evolution" / "154.md"
+SOURCE_DISCOVERY_ADR = ROOT / "docs" / "architecture" / "adr" / "0004-safe-project-source-discovery.md"
 CANONICAL_95_MERGE_SHA = "6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599"
 ISSUE_115_CANDIDATE_SHA = "25afd31b910dec97cffea34a25092c6e7f8b4f2e"
 CANONICAL_115_MERGE_SHA = "b475f1cd805f86cc8ad9526e563e3c6fb8409ff1"
@@ -77,9 +77,9 @@ def test_adr_assigns_one_owner_to_every_required_capability() -> None:
 def test_current_docs_link_the_accepted_adr() -> None:
     for path in (
         ROOT / "README.md",
-        ROOT / "docs" / "ARCHITECTURE.md",
-        ROOT / "docs" / "FEATURES.md",
-        ROOT / "docs" / "CHEATSHEET.md",
+        ROOT / "docs" / "architecture" / "architecture.md",
+        ROOT / "docs" / "concepts" / "features.md",
+        ROOT / "docs" / "guides" / "cheatsheet.md",
         ROOT / "docs" / "README.md",
     ):
         text = path.read_text(encoding="utf-8")
@@ -87,7 +87,7 @@ def test_current_docs_link_the_accepted_adr() -> None:
 
 
 def test_roadmap_uses_reconciled_status_contract() -> None:
-    text = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "process" / "roadmap.md").read_text(encoding="utf-8")
 
     for status in (
         "`IMPLEMENTED`",
@@ -116,8 +116,8 @@ def test_roadmap_uses_reconciled_status_contract() -> None:
 
 
 def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
-    contract = (ROOT / "docs" / "WRITE_GATE_CONTRACT.md").read_text(encoding="utf-8")
-    roadmap = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+    contract = (ROOT / "docs" / "reference" / "write-gate-contract.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs" / "process" / "roadmap.md").read_text(encoding="utf-8")
 
     for marker in (
         "detection",
@@ -136,14 +136,14 @@ def test_write_gate_contract_and_roadmap_evolution_are_documented() -> None:
     assert "https://github.com/LuigiFerronatto/TESSERA/pull/107" in roadmap
     assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
     assert "https://github.com/LuigiFerronatto/TESSERA/pull/108" in roadmap
-    assert "PR_EVOLUTION_92.md" in roadmap
+    assert "pr-evolution/92.md" in roadmap
     assert "| [#92]" in roadmap and "9ab03f7a52bb63ef8942cc8bf292a51ea90e5b05" in roadmap
     assert "`VALIDATED`" in roadmap
     assert "| [#19]" in roadmap and "BLOCKED" in roadmap
 
 
 def test_issue_92_pr_evolution_audit_is_complete_and_deduplicated() -> None:
-    audit = (ROOT / "docs" / "PR_EVOLUTION_92.md").read_text(encoding="utf-8")
+    audit = (ROOT / "docs" / "history" / "pr-evolution" / "92.md").read_text(encoding="utf-8")
 
     for classification in (
         "RUNTIME_IMPLEMENTATION",
@@ -268,7 +268,7 @@ def test_issue_115_post_merge_lifecycle_unlocks_only_116() -> None:
 
 def test_issue_115_canonical_delivery_is_deduplicated() -> None:
     audit = ISSUE_115_AUDIT.read_text(encoding="utf-8")
-    record = (ROOT / "docs/test-cards/115-repository-layout-architecture.md").read_text(
+    record = (ROOT / "docs/process/test-cards/115-repository-layout-architecture.md").read_text(
         encoding="utf-8"
     )
 
@@ -305,7 +305,7 @@ def test_issue_93_post_merge_lifecycle_and_dependency_routing_are_truthful() -> 
     assert "`VALIDATED`" in issue_93
     assert "`KEEP`" in issue_93
     assert "c6124548f32b6dc5e1b7acf5127632bc6c75fccc" in issue_93
-    assert "PR_EVOLUTION_93.md" in issue_93
+    assert "pr-evolution/93.md" in issue_93
     assert "5d43a2d4cdda0c17be6516f47920121070339d0f" in audit
     for delivery in ("#83", "#98", "#108", "#126", "#127"):
         assert delivery in audit
@@ -331,7 +331,7 @@ def test_issue_93_post_merge_lifecycle_and_dependency_routing_are_truthful() -> 
 def test_issue_116_tracks_distribution_without_starting_downstream_work() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_116_AUDIT.read_text(encoding="utf-8")
-    record = (ROOT / "docs/test-cards/116-packaging-hardening.md").read_text(
+    record = (ROOT / "docs/process/test-cards/116-packaging-hardening.md").read_text(
         encoding="utf-8"
     )
 
@@ -369,9 +369,9 @@ def test_issue_116_tracks_distribution_without_starting_downstream_work() -> Non
 
 def test_issue_117_post_merge_lifecycle_and_dependency_routing() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
-    audit = (ROOT / "docs/PR_EVOLUTION_117.md").read_text(encoding="utf-8")
+    audit = (ROOT / "docs/history/pr-evolution/117.md").read_text(encoding="utf-8")
     record = (
-        ROOT / "docs/test-cards/117-configuration-init-discovery.md"
+        ROOT / "docs/process/test-cards/117-configuration-init-discovery.md"
     ).read_text(encoding="utf-8")
 
     assert "`VALIDATED`" in _markdown_table_row(roadmap, "#117")
@@ -414,7 +414,7 @@ def test_issue_153_validated_records_preserve_delivery_and_downstream_boundaries
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_153_AUDIT.read_text(encoding="utf-8")
     record = (
-        ROOT / "docs/test-cards/153-configuration-v2-store-sources-index.md"
+        ROOT / "docs/process/test-cards/153-configuration-v2-store-sources-index.md"
     ).read_text(encoding="utf-8")
 
     issue_153 = _markdown_table_row(roadmap, "#153")
@@ -445,7 +445,7 @@ def test_issue_153_validated_records_preserve_delivery_and_downstream_boundaries
 def test_issue_154_validated_lifecycle_preserves_discovery_boundaries() -> None:
     roadmap = ROADMAP.read_text(encoding="utf-8")
     audit = ISSUE_154_AUDIT.read_text(encoding="utf-8")
-    record = (ROOT / "docs/test-cards/154-safe-source-discovery.md").read_text(
+    record = (ROOT / "docs/process/test-cards/154-safe-source-discovery.md").read_text(
         encoding="utf-8"
     )
     adr = SOURCE_DISCOVERY_ADR.read_text(encoding="utf-8")

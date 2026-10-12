@@ -1,20 +1,9 @@
-"""
-Rich-powered terminal UI helpers for the `tessera` CLI.
+"""Legacy renderer imports and the explicit TESSERA wordmark.
 
-Goals:
-  - Make it visually obvious what's a **file/location** (dim, monospace,
-    prefixed with a folder icon) vs what's **retrieved context/content**
-    (colored panel, prefixed by memory type) — this was explicitly requested
-    after `tessera start --use-llm` output mixed both without visual distinction.
-  - Color-code by node type consistently across every command (list/query/
-    start): factual=blue, preference=magenta, procedural_anchor=green,
-    tag=dim grey.
-  - Degrade gracefully: every renderer here also has a plain-text fallback
-    (used automatically when stdout isn't a TTY, or when `--plain`/`NO_COLOR`
-    is set) so piping into `grep`/`head`/a file never breaks.
-
-This module has ZERO side effects at import time (no I/O), so it's cheap
-to import even from `tessera list --paths-only` scripting paths that skip it.
+The CLI now renders command results through ``presentation.py``. Older helpers
+remain import-compatible but are not command formatting paths. Console capability
+selection delegates to the same centralized policy; NO_COLOR preserves layout.
+This module has no import-time I/O.
 """
 
 from __future__ import annotations
@@ -51,47 +40,20 @@ TESSERA_TAGLINE = (
 
 
 def _use_color(force_plain: bool = False) -> bool:
-    """
-    Decides whether to render with Rich color/formatting at all.
-    Off when: --plain passed, NO_COLOR env var set (https://no-color.org/),
-    stdout isn't a TTY (piped into a file/grep/head), or `rich` isn't
-    installed for some reason (defensive — it's a hard dependency, but a
-    broken environment shouldn't crash a "list my memories" command).
-    """
-    if force_plain:
-        return False
-    if os.environ.get("NO_COLOR") is not None:
-        return False
-    if os.environ.get("TESSERA_NO_COLOR") is not None:
-        return False
-    # Explicit opt-in to force color even when stdout isn't a TTY (e.g.
-    # piping into `less -R`, or capturing output for a screen recording).
-    force_color = os.environ.get("FORCE_COLOR") is not None or os.environ.get("TESSERA_FORCE_COLOR") is not None
-    if not sys.stdout.isatty() and not force_color:
-        return False
-    try:
-        import rich  # noqa: F401
-    except ImportError:
-        return False
-    return True
+    from .presentation import policy
+    return not force_plain and policy().mode == "rich"
 
 
 def get_console(force_plain: bool = False):
-    """Returns a rich.Console honoring the same _use_color() decision, or
-    None if plain-text should be used instead (caller falls back to print())."""
+    from .presentation import policy
     if not _use_color(force_plain):
         return None
-    from rich.console import Console
-
-    # Rich's own Console() does its own independent isatty() check and will
-    # silently drop color if stdout isn't a TTY — even if we already decided
-    # color should be forced (FORCE_COLOR/TESSERA_FORCE_COLOR, e.g. piping into
-    # `less -R` or capturing a screen recording). Pass force_terminal=True
-    # in that case so Rich doesn't second-guess us.
-    force_color = os.environ.get("FORCE_COLOR") is not None or os.environ.get("TESSERA_FORCE_COLOR") is not None
-    if force_color and not sys.stdout.isatty():
-        return Console(force_terminal=True)
-    return Console()
+    try:
+        from rich.console import Console
+    except ImportError:
+        return None
+    output = policy()
+    return Console(no_color=not output.color, width=output.width, force_terminal=output.color)
 
 
 def print_banner(console=None) -> None:

@@ -11,3 +11,17 @@ dist/
 .benchmark-data/
 artifacts/longmemeval-v1/
 artifacts/benchmark-reporting/
+
+# Derived TESSERA index for this repo (rebuild with `tessera index`); config.yaml stays tracked
+.tessera/index/
+
+# Local agent-skill lockfiles (tooling on the developer machine, not part of the product)
+skills-lock.json
+
+# Personal editor settings
+.vscode/
+
+# Local checkout of the optional mobile site (former submodule, hosted outside GitHub)
+sites/
+artifacts/rendering/
+
