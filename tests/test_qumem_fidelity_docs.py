@@ -40,8 +40,14 @@ def test_docstrings_name_the_actual_baseline_without_changing_prompts():
     assert "free text" in docs["orchestrator"]
 
 
-def test_candidate_record_cannot_promote_runtime_fidelity():
+def test_merged_documentation_record_cannot_promote_runtime_fidelity():
     text = (ROOT / "docs/test-cards/146-qumem-fidelity-documentation.md").read_text(encoding="utf-8")
-    assert "`IN_PROGRESS`" in text
-    assert "Not merged" in text
+    header = text.split("## In one sentence", 1)[0]
+    assert "| Record status | `IMPLEMENTED` |" in header
+    assert "| Decision | `PENDING`" in header
+    assert "b5381e93df68006b02a32bf410398f0cfc49dc4c" in header
+    assert "0a4a22c3b356c191a6f30c555eb01677ac2b85a4" in header
+    assert "Not merged" not in text
+    assert "37849579311" in text and "37849579474" in text
+    assert "historical BLOCK" in text
     assert "No runtime dependency is unlocked" in text

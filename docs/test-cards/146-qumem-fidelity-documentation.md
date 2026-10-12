@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `documentation` |
-| Pull request | Candidate branch `docs/146-qumem-fidelity` |
-| Merge commit | Not merged |
-| Decision | `PENDING` independent review |
+| Pull request | [#284](https://github.com/LuigiFerronatto/TESSERA/pull/284), final candidate `b5381e93df68006b02a32bf410398f0cfc49dc4c` |
+| Merge commit | `0a4a22c3b356c191a6f30c555eb01677ac2b85a4` (canonical implementation merge; not yet `VALIDATED`) |
+| Decision | `PENDING` (no independent decision recorded in PR #284) |
 | Benchmark applicability | `NOT_APPLICABLE` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-09 |
 
 ## In one sentence
 Explain which research ideas TESSERA implements, approximates, or has not yet validated.
@@ -29,7 +29,7 @@ One dated source-to-runtime table assigns each gap to its owning Test Card;
 references and non-executable docstrings use the same distinctions.
 
 ## How does it work now?
-TARGET — NOT YET ON MAIN: the candidate explains the current heuristic,
+Merged on main (#284): the documentation explains the current heuristic,
 one-pass, single-query and free-text baseline. It preserves historical lessons
 without promoting experiments or changing runtime behavior.
 
@@ -45,6 +45,16 @@ the unchanged contracts. Executable ASTs are compared against the canonical
 baseline after removing only module/class/function docstrings. Exact counts and
 remote gates are recorded in the PR, not inferred from this stage status.
 
+Canonical-merge [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849579311)
+and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/37849579474)
+passed on `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`. This is a documentation
+repair with `NOT_APPLICABLE` benchmark applicability; those checks do not prove
+QUMem scientific/runtime fidelity. The only recorded independent audit is a
+[historical BLOCK](https://github.com/LuigiFerronatto/TESSERA/pull/284#issuecomment-5946126059)
+on superseded head `ffed90b910567010ed7b0380fb0b02f8ab2660e1`, not a final-head
+decision. The record remains `IMPLEMENTED` / `PENDING` until that decision is
+reconciled; CI success alone is not an independent KEEP.
+
 ## What improved?
 Readers can distinguish implemented safety repairs from still-unvalidated
 scientific claims and find each remaining experiment.
@@ -56,7 +66,7 @@ semantic defect; this prose-only repair does not change prompts. #78 remains
 owner of other historical/private-project cleanup.
 
 ## What is unlocked next?
-No runtime dependency is unlocked by a documentation candidate.
+No runtime dependency is unlocked by this merged documentation repair.
 
 ## Technical provenance
 - Baseline: `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
