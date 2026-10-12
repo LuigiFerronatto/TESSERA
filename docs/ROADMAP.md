@@ -1096,3 +1096,11 @@ ephemeral journal, provider capability profiles and an offline semantic-parity
 benchmark. It is `IN_PROGRESS`, not merged or KEEP. The [stage record](test-cards/196-neutral-hook-core.md)
 records unavailable downstream effects and expanded-comment gaps. No existing
 queue, dependency status or runtime installation is changed by this candidate.
+
+### #191 source-only candidate progress
+
+The explicit-path conversation source import candidate is IN_PROGRESS on top of
+canonical `20814a4`; it exposes generic JSONL v1 and a strict, fail-closed Claude
+linear subset. Preview/manifests, bounded reads, redaction and source identity are
+separate from episode construction, derivation/admission and live capture. This
+is not a full #191 KEEP or canonical delivery. See the [stage record](test-cards/191-conversation-source-import.md).

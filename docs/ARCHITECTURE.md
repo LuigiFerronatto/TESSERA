@@ -698,3 +698,13 @@ model or index refresh. Existing `TesseraTaskHook` remains unchanged. Candidate
 boundaries are inputs for future episode work, not automatic task completion.
 This unmerged experiment has required semantic-parity evidence and explicit
 unimplemented downstream effects; it is not a delivered integration.
+
+## Historical conversation source boundary (candidate #191)
+
+The experimental `conversations preview/import` workflow reads only declared,
+bounded JSONL paths into inspectable `conversation` sources with `drawer: null`.
+It never calls the memory writer, decomposition or provider adapters. Original
+source hashes and ordered turn/tool locators remain separate from the normalized
+Markdown's canonical Engine evidence spans. Indexing is an explicit subsequent
+step; revisions, supporting-turn derivations, live-history convergence and
+admission remain separate contracts. See [Conversation import](CONVERSATION_IMPORT.md).

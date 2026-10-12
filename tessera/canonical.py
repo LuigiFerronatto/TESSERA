@@ -19,6 +19,7 @@ from .harness_adapters import DEFAULT_HARNESS_ADAPTERS, HarnessAdapterRegistry
 
 DRAWERS = {"facts", "preferences", "insights"}
 NON_MEMORY_TYPES = {
+    "conversation",
     "harness_instructions",
     "skill_instructions",
     "project_context",
