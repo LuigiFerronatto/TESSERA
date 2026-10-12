@@ -462,6 +462,10 @@ TESSERA is research-driven, but a cited paper is a **reference signal**, not pro
 | [Mem0 paper](https://arxiv.org/abs/2504.19413) | Scalable long-term memory and hybrid retrieval comparison |
 | [Zep / Graphiti paper](https://arxiv.org/abs/2501.13956) | Temporal context graphs, fact validity, provenance, incremental graph updates |
 
+For QUMem specifically, see the [paper-to-runtime fidelity map](docs/QUMEM-GAP-ANALYSIS.md).
+Current heuristics and optional one-pass/single-query assistance are not a
+validated reproduction of the paper's full pipeline.
+
 ## Acknowledgements
 
 TESSERA is informed by a broader ecosystem of memory systems, agent runtimes, benchmarks, and retrieval architectures. In addition to the papers above, the project actively studies and compares ideas from:
@@ -517,3 +521,11 @@ copyright and license notices supplied with third-party code and assets.
 TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
 
 See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
+
+### CLI presentation and automation
+
+Run `tessera` or `tessera status` for a read-only project dashboard. All commands
+support `--json`, `--plain`, `--no-color`, `--quiet`, `--verbose`, and `--debug`.
+Query JSON retains complete evidence; human results use compact previews with
+`--full` and `--explain` for detail. See the [CLI output contract](docs/CLI_OUTPUT.md)
+for error categories, compatibility exceptions and safe non-interactive usage.

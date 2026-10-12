@@ -139,3 +139,12 @@ Protocol mechanics follow the official [MCP lifecycle specification](https://mod
 and [cancellation specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/cancellation).
 The adapter uses the [official Python SDK v1](https://github.com/modelcontextprotocol/python-sdk/tree/v1.30.0),
 not the separately evolving v2 interface.
+
+## Optional single-write receipts
+
+`write_memory` accepts `operation_id` for the shared durable lifecycle; the
+existing envelope carries `data.write_receipt`. `inspect_write_receipt` is
+read-only; `repair_write_receipt` rebuilds local derived state under the normal
+serialized, drain-started-writes runtime boundary. See
+[WRITE_RECEIPTS.md](WRITE_RECEIPTS.md) for states, idempotency, recovery and
+legacy behavior when the ID is omitted. No HTTP or post-write hooks are added.
