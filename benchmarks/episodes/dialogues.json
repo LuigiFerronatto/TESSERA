@@ -1,0 +1,592 @@
+{
+  "schema_version": 1,
+  "fixture_version": "synthetic-draft-v1",
+  "label_status": "synthetic_author_draft_not_human_reviewed",
+  "provenance": "New synthetic dialogues authored for #138; no private conversation data; no independent human review.",
+  "dialogues": [
+    {
+      "dialogue_id": "dialogue-01",
+      "scenario": "assistant-vocabulary",
+      "purpose": "same task across many assistant responses",
+      "turns": [
+        {
+          "turn_id": "dialogue-01:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Diagnose database replication latency.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        },
+        {
+          "turn_id": "dialogue-01:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "First, inspect the leader topology.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        },
+        {
+          "turn_id": "dialogue-01:turn-3",
+          "position": 30,
+          "role": "assistant",
+          "content": "Orbital mechanics uses eccentricity and inclination.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        },
+        {
+          "turn_id": "dialogue-01:turn-4",
+          "position": 40,
+          "role": "tool",
+          "content": "{\"status\":\"healthy\",\"queue\":4}",
+          "timestamp": "2026-01-01T00:04:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        },
+        {
+          "turn_id": "dialogue-01:turn-5",
+          "position": 50,
+          "role": "assistant",
+          "content": "The inspected connection remains open.",
+          "timestamp": "2026-01-01T00:05:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        },
+        {
+          "turn_id": "dialogue-01:turn-6",
+          "position": 60,
+          "role": "user",
+          "content": "Compare database replication latency across regions.",
+          "timestamp": "2026-01-01T00:06:00+00:00",
+          "session_id": "session-dialogue-01",
+          "task_id": "task-dialogue-01"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-02",
+      "scenario": "shared-vocabulary-shift",
+      "purpose": "topic shift with shared vocabulary; expected lexical false merge",
+      "turns": [
+        {
+          "turn_id": "dialogue-02:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "The Python release needs a stable deployment environment.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-02",
+          "task_id": "task-dialogue-02"
+        },
+        {
+          "turn_id": "dialogue-02:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "The environment is ready.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-02",
+          "task_id": "task-dialogue-02"
+        },
+        {
+          "turn_id": "dialogue-02:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "The python needs a humid habitat environment for shedding.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-02",
+          "task_id": "task-dialogue-02"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-02:turn-3"
+      ]
+    },
+    {
+      "dialogue_id": "dialogue-03",
+      "scenario": "short-acknowledgements",
+      "purpose": "short Portuguese user turns stay with their task",
+      "turns": [
+        {
+          "turn_id": "dialogue-03:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Prepare the migration checklist.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "Should I include rollback?",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "sim",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-4",
+          "position": 40,
+          "role": "assistant",
+          "content": "I can prepare it.",
+          "timestamp": "2026-01-01T00:04:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-5",
+          "position": 50,
+          "role": "user",
+          "content": "faz isso",
+          "timestamp": "2026-01-01T00:05:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-6",
+          "position": 60,
+          "role": "assistant",
+          "content": "The checklist is ready.",
+          "timestamp": "2026-01-01T00:06:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        },
+        {
+          "turn_id": "dialogue-03:turn-7",
+          "position": 70,
+          "role": "user",
+          "content": "ok",
+          "timestamp": "2026-01-01T00:07:00+00:00",
+          "session_id": "session-dialogue-03",
+          "task_id": "task-dialogue-03"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-04",
+      "scenario": "intervening-tools",
+      "purpose": "tool calls remain exact source context",
+      "turns": [
+        {
+          "turn_id": "dialogue-04:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Inspect the cache eviction policy.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-04",
+          "task_id": "task-dialogue-04"
+        },
+        {
+          "turn_id": "dialogue-04:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "Inspecting the runtime now.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-04",
+          "task_id": "task-dialogue-04"
+        },
+        {
+          "turn_id": "dialogue-04:turn-3",
+          "position": 30,
+          "role": "tool",
+          "content": "{\"command\":\"inspect\",\"stdout\":\"LFU\\nsize=32\"}",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-04",
+          "task_id": "task-dialogue-04"
+        },
+        {
+          "turn_id": "dialogue-04:turn-4",
+          "position": 40,
+          "role": "tool",
+          "content": "  raw log\r\n\tvalue: 7  ",
+          "timestamp": "2026-01-01T00:04:00+00:00",
+          "session_id": "session-dialogue-04",
+          "task_id": "task-dialogue-04"
+        },
+        {
+          "turn_id": "dialogue-04:turn-5",
+          "position": 50,
+          "role": "user",
+          "content": "Explain the cache eviction policy.",
+          "timestamp": "2026-01-01T00:05:00+00:00",
+          "session_id": "session-dialogue-04",
+          "task_id": "task-dialogue-04"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-05",
+      "scenario": "long-pause-same-task",
+      "purpose": "long pause does not imply a semantic topic change",
+      "turns": [
+        {
+          "turn_id": "dialogue-05:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Prepare the database migration checklist.",
+          "timestamp": "2026-01-01T00:00:00+00:00",
+          "session_id": "session-dialogue-05",
+          "task_id": "task-dialogue-05"
+        },
+        {
+          "turn_id": "dialogue-05:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "The checklist includes a snapshot.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-05",
+          "task_id": "task-dialogue-05"
+        },
+        {
+          "turn_id": "dialogue-05:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Continue the database migration checklist.",
+          "timestamp": "2026-01-01T02:01:00+00:00",
+          "session_id": "session-dialogue-05",
+          "task_id": "task-dialogue-05"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-06",
+      "scenario": "short-pause-new-task",
+      "purpose": "new topic within a short pause",
+      "turns": [
+        {
+          "turn_id": "dialogue-06:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Diagnose database replication latency.",
+          "timestamp": "2026-01-01T00:00:00+00:00",
+          "session_id": "session-dialogue-06",
+          "task_id": "task-dialogue-06"
+        },
+        {
+          "turn_id": "dialogue-06:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "The logs show queued writes.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-06",
+          "task_id": "task-dialogue-06"
+        },
+        {
+          "turn_id": "dialogue-06:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Choose hiking boots for muddy trails.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-06",
+          "task_id": "task-dialogue-06"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-06:turn-3"
+      ]
+    },
+    {
+      "dialogue_id": "dialogue-07",
+      "scenario": "explicit-switch-shared-words",
+      "purpose": "explicit switch outranks shared vocabulary",
+      "turns": [
+        {
+          "turn_id": "dialogue-07:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Prepare the release planning checklist.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-07",
+          "task_id": "task-dialogue-07"
+        },
+        {
+          "turn_id": "dialogue-07:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "The release checklist is ready.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-07",
+          "task_id": "task-dialogue-07"
+        },
+        {
+          "turn_id": "dialogue-07:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "New topic: prepare the family holiday planning checklist.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-07",
+          "task_id": "task-dialogue-07"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-07:turn-3"
+      ]
+    },
+    {
+      "dialogue_id": "dialogue-08",
+      "scenario": "assistant-topic-injection",
+      "purpose": "unrelated assistant words never decide user continuity",
+      "turns": [
+        {
+          "turn_id": "dialogue-08:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Plan the garden irrigation schedule.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-08",
+          "task_id": "task-dialogue-08"
+        },
+        {
+          "turn_id": "dialogue-08:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "Quantum entanglement, neutrinos, superconductors.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-08",
+          "task_id": "task-dialogue-08"
+        },
+        {
+          "turn_id": "dialogue-08:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Adjust the garden irrigation schedule.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-08",
+          "task_id": "task-dialogue-08"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-09",
+      "scenario": "short-substantive-change",
+      "purpose": "short content is not automatically an acknowledgement",
+      "turns": [
+        {
+          "turn_id": "dialogue-09:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Deploy database",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-09",
+          "task_id": "task-dialogue-09"
+        },
+        {
+          "turn_id": "dialogue-09:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "Deployment finished.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-09",
+          "task_id": "task-dialogue-09"
+        },
+        {
+          "turn_id": "dialogue-09:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Book flights",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-09",
+          "task_id": "task-dialogue-09"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-09:turn-3"
+      ]
+    },
+    {
+      "dialogue_id": "dialogue-10",
+      "scenario": "acknowledgement-blind-spot",
+      "purpose": "adjacent acknowledgement hides a topic change; abstention limitation",
+      "turns": [
+        {
+          "turn_id": "dialogue-10:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Prepare a database backup.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-10",
+          "task_id": "task-dialogue-10"
+        },
+        {
+          "turn_id": "dialogue-10:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "The backup is ready.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-10",
+          "task_id": "task-dialogue-10"
+        },
+        {
+          "turn_id": "dialogue-10:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "ok",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-10",
+          "task_id": "task-dialogue-10"
+        },
+        {
+          "turn_id": "dialogue-10:turn-4",
+          "position": 40,
+          "role": "assistant",
+          "content": "Acknowledged.",
+          "timestamp": "2026-01-01T00:04:00+00:00",
+          "session_id": "session-dialogue-10",
+          "task_id": "task-dialogue-10"
+        },
+        {
+          "turn_id": "dialogue-10:turn-5",
+          "position": 50,
+          "role": "user",
+          "content": "Choose hiking boots for muddy trails.",
+          "timestamp": "2026-01-01T00:05:00+00:00",
+          "session_id": "session-dialogue-10",
+          "task_id": "task-dialogue-10"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-10:turn-5"
+      ]
+    },
+    {
+      "dialogue_id": "dialogue-11",
+      "scenario": "paraphrase-blind-spot",
+      "purpose": "same task with disjoint wording; lexical limitation",
+      "turns": [
+        {
+          "turn_id": "dialogue-11:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Repair automobile brakes.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-11",
+          "task_id": "task-dialogue-11"
+        },
+        {
+          "turn_id": "dialogue-11:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "I will inspect the vehicle.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-11",
+          "task_id": "task-dialogue-11"
+        },
+        {
+          "turn_id": "dialogue-11:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Fix car stopping mechanism.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-11",
+          "task_id": "task-dialogue-11"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-12",
+      "scenario": "leading-system-and-empty-tool",
+      "purpose": "leading context and empty tool output are retained",
+      "turns": [
+        {
+          "turn_id": "dialogue-12:turn-1",
+          "position": 10,
+          "role": "system",
+          "content": "Conversation metadata: source roles are explicit.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-12",
+          "task_id": "task-dialogue-12"
+        },
+        {
+          "turn_id": "dialogue-12:turn-2",
+          "position": 20,
+          "role": "user",
+          "content": "Review storage permissions.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-12",
+          "task_id": "task-dialogue-12"
+        },
+        {
+          "turn_id": "dialogue-12:turn-3",
+          "position": 30,
+          "role": "assistant",
+          "content": "Checking storage access.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-12",
+          "task_id": "task-dialogue-12"
+        },
+        {
+          "turn_id": "dialogue-12:turn-4",
+          "position": 40,
+          "role": "tool",
+          "content": "",
+          "timestamp": "2026-01-01T00:04:00+00:00",
+          "session_id": "session-dialogue-12",
+          "task_id": "task-dialogue-12"
+        },
+        {
+          "turn_id": "dialogue-12:turn-5",
+          "position": 50,
+          "role": "user",
+          "content": "Summarize storage permissions.",
+          "timestamp": "2026-01-01T00:05:00+00:00",
+          "session_id": "session-dialogue-12",
+          "task_id": "task-dialogue-12"
+        }
+      ],
+      "draft_boundary_ids": []
+    },
+    {
+      "dialogue_id": "dialogue-13",
+      "scenario": "portuguese-switch",
+      "purpose": "explicit Portuguese switch and sparse source positions",
+      "turns": [
+        {
+          "turn_id": "dialogue-13:turn-1",
+          "position": 10,
+          "role": "user",
+          "content": "Organize a agenda da oficina.",
+          "timestamp": "2026-01-01T00:01:00+00:00",
+          "session_id": "session-dialogue-13",
+          "task_id": "task-dialogue-13"
+        },
+        {
+          "turn_id": "dialogue-13:turn-2",
+          "position": 20,
+          "role": "assistant",
+          "content": "A agenda está pronta.",
+          "timestamp": "2026-01-01T00:02:00+00:00",
+          "session_id": "session-dialogue-13",
+          "task_id": "task-dialogue-13"
+        },
+        {
+          "turn_id": "dialogue-13:turn-3",
+          "position": 30,
+          "role": "user",
+          "content": "Mudando de assunto: organize a agenda das férias.",
+          "timestamp": "2026-01-01T00:03:00+00:00",
+          "session_id": "session-dialogue-13",
+          "task_id": "task-dialogue-13"
+        }
+      ],
+      "draft_boundary_ids": [
+        "dialogue-13:turn-3"
+      ]
+    }
+  ]
+}

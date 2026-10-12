@@ -1,0 +1,61 @@
+{
+  "schema_version": "renderer-preregistration-draft/1",
+  "status": "DRAFT_NOT_EXECUTION_AUTHORIZATION",
+  "issue": 28,
+  "decision": "ITERATE",
+  "hypothesis": "With retrieval and reader policy fixed, selected-span presentation can improve downstream QA while making provenance and overhead tradeoffs measurable.",
+  "current_scope": "Offline capture/replay and synthetic presentation mechanics only",
+  "authorized_execution": {"provider_calls": 0, "cost_ceiling_usd": 0},
+  "frozen_offline_controls": {
+    "capture_version": "tessera-renderer-capture/1",
+    "renderer_version": "tessera-renderer-replay/1",
+    "renderer_arms": ["R0", "R1", "R2"],
+    "reader_input_policy": "frozen-evidence-reader-input/1",
+    "identity_policy": "sha256-neutral-references-v1",
+    "budget_policy": "fixed-total-input; reserve-policy-and-query; ordered-context-prefix-v1",
+    "token_count_method": "unicode-whitespace-v1 (not model tokens)",
+    "synthetic_diagnostic_budgets": [180, 512, 10000],
+    "fixture": "invented-presentation-controls-v1"
+  },
+  "required_before_quality_execution": {
+    "exact_capture_sha256_and_query_order": null,
+    "dataset_revision_sha256_and_license": null,
+    "retrieval_commit_configuration_and_parent_record": null,
+    "renderer_commit_and_policy_sha256": null,
+    "provider_model_immutable_revision_endpoint": null,
+    "provider_tokenizer_revision_and_message_overhead_policy": null,
+    "reader_decoding_seed_max_output_tokens": null,
+    "timeout_retry_maximum_attempts_and_failure_policy": null,
+    "authorized_cost_ceiling_and_execution_destination": null,
+    "environment_fingerprint": null,
+    "dev_and_disjoint_held_out_membership_hashes": null,
+    "independent_reference_scoring_protocol": null,
+    "human_or_calibrated_judge_reference": null
+  },
+  "draft_quality_protocol": {
+    "primary_outcome": "Paired per-query answer correctness at the same actual model-input budget",
+    "baseline": "R0 with frozen retrieval and the same reader/input policy",
+    "comparisons": ["R1 minus R0", "R2 minus R0"],
+    "proposed_minimum_absolute_qa_gain": 0.02,
+    "proposed_held_out_rule": "Positive paired-bootstrap lower confidence bound, with 97.5 percent intervals per comparison for the two planned comparisons; 10000 fixed-seed resamples",
+    "bootstrap_seed": 28,
+    "dev_rule": "Same direction on DEV and two repeated reader passes; report observed agreement, do not claim deterministic model generation",
+    "selection_rule": "Freeze configuration and select any candidate on DEV before held-out outcomes; no question-specific or post-outcome renderer tuning",
+    "abstention_rule": "Report separate confusion counts and denominators after labels are joined by the evaluator; do not infer success from empty retrieval",
+    "provenance_rule": "Report available, complete and exact-span provenance counts for every arm; an R2 promotion must not reduce provenance completeness below R1 at the registered budget",
+    "failure_rule": "Preserve every failed attempt, report coverage and infrastructure failures separately, and do not drop missing queries or score provider failures as wrong answers",
+    "decision_rule": "Any unmeasured outcome, failed isolation invariant, insufficient sample, or inconclusive benefit remains ITERATE; synthetic retention alone cannot justify KEEP"
+  },
+  "dependency_gates": {
+    "103": "Still requires accepted #28/#74/#96/#100; this draft is only a potential input boundary",
+    "104": "Still requires accepted #74/#100/#103 and independently reviewed judge calibration",
+    "105": "Still requires accepted #96/#100/#103/#104 and a separate preregistered full-500 run"
+  },
+  "storage_rule": "Keep captures, questions, source content, raw inputs, dataset labels and all provider outputs outside Git; only compact non-content evidence may be versioned",
+  "non_claims": [
+    "No measured downstream QA, abstention, control-flow or reader-latency benefit",
+    "No official LongMemEval result or fair external-system comparison",
+    "No new temporal validity, source authority, conflict arbitration or evidence-sufficiency behavior",
+    "No dependency closure or change to canonical Benchmark Ledger profiles"
+  ]
+}

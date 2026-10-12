@@ -84,10 +84,13 @@ bytes; none of the corpus, screenshots or model assets was downloaded here.
 
 PR [#315](https://github.com/LuigiFerronatto/TESSERA/pull/315) renderer preparation
 and [#321](https://github.com/LuigiFerronatto/TESSERA/pull/321) reader preparation
-were inspected as unmerged contracts. This V2 profile does not import them,
+were inspected as unmerged contracts during the original 2026-10-02 audit.
+PR #315 subsequently merged as `e420f6296ac06d01da7f3f3f3a11640e2034d90b`;
+that preparation delivery does not establish reader-quality acceptance. PR #321
+remains unmerged. This V2 profile does not import either package,
 reuse their text-token policy, manufacture their reader messages, or append
 V2 outcomes to the closed #100 V1 retrieval ledger. Any future V2 reader bridge
 must carry the upstream multimodal prompt unchanged after proper token counting.
 
 See [protocol audit](protocol-audit.md), [source pins](protocol.json), and the
-[plain-language record](../../docs/test-cards/106-v2-conformance-preparation.md).
+[plain-language record](../../docs/process/test-cards/106-v2-conformance-preparation.md).

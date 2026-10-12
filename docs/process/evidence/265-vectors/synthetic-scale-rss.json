@@ -1,0 +1,1894 @@
+{
+  "schema_version": 1,
+  "issue": 265,
+  "plan": {
+    "schema_version": 1,
+    "registered_at_utc": "2026-10-02T06:33:28Z",
+    "scope": "bounded synthetic backend mechanics; no embedding model or semantic-quality claim",
+    "sizes": [
+      256,
+      2048,
+      8192
+    ],
+    "dimensions": [
+      16,
+      64
+    ],
+    "backends": [
+      "exact-flat",
+      "sqlite-exact",
+      "ckdtree-exact",
+      "ckdtree-ann"
+    ],
+    "ann_epsilon": 0.5,
+    "ckdtree_leafsize": 16,
+    "seed": 2652026,
+    "queries_per_filter": 12,
+    "filters": [
+      "all",
+      "atomic",
+      "scoped-source"
+    ],
+    "top_k": 10,
+    "warm_repetitions": 2,
+    "child_timeout_seconds": 600,
+    "data_generator": "sha256 deterministic coordinates; four clustered centers plus uniform points; lane is row index modulo 3; unique numeric vectors",
+    "memory_method": "isolated subprocess per backend/size/dimension; resource.getrusage(RUSAGE_SELF).ru_maxrss converted to bytes; includes native allocations and baseline runtime; no tracemalloc",
+    "timing_method": "perf_counter; import/open, materialization, ingest, each cold filtered-tree build and warmed query p50/p95 measured separately; worker count 1",
+    "correctness_gates": {
+      "exact_candidate_recall_at_10": 1.0,
+      "filter_correctness": 1.0,
+      "repeatability": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "ann_l2_distance_bound_factor": 1.5,
+      "ann_recall_review_threshold": 0.95,
+      "score_absolute_tolerance": 1e-12
+    },
+    "decision_rule": "Report all cells, misses, ties, timeouts and failures. No performance pass threshold or default winner. ANN recall below 0.95 triggers ITERATE, never query/budget/epsilon tuning. Real-corpus quality remains gated by #158."
+  },
+  "plan_sha256": "78a5cfe46beb33dcc11bb69beff8ba20fed6988ed9d959b27777719507584dc4",
+  "scope": "bounded synthetic backend mechanics; no embedding model or semantic-quality claim",
+  "decision": "ITERATE",
+  "cells": [
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "c0733552a0222cec5c162c5ab5168eefe4f0154b98cfc6ac1db69788bb46d63c",
+      "records": 256,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 87,
+      "import_ms": 826.8086810003297,
+      "record_materialization_ms": 2.3440479999408126,
+      "open_ms": 0.002504000804037787,
+      "record_ingest_ms": 4.83912900017458,
+      "cold_query_ms_by_filter": {
+        "all": 6.9554589990730165,
+        "atomic": 4.779811000844347,
+        "scoped-source": 4.951193999659154
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 5.120815500049503,
+          "p95": 6.590228998902603
+        },
+        "atomic": {
+          "p50": 4.0633759990669205,
+          "p95": 4.491244000746519
+        },
+        "scoped-source": {
+          "p50": 3.8200209992282907,
+          "p95": 3.996802999608917
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.2686870011530118,
+      "post_update_cold_query_ms": 4.845608000323409,
+      "clean_rebuild_ms": 4.604241001288756,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135618560,
+        "baseline_peak_rss": 135507968,
+        "after_materialization_current_rss": 135999488,
+        "after_ingest_current_rss": 136019968,
+        "after_ingest_peak_rss": 135901184,
+        "after_cold_current_rss": 136683520,
+        "after_cold_peak_rss": 136556544,
+        "after_warm_current_rss": 137256960,
+        "after_warm_peak_rss": 137080832,
+        "full_lifecycle_peak_rss": 137080832,
+        "peak_above_baseline_peak": 1572864
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "c0733552a0222cec5c162c5ab5168eefe4f0154b98cfc6ac1db69788bb46d63c",
+      "records": 256,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 89,
+      "import_ms": 843.6128909997933,
+      "record_materialization_ms": 2.4459689993818756,
+      "open_ms": 1.0793370001920266,
+      "record_ingest_ms": 14.675721000457997,
+      "cold_query_ms_by_filter": {
+        "all": 15.730502000224078,
+        "atomic": 15.005077999376226,
+        "scoped-source": 14.866182000332628
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 15.295201999833807,
+          "p95": 16.49249799993413
+        },
+        "atomic": {
+          "p50": 14.405280500795925,
+          "p95": 15.044716001284542
+        },
+        "scoped-source": {
+          "p50": 14.47883950004325,
+          "p95": 14.994252000178676
+        }
+      },
+      "incremental_edit_move_delete_ms": 59.91818999973475,
+      "post_update_cold_query_ms": 15.173177000178839,
+      "clean_rebuild_ms": 14.314265999928466,
+      "disk_bytes": 249856,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136491008,
+        "baseline_peak_rss": 136409088,
+        "after_materialization_current_rss": 136912896,
+        "after_ingest_current_rss": 138199040,
+        "after_ingest_peak_rss": 137981952,
+        "after_cold_current_rss": 139153408,
+        "after_cold_peak_rss": 138899456,
+        "after_warm_current_rss": 139366400,
+        "after_warm_peak_rss": 139161600,
+        "full_lifecycle_peak_rss": 139423744,
+        "peak_above_baseline_peak": 3014656
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "c0733552a0222cec5c162c5ab5168eefe4f0154b98cfc6ac1db69788bb46d63c",
+      "records": 256,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 91,
+      "import_ms": 784.3143469999632,
+      "record_materialization_ms": 2.1818379991600523,
+      "open_ms": 0.011267000445513986,
+      "record_ingest_ms": 4.414089999045245,
+      "cold_query_ms_by_filter": {
+        "all": 5.673622999893269,
+        "atomic": 0.8292769998661242,
+        "scoped-source": 0.5463990000862395
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.2438254996377509,
+          "p95": 0.321585001074709
+        },
+        "atomic": {
+          "p50": 0.23423600032401737,
+          "p95": 0.25801199990382884
+        },
+        "scoped-source": {
+          "p50": 0.23756099926686147,
+          "p95": 0.3432970006542746
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.29298300069058314,
+      "post_update_cold_query_ms": 5.9119360012118705,
+      "clean_rebuild_ms": 4.929631999402773,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135524352,
+        "baseline_peak_rss": 135487488,
+        "after_materialization_current_rss": 135917568,
+        "after_ingest_current_rss": 135938048,
+        "after_ingest_peak_rss": 135880704,
+        "after_cold_current_rss": 136929280,
+        "after_cold_peak_rss": 136835072,
+        "after_warm_current_rss": 137179136,
+        "after_warm_peak_rss": 137097216,
+        "full_lifecycle_peak_rss": 137621504,
+        "peak_above_baseline_peak": 2134016
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "c0733552a0222cec5c162c5ab5168eefe4f0154b98cfc6ac1db69788bb46d63c",
+      "records": 256,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 93,
+      "import_ms": 789.2299550003372,
+      "record_materialization_ms": 1.9755929988605203,
+      "open_ms": 0.009453999155084603,
+      "record_ingest_ms": 5.428471000413992,
+      "cold_query_ms_by_filter": {
+        "all": 6.079933998989873,
+        "atomic": 0.8914390000427375,
+        "scoped-source": 0.5815700005769031
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.26365499979874585,
+          "p95": 0.3321509993838845
+        },
+        "atomic": {
+          "p50": 0.24986450080177747,
+          "p95": 0.39017699964460917
+        },
+        "scoped-source": {
+          "p50": 0.25850749989331234,
+          "p95": 0.3967669999838108
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.2850420005415799,
+      "post_update_cold_query_ms": 5.789394999737851,
+      "clean_rebuild_ms": 4.367760999230086,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135700480,
+        "baseline_peak_rss": 135606272,
+        "after_materialization_current_rss": 136093696,
+        "after_ingest_current_rss": 136114176,
+        "after_ingest_peak_rss": 135999488,
+        "after_cold_current_rss": 137043968,
+        "after_cold_peak_rss": 136982528,
+        "after_warm_current_rss": 137289728,
+        "after_warm_peak_rss": 137244672,
+        "full_lifecycle_peak_rss": 137768960,
+        "peak_above_baseline_peak": 2162688
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "445c199723595d9a9db70b0f27cd1d018a78525139d4fe68dc871f1c17e6e782",
+      "records": 256,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 95,
+      "import_ms": 778.5056699995039,
+      "record_materialization_ms": 3.8104870000097435,
+      "open_ms": 0.0019529998098732904,
+      "record_ingest_ms": 6.1634979992959416,
+      "cold_query_ms_by_filter": {
+        "all": 10.960114999761572,
+        "atomic": 8.576088001063908,
+        "scoped-source": 8.40611599960539
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 10.106597499543568,
+          "p95": 10.941426999124815
+        },
+        "atomic": {
+          "p50": 8.347639499334036,
+          "p95": 9.418734000064433
+        },
+        "scoped-source": {
+          "p50": 8.097479500065674,
+          "p95": 8.342401999470894
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.3228880013921298,
+      "post_update_cold_query_ms": 9.68867400115414,
+      "clean_rebuild_ms": 5.773451999630197,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135294976,
+        "baseline_peak_rss": 135188480,
+        "after_materialization_current_rss": 136445952,
+        "after_ingest_current_rss": 136466432,
+        "after_ingest_peak_rss": 136368128,
+        "after_cold_current_rss": 137179136,
+        "after_cold_peak_rss": 137023488,
+        "after_warm_current_rss": 137498624,
+        "after_warm_peak_rss": 137416704,
+        "full_lifecycle_peak_rss": 137416704,
+        "peak_above_baseline_peak": 2228224
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "445c199723595d9a9db70b0f27cd1d018a78525139d4fe68dc871f1c17e6e782",
+      "records": 256,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 97,
+      "import_ms": 827.3201299998618,
+      "record_materialization_ms": 4.161615999692003,
+      "open_ms": 0.9391889998369152,
+      "record_ingest_ms": 28.52561899999273,
+      "cold_query_ms_by_filter": {
+        "all": 31.123742999625392,
+        "atomic": 29.297019998921314,
+        "scoped-source": 28.155481999419862
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 29.90121399943746,
+          "p95": 32.98932200050331
+        },
+        "atomic": {
+          "p50": 28.10836700064101,
+          "p95": 38.8580839990027
+        },
+        "scoped-source": {
+          "p50": 26.821457999176346,
+          "p95": 27.307536998705473
+        }
+      },
+      "incremental_edit_move_delete_ms": 101.2471590001951,
+      "post_update_cold_query_ms": 29.44190400012303,
+      "clean_rebuild_ms": 25.137476999589126,
+      "disk_bytes": 389120,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136429568,
+        "baseline_peak_rss": 136392704,
+        "after_materialization_current_rss": 137564160,
+        "after_ingest_current_rss": 139112448,
+        "after_ingest_peak_rss": 139014144,
+        "after_cold_current_rss": 140312576,
+        "after_cold_peak_rss": 140193792,
+        "after_warm_current_rss": 140566528,
+        "after_warm_peak_rss": 140455936,
+        "full_lifecycle_peak_rss": 140587008,
+        "peak_above_baseline_peak": 4194304
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "445c199723595d9a9db70b0f27cd1d018a78525139d4fe68dc871f1c17e6e782",
+      "records": 256,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 99,
+      "import_ms": 756.2403859992628,
+      "record_materialization_ms": 3.7855900009162724,
+      "open_ms": 0.01117599822464399,
+      "record_ingest_ms": 6.326369000817067,
+      "cold_query_ms_by_filter": {
+        "all": 11.00008300090849,
+        "atomic": 1.3216950010246364,
+        "scoped-source": 0.9113579999393551
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.46030100020288955,
+          "p95": 1.2781709992850665
+        },
+        "atomic": {
+          "p50": 0.45168850010668393,
+          "p95": 0.4851969988521887
+        },
+        "scoped-source": {
+          "p50": 0.4558794998956728,
+          "p95": 0.5537100005312823
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.3151559994876152,
+      "post_update_cold_query_ms": 10.413455000161775,
+      "clean_rebuild_ms": 5.789054999695509,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136630272,
+        "baseline_peak_rss": 136531968,
+        "after_materialization_current_rss": 137773056,
+        "after_ingest_current_rss": 137797632,
+        "after_ingest_peak_rss": 137711616,
+        "after_cold_current_rss": 139296768,
+        "after_cold_peak_rss": 139067392,
+        "after_warm_current_rss": 139317248,
+        "after_warm_peak_rss": 139198464,
+        "full_lifecycle_peak_rss": 139722752,
+        "peak_above_baseline_peak": 3190784
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "445c199723595d9a9db70b0f27cd1d018a78525139d4fe68dc871f1c17e6e782",
+      "records": 256,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 101,
+      "import_ms": 812.691907000044,
+      "record_materialization_ms": 3.771949999645585,
+      "open_ms": 0.011907999578397721,
+      "record_ingest_ms": 5.932175999987521,
+      "cold_query_ms_by_filter": {
+        "all": 10.75815500007593,
+        "atomic": 1.3523799989343388,
+        "scoped-source": 0.9385989997099387
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.47028049903019564,
+          "p95": 0.5540090005524689
+        },
+        "atomic": {
+          "p50": 0.46292499973787926,
+          "p95": 0.5670890004694229
+        },
+        "scoped-source": {
+          "p50": 0.4585134993249085,
+          "p95": 0.5325679994712118
+        }
+      },
+      "incremental_edit_move_delete_ms": 0.5863480000698473,
+      "post_update_cold_query_ms": 10.642212999300682,
+      "clean_rebuild_ms": 6.7642159992828965,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135614464,
+        "baseline_peak_rss": 135589888,
+        "after_materialization_current_rss": 136794112,
+        "after_ingest_current_rss": 136814592,
+        "after_ingest_peak_rss": 136769536,
+        "after_cold_current_rss": 138264576,
+        "after_cold_peak_rss": 138244096,
+        "after_warm_current_rss": 138280960,
+        "after_warm_peak_rss": 138244096,
+        "full_lifecycle_peak_rss": 138899456,
+        "peak_above_baseline_peak": 3309568
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "fd26638d91e8b708e2fb0d0a1465312e66f15a65b39e2e02f26908ded17bcc7f",
+      "records": 2048,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 103,
+      "import_ms": 806.2440269986837,
+      "record_materialization_ms": 14.647968999270233,
+      "open_ms": 0.003395000021555461,
+      "record_ingest_ms": 36.14765500060457,
+      "cold_query_ms_by_filter": {
+        "all": 43.89163000087137,
+        "atomic": 32.718021000619046,
+        "scoped-source": 31.44096200048807
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 42.66356799962523,
+          "p95": 58.46743800066179
+        },
+        "atomic": {
+          "p50": 34.98543499972584,
+          "p95": 47.005448999698274
+        },
+        "scoped-source": {
+          "p50": 33.06184450048022,
+          "p95": 34.70144499988237
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.1442119994171662,
+      "post_update_cold_query_ms": 42.45363699919835,
+      "clean_rebuild_ms": 36.938158998964354,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135884800,
+        "baseline_peak_rss": 135786496,
+        "after_materialization_current_rss": 139296768,
+        "after_ingest_current_rss": 139317248,
+        "after_ingest_peak_rss": 139194368,
+        "after_cold_current_rss": 141066240,
+        "after_cold_peak_rss": 143458304,
+        "after_warm_current_rss": 141176832,
+        "after_warm_peak_rss": 143601664,
+        "full_lifecycle_peak_rss": 143626240,
+        "peak_above_baseline_peak": 7839744
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "fd26638d91e8b708e2fb0d0a1465312e66f15a65b39e2e02f26908ded17bcc7f",
+      "records": 2048,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 105,
+      "import_ms": 906.9009040013043,
+      "record_materialization_ms": 15.10834500004421,
+      "open_ms": 1.0397179994470207,
+      "record_ingest_ms": 120.14231600005587,
+      "cold_query_ms_by_filter": {
+        "all": 122.8139380000357,
+        "atomic": 115.76137699921674,
+        "scoped-source": 114.29743200096709
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 125.71863449920784,
+          "p95": 190.838177999467
+        },
+        "atomic": {
+          "p50": 117.28453249997983,
+          "p95": 170.16198599958443
+        },
+        "scoped-source": {
+          "p50": 115.84774700077105,
+          "p95": 167.88051600087783
+        }
+      },
+      "incremental_edit_move_delete_ms": 472.5877440014301,
+      "post_update_cold_query_ms": 176.43463399872417,
+      "clean_rebuild_ms": 116.84575000072073,
+      "disk_bytes": 1875968,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135360512,
+        "baseline_peak_rss": 135323648,
+        "after_materialization_current_rss": 138731520,
+        "after_ingest_current_rss": 143470592,
+        "after_ingest_peak_rss": 146071552,
+        "after_cold_current_rss": 145907712,
+        "after_cold_peak_rss": 148316160,
+        "after_warm_current_rss": 146096128,
+        "after_warm_peak_rss": 148508672,
+        "full_lifecycle_peak_rss": 148893696,
+        "peak_above_baseline_peak": 13570048
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "fd26638d91e8b708e2fb0d0a1465312e66f15a65b39e2e02f26908ded17bcc7f",
+      "records": 2048,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 107,
+      "import_ms": 832.6401590002206,
+      "record_materialization_ms": 14.692946000650409,
+      "open_ms": 0.013520000720745884,
+      "record_ingest_ms": 35.521919999155216,
+      "cold_query_ms_by_filter": {
+        "all": 43.402879000495886,
+        "atomic": 4.625311999916448,
+        "scoped-source": 2.805920999890077
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.2575309999883757,
+          "p95": 0.31032900005811825
+        },
+        "atomic": {
+          "p50": 0.24205299996538088,
+          "p95": 0.28708500030916184
+        },
+        "scoped-source": {
+          "p50": 0.24247399960586336,
+          "p95": 0.3210949998901924
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.1114839999208925,
+      "post_update_cold_query_ms": 43.91900300106499,
+      "clean_rebuild_ms": 35.64166799878876,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136396800,
+        "baseline_peak_rss": 136278016,
+        "after_materialization_current_rss": 139771904,
+        "after_ingest_current_rss": 139792384,
+        "after_ingest_peak_rss": 139685888,
+        "after_cold_current_rss": 142954496,
+        "after_cold_peak_rss": 143224832,
+        "after_warm_current_rss": 142954496,
+        "after_warm_peak_rss": 143224832,
+        "full_lifecycle_peak_rss": 144797696,
+        "peak_above_baseline_peak": 8519680
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "fd26638d91e8b708e2fb0d0a1465312e66f15a65b39e2e02f26908ded17bcc7f",
+      "records": 2048,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 109,
+      "import_ms": 757.5947440000164,
+      "record_materialization_ms": 15.327962000810658,
+      "open_ms": 0.017315000150119886,
+      "record_ingest_ms": 35.72423800142133,
+      "cold_query_ms_by_filter": {
+        "all": 42.579724999086466,
+        "atomic": 4.097258000911097,
+        "scoped-source": 2.487117000782746
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.24890250006137649,
+          "p95": 0.3122019988950342
+        },
+        "atomic": {
+          "p50": 0.2457235004840186,
+          "p95": 0.2820369991241023
+        },
+        "scoped-source": {
+          "p50": 0.24080599996523233,
+          "p95": 0.3217449993826449
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.1622589991020504,
+      "post_update_cold_query_ms": 40.429274000416626,
+      "clean_rebuild_ms": 35.46239000024798,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135372800,
+        "baseline_peak_rss": 135319552,
+        "after_materialization_current_rss": 138764288,
+        "after_ingest_current_rss": 138784768,
+        "after_ingest_peak_rss": 138727424,
+        "after_cold_current_rss": 141979648,
+        "after_cold_peak_rss": 142266368,
+        "after_warm_current_rss": 141979648,
+        "after_warm_peak_rss": 142266368,
+        "full_lifecycle_peak_rss": 143851520,
+        "peak_above_baseline_peak": 8531968
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 0.9972222222222222,
+        "minimum_query_recall_at_10": 0.9,
+        "query_id_order_agreement": 0.9722222222222222,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0077694372772654,
+        "query_count_below_recall_review_threshold": 1,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "3c2492ed2c35af9a64cdedcbe37108e1538f29ddb70f6fd401e81dfaf0f69c5a",
+      "records": 2048,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 111,
+      "import_ms": 785.2903889997833,
+      "record_materialization_ms": 30.579992999264505,
+      "open_ms": 0.003966000804211944,
+      "record_ingest_ms": 57.09270100123831,
+      "cold_query_ms_by_filter": {
+        "all": 87.5277190007182,
+        "atomic": 92.28122200147482,
+        "scoped-source": 69.51994500013825
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 85.92228650013567,
+          "p95": 114.45218199878582
+        },
+        "atomic": {
+          "p50": 71.55499900090945,
+          "p95": 98.2972729998437
+        },
+        "scoped-source": {
+          "p50": 70.21845149938599,
+          "p95": 95.97393699914392
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.2468879995140014,
+      "post_update_cold_query_ms": 86.12044300025445,
+      "clean_rebuild_ms": 48.17513499983761,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136179712,
+        "baseline_peak_rss": 136073216,
+        "after_materialization_current_rss": 143654912,
+        "after_ingest_current_rss": 144011264,
+        "after_ingest_peak_rss": 143937536,
+        "after_cold_current_rss": 145813504,
+        "after_cold_peak_rss": 152064000,
+        "after_warm_current_rss": 145915904,
+        "after_warm_peak_rss": 152064000,
+        "full_lifecycle_peak_rss": 152064000,
+        "peak_above_baseline_peak": 15990784
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "3c2492ed2c35af9a64cdedcbe37108e1538f29ddb70f6fd401e81dfaf0f69c5a",
+      "records": 2048,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 113,
+      "import_ms": 772.0882770008757,
+      "record_materialization_ms": 34.35321799952362,
+      "open_ms": 1.2924650000059046,
+      "record_ingest_ms": 209.0114069997071,
+      "cold_query_ms_by_filter": {
+        "all": 238.97487700014608,
+        "atomic": 223.55021499970462,
+        "scoped-source": 221.748875999765
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 252.00748850056698,
+          "p95": 345.3737319996435
+        },
+        "atomic": {
+          "p50": 239.21870600042894,
+          "p95": 278.7143549994653
+        },
+        "scoped-source": {
+          "p50": 244.4991129987102,
+          "p95": 303.058368001075
+        }
+      },
+      "incremental_edit_move_delete_ms": 885.8230060013739,
+      "post_update_cold_query_ms": 251.66211299983843,
+      "clean_rebuild_ms": 207.32543900157907,
+      "disk_bytes": 3002368,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135565312,
+        "baseline_peak_rss": 135467008,
+        "after_materialization_current_rss": 143052800,
+        "after_ingest_current_rss": 148869120,
+        "after_ingest_peak_rss": 153546752,
+        "after_cold_current_rss": 154746880,
+        "after_cold_peak_rss": 159428608,
+        "after_warm_current_rss": 154963968,
+        "after_warm_peak_rss": 159657984,
+        "full_lifecycle_peak_rss": 159817728,
+        "peak_above_baseline_peak": 24350720
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "3c2492ed2c35af9a64cdedcbe37108e1538f29ddb70f6fd401e81dfaf0f69c5a",
+      "records": 2048,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 115,
+      "import_ms": 750.1093569990189,
+      "record_materialization_ms": 30.49932300018554,
+      "open_ms": 0.020901001335005276,
+      "record_ingest_ms": 47.458512999583036,
+      "cold_query_ms_by_filter": {
+        "all": 86.57162899908144,
+        "atomic": 7.1821550009190105,
+        "scoped-source": 4.05238499843108
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.4996089992346242,
+          "p95": 0.5559119999816176
+        },
+        "atomic": {
+          "p50": 0.46678550097567495,
+          "p95": 0.6132669986982364
+        },
+        "scoped-source": {
+          "p50": 0.4691039994213497,
+          "p95": 0.5421619989647297
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.1598259989114013,
+      "post_update_cold_query_ms": 83.30852200015215,
+      "clean_rebuild_ms": 47.08198700063804,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 137007104,
+        "baseline_peak_rss": 136962048,
+        "after_materialization_current_rss": 144490496,
+        "after_ingest_current_rss": 144842752,
+        "after_ingest_peak_rss": 144830464,
+        "after_cold_current_rss": 149737472,
+        "after_cold_peak_rss": 152825856,
+        "after_warm_current_rss": 149737472,
+        "after_warm_peak_rss": 152825856,
+        "full_lifecycle_peak_rss": 155828224,
+        "peak_above_baseline_peak": 18866176
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "3c2492ed2c35af9a64cdedcbe37108e1538f29ddb70f6fd401e81dfaf0f69c5a",
+      "records": 2048,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 117,
+      "import_ms": 788.899939001567,
+      "record_materialization_ms": 31.219137999869417,
+      "open_ms": 0.020760000552400015,
+      "record_ingest_ms": 48.56423900127993,
+      "cold_query_ms_by_filter": {
+        "all": 89.1151819996594,
+        "atomic": 7.159922999562696,
+        "scoped-source": 4.132362999371253
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.4964394993294263,
+          "p95": 0.5666979996021837
+        },
+        "atomic": {
+          "p50": 0.47421150065929396,
+          "p95": 0.5005309994885465
+        },
+        "scoped-source": {
+          "p50": 0.46952000047895126,
+          "p95": 0.5457080005726311
+        }
+      },
+      "incremental_edit_move_delete_ms": 1.1807669998233905,
+      "post_update_cold_query_ms": 86.57333200062567,
+      "clean_rebuild_ms": 48.05074900104955,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135426048,
+        "baseline_peak_rss": 135364608,
+        "after_materialization_current_rss": 142897152,
+        "after_ingest_current_rss": 143204352,
+        "after_ingest_peak_rss": 143114240,
+        "after_cold_current_rss": 148135936,
+        "after_cold_peak_rss": 151240704,
+        "after_warm_current_rss": 148135936,
+        "after_warm_peak_rss": 151240704,
+        "full_lifecycle_peak_rss": 154218496,
+        "peak_above_baseline_peak": 18853888
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "b18518b19a65e057db550fd48f9677ed15f2bd60b7068f82b26c5973801b02b9",
+      "records": 8192,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 119,
+      "import_ms": 810.4064660001313,
+      "record_materialization_ms": 62.42981299874373,
+      "open_ms": 0.00368599830835592,
+      "record_ingest_ms": 147.24547400146548,
+      "cold_query_ms_by_filter": {
+        "all": 197.54957700024534,
+        "atomic": 164.9562969996623,
+        "scoped-source": 154.30155199828732
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 204.338803499013,
+          "p95": 255.00167500103998
+        },
+        "atomic": {
+          "p50": 155.53235300012602,
+          "p95": 218.55666099872906
+        },
+        "scoped-source": {
+          "p50": 144.38336399962282,
+          "p95": 230.5744479999703
+        }
+      },
+      "incremental_edit_move_delete_ms": 4.452388000572682,
+      "post_update_cold_query_ms": 261.3606630002323,
+      "clean_rebuild_ms": 143.5451559991634,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136220672,
+        "baseline_peak_rss": 136118272,
+        "after_materialization_current_rss": 146972672,
+        "after_ingest_current_rss": 147931136,
+        "after_ingest_peak_rss": 147853312,
+        "after_cold_current_rss": 159854592,
+        "after_cold_peak_rss": 165679104,
+        "after_warm_current_rss": 160018432,
+        "after_warm_peak_rss": 165679104,
+        "full_lifecycle_peak_rss": 165679104,
+        "peak_above_baseline_peak": 29560832
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "b18518b19a65e057db550fd48f9677ed15f2bd60b7068f82b26c5973801b02b9",
+      "records": 8192,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 121,
+      "import_ms": 773.4014990001015,
+      "record_materialization_ms": 62.22923299901595,
+      "open_ms": 1.0096539990627207,
+      "record_ingest_ms": 482.85138200117217,
+      "cold_query_ms_by_filter": {
+        "all": 571.0955810009182,
+        "atomic": 474.9680630011426,
+        "scoped-source": 582.6359909988241
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 596.6940750004142,
+          "p95": 666.706083000463
+        },
+        "atomic": {
+          "p50": 551.9790385005763,
+          "p95": 592.2066509992874
+        },
+        "scoped-source": {
+          "p50": 555.1792410005874,
+          "p95": 596.3252220008144
+        }
+      },
+      "incremental_edit_move_delete_ms": 2155.1796370004013,
+      "post_update_cold_query_ms": 545.4133919993183,
+      "clean_rebuild_ms": 465.9210500012705,
+      "disk_bytes": 7446528,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136728576,
+        "baseline_peak_rss": 136626176,
+        "after_materialization_current_rss": 147480576,
+        "after_ingest_current_rss": 153473024,
+        "after_ingest_peak_rss": 168120320,
+        "after_cold_current_rss": 173113344,
+        "after_cold_peak_rss": 178405376,
+        "after_warm_current_rss": 174227456,
+        "after_warm_peak_rss": 179503104,
+        "full_lifecycle_peak_rss": 180736000,
+        "peak_above_baseline_peak": 44109824
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "b18518b19a65e057db550fd48f9677ed15f2bd60b7068f82b26c5973801b02b9",
+      "records": 8192,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 123,
+      "import_ms": 771.5371069989487,
+      "record_materialization_ms": 62.79043799986539,
+      "open_ms": 0.02413600122963544,
+      "record_ingest_ms": 148.23544499995478,
+      "cold_query_ms_by_filter": {
+        "all": 181.18984700049623,
+        "atomic": 18.209236999609857,
+        "scoped-source": 14.857868000035523
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.5324679996192572,
+          "p95": 0.6441829991672421
+        },
+        "atomic": {
+          "p50": 0.4915575009363238,
+          "p95": 0.5576749990723329
+        },
+        "scoped-source": {
+          "p50": 0.48386099933850346,
+          "p95": 0.5140009998285677
+        }
+      },
+      "incremental_edit_move_delete_ms": 4.8049710003397195,
+      "post_update_cold_query_ms": 179.18429800010927,
+      "clean_rebuild_ms": 144.3594430002122,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 137007104,
+        "baseline_peak_rss": 136990720,
+        "after_materialization_current_rss": 147795968,
+        "after_ingest_current_rss": 148729856,
+        "after_ingest_peak_rss": 148606976,
+        "after_cold_current_rss": 155348992,
+        "after_cold_peak_rss": 165253120,
+        "after_warm_current_rss": 155516928,
+        "after_warm_peak_rss": 165253120,
+        "full_lifecycle_peak_rss": 167157760,
+        "peak_above_baseline_peak": 30167040
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "b18518b19a65e057db550fd48f9677ed15f2bd60b7068f82b26c5973801b02b9",
+      "records": 8192,
+      "dimensions": 16,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 125,
+      "import_ms": 815.7121290005307,
+      "record_materialization_ms": 66.28538000040862,
+      "open_ms": 0.020690999008365907,
+      "record_ingest_ms": 154.7169980003673,
+      "cold_query_ms_by_filter": {
+        "all": 220.79145699899527,
+        "atomic": 19.217836999814608,
+        "scoped-source": 11.256145000515971
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.316592999297427,
+          "p95": 0.4073830004927004
+        },
+        "atomic": {
+          "p50": 0.2569050002421136,
+          "p95": 0.31945299997460097
+        },
+        "scoped-source": {
+          "p50": 0.2641954997670837,
+          "p95": 0.4909769995720126
+        }
+      },
+      "incremental_edit_move_delete_ms": 5.324267000105465,
+      "post_update_cold_query_ms": 198.21395100007067,
+      "clean_rebuild_ms": 156.26122200046666,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 135786496,
+        "baseline_peak_rss": 135745536,
+        "after_materialization_current_rss": 146550784,
+        "after_ingest_current_rss": 147505152,
+        "after_ingest_peak_rss": 147488768,
+        "after_cold_current_rss": 154062848,
+        "after_cold_peak_rss": 164003840,
+        "after_warm_current_rss": 154169344,
+        "after_warm_peak_rss": 164003840,
+        "full_lifecycle_peak_rss": 165830656,
+        "peak_above_baseline_peak": 30085120
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 0.9944444444444445,
+        "minimum_query_recall_at_10": 0.9,
+        "query_id_order_agreement": 0.9444444444444444,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0599160079358259,
+        "query_count_below_recall_review_threshold": 2,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "exact-flat",
+      "fixture_sha256": "18d5256cf6d002ced157278bba1f90fbf86dcb4bf95f630fd9f305b61a125152",
+      "records": 8192,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 127,
+      "import_ms": 838.3279379995656,
+      "record_materialization_ms": 128.6106989991822,
+      "open_ms": 0.004346000423538499,
+      "record_ingest_ms": 194.80772799943225,
+      "cold_query_ms_by_filter": {
+        "all": 367.3037230000773,
+        "atomic": 306.9587429999956,
+        "scoped-source": 316.26926099852426
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 397.93598749929515,
+          "p95": 476.58576700086996
+        },
+        "atomic": {
+          "p50": 308.51007850014867,
+          "p95": 380.61218799884955
+        },
+        "scoped-source": {
+          "p50": 292.60629399959726,
+          "p95": 342.7674609993119
+        }
+      },
+      "incremental_edit_move_delete_ms": 4.686493999543018,
+      "post_update_cold_query_ms": 431.1440190012945,
+      "clean_rebuild_ms": 192.61157500113768,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 134209536,
+        "baseline_peak_rss": 134176768,
+        "after_materialization_current_rss": 164179968,
+        "after_ingest_current_rss": 165138432,
+        "after_ingest_peak_rss": 165023744,
+        "after_cold_current_rss": 170987520,
+        "after_cold_peak_rss": 198053888,
+        "after_warm_current_rss": 171130880,
+        "after_warm_peak_rss": 198053888,
+        "full_lifecycle_peak_rss": 198053888,
+        "peak_above_baseline_peak": 63877120
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "sqlite-exact",
+      "fixture_sha256": "18d5256cf6d002ced157278bba1f90fbf86dcb4bf95f630fd9f305b61a125152",
+      "records": 8192,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 129,
+      "import_ms": 786.915417000273,
+      "record_materialization_ms": 134.84869199965033,
+      "open_ms": 1.2426890007191105,
+      "record_ingest_ms": 903.5260549990198,
+      "cold_query_ms_by_filter": {
+        "all": 1084.1001869994216,
+        "atomic": 970.160870001564,
+        "scoped-source": 1093.7957460009784
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 1046.6598015000272,
+          "p95": 1080.019036999147
+        },
+        "atomic": {
+          "p50": 1000.5055625006207,
+          "p95": 1064.7448880008596
+        },
+        "scoped-source": {
+          "p50": 993.5008524998921,
+          "p95": 1095.1696939991962
+        }
+      },
+      "incremental_edit_move_delete_ms": 3994.660632000887,
+      "post_update_cold_query_ms": 1070.808484000736,
+      "clean_rebuild_ms": 854.5661959997233,
+      "disk_bytes": 11927552,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136241152,
+        "baseline_peak_rss": 136138752,
+        "after_materialization_current_rss": 166195200,
+        "after_ingest_current_rss": 180264960,
+        "after_ingest_peak_rss": 199786496,
+        "after_cold_current_rss": 198889472,
+        "after_cold_peak_rss": 222007296,
+        "after_warm_current_rss": 203206656,
+        "after_warm_peak_rss": 223125504,
+        "full_lifecycle_peak_rss": 224563200,
+        "peak_above_baseline_peak": 88424448
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-exact",
+      "fixture_sha256": "18d5256cf6d002ced157278bba1f90fbf86dcb4bf95f630fd9f305b61a125152",
+      "records": 8192,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 131,
+      "import_ms": 885.5802899997798,
+      "record_materialization_ms": 138.42209900030866,
+      "open_ms": 0.022533000446856022,
+      "record_ingest_ms": 200.07479900050384,
+      "cold_query_ms_by_filter": {
+        "all": 407.7629120001802,
+        "atomic": 35.60992399980023,
+        "scoped-source": 15.9673929993005
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.620097499449912,
+          "p95": 0.8077749989752192
+        },
+        "atomic": {
+          "p50": 0.5474594991028425,
+          "p95": 0.6073479999031406
+        },
+        "scoped-source": {
+          "p50": 0.5326584996510064,
+          "p95": 0.7123840005078819
+        }
+      },
+      "incremental_edit_move_delete_ms": 4.837426999074523,
+      "post_update_cold_query_ms": 355.6853539994336,
+      "clean_rebuild_ms": 199.78875599917956,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136331264,
+        "baseline_peak_rss": 136269824,
+        "after_materialization_current_rss": 166289408,
+        "after_ingest_current_rss": 167251968,
+        "after_ingest_peak_rss": 167165952,
+        "after_cold_current_rss": 181538816,
+        "after_cold_peak_rss": 198754304,
+        "after_warm_current_rss": 181542912,
+        "after_warm_peak_rss": 198754304,
+        "full_lifecycle_peak_rss": 200286208,
+        "peak_above_baseline_peak": 64016384
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    },
+    {
+      "backend": "ckdtree-ann",
+      "fixture_sha256": "18d5256cf6d002ced157278bba1f90fbf86dcb4bf95f630fd9f305b61a125152",
+      "records": 8192,
+      "dimensions": 64,
+      "top_k": 10,
+      "queries_per_repetition": 36,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "versions": {
+        "python": "3.12.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "scikit_learn": "1.9.1"
+      },
+      "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+      "pid": 133,
+      "import_ms": 782.1629270001722,
+      "record_materialization_ms": 128.3877180012496,
+      "open_ms": 0.02262399902974721,
+      "record_ingest_ms": 193.35929800035956,
+      "cold_query_ms_by_filter": {
+        "all": 365.32977299975755,
+        "atomic": 30.104777000815375,
+        "scoped-source": 15.55791600003431
+      },
+      "warm_query_ms_by_filter": {
+        "all": {
+          "p50": 0.639750999653188,
+          "p95": 0.8833770007186104
+        },
+        "atomic": {
+          "p50": 0.5158679996384308,
+          "p95": 0.6132769995019771
+        },
+        "scoped-source": {
+          "p50": 0.523504499142291,
+          "p95": 0.6124760002421681
+        }
+      },
+      "incremental_edit_move_delete_ms": 4.251069000019925,
+      "post_update_cold_query_ms": 374.06535599984636,
+      "clean_rebuild_ms": 199.30424300036975,
+      "disk_bytes": 0,
+      "native_memory_bytes": {
+        "baseline_current_rss": 136192000,
+        "baseline_peak_rss": 136097792,
+        "after_materialization_current_rss": 166141952,
+        "after_ingest_current_rss": 167104512,
+        "after_ingest_peak_rss": 166973440,
+        "after_cold_current_rss": 181383168,
+        "after_cold_peak_rss": 198561792,
+        "after_warm_current_rss": 181391360,
+        "after_warm_peak_rss": 198561792,
+        "full_lifecycle_peak_rss": 199962624,
+        "peak_above_baseline_peak": 63864832
+      },
+      "repeatability": 1.0,
+      "filter_correctness": 1.0,
+      "ghost_vectors": 0,
+      "clean_incremental_equivalence": true,
+      "comparison": {
+        "identical_frozen_inputs_and_budget": true,
+        "mean_recall_at_10": 1.0,
+        "minimum_query_recall_at_10": 1.0,
+        "query_id_order_agreement": 1,
+        "max_common_hit_score_error": 0.0,
+        "max_ranked_unit_l2_distance_ratio": 1.0,
+        "query_count_below_recall_review_threshold": 0,
+        "mechanics_gate": true
+      }
+    }
+  ],
+  "candidate_source_sha256": {
+    "tessera/vector_backend.py": "edabed351bede6a237bd34f3bba9b81181b340c5fcf712b9140e8e1c0c9ae4a6",
+    "tessera/vector_sqlite.py": "7068996ce37c8e248b6a1cf0cd6471d0ce76c80e2435fe6ca06e205680f046e6",
+    "tessera/vector_ckdtree.py": "932d3f5c00e45729721ddef1dc53ab4106dbb1bcf007108f397ada903c35b53b",
+    "benchmarks/vector_backends/scale_sweep.py": "26ecf794b5a6f141e396722cc02f883b154e62299ba8130a62d5bfec476b9b05"
+  },
+  "limitations": [
+    "bounded synthetic observations; no semantic quality or production-scale guarantee",
+    "cKDTree can degrade above about 20 dimensions; epsilon is an L2 distance approximation bound, not a recall guarantee",
+    "full API timing includes different verification/caching policies, not just nearest-neighbor kernels",
+    "cold queries include filtered-tree construction; all cold costs and native peaks are reported",
+    "RSS includes runtime, inputs, native dependencies and lifecycle validation; peak-minus-baseline is descriptive, not isolated allocation accounting",
+    "local timings are unpinned observational measurements; no speed winner or threshold is inferred"
+  ],
+  "all_mechanics_gates_passed": true
+}
