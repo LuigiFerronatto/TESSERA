@@ -10,6 +10,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
+- Added an opt-in repository-only episode-boundary comparison harness for #138,
+  with unchanged E0, explicit-role E1/E3, lossless source memberships, separate
+  timeout traces and a frozen synthetic draft plus blinded annotation packet.
+  Human review and downstream quality gates remain pending; installed runtime
+  behavior and canonical turn models are unchanged.
 - Add opt-in Open Knowledge Format import/export plans, explicit standalone
   source-copy/export transactions and a pinned
   synthetic round-trip experiment. Typed relations, temporal truth and provenance
