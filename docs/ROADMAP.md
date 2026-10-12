@@ -710,7 +710,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#20](https://github.com/LuigiFerronatto/TESSERA/issues/20) | open | `BLOCKED` | EXECUTABLE | Trust | Owns `sufficient / insufficient / conflicting / ambiguous`; state reconstruction belongs #141. |
 | [#17](https://github.com/LuigiFerronatto/TESSERA/issues/17) | open | `DEFERRED` | EXECUTABLE | Retrieval | Owns HOW validated retrieval capabilities are selected/combined; depends on #140/#20/#74/#96 and relevant capability baselines. |
 | [#18](https://github.com/LuigiFerronatto/TESSERA/issues/18) | open | `TRACKER` | TRACKER | Measurement | Measurement spine; #96/#100 complete, #28/#103–#106 open. |
-| [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) | open | `DEFERRED` | EVALUATION | Measurement | #68/#96 complete; freeze evidence and vary renderer only. |
+| [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) | open | `IMPLEMENTED` | EVALUATION | Measurement | #68/#96 complete; freeze evidence and vary renderer only. PR #315 final candidate `595f6cc0d70a2be2dd9fa52642ef63a7aacf6341`, canonical merge `e420f6296ac06d01da7f3f3f3a11640e2034d90b`; offline controls only, decision `ITERATE`, reader-quality evidence outstanding; not `VALIDATED`. |
 | [#103](https://github.com/LuigiFerronatto/TESSERA/issues/103) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #28/#74/#96/#100; frozen-evidence reader. |
 | [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) | open | `BLOCKED` | EVALUATION | Measurement | Depends on #74/#100/#103; calibrated judge. |
 | [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105) | open | `BLOCKED` | BENCHMARK | Measurement | Depends on #96/#100/#103/#104; LongMemEval V1 full-500. |

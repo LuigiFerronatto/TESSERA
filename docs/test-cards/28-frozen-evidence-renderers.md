@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#28](https://github.com/LuigiFerronatto/TESSERA/issues/28) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `benchmark infrastructure` |
-| Pull request | [#315](https://github.com/LuigiFerronatto/TESSERA/pull/315), draft |
-| Head commit | Exact source revision recorded by each replay manifest and PR head |
-| Merge commit | Not merged |
+| Pull request | [#315](https://github.com/LuigiFerronatto/TESSERA/pull/315), merged |
+| Head commit | Final candidate `595f6cc0d70a2be2dd9fa52642ef63a7aacf6341` |
+| Merge commit | Canonical `e420f6296ac06d01da7f3f3f3a11640e2034d90b` |
 | Decision | `ITERATE` |
 | Benchmark applicability | `SMOKE_ONLY` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -38,7 +38,7 @@ policy. No runtime files, defaults, existing benchmarks or ranking change.
 
 ## How does it work now?
 
-**TARGET — NOT YET ON MAIN.** R0 shows complete raw bodies; R1 shows selected
+**IMPLEMENTED ON MAIN (offline controls only; ITERATE, not VALIDATED).** R0 shows complete raw bodies; R1 shows selected
 spans and provenance; R2 adds existing direct relations and full-memory
 references. Missing spans fall back to explicitly marked raw bodies. Source
 identity aliases retain a local audit mapping without leaking benchmark IDs
