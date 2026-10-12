@@ -89,6 +89,8 @@ experiment with proposed `ITERATE`; it does not change the current default.
 | #78 Project-neutral history | `IN_PROGRESS` | [78-project-neutral-history.md](78-project-neutral-history.md) | Public cleanup with pinned history retained |
 | #80 Architecture diagrams | `IN_PROGRESS` | [80-architecture-diagrams.md](80-architecture-diagrams.md) | Six source-mapped current/experimental SVGs |
 
+| #196 Provider-neutral lifecycle Hook Core | `IN_PROGRESS` | [196-neutral-hook-core.md](196-neutral-hook-core.md) | [Issue #196](https://github.com/LuigiFerronatto/TESSERA/issues/196), additive SDK candidate, ITERATE pending review |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.

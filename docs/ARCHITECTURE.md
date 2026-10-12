@@ -688,3 +688,13 @@ The [frozen experiment](../benchmarks/graph_expansion/README.md) currently
 supports **ITERATE**, not default promotion. Its quality matches no expansion,
 so bounded graph selection alone has not established the intended gain. A3
 remains conditional on #26; no schema-confidence field is invented here.
+
+## Experimental lifecycle SDK candidate (#196)
+
+[Hook Core](HOOK_CORE.md) separates frozen provider wire mappings from canonical
+lifecycle milestones, explicit project/run identity, redacted bounded ephemeral
+evidence and prepared-context budgets. It never invokes a writer, admission,
+model or index refresh. Existing `TesseraTaskHook` remains unchanged. Candidate
+boundaries are inputs for future episode work, not automatic task completion.
+This unmerged experiment has required semantic-parity evidence and explicit
+unimplemented downstream effects; it is not a delivered integration.

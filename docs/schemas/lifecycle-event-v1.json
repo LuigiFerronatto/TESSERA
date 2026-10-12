@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LuigiFerronatto/TESSERA/blob/main/docs/schemas/lifecycle-event-v1.json",
+  "title": "Experimental TESSERA lifecycle event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+    },
+    "canonical_type": {
+      "enum": [
+        "runtime_session_started",
+        "runtime_session_resumed",
+        "runtime_session_ended",
+        "task_input_received",
+        "before_reasoning",
+        "tool_call_started",
+        "tool_call_completed",
+        "tool_call_failed",
+        "after_reasoning",
+        "turn_completed",
+        "subagent_started",
+        "subagent_completed",
+        "context_compaction_before",
+        "context_compaction_after",
+        "runtime_error"
+      ]
+    },
+    "identities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runtime_session_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+        },
+        "tessera_run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+        },
+        "turn_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "provider_task_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tessera_episode_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subagent_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parent_run_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parent_turn_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "runtime_session_id",
+        "tessera_run_id",
+        "turn_id",
+        "provider_task_id",
+        "tessera_episode_id",
+        "subagent_id",
+        "parent_run_id",
+        "parent_turn_id"
+      ]
+    },
+    "scope": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scope_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+            },
+            "root": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "global_scope": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "scope_id",
+            "root",
+            "global_scope"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "runtime": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+    },
+    "provider_event": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+    },
+    "adapter_version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+        },
+        "tool_call_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+        },
+        "arguments": {},
+        "output": {},
+        "outcome": {
+          "enum": [
+            "success",
+            "failure",
+            "unknown",
+            "runtime_error"
+          ]
+        },
+        "evidence_origin_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,255}$"
+        },
+        "trigger": {
+          "enum": [
+            "auto",
+            "manual"
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "boundary": {
+          "enum": [
+            "response_end",
+            "session_end"
+          ]
+        }
+      },
+      "required": []
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "can_inject_context": {
+          "type": "boolean"
+        },
+        "can_block": {
+          "type": "boolean"
+        },
+        "can_rewrite": {
+          "type": "boolean"
+        },
+        "synchronous": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "can_inject_context",
+        "can_block",
+        "can_rewrite",
+        "synchronous"
+      ]
+    },
+    "runtime_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "event_id",
+    "canonical_type",
+    "identities",
+    "scope",
+    "sequence",
+    "occurred_at",
+    "runtime",
+    "provider_event",
+    "adapter_version",
+    "payload",
+    "capabilities",
+    "runtime_version"
+  ]
+}
