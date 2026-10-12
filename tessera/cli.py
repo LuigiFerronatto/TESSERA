@@ -772,6 +772,9 @@ def build_parser():
     parser.add_argument("--version", "--v", action="store_true", help="Show the installed TESSERA version")
     sub = parser.add_subparsers(dest="command", required=False)
 
+    from .integration_setup import add_setup_parsers
+    add_setup_parsers(sub)
+
     # Compatibility parent; all parsers receive the complete output policy
     # below, with suppressed defaults preserving flags supplied at any level.
     plain_parent = ArgumentParser(add_help=False)

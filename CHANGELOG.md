@@ -16,6 +16,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   OFF by default, with no CLI/MCP hooks, raw content capture or ranking feedback.
   Full session integration remains gated by lifecycle identity (#196/#177).
   ([#259](https://github.com/LuigiFerronatto/TESSERA/issues/259))
+- Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
+  with explicit scope/store bindings, strict Claude/Gemini/Copilot JSON adapters,
+  hash-bound CLI apply/remove/semantic rollback, and byte-exact in-process
+  rollback tested only on synthetic configs. Codex exposes a verified user-scope
+  native command plan without TOML rewrites or client execution. Real provider/
+  version acceptance and semantic/lifecycle hooks remain unverified. (#190)
 - Added repository-only frozen-evidence capture/replay controls for R0 raw,
   R1 selected-span/provenance and R2 structured presentation. Deterministic
   offline budgets expose evidence/provenance retention and overhead without

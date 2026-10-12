@@ -83,6 +83,11 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 
 ## Quickstart
 
+Experimental runtime setup previews are documented in
+[Integration setup plans](docs/INTEGRATION_SETUP.md). Direct and guided commands
+share one preview-by-default plan; explicit JSON mutation requires its exact hash.
+Real client/version/OS acceptance remains pending.
+
 Configure this project, write one fact, index it, and query it. The config is
 human-readable and contains no credential:
 
