@@ -84,7 +84,7 @@ workflow's bot identity; do not claim to be a human or a different bot.
 2. Identify only the **P0 BLOCKER** and **P1 MUST_FIX** findings listed in
    that human review. Ignore P2/FOLLOW_UP and NOTE items entirely unless a
    maintainer's label-triggering comment explicitly asked you to address them.
-3. Read the linked Issue/Test Card and `docs/CHANGE_POLICY.md` so your fix
+3. Read the linked Issue/Test Card and `docs/process/change-policy.md` so your fix
    stays inside the PR's declared contract.
 
 ## Allowed commands

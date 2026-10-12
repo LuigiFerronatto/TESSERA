@@ -23,7 +23,7 @@ Quick usage:
     engine.build_index()
     results = engine.retrieve_context("How does Alex want reports delivered?")
 
-See docs/ARCHITECTURE.md for the full design rationale.
+See docs/architecture/architecture.md for the full design rationale.
 """
 
 from .models import (
@@ -81,7 +81,7 @@ from .segmentation import (
     segment_source_document,
 )
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 __all__ = [
     "TesseraEngine",

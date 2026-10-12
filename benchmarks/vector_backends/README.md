@@ -14,8 +14,8 @@ quality is represented. The script asserts 100% exact score/order agreement,
 Recall@10, filter correctness, no ghosts and clean/incremental equivalence;
 performance measurements are descriptive and environment-dependent.
 
-[Contract and limitations](../../docs/VECTOR_BACKENDS.md).
-[Recorded candidate measurement](../../docs/evidence/265-vectors/synthetic-mechanics.json).
+[Contract and limitations](../../docs/reference/vector-backends.md).
+[Recorded candidate measurement](../../docs/process/evidence/265-vectors/synthetic-mechanics.json).
 The dedicated `Frozen vector mechanics` CI workflow uploads a fresh exact-head
 report; standard TESSERA CI separately covers the base suite and packaging.
 

@@ -32,7 +32,7 @@ support retention, provable-span retention, and write/index/rebuild/result parit
 The runtime checksum identifies working-tree code independently of the checkout
 revision; an uncommitted candidate must not be called an exact-head CI result.
 Byte counts are fixture-specific storage overhead, not a scalability or latency
-claim. See `docs/evidence/137/` and the Test Card stage record.
+claim. See `docs/process/evidence/137/` and the Test Card stage record.
 
 Benchmark applicability remains REQUIRED. This audit supplements the repository's
 exact-head deterministic LongMemEval dev-50 gate; it does not replace that gate

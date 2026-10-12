@@ -27,6 +27,34 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGACY_IDENTITY_TOKENS = ("lao", "blip", "lab autonomous officer")
 
 
+def contains_legacy_identity(text):
+    """Catch identity components, not n-grams inside randomized temp names.
+
+    Underscores and hyphens delimit identifier components, so LAO_MEM_DIR and
+    legacy-lao-engine-router still fail the gate. Case remains irrelevant.
+    """
+    return any(re.search(r"(?<![a-z0-9])" + re.escape(token) + r"(?![a-z0-9])",
+                         text, re.IGNORECASE) for token in LEGACY_IDENTITY_TOKENS)
+
+
+@pytest.mark.parametrize("text", [
+    "LAO", "LAO_MEM_DIR", "legacy-lao-engine-router", "Blip", "lab autonomous officer",
+    "blip_gateway", "/legacy/lao/config", "Use LAB AUTONOMOUS OFFICER here",
+], ids=["standalone", "environment", "router", "provider", "historical-name",
+        "gateway", "path-component", "case-insensitive"])
+def test_legacy_identity_gate_rejects_real_tokens(text):
+    assert contains_legacy_identity(text)
+
+
+@pytest.mark.parametrize("text", [
+    "/tmp/tessera_doctor_laoseqhs/_doctor_probe/probe.md",
+    "/tmp/tessera_doctor_blipqx7n/_doctor_probe/probe.md",
+    "tessera_doctor_ablaoxy", "tessera_doctor_xblip", "plain project configuration",
+], ids=["random-prefix-a", "random-prefix-b", "embedded", "suffix", "neutral"])
+def test_legacy_identity_gate_allows_neutral_randomized_words(text):
+    assert not contains_legacy_identity(text)
+
+
 @pytest.mark.parametrize(
     ("explicit", "environ", "expected", "warned"),
     [
@@ -60,8 +88,11 @@ def test_existing_claude_memory_is_not_discovered_but_explicit_path_is_valid(tmp
 def test_alias_warning_stays_off_machine_readable_stdout(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("TESSERA_STORAGE_DIR", raising=False)
     monkeypatch.setenv("LAO_MEM_DIR", str(tmp_path))
+    # Run outside the repository with an explicit store, so the write never lands in
+    # this repo's real store (config discovery would otherwise find .tessera/config.yaml).
+    monkeypatch.chdir(tmp_path)
     result = main([
-        "write", "--id", "project/json-contract", "--type", "factual",
+        "write", "--store", str(tmp_path), "--id", "project/json-contract", "--type", "factual",
         "--episode", "ep-95", "--content", "Machine output stays valid.", "--json",
     ])
     captured = capsys.readouterr()
@@ -79,10 +110,8 @@ def test_help_doctor_and_quickstart_are_project_neutral(tmp_path, monkeypatch, c
     help_text = capsys.readouterr().out.lower()
     report_text = json.dumps(run_doctor(str(tmp_path)).to_dict(), ensure_ascii=False).lower()
     plan_text = json.dumps(build_quickstart_plan(str(tmp_path)).to_dict(), ensure_ascii=False).lower()
-    for token in LEGACY_IDENTITY_TOKENS:
-        assert token not in help_text
-        assert token not in report_text
-        assert token not in plan_text
+    for text in (help_text, report_text, plan_text):
+        assert not contains_legacy_identity(text)
     assert "TESSERA_STORAGE_DIR" in json.dumps(build_quickstart_plan(str(tmp_path)).mcp_config_block)
 
 
@@ -206,20 +235,17 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         re.IGNORECASE,
     )
     allowed_files = {
-        "README.md", "CHANGELOG.md", "docs/PR_EVOLUTION_95.md",
-        "docs/CODE_EXPLANATION.md", "docs/COMO-FUNCIONA-E-PROXIMOS-PASSOS.md",
-        "docs/PROCEDURAL_ANCHORS.md", "docs/QUMEM-GAP-ANALYSIS.md",
-        "docs/ROTEIRO-DEMO-VIDEO.md", "docs/adr/0001-core-vs-optional-llm-boundary.md",
-        "docs/slides/README.md", "docs/slides/tessera-apresentacao.html",
-        "docs/slides/assets/LOGO_PRIMARIA_fundo_claro.svg",
-        "docs/slides/assets/LOGO_SECUNDARIA_fundo_escuro.svg",
-        "docs/test-cards/112-tessera-ascii-banner.md",
-        "docs/test-cards/93-storage-configuration-parity.md",
-        "docs/test-cards/95-remove-legacy-runtime-coupling.md",
-        "docs/PR_EVOLUTION_93.md",
-        "docs/PR_EVOLUTION_117.md",
-        "docs/adr/0003-configuration-and-store-discovery.md",
-        "docs/test-cards/117-configuration-init-discovery.md",
+        "README.md", "CHANGELOG.md", "docs/history/pr-evolution/95.md",
+        "docs/architecture/code-explanation.md", "docs/guides/how-it-works-pt.md",
+        "docs/concepts/procedural-anchors.md", "docs/research/qumem-gap-analysis.md",
+        "docs/architecture/adr/0001-core-vs-optional-llm-boundary.md",
+        "docs/process/test-cards/112-tessera-ascii-banner.md",
+        "docs/process/test-cards/93-storage-configuration-parity.md",
+        "docs/process/test-cards/95-remove-legacy-runtime-coupling.md",
+        "docs/history/pr-evolution/93.md",
+        "docs/history/pr-evolution/117.md",
+        "docs/architecture/adr/0003-configuration-and-store-discovery.md",
+        "docs/process/test-cards/117-configuration-init-discovery.md",
         "tessera/config.py", "tessera/legacy_compat.py", "tessera/llm_bridge.py",
         "tests/test_canonical_compatibility.py", "tests/test_issue_95_runtime_boundary.py",
         "tests/test_issue_93_storage_config_parity.py",
@@ -228,7 +254,10 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         "tests/test_issue_154_source_discovery.py",
     }
     unexpected = []
-    for path in ROOT.rglob("*"):
+    # Scan what the repository ships (tracked files), not local environments or
+    # caches such as .venv/, build/ or .benchmark-data/ that only exist on one machine.
+    tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split("\n")
+    for path in (ROOT / name for name in tracked if name):
         if not path.is_file() or ".git" in path.parts or ".codex" in path.parts:
             continue
         relative = path.relative_to(ROOT).as_posix()
@@ -239,7 +268,7 @@ def test_reference_inventory_allowlist_contains_only_compatibility_or_history():
         # compatibility inventory covered by this test.
         if relative.startswith("website/"):
             continue
-        if relative.startswith("archive/") or relative.startswith("docs/slides/assets/mascots/"):
+        if relative.startswith("archive/"):
             continue
         try:
             text = path.read_text(encoding="utf-8")

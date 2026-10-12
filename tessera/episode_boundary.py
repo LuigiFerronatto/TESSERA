@@ -8,7 +8,7 @@ The returned Beginning/Middle/End Episode is a TESSERA-specific representation.
 
 Issue #138 owns reviewed boundary fixtures and role-aware continuity evaluation.
 No quality/cost superiority is established by this implementation. See
-docs/QUMEM-GAP-ANALYSIS.md for the current source-to-implementation map.
+docs/research/qumem-gap-analysis.md for the current source-to-implementation map.
 """
 
 import datetime

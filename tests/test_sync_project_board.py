@@ -2,7 +2,7 @@
 
 All GitHub access is mocked at the `run_gh` boundary so these tests never
 require network access, `gh` authentication, or a real Project. See
-docs/PROJECT_BOARD_SYNC.md for the field model this exercises.
+docs/process/project-board-sync.md for the field model this exercises.
 """
 
 from __future__ import annotations

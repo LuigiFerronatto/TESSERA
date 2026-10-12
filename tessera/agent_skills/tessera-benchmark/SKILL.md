@@ -27,7 +27,7 @@ using the same frozen data and settings. Four-query sanity is a smoke gate, not
 LongMemEval, full QUMem fidelity or a broad answer-quality result.
 
 ## Required benchmark routing
-Read the checkout's `docs/BENCHMARK_CI.md` and the owning Test Card before a PR
+Read the checkout's `docs/process/benchmark-ci.md` and the owning Test Card before a PR
 claims REQUIRED, SMOKE_ONLY or NOT_APPLICABLE. Use the repository's existing
 runner and integrity checks, not a parallel implementation. An applicable
 required benchmark must complete on the exact candidate; offline reporting

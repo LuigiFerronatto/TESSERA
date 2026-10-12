@@ -1,7 +1,7 @@
 """Static governance tests for the TESSERA agentic-workflow governance system.
 
 These tests freeze the safety-critical invariants declared by
-`docs/AGENTIC_GOVERNANCE.md` and the individual `.github/workflows/tessera-*`
+`docs/process/agentic-governance.md` and the individual `.github/workflows/tessera-*`
 sources without depending on network access, GitHub Actions, or any AI
 engine actually running. They fail loudly if a future edit to a workflow
 source silently removes a separation-of-duties or least-privilege guarantee.
@@ -289,7 +289,7 @@ def test_generated_maintenance_workflow_write_operations_require_explicit_operat
     gh-aw workflows and the merge governor. Rather than removing it (it is
     required for `tessera-documentation-drift`'s `close-older-issues`
     expiring safe output to actually close superseded issues), it is
-    documented in `docs/AGENTIC_GOVERNANCE.md` and constrained here: every
+    documented in `docs/process/agentic-governance.md` and constrained here: every
     job other than the default cleanup jobs must require a non-default,
     non-empty `inputs.operation` value, so none of them can fire from the
     unattended daily `schedule` trigger.
@@ -323,7 +323,7 @@ def test_merge_governor_lifecycle_gate_rejects_out_of_scope_files():
     from governance import merge_governor as mg
 
     result = mg.evaluate_lifecycle_pr_gates(
-        changed_files=["docs/ROADMAP.md", "tessera/engine.py"],
+        changed_files=["docs/process/roadmap.md", "tessera/engine.py"],
         allowed_path_prefixes=["docs/", "CHANGELOG.md"],
         ci_success=True,
         benchmark_success=True,
@@ -345,7 +345,7 @@ PERSONAS = {
 @pytest.mark.parametrize("workflow_id,persona", sorted(PERSONAS.items()))
 def test_workflow_declares_its_content_level_persona(workflow_id, persona):
     """Every gh-aw workflow must render a distinct persona header in its
-    reports (see docs/AGENTIC_GOVERNANCE.md#personas), so a maintainer can
+    reports (see docs/process/agentic-governance.md#personas), so a maintainer can
     tell which governance role produced a comment without reading the
     workflow name. This is content-level branding only; it never changes
     the actual GitHub comment author."""
