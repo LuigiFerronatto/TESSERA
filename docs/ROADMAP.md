@@ -1088,8 +1088,12 @@ portfolio and issue decision require lifecycle reconciliation after review/merge
 
 ## Candidate evolution — #196 Hook Core
 
-The isolated #196 SDK candidate proposes a normalized lifecycle schema, bounded
+PR #304 merged as canonical commit `30ca94ad1b96879ccb58983966f4171751e36de6`
+(final candidate `729446057b3021eb39d694b586509fce22f8433a`); #196 is
+`IMPLEMENTED` for this foundation slice, not VALIDATED or complete, and stays
+open for its remaining acceptance criteria. The decision remains ITERATE
+pending maintainer confirmation. The isolated #196 SDK candidate proposed a normalized lifecycle schema, bounded
 ephemeral journal, provider capability profiles and an offline semantic-parity
-benchmark. It is `IN_PROGRESS`, not merged or KEEP. The [stage record](test-cards/196-neutral-hook-core.md)
+benchmark. It was `IN_PROGRESS` before merge. The [stage record](test-cards/196-neutral-hook-core.md)
 records unavailable downstream effects and expanded-comment gaps. No existing
 queue, dependency status or runtime installation is changed by this candidate.

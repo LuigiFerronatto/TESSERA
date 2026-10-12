@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#196](https://github.com/LuigiFerronatto/TESSERA/issues/196) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; not yet VALIDATED) |
 | Capability type | runtime / benchmark |
-| Pull request | Candidate branch `feat/196-neutral-hook-core`; see issue-linked draft |
-| Head commit | Exact measured head and source hash in CI `hooks-parity.json` |
-| Merge commit | Not merged |
+| Pull request | [#304](https://github.com/LuigiFerronatto/TESSERA/pull/304) (merged) |
+| Head commit | Final candidate `729446057b3021eb39d694b586509fce22f8433a` |
+| Merge commit | Canonical implementation merge `30ca94ad1b96879ccb58983966f4171751e36de6` |
 | Decision | `ITERATE` proposed; human review pending |
 | Benchmark applicability | `REQUIRED` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
