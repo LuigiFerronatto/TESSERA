@@ -411,8 +411,10 @@ def main(argv=None):
             else resolve_runtime_configuration()
         )
         create_server(configuration, request_timeout=args.request_timeout).run(transport="stdio")
-    except ImportError:
-        parser.exit(2, "tessera-mcp: Install the optional transport with pip install 'tessera[mcp]'.\n")
+    except ImportError as exc:
+        # The SDK boundary distinguishes "extra missing" from "installed SDK
+        # version unsupported"; forward that message instead of guessing.
+        parser.exit(2, f"tessera-mcp: {exc}\n")
     except Exception:
         import json
         from .mcp_runtime import SCHEMA_VERSION
