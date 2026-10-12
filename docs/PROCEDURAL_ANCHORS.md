@@ -1,5 +1,10 @@
 # Âncoras Procedimentais (Procedural Anchors)
 
+> Historical design narrative, not the current implementation contract.
+> QUMem-fidelity and temporal/state claims below are superseded by the
+> [dated source-to-runtime audit](QUMEM-GAP-ANALYSIS.md). Heuristic behavior
+> and illustrative provider results do not establish paper fidelity.
+
 No LAO (Lab Autonomous Officer), as âncoras procedimentais (procedural anchors) funcionam como pacotes estruturados e compactos de conhecimento prático que ajudam o agente a aprender com suas experiências passadas [1, 2].
 Diferente das memórias factuais ou de preferências — que dizem ao LAO o que buscar ou o que o usuário deseja —, as âncoras procedimentais focam no "como fazer", atuando especificamente como estabilizadores de execução para que o agente não falhe em detalhes básicos de infraestrutura, sintaxe ou configuração [1, 2].
 No ecossistema de memória Tessera que projetamos para o LAO, o funcionamento dessas âncoras é estruturado com base em quatro princípios fundamentais:
