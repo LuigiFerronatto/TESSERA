@@ -4,14 +4,14 @@ import json
 import pytest
 
 from tessera.cli import main
-from tessera.config import ConfigurationError, ConfigurationResolver
+from tessera.config import ConfigurationError, ConfigurationResolver, LEGACY_STORAGE_ENV
 from tessera.diagnostics import apply_quickstart_plan, build_quickstart_plan
 
 
 @pytest.fixture(autouse=True)
 def clean_environment(monkeypatch):
     monkeypatch.delenv("TESSERA_STORAGE_DIR", raising=False)
-    monkeypatch.delenv("LAO_MEM_DIR", raising=False)
+    monkeypatch.delenv(LEGACY_STORAGE_ENV, raising=False)
 
 
 def configure(root, store="kb/store", version=2):
@@ -72,7 +72,7 @@ def test_config_precedence_matches_resolver(tmp_path, monkeypatch, override):
     elif override == "canonical":
         monkeypatch.setenv("TESSERA_STORAGE_DIR", other)
     else:
-        monkeypatch.setenv("LAO_MEM_DIR", other)
+        monkeypatch.setenv(LEGACY_STORAGE_ENV, other)
     plan = build_quickstart_plan(str(tmp_path), **kwargs)
     selection = ConfigurationResolver(cwd=tmp_path).resolve(explicit=kwargs.get("storage_dir"))
     assert plan.storage_dir == selection.storage_dir

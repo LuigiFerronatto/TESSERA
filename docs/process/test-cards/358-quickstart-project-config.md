@@ -5,7 +5,7 @@
 | Issue | [#358](https://github.com/LuigiFerronatto/TESSERA/issues/358) |
 | Record status | `IN_PROGRESS` |
 | Capability type | `runtime` |
-| Pull request | See the linked issue's implementation pull request |
+| Pull request | [#381](https://github.com/LuigiFerronatto/TESSERA/pull/381) |
 | Head commit | See the implementation pull request |
 | Merge commit | Not merged |
 | Decision | Proposed `KEEP`, pending exact-head CI |
@@ -92,7 +92,7 @@ acceptance gates are complete.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card; Evidence/Learnings/Decision | [#358](https://github.com/LuigiFerronatto/TESSERA/issues/358) |
-| Pull request / exact head / evolution audit | Linked implementation PR in #358 |
+| Pull request / exact head / evolution audit | [#381](https://github.com/LuigiFerronatto/TESSERA/pull/381) |
 | Previous config delivery | #153 / merged PR #173 (`2508676`) |
 | Merge commit | Not merged |
 | Benchmark record | Smoke-only; deterministic sanity and 2,500-note planning probe above |
