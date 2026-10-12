@@ -14,6 +14,12 @@ _Nothing yet._
 
 ### Experimental
 
+- Add an explicitly enabled, privacy-minimized Python operational ledger with
+  bounded project/run events, deterministic deduplication, aggregate analytics,
+  read-only export plans and stale-safe retention/clear plans. Collection stays
+  OFF by default, with no CLI/MCP hooks, raw content capture or ranking feedback.
+  Full session integration remains gated by lifecycle identity (#196/#177).
+  ([#259](https://github.com/LuigiFerronatto/TESSERA/issues/259))
 - Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
   with explicit scope/store bindings, strict Claude/Gemini/Copilot JSON adapters,
   hash-bound CLI apply/remove/semantic rollback, and byte-exact in-process

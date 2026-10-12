@@ -41,6 +41,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #259 Private operational ledger | `IN_PROGRESS` mechanics / `BLOCKED` full integration | [259-private-operational-ledger.md](259-private-operational-ledger.md) | [Issue #259](https://github.com/LuigiFerronatto/TESSERA/issues/259), [Draft PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319); #196/#177 lifecycle gate remains |
 | #190 Reversible integration plans | `IN_PROGRESS` | [190-reversible-integration-plans.md](190-reversible-integration-plans.md) | [Issue #190](https://github.com/LuigiFerronatto/TESSERA/issues/190); draft candidate; real-client acceptance and semantic/hook dependencies remain open |
 | #28 Frozen evidence renderers | `IN_PROGRESS` | [28-frozen-evidence-renderers.md](28-frozen-evidence-renderers.md) | [Issue #28](https://github.com/LuigiFerronatto/TESSERA/issues/28), offline candidate only; reader-quality gate remains open, `ITERATE` |
 | #138 Role-aware episode experiment | `IN_PROGRESS` preparation / `BLOCKED` review | [138-role-aware-episodes.md](138-role-aware-episodes.md) | [Issue #138](https://github.com/LuigiFerronatto/TESSERA/issues/138); opt-in E1/E3 harness, unreviewed synthetic fixture, human gate pending |
