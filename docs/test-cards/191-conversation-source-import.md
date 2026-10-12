@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#191](https://github.com/LuigiFerronatto/TESSERA/issues/191) |
-| Record status | `IN_PROGRESS` source-only draft candidate |
+| Record status | `IMPLEMENTED` bounded C0 source slice merged; full #191 remains open, not `VALIDATED` |
 | Capability type | runtime |
-| Pull request | Draft publication pending |
-| Head commit | Exact published head and tree recorded in the PR |
-| Merge commit | Not merged |
+| Pull request | [#307](https://github.com/LuigiFerronatto/TESSERA/pull/307) (merged) |
+| Head commit | Final candidate `996980600d4302c32dcf61ed0f66996efc1da90a` (pre-merge record cited `222b7ad98d2ef20974a48eae08d6a62efbbefbd9`) |
+| Merge commit | Canonical implementation merge `e417a5f41e00bfd79d58854cbe485a9e215a06cf` |
 | Decision | `ITERATE` full scope; bounded C0 candidate for review |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |

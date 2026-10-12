@@ -1099,8 +1099,9 @@ queue, dependency status or runtime installation is changed by this candidate.
 
 ### #191 source-only candidate progress
 
-The explicit-path conversation source import candidate is IN_PROGRESS on top of
-canonical `20814a4`; it exposes generic JSONL v1 and a strict, fail-closed Claude
+The explicit-path conversation source import slice is `IMPLEMENTED` via PR #307
+(final candidate `996980600d4302c32dcf61ed0f66996efc1da90a`, canonical merge
+`e417a5f41e00bfd79d58854cbe485a9e215a06cf`); post-merge CI/benchmark evidence is not yet recorded, so it is not `VALIDATED`; it exposes generic JSONL v1 and a strict, fail-closed Claude
 linear subset. Preview/manifests, bounded reads, redaction and source identity are
 separate from episode construction, derivation/admission and live capture. This
-is not a full #191 KEEP or canonical delivery. See the [stage record](test-cards/191-conversation-source-import.md).
+is not a full #191 KEEP; full #191 stays open. See the [stage record](test-cards/191-conversation-source-import.md).
