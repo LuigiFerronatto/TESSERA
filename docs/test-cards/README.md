@@ -91,6 +91,11 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | #196 Provider-neutral lifecycle Hook Core | `IN_PROGRESS` | [196-neutral-hook-core.md](196-neutral-hook-core.md) | [Issue #196](https://github.com/LuigiFerronatto/TESSERA/issues/196), additive SDK candidate, ITERATE pending review |
 
+## Composition experiment
+
+- [#258 — safe composition of public reads](258-typed-recipes.md): `IN_PROGRESS`,
+  opt-in candidate; proposed `ITERATE`, no production reuse or adoption claimed
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.

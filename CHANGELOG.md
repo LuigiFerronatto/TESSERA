@@ -10,6 +10,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
+- Added an opt-in, read-only typed recipe composition experiment with explicit
+  effects, bounded validation, dry-run plans and structured partial outcomes.
+  Adoption is `ITERATE`; direct APIs remain the default and canonical writes,
+  providers, automatic discovery and checkpoint resume remain unavailable.
+  ([#258](https://github.com/LuigiFerronatto/TESSERA/issues/258))
 - Add a provider-neutral lifecycle Hook Core SDK with explicit project/run
   identity, redacted bounded ephemeral capture, prepared-context budgets and
   frozen Claude/Codex/Gemini/Copilot mappings. Response boundaries never save
