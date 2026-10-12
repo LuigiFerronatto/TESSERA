@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (ADR merged; runtime pending #362) |
 | Capability type | `architecture decision` |
 | Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) (ADR 0008, Accepted) |
-| Head commit | See the pull request |
-| Merge commit | Not merged |
+| Head commit | `5e004f1e26a305ad09d5c3eda86a275fde7eefef` |
+| Merge commit | `6228ecb4f88deff1e1c445b10c29250108a8ccb6` |
 | Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
@@ -46,7 +46,7 @@ handshake. No runtime code changes in this stage.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. Until #362 merges, startup still blocks on the
+ADR ACCEPTED ON MAIN; RUNTIME TARGET NOT YET IMPLEMENTED. Until #362 merges, startup still blocks on the
 index build.
 
 ## Concrete example
@@ -77,7 +77,7 @@ All runtime behaviour remains unimplemented and is owned by #362, including the
 
 ## What is unlocked next?
 
-Once this ADR merges, #362 is unblocked and #190 can rely on default client
+The ADR is merged, so #362 is unblocked and #190 can rely on default client
 timeouts.
 
 ## Technical provenance
@@ -86,7 +86,7 @@ timeouts.
 |---|---|
 | Issue/Test Card | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
 | Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) |
-| Merge commit | Not merged |
+| Merge commit | `6228ecb4f88deff1e1c445b10c29250108a8ccb6` |
 | Evidence/Learnings/Decision | Issue #361 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
 | PR Evolution Audit | Pull request body |
@@ -96,6 +96,6 @@ timeouts.
 ```text
 #120 startup contract: build the index before tools can run
 → ADR 0008 proposed: handshake first, background indexing, explicit readiness
-→ current state: Accepted in review, runtime unchanged
+→ current state: ADR 0008 Accepted and merged on main; runtime unchanged
 → next validated dependency: #362 implementation
 ```
