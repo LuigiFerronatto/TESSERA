@@ -9,6 +9,8 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 ## Unreleased
 
 ### Experimental
+- Add an immutable instruction-format adapter registry with inspectable filename defaults and generic fallback; preserve existing canonical metadata and retrieval semantics. ([#71](https://github.com/LuigiFerronatto/TESSERA/issues/71))
+
 
 - Add opt-in, capability-typed embedding, generation and reranking profiles to
   project and named-global configuration, with environment-only credential

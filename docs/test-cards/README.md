@@ -70,6 +70,8 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | #146 QUMem fidelity documentation | `IN_PROGRESS` | [146-qumem-fidelity-documentation.md](146-qumem-fidelity-documentation.md) | Paper/runtime truth correction; no child implementation promoted |
 
+| #71 Harness adapter registry | `IN_PROGRESS` | [71-harness-adapter-registry.md](71-harness-adapter-registry.md) | Immutable format defaults; no authority/precedence change |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
