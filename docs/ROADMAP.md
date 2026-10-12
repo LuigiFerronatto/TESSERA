@@ -26,6 +26,8 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 
 > #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
 
+> #263 post-merge reconciliation (2026-10-12): [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) merged as canonical merge commit `4b8606112d26b9294f295edcd988af41082ea415` (final candidate head `894464179c669d876f4d2f1f314f4699559ae49a`). Status is `IMPLEMENTED`, not `VALIDATED`: canonical-merge CI/Benchmark Ledger evidence is still to be confirmed. The earlier candidate note above is retained as history. No dependent issue is promoted by this reconciliation; see [stage record](test-cards/263-durable-write-receipts.md).
+
 ## Status contract
 
 - `IMPLEMENTED` — canonical runtime/contract delivery is merged on `main`.

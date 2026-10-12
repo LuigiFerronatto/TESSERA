@@ -3,12 +3,12 @@
 | Field | Value |
 |---|---|
 | Issue | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged 2026-10-12; `VALIDATED` pending canonical-merge CI/benchmark evidence) |
 | Capability type | `runtime` |
 | Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
 | Head commit | Runtime candidate `cc8f106a863c88dc5095a11b1430961f7cfc148f`; subsequent documentation-only head is recorded in PR #290 |
-| Merge commit | Not merged |
-| Decision | `PENDING` human review; proposed `KEEP` |
+| Merge commit | `4b8606112d26b9294f295edcd988af41082ea415` (final candidate head `894464179c669d876f4d2f1f314f4699559ae49a`) |
+| Decision | `KEEP` (inherited from PR #290; pre-merge record: `PENDING`, proposed `KEEP`) |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |
 
@@ -38,7 +38,7 @@ Admission rules, retrieval scoring and canonical Markdown bodies are unchanged.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. The [receipt contract](../WRITE_RECEIPTS.md) specifies
+TARGET — merged to `main` in PR #290 (see Merge commit above); original candidate wording follows. The [receipt contract](../WRITE_RECEIPTS.md) specifies
 opt-in, outcomes, recovery, supported filesystems, journal retention and privacy.
 A clean local repair bypasses stale in-memory state and pickle loading, then
 rebuilds derived graph/index/manifest and evidence from canonical sources.
@@ -103,7 +103,7 @@ unmerged incremental-index hardening PR #282.
 | Issue/Test Card | [#263](https://github.com/LuigiFerronatto/TESSERA/issues/263) |
 | Pull request | [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) |
 | Canonical base | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
-| Merge commit | Not merged |
+| Merge commit | `4b8606112d26b9294f295edcd988af41082ea415` (final candidate head `894464179c669d876f4d2f1f314f4699559ae49a`) |
 | Evidence/Learnings/Decision | Failure-injection tests and smoke above; proposed KEEP, human decision pending |
 | Benchmark record | [Offline local smoke](evidence/263-write-receipts-smoke.json) |
 | PR Evolution Audit | #108 write safety, #246 indexing, #229 MCP; this PR adds opt-in receipts without claiming a new canonical delivery |
