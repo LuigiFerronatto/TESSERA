@@ -10,6 +10,11 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
+- Add explicitly opt-in D0/D1/D2 typed decomposition experiments with versioned
+  F/P/I semantics, strict one-pass/three-pass contracts and canonical write
+  admission. Add a draft annotation packet and human-review-gated capture,
+  replay and scoring harness. Existing defaults remain unchanged; no provider
+  quality result or default adoption is claimed. ([#136](https://github.com/LuigiFerronatto/TESSERA/issues/136))
 - Added an opt-in repository-only episode-boundary comparison harness for #138,
   with unchanged E0, explicit-role E1/E3, lossless source memberships, separate
   timeout traces and a frozen synthetic draft plus blinded annotation packet.
