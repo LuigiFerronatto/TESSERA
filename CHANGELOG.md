@@ -19,6 +19,45 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   covered by frozen-vector mechanics tests. No semantic Engine default or
   embedding provider is enabled; real-corpus/default selection remains an open
   experiment. ([#265](https://github.com/LuigiFerronatto/TESSERA/issues/265))
+### Added
+- Package five provider-neutral agent Skills for existing init, write, query, read-only corpus diagnostics and benchmark workflows, with a read-only resource API; keep procedural-anchor notes separate. ([#121](https://github.com/LuigiFerronatto/TESSERA/issues/121))
+
+
+### Experimental
+
+- Added opt-in Python `revision_history=True`: durable observed full-source
+  revisions and issued evidence IDs outside the disposable index, with old-body
+  preservation before overwrites and explicit archive failures. Historical
+  revisions do not become live memories. See [revision history](docs/REVISION_HISTORY.md)
+  and [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73); temporal validity
+  and default activation remain separate decisions.
+### Added
+
+- Opt-in operation IDs provide versioned, content-free single-write receipts
+  across Python, CLI and MCP. Retries and crash recovery preserve canonical
+  bytes; deterministic local inspection/repair reports and rebuilds incomplete
+  index/graph/manifest and Evidence Ledger stages without provider calls.
+  Existing calls without operation IDs retain their behavior.
+  ([#263](https://github.com/LuigiFerronatto/TESSERA/issues/263))
+### Experimental
+- Add an immutable instruction-format adapter registry with inspectable filename defaults and generic fallback; preserve existing canonical metadata and retrieval semantics. ([#71](https://github.com/LuigiFerronatto/TESSERA/issues/71))
+
+
+- Add opt-in, capability-typed embedding, generation and reranking profiles to
+  project and named-global configuration, with environment-only credential
+  references, inspectable model identity and explicit application adapter
+  resolution. No default model, provider SDK, download or retrieval change is
+  introduced. ([#157](https://github.com/LuigiFerronatto/TESSERA/issues/157))
+
+### Fixed
+
+- Keep configured source allow lists and recursion boundaries intact across
+  fresh, cached and incremental builds. Updating a relation target now restores
+  inbound links from unchanged sources. Project documents and generated-memory
+  files use distinct physical source keys, preventing path collisions from
+  hiding edits or conflating provenance. The derived graph cache moves to
+  schema 3 and rebuilds automatically; legacy store-only source paths and
+  logical memory IDs retain their existing conventions.
 
 ### Changed
 
@@ -58,6 +97,17 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   support remains. See [runtime contract](docs/MCP_RUNTIME.md).
 
 ### Architecture Decisions
+- Removed the positive human-approval prerequisite from the deterministic Merge
+  Governor at the owner's request. Active requested changes, unresolved threads,
+  drafts, conflicts, exact-head tests and benchmark evidence remain blocking.
+  Repository protection changes remain a separate administrator operation. (#287)
+- Bound benchmark readiness to parsed PR metadata and refreshed it on body edits,
+  preventing older green checks on the same commit from satisfying a changed
+  applicability, issue or rationale. Deterministic gates and workflow permissions are unchanged. (#194)
+- Retired automatic AI pull-request reviews and their CI gate. Deterministic
+  tests, builds, offline benchmarks, conflict/thread checks and active review objections
+  remain; GitHub branch-protection migration is a separate admin step.
+  See [current governance](docs/AGENTIC_GOVERNANCE.md).
 - Added a deterministic, idempotent sync tool
   (`scripts/sync_project_board.py`) that reflects each open issue's own
   authoritative `## Portfolio routing` block onto GitHub Project #9's
