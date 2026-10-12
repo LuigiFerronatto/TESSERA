@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540" role="img" data-status="current">
+  <title>Agent and TESSERA responsibilities</title>
+  <desc>The consuming agent owns decisions. TESSERA supplies scoped source-backed evidence.</desc>
+  <rect width="1400" height="540" fill="#ffffff" />
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#516a7e" />
+    </marker>
+  </defs>
+  <text x="44" y="53" font-size="32" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Agent and TESSERA responsibilities</text>
+  <text x="44" y="89" font-size="18" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">The consuming agent owns decisions. TESSERA supplies scoped source-backed evidence.</text>
+  <text x="44" y="489" font-size="18" fill="#23506c" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">CURRENT FOUNDATION: audited canonical baseline</text>
+  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md</text>
+  <rect x="44" y="170" width="330" height="210" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="62" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Consuming agent</text>
+  <text x="62" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Task interpretation, tools,</text>
+  <text x="62" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">decisions and final answer</text>
+  <rect x="536" y="170" width="360" height="210" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="554" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">TESSERA</text>
+  <text x="554" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Canonical writes, indexing,</text>
+  <text x="554" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">retrieval and inspectable</text>
+  <text x="554" y="288" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">provenance</text>
+  <rect x="1050" y="170" width="305" height="210" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
+  <text x="1068" y="204" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Source records</text>
+  <text x="1068" y="236" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Generated Markdown and</text>
+  <text x="1068" y="262" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">selected external</text>
+  <text x="1068" y="288" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">documents</text>
+  <line x1="374" y1="216" x2="531" y2="216" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="392.5" y="204.0" font-size="16" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">request</text>
+  <line x1="536" y1="330" x2="379" y2="330" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="397.5" y="318.0" font-size="16" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">evidence</text>
+  <line x1="1050" y1="235" x2="901" y2="235" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="915.5" y="223.0" font-size="16" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">read</text>
+  <line x1="896" y1="330" x2="1045" y2="330" stroke="#516a7e" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="910.5" y="318.0" font-size="16" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">gated write</text>
+</svg>
