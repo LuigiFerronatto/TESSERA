@@ -98,6 +98,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 | #80 Architecture diagrams | `IN_PROGRESS` | [80-architecture-diagrams.md](80-architecture-diagrams.md) | Six source-mapped current/experimental SVGs |
 
 | #196 Provider-neutral lifecycle Hook Core | `IN_PROGRESS` | [196-neutral-hook-core.md](196-neutral-hook-core.md) | [Issue #196](https://github.com/LuigiFerronatto/TESSERA/issues/196), additive SDK candidate, ITERATE pending review |
+| #349 One source-selection authority (ADR 0005) | `IN_PROGRESS` architecture decision | [349-single-source-selection-authority.md](349-single-source-selection-authority.md) | [Issue #349](https://github.com/LuigiFerronatto/TESSERA/issues/349), [ADR 0005](../../architecture/adr/0005-single-source-selection-authority.md); Accepted; `.gitignore` participates as a convenience-ignore layer; runtime pending #352/#353/#354 |
 
 ## Composition experiment
 
