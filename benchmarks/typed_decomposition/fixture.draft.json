@@ -1,0 +1,205 @@
+{
+  "schema_version": "typed-decomposition-eval-v1",
+  "contract_version": "fpi-v1",
+  "origin": "assistant-authored synthetic draft; not human reviewed",
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "reviewed_at": null,
+    "content_sha256": null
+  },
+  "cases": [
+    {
+      "id": "facts",
+      "category": "facts_only",
+      "episode": {
+        "beginning": "The user moved their workshop to Cedar Street in March.",
+        "middle": "The workshop has two benches.",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "facts-u1",
+          "content": "The user moved their workshop to Cedar Street in March.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "An event with stated time, not an immutable trait."
+        },
+        {
+          "id": "facts-u2",
+          "content": "The workshop has two benches.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "A separately updateable current state."
+        }
+      ],
+      "annotation_notes": "Do not infer the user enjoys woodworking or will remain at this address forever."
+    },
+    {
+      "id": "rationale",
+      "category": "preference_rationale",
+      "episode": {
+        "beginning": "The user is choosing a weekly report format.",
+        "middle": "The user says: \"I prefer a short written summary because I can read it between meetings.\"",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "rationale-u1",
+          "content": "The user prefers a short written weekly report because they can read it between meetings.",
+          "acceptable_types": [
+            "preference"
+          ],
+          "rationale": "The supplied reason belongs to the preference, not an invented user trait."
+        }
+      ],
+      "annotation_notes": "Retain the report scope and rationale together; do not infer a general aversion to detail."
+    },
+    {
+      "id": "change",
+      "category": "preference_change",
+      "episode": {
+        "beginning": "Last month the user said they preferred morning planning sessions.",
+        "middle": "Today the user says: \"Please schedule planning in the afternoon now; my morning shift changed.\"",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "change-u1",
+          "content": "Last month the user preferred morning planning sessions.",
+          "acceptable_types": [
+            "preference"
+          ],
+          "rationale": "Historical preference with explicit time."
+        },
+        {
+          "id": "change-u2",
+          "content": "The user now prefers afternoon planning sessions because their morning shift changed.",
+          "acceptable_types": [
+            "preference"
+          ],
+          "rationale": "Changed current preference, qualified by now; independent from historical state."
+        }
+      ],
+      "annotation_notes": "Reviewer must settle historical-label inclusion before capture. Do not collapse opposing preferences into a timeless trait."
+    },
+    {
+      "id": "principle",
+      "category": "transferable_insight",
+      "episode": {
+        "beginning": "The user chose a train over a flight after two cancellations.",
+        "middle": "The user says: \"For my short trips with fixed arrival deadlines, I will choose the option with a backup departure rather than the lowest fare.\"",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "principle-u1",
+          "content": "After two cancellations, the user chose a train instead of a flight.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "A concrete choice event."
+        },
+        {
+          "id": "principle-u2",
+          "content": "For short trips with fixed arrival deadlines, the user will prioritize a backup departure over the lowest fare.",
+          "acceptable_types": [
+            "procedural_anchor"
+          ],
+          "rationale": "Explicit user-specific future decision principle grounded in the failed alternatives."
+        }
+      ],
+      "annotation_notes": "Do not replace the insight with generic travel advice or invent a fear of flying."
+    },
+    {
+      "id": "temptation",
+      "category": "unsupported_inference",
+      "episode": {
+        "beginning": "At one team lunch, the user ordered a vegetarian soup.",
+        "middle": "No reason or longer-term food preference was discussed.",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "temptation-u1",
+          "content": "The user ordered a vegetarian soup at one team lunch.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "One observed choice does not establish vegetarianism."
+        }
+      ],
+      "annotation_notes": "Reject vegetarian identity, permanent diet restrictions and health explanations as unsupported."
+    },
+    {
+      "id": "empty",
+      "category": "zero_memory",
+      "episode": {
+        "beginning": "Hello!",
+        "middle": "Thanks for the help.",
+        "end": "You are welcome."
+      },
+      "expected_units": [],
+      "annotation_notes": "Courtesy-only exchange: no durable memory is proposed. This is a draft judgment awaiting human review."
+    },
+    {
+      "id": "atomic",
+      "category": "multiple_same_type",
+      "episode": {
+        "beginning": "The user has a blue bicycle and a red toolbox.",
+        "middle": "The toolbox is kept in the hallway.",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "atomic-u1",
+          "content": "The user has a blue bicycle.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "Independent object/color claim."
+        },
+        {
+          "id": "atomic-u2",
+          "content": "The user has a red toolbox.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "Independent ownership/color claim."
+        },
+        {
+          "id": "atomic-u3",
+          "content": "The toolbox is kept in the hallway.",
+          "acceptable_types": [
+            "factual"
+          ],
+          "rationale": "Location can change independently of ownership/color."
+        }
+      ],
+      "annotation_notes": "Reviewer should decide whether color and ownership merit further splitting; freeze that decision consistently."
+    },
+    {
+      "id": "ambiguous",
+      "category": "cross_type_ambiguity",
+      "episode": {
+        "beginning": "The user is discussing how to compare unfamiliar software.",
+        "middle": "The user says: \"For my evaluations, I choose the tool with a reversible trial because it lets me change course after testing.\"",
+        "end": ""
+      },
+      "expected_units": [
+        {
+          "id": "ambiguous-u1",
+          "content": "For unfamiliar-software evaluations, the user chooses a reversible trial so they can change course after testing.",
+          "acceptable_types": [
+            "preference",
+            "procedural_anchor"
+          ],
+          "rationale": "An explicit contextual preference with rationale can also support a user-specific decision principle."
+        }
+      ],
+      "annotation_notes": "Allow either annotated type, count the unit once, and do not reward duplicate cross-type paraphrases."
+    }
+  ]
+}

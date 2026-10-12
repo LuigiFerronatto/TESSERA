@@ -1,0 +1,568 @@
+{
+  "schema_version": 1,
+  "audit_version": "1.0",
+  "audited_on": "2026-10-02",
+  "issue": 179,
+  "baseline_commit": "20814a47ec0f72d7bea0639e0b057df1ecf5cded",
+  "repositories": [
+    {
+      "repo": "MemPalace/mempalace",
+      "sha": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "url": "https://github.com/MemPalace/mempalace/commit/5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "observed_default_branch": "develop",
+      "release_claim": false
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "sha": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "url": "https://github.com/mem0ai/mem0/commit/abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "observed_default_branch": "main",
+      "release_claim": false
+    },
+    {
+      "repo": "MemTensor/MemOS",
+      "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "url": "https://github.com/MemTensor/MemOS/commit/a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "observed_default_branch": "main",
+      "release_claim": false
+    },
+    {
+      "repo": "MemTensor/MemOS-Cloud-CLI",
+      "sha": "8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "url": "https://github.com/MemTensor/MemOS-Cloud-CLI/commit/8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "observed_default_branch": "main",
+      "release_claim": false
+    },
+    {
+      "repo": "letta-ai/letta",
+      "sha": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "url": "https://github.com/letta-ai/letta/commit/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "observed_default_branch": "main",
+      "release_claim": false
+    },
+    {
+      "repo": "letta-ai/letta-code",
+      "sha": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "url": "https://github.com/letta-ai/letta-code/commit/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "observed_default_branch": "main",
+      "release_claim": false
+    },
+    {
+      "repo": "getzep/graphiti",
+      "sha": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "url": "https://github.com/getzep/graphiti/commit/3c427640abf909f12f71f963fce15eb514a3c493",
+      "observed_default_branch": "main",
+      "release_claim": false
+    }
+  ],
+  "sources": [
+    {
+      "id": "MP01",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "README.md",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/README.md",
+      "content_sha256": "f0ccb29707bb9f54a901e0882cf0dc707304ad5d26d641bc947359125932310c",
+      "bytes": 16968,
+      "lines": 367,
+      "kind": "docs"
+    },
+    {
+      "id": "MP02",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/hooks_cli.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/hooks_cli.py",
+      "content_sha256": "8b22e3ca983153c80cf8e7ca8b7e44474f7b64913c6289f1d859276c0612a40c",
+      "bytes": 68292,
+      "lines": 1742,
+      "kind": "code"
+    },
+    {
+      "id": "MP03",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/hook_shell.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/hook_shell.py",
+      "content_sha256": "11136209421d76274b69e538faa7cc444f1a417526814632d164a191eb3f2486",
+      "bytes": 5550,
+      "lines": 169,
+      "kind": "code"
+    },
+    {
+      "id": "MP04",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "docs/hook-write-routing.md",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/docs/hook-write-routing.md",
+      "content_sha256": "0169497919924150efc0af9065e8e6eaeed201c7de8915b6f046f4f9ab3ed3f3",
+      "bytes": 3421,
+      "lines": 118,
+      "kind": "docs"
+    },
+    {
+      "id": "MP05",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": ".claude-plugin/hooks/hooks.json",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/.claude-plugin/hooks/hooks.json",
+      "content_sha256": "292ec8c2e807d8ae441dad105f7fe50ae2647e2977a81110e5834b8a14aa3f62",
+      "bytes": 797,
+      "lines": 38,
+      "kind": "code"
+    },
+    {
+      "id": "MP06",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": ".codex-plugin/hooks.json",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/.codex-plugin/hooks.json",
+      "content_sha256": "5c9cb0e0cf5fbadc3bf81d3cabe5fe9d605b6d9a618e79b2047e2fad8a9d7dc1",
+      "bytes": 712,
+      "lines": 37,
+      "kind": "code"
+    },
+    {
+      "id": "MP07",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": ".claude-plugin/hooks/mempal-precompact-hook.sh",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/.claude-plugin/hooks/mempal-precompact-hook.sh",
+      "content_sha256": "c405539904311ad97fb6e786ed494d7db5ca75537708d8d4eef6d0ef3c7bb320",
+      "bytes": 735,
+      "lines": 24,
+      "kind": "code"
+    },
+    {
+      "id": "MP08",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/convo_miner.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/convo_miner.py",
+      "content_sha256": "4afe3e349a173218d3d1dc24050dbb9b33097ca21496b347e0662bb174dcad07",
+      "bytes": 50724,
+      "lines": 1305,
+      "kind": "code"
+    },
+    {
+      "id": "MP09",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/knowledge_graph.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/knowledge_graph.py",
+      "content_sha256": "c80be47dca8c31685a0d7b5b5d8e5cf0ec32a9c6b19ef0aab8bab1907c9a91cc",
+      "bytes": 40033,
+      "lines": 988,
+      "kind": "code"
+    },
+    {
+      "id": "MP10",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/backends/base.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/backends/base.py",
+      "content_sha256": "416ddedcbe11e9182640065b304922c21d8127b6bc97968961daa7dcee90a970",
+      "bytes": 36002,
+      "lines": 910,
+      "kind": "code"
+    },
+    {
+      "id": "MP11",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/backends/registry.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/backends/registry.py",
+      "content_sha256": "48304b8a7642162312ca18356ba6599d8c153fd763c98e730dea6c3423d389c3",
+      "bytes": 8406,
+      "lines": 253,
+      "kind": "code"
+    },
+    {
+      "id": "MP12",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "mempalace/searcher/ranking.py",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/mempalace/searcher/ranking.py",
+      "content_sha256": "38bfda791f9e2a8cbeb3efb3450dc6bc3068713e5321322c90408cc5318ec016",
+      "bytes": 14624,
+      "lines": 363,
+      "kind": "code"
+    },
+    {
+      "id": "MP13",
+      "repository": "MemPalace/mempalace",
+      "revision": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+      "path": "hooks/README.md",
+      "url": "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/hooks/README.md",
+      "content_sha256": "69716be149f8fbcecf7bff000a299b8c929c0b3af51dccb986fd210e072ce27d",
+      "bytes": 11045,
+      "lines": 251,
+      "kind": "docs"
+    },
+    {
+      "id": "M001",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "mem0/memory/main.py",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/mem0/memory/main.py",
+      "content_sha256": "f329ca4a17af1fbefb32ac10d4cc7ae7ddbdb7435a87eb74c30915cff98b8b7c",
+      "bytes": 169881,
+      "lines": 3912,
+      "kind": "code"
+    },
+    {
+      "id": "M002",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "integrations/agent-plugin-core/python/hook_runner.py",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/integrations/agent-plugin-core/python/hook_runner.py",
+      "content_sha256": "8791a8641d2a1ad34cdacaf58f6a5b55db4b3a2dda324f2fd0117457f54f7bf3",
+      "bytes": 13176,
+      "lines": 388,
+      "kind": "code"
+    },
+    {
+      "id": "M003",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "integrations/agent-plugin-core/python/memory_core.py",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/integrations/agent-plugin-core/python/memory_core.py",
+      "content_sha256": "35700da6ffd37fb5008e5ad326be69adf0991a36254be8104c4473bed76ab919",
+      "bytes": 96253,
+      "lines": 2676,
+      "kind": "code"
+    },
+    {
+      "id": "M004",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "integrations/claude-code-plugin/hooks/hooks.json",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/integrations/claude-code-plugin/hooks/hooks.json",
+      "content_sha256": "690e9c366eef75b9aa472b540e11d38f53ed8600bf7d304bb505d505f82948ae",
+      "bytes": 3100,
+      "lines": 110,
+      "kind": "code"
+    },
+    {
+      "id": "M005",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "integrations/claude-code-plugin/adapters/claude/hook.py",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/integrations/claude-code-plugin/adapters/claude/hook.py",
+      "content_sha256": "71c607ba72aabae91e97985e001518c11141f771dc6a0ad612ce217a0c3def8a",
+      "bytes": 1660,
+      "lines": 54,
+      "kind": "code"
+    },
+    {
+      "id": "M006",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "integrations/claude-code-plugin/adapters/claude/transcript.py",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/integrations/claude-code-plugin/adapters/claude/transcript.py",
+      "content_sha256": "34a60c572b55fc53f36532746f9189b33dc01919bf32a45df429ba714bc4bf77",
+      "bytes": 13086,
+      "lines": 362,
+      "kind": "code"
+    },
+    {
+      "id": "M007",
+      "repository": "mem0ai/mem0",
+      "revision": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+      "path": "docs/platform/features/temporal-reasoning.mdx",
+      "url": "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/docs/platform/features/temporal-reasoning.mdx",
+      "content_sha256": "14057cfb0c75cb20f8e68b62cce5e0d9c073c7bd5edf960a1a691a603876eb68",
+      "bytes": 2623,
+      "lines": 81,
+      "kind": "docs"
+    },
+    {
+      "id": "MS01",
+      "repository": "MemTensor/MemOS-Cloud-CLI",
+      "revision": "8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "path": "src/memos_cli/hooks/runner.py",
+      "url": "https://github.com/MemTensor/MemOS-Cloud-CLI/blob/8efa86ab222e073b5d476c86bc75535373ba7b98/src/memos_cli/hooks/runner.py",
+      "content_sha256": "eb5bb9e6000054e0927ef9a36b48b639ea644ec455d461b373961cbac9f6e07f",
+      "bytes": 10631,
+      "lines": 262,
+      "kind": "code"
+    },
+    {
+      "id": "MS02",
+      "repository": "MemTensor/MemOS-Cloud-CLI",
+      "revision": "8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "path": "src/memos_cli/hooks/agents.py",
+      "url": "https://github.com/MemTensor/MemOS-Cloud-CLI/blob/8efa86ab222e073b5d476c86bc75535373ba7b98/src/memos_cli/hooks/agents.py",
+      "content_sha256": "d5e7229233c041c394ab281ca2042ac04259d796737f35a8a424ad79176f6b1b",
+      "bytes": 12319,
+      "lines": 304,
+      "kind": "code"
+    },
+    {
+      "id": "MS03",
+      "repository": "MemTensor/MemOS-Cloud-CLI",
+      "revision": "8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "path": "src/memos_cli/hooks/installer.py",
+      "url": "https://github.com/MemTensor/MemOS-Cloud-CLI/blob/8efa86ab222e073b5d476c86bc75535373ba7b98/src/memos_cli/hooks/installer.py",
+      "content_sha256": "44da1ec7b774bc9402a39bc4d5f1676bddbc80354e6ac6e1b85e3a7145a71d42",
+      "bytes": 34539,
+      "lines": 918,
+      "kind": "code"
+    },
+    {
+      "id": "MS04",
+      "repository": "MemTensor/MemOS-Cloud-CLI",
+      "revision": "8efa86ab222e073b5d476c86bc75535373ba7b98",
+      "path": "src/memos_cli/hooks/state_store.py",
+      "url": "https://github.com/MemTensor/MemOS-Cloud-CLI/blob/8efa86ab222e073b5d476c86bc75535373ba7b98/src/memos_cli/hooks/state_store.py",
+      "content_sha256": "45b8ee9ff09de5692b06db5b30220ac0d7874682393ea388ff8d5d8ed117c3a2",
+      "bytes": 8497,
+      "lines": 240,
+      "kind": "code"
+    },
+    {
+      "id": "MS05",
+      "repository": "MemTensor/MemOS",
+      "revision": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "path": "src/memos/mem_cube/general.py",
+      "url": "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/src/memos/mem_cube/general.py",
+      "content_sha256": "e03b259c41a1dbd7689aadd73f990eba4c3fd563a327c69c7ebb05158d4b563c",
+      "bytes": 9650,
+      "lines": 240,
+      "kind": "code"
+    },
+    {
+      "id": "MS06",
+      "repository": "MemTensor/MemOS",
+      "revision": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "path": "src/memos/mem_os/core.py",
+      "url": "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/src/memos/mem_os/core.py",
+      "content_sha256": "1f50e5bc104ed857cfeff9b750b4b12df889e5a2e5a4f840e076209c60b1286c",
+      "bytes": 53079,
+      "lines": 1203,
+      "kind": "code"
+    },
+    {
+      "id": "MS07",
+      "repository": "MemTensor/MemOS",
+      "revision": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "path": "docs/en/open_source/modules/mem_cube.md",
+      "url": "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/docs/en/open_source/modules/mem_cube.md",
+      "content_sha256": "f8e49a7514c592f9022951babf1f42553faf6f70e49c556aaadc2e40cd9b8ab9",
+      "bytes": 9512,
+      "lines": 285,
+      "kind": "docs"
+    },
+    {
+      "id": "MS08",
+      "repository": "MemTensor/MemOS",
+      "revision": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "path": "src/memos/memories/textual/tree.py",
+      "url": "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/src/memos/memories/textual/tree.py",
+      "content_sha256": "c2ec0f3559169d04ec540f719428ce6271e6d5769fae56f9e41c2557ac4bca9e",
+      "bytes": 25764,
+      "lines": 649,
+      "kind": "code"
+    },
+    {
+      "id": "MS09",
+      "repository": "MemTensor/MemOS",
+      "revision": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "path": "src/memos/memories/textual/item.py",
+      "url": "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/src/memos/memories/textual/item.py",
+      "content_sha256": "b3571ddb63735ca1f4f480a605d76e477946654162335119410db7e5956d92ad",
+      "bytes": 15015,
+      "lines": 376,
+      "kind": "code"
+    },
+    {
+      "id": "LT01",
+      "repository": "letta-ai/letta",
+      "revision": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "path": "README.md",
+      "url": "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+      "content_sha256": "1d624e8fd383c1198c8d42da87b055d591a5760e19607692eb46bbbfe2a58f03",
+      "bytes": 1574,
+      "lines": 39,
+      "kind": "docs"
+    },
+    {
+      "id": "LT02",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "README.md",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md",
+      "content_sha256": "61811b022086eeb9d0bdab91cce960f193e9b1bec544c36f64cf6a1f5eb9382c",
+      "bytes": 9696,
+      "lines": 145,
+      "kind": "docs"
+    },
+    {
+      "id": "LT03",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/hooks/types.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/hooks/types.ts",
+      "content_sha256": "c65db333d928cd214cf6ceb7665c5f7ac2e27627bd66c6dca400be87fc5b7327",
+      "bytes": 12510,
+      "lines": 451,
+      "kind": "code"
+    },
+    {
+      "id": "LT04",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/hooks/executor.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/hooks/executor.ts",
+      "content_sha256": "93545f6074c544b65b4e57154d9891c2bbf57e06acc69fff76ef645391bdd5c0",
+      "bytes": 15326,
+      "lines": 531,
+      "kind": "code"
+    },
+    {
+      "id": "LT05",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/agent/memory-git-hooks.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/agent/memory-git-hooks.ts",
+      "content_sha256": "a4831efc84d883c8a201132166cbe47983ec7a56513f0434b59586d2685f1667",
+      "bytes": 10934,
+      "lines": 297,
+      "kind": "code"
+    },
+    {
+      "id": "LT06",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/agent/prompts/letta_root_memfs.md",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/agent/prompts/letta_root_memfs.md",
+      "content_sha256": "d4cc80df5e20b3302042bd832aff0e4544a92e24e36db892bf07f6d172ebb64f",
+      "bytes": 22588,
+      "lines": 209,
+      "kind": "docs"
+    },
+    {
+      "id": "LT07",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/agent/memory-filesystem.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/agent/memory-filesystem.ts",
+      "content_sha256": "a2884fd2e467af615a7a56584ccf9df520e470c6eef39930a98ec7dc10bfe628",
+      "bytes": 22353,
+      "lines": 693,
+      "kind": "code"
+    },
+    {
+      "id": "LT08",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/agent/memory-git.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/agent/memory-git.ts",
+      "content_sha256": "3e83d9ce002a963a93efff1f2a376186796d2b383b920cf12d7e30ed46489d0c",
+      "bytes": 58752,
+      "lines": 2013,
+      "kind": "code"
+    },
+    {
+      "id": "LT09",
+      "repository": "letta-ai/letta-code",
+      "revision": "37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7",
+      "path": "src/agent/memory-runtime.ts",
+      "url": "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/src/agent/memory-runtime.ts",
+      "content_sha256": "54ff0262bd947aa865f9e47cedba8c98b34bdc3d2b56aeae19749f8e9be9159b",
+      "bytes": 945,
+      "lines": 28,
+      "kind": "code"
+    },
+    {
+      "id": "GR01",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "graphiti_core/graphiti.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/graphiti_core/graphiti.py",
+      "content_sha256": "2d0ffbb8b6de59787269326a9255d875f74da63ed66fd4f4fad3f159538d0fdd",
+      "bytes": 74701,
+      "lines": 1852,
+      "kind": "code"
+    },
+    {
+      "id": "GR02",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "graphiti_core/edges.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/graphiti_core/edges.py",
+      "content_sha256": "0151d72ebfb057033c6d52a163e22f252f67b915722e14315b685c7831b3b1c6",
+      "bytes": 33631,
+      "lines": 1046,
+      "kind": "code"
+    },
+    {
+      "id": "GR03",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "graphiti_core/nodes.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/graphiti_core/nodes.py",
+      "content_sha256": "529eb74b7c93e7551f6287b1a7bf6818d31fd045623b3260967dad573e4d801c",
+      "bytes": 38014,
+      "lines": 1122,
+      "kind": "code"
+    },
+    {
+      "id": "GR04",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "graphiti_core/search/search.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/graphiti_core/search/search.py",
+      "content_sha256": "9fe64da1825864950285b1733a4920001d70c780e3f0386837e98eedbfed7529",
+      "bytes": 33042,
+      "lines": 875,
+      "kind": "code"
+    },
+    {
+      "id": "GR05",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "graphiti_core/utils/maintenance/edge_operations.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/graphiti_core/utils/maintenance/edge_operations.py",
+      "content_sha256": "b773ff4489968af2a996d5074e679cab9806cc0904a7ff9f2aecc74382325abe",
+      "bytes": 36703,
+      "lines": 911,
+      "kind": "code"
+    },
+    {
+      "id": "GR06",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "mcp_server/README.md",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/mcp_server/README.md",
+      "content_sha256": "4397db54fd39755e50451d2995612b5f6bc4dfc9b76aab5214fee9ad84a93038",
+      "bytes": 24903,
+      "lines": 719,
+      "kind": "docs"
+    },
+    {
+      "id": "GR07",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "mcp_server/src/graphiti_mcp_server.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/mcp_server/src/graphiti_mcp_server.py",
+      "content_sha256": "ddb12a685f474ed5a05bf08654922a0c69a6b6a484aa2c43740e57a27433f1d3",
+      "bytes": 56385,
+      "lines": 1379,
+      "kind": "code"
+    },
+    {
+      "id": "GR08",
+      "repository": "getzep/graphiti",
+      "revision": "3c427640abf909f12f71f963fce15eb514a3c493",
+      "path": "mcp_server/src/services/queue_service.py",
+      "url": "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/mcp_server/src/services/queue_service.py",
+      "content_sha256": "83b9853930c6f32ef42b1941fdf365746f55605ea7cf71b620ac963a94fe1743",
+      "bytes": 7734,
+      "lines": 184,
+      "kind": "code"
+    }
+  ],
+  "method": "Read-only inspection through GitHub connector. No competitor code executed, installed, or vendored. Source hashes are of inspected UTF-8 snapshots; no runtime quality benchmark was run.",
+  "fingerprint_normalization": "Decode UTF-8, normalize line endings to LF, remove trailing whitespace at end of file, append one LF; SHA-256/bytes/lines refer to this normalized inspected snapshot."
+}

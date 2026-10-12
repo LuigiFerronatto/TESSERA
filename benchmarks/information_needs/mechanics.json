@@ -1,0 +1,48 @@
+{
+  "contract_metrics": {
+    "N0": {
+      "need_counts": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "provider_callable_calls": 18,
+      "runs": 6,
+      "schema_errors": 0
+    },
+    "N1": {
+      "need_counts": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "provider_callable_calls": 14,
+      "runs": 6,
+      "schema_errors": 0
+    },
+    "N2": {
+      "need_counts": [
+        1,
+        3,
+        3,
+        0,
+        0,
+        3
+      ],
+      "provider_callable_calls": 14,
+      "runs": 6,
+      "schema_errors": 0
+    }
+  },
+  "fixture_sha256": "6dc4955b5defc88540b7ce2972589f378065887604966005f8af275c3a0392a9",
+  "mode": "mock_mechanics",
+  "quality_gate": "BLOCKED: independent facet/state/consumer-effort review and provider captures required",
+  "quality_metrics": null,
+  "schema_version": 1
+}
