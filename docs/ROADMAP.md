@@ -740,7 +740,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#165](https://github.com/LuigiFerronatto/TESSERA/issues/165) | open | `BLOCKED` | EVALUATION | Intelligence | Depends on #157/#160/#163; local generative memory organization/reasoning. |
 | [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166) | open | `DEFERRED` | EXECUTABLE | CLI | Technically executable from validated #112/#116/#117, but parked until #155 semantics stabilize. |
 | [#167](https://github.com/LuigiFerronatto/TESSERA/issues/167) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Working Context packet identity/bootstrap/reuse/freshness; depends on #169 and #20 as applicable; consumes #168. |
-| [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) | open | `READY` | ARCHITECTURE | Cognitive Continuity | Long-Term Memory durable boundary; validated foundation satisfied; implementation behavior remains dependency-routed to child cards. |
+| [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) | open | `IMPLEMENTED` | ARCHITECTURE | Cognitive Continuity | Long-Term Memory durable boundary; PR #296 merged as `8dcd4a5b7b9a066288646872ffc1594888e4e5fb` (candidate `27390c8c953d2874fd49998f073d2abeb925ecd3`); maintainer contract decision still `PENDING`, not `VALIDATED`; implementation behavior remains dependency-routed to child cards. |
 | [#169](https://github.com/LuigiFerronatto/TESSERA/issues/169) | open | `BLOCKED` | EXECUTABLE | Cognitive Continuity | Context Compiler; depends on #139/#140/#141/#20 and consumes #168. |
 | [#170](https://github.com/LuigiFerronatto/TESSERA/issues/170) | open | `TRACKER` | TRACKER | Cognitive Continuity | Agent Cognitive Continuity epic; no direct feature PR. |
 | [#171](https://github.com/LuigiFerronatto/TESSERA/issues/171) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Semantic `search/context/evidence/remember/inspect`; #120 transport prerequisite satisfied; still depends on #167/#169, with #19/#92 governing durable remember. |
@@ -1062,7 +1062,8 @@ This map is routing, not permission to bypass each Issue/Test Card's Definition 
 
 ## Long-Term Memory boundary candidate
 
-[#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) has a proposed
-[durable/ephemeral contract](LONG_TERM_MEMORY.md). It documents current primitives
+[#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) has a merged proposed
+[durable/ephemeral contract](LONG_TERM_MEMORY.md) (PR #296, canonical merge
+`8dcd4a5b7b9a066288646872ffc1594888e4e5fb`; contract decision pending). It documents current primitives
 and reserves future admission, temporal, lineage and context responsibilities.
-The candidate changes no queue status and does not implement its child contracts.
+The merge unblocks no dependent issue and does not implement its child contracts.

@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (proposed contract merged; contract decision pending) |
 | Capability type | `documentation` |
-| Pull request | Candidate branch `docs/168-durable-memory-boundary` |
-| Merge commit | Not merged |
+| Pull request | [#296](https://github.com/LuigiFerronatto/TESSERA/pull/296), final candidate `27390c8c953d2874fd49998f073d2abeb925ecd3` |
+| Merge commit | `8dcd4a5b7b9a066288646872ffc1594888e4e5fb` |
 | Decision | `PENDING` contract review |
 | Benchmark applicability | `NOT_APPLICABLE` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 Document the distinction between durable source records, rebuildable evidence/indexes and ephemeral generated context.
