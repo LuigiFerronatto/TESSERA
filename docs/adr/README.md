@@ -10,3 +10,4 @@ architecture; it does not make a proposed runtime capability current.
 | [0002](0002-repository-layout-and-distribution-boundary.md) | Accepted | Preserve the root package, separate distributable runtime from repository tooling, and migrate in owned stages |
 | [0003](0003-configuration-and-store-discovery.md) | Accepted candidate | Versioned project config, named global registry, deterministic store selection, and explicit migration |
 | [0004](0004-safe-project-source-discovery.md) | Accepted candidate | Root-bounded, explainable, no-mutation source discovery and `.tessera-ignore` policy |
+| [0008](0008-mcp-startup-readiness.md) | Proposed | MCP handshake independent of index readiness; background indexing with explicit readiness states |
