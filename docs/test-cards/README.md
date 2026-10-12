@@ -80,6 +80,8 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | #168 Long-Term Memory boundary | `IN_PROGRESS` | [168-long-term-memory-boundary.md](168-long-term-memory-boundary.md) | Proposed current/target ownership; no runtime activation |
 
+| #166 / #119 Unified CLI presentation | `IN_PROGRESS` | [166-unified-cli-presentation.md](166-unified-cli-presentation.md) | [Issue #166](https://github.com/LuigiFerronatto/TESSERA/issues/166), [CLI output contract](../CLI_OUTPUT.md); candidate review pending |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
