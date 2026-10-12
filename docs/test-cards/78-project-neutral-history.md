@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#78](https://github.com/LuigiFerronatto/TESSERA/issues/78) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; canonical-merge CI/benchmark not yet confirmed, so not `VALIDATED`) |
 | Capability type | `documentation` |
-| Pull request | Candidate branch `docs/78-80-project-neutral-visuals` |
-| Merge commit | Not merged |
-| Decision | `PENDING` review |
+| Pull request | [#303](https://github.com/LuigiFerronatto/TESSERA/pull/303); final candidate `f4740896c14b7710ccf84167fe9b1d67cf803df2` |
+| Merge commit | `3f93040ee4150c08a3a13fbf9d899804dc3a18cf` |
+| Decision | `PENDING` maintainer decision (not recorded on the merged PR) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-02 |
 
@@ -25,7 +25,7 @@ project ownership or show research ideas as current capabilities.
 Normalize legacy names, retain pinned original audits, remove branded artwork from the current tree and reuse the existing TESSERA asset. The companion documentation card covers the related cleanup/visual lane.
 
 ## How does it work now?
-TARGET — NOT YET ON MAIN: the [diagram guide](../ARCHITECTURE_DIAGRAMS.md)
+IMPLEMENTED ON MAIN (PR #303): the [diagram guide](../ARCHITECTURE_DIAGRAMS.md)
 records six asset/source mappings and current-versus-target status. Historical
 prose points to current contracts and exact prior identifiers stay in linked Git
 history. Production runtime semantics remain unchanged.
