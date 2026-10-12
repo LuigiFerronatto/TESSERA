@@ -14,6 +14,7 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from .source_formats import source_format_for_path, split_markdown, split_source
+from .harness_adapters import DEFAULT_HARNESS_ADAPTERS, HarnessAdapterRegistry
 
 
 DRAWERS = {"facts", "preferences", "insights"}
@@ -251,29 +252,8 @@ def _split_markdown(raw_text: str) -> Tuple[Dict[str, Any], str]:
 
 
 def _infer_document_type(filename_lower: str) -> str:
-    harness_files = {
-        "claude.md",
-        "agents.md",
-        "gemini.md",
-        "copilot-instructions.md",
-    }
-    if filename_lower in harness_files:
-        return "harness_instructions"
-    if (
-        filename_lower == "skill.md"
-        or filename_lower.endswith(".skill.md")
-        or filename_lower.startswith("sk_")
-    ):
-        return "skill_instructions"
-    if "decision" in filename_lower or filename_lower.startswith("adr"):
-        return "decision_record"
-    if "experiment" in filename_lower:
-        return "experiment_record"
-    if "report" in filename_lower:
-        return "report"
-    if filename_lower == "readme.md":
-        return "project_context"
-    return "memory"
+    """Compatibility wrapper over the canonical filename-adapter registry."""
+    return DEFAULT_HARNESS_ADAPTERS.inspect(filename_lower).document_type
 
 
 def parse_and_normalize(
@@ -282,6 +262,7 @@ def parse_and_normalize(
     storage_dir: str,
     persistent_id: Optional[str] = None,
     persistent_doc_id: Optional[str] = None,
+    adapter_registry: Optional[HarnessAdapterRegistry] = None,
 ) -> CanonicalMetadata:
     source_format = source_format_for_path(filepath) or "text"
     frontmatter, body = split_source(raw_text, source_format=source_format)
@@ -290,7 +271,7 @@ def parse_and_normalize(
     rel_path = os.path.relpath(filepath, storage_dir)
     rel_path_posix = rel_path.replace(os.sep, "/")
     filename = os.path.basename(filepath)
-    filename_lower = filename.lower()
+    adapter = (adapter_registry if adapter_registry is not None else DEFAULT_HARNESS_ADAPTERS).inspect(filepath)
     doc_hash = compute_sha256(raw_text)
     body_hash = compute_sha256(body)
     doc_id = persistent_doc_id or f"doc_{compute_sha256(rel_path_posix)[:12]}"
@@ -325,7 +306,7 @@ def parse_and_normalize(
         doc_type = str(explicit_doc_type).strip()
         origin["document_type"] = "explicit"
     else:
-        doc_type = _infer_document_type(filename_lower)
+        doc_type = adapter.document_type
         origin["document_type"] = "inferred"
 
     raw_kind = _first(frontmatter, "kind", "node_type", "memory_type", "type")
@@ -385,14 +366,7 @@ def parse_and_normalize(
         harness = str(explicit_harness)
         origin["scope.harness"] = "explicit"
     else:
-        harness_map = {
-            "claude.md": "claude",
-            "gemini.md": "gemini",
-            "copilot-instructions.md": "copilot",
-        }
-        # AGENTS.md is intentionally harness-agnostic: it is normative agent
-        # instruction knowledge but not tied to a single vendor/runtime.
-        harness = harness_map.get(filename_lower)
+        harness = adapter.harness
         origin["scope.harness"] = "inferred" if harness else "default"
     scope = ScopeMetadata(level, scope_path, harness)
 
