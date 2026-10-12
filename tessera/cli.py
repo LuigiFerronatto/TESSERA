@@ -11,6 +11,7 @@ Usage:
 
 import argparse
 from contextlib import redirect_stderr
+import json
 import os
 import sys
 import warnings
