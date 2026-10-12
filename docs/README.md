@@ -29,8 +29,10 @@ If you are making an architecture decision, also read the relevant Test Card and
 | [OVERVIEW.md](OVERVIEW.md) | What TESSERA is, why it exists, current vs planned architecture. |
 | [FEATURES.md](FEATURES.md) | Capabilities implemented on current Foundation. |
 | [CONCEPTS.md](CONCEPTS.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
+| [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) | Versioned current/experimental SVG diagrams and source mappings. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical current-main architecture and module/pipeline boundaries. |
 | [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
+| [LONG_TERM_MEMORY.md](LONG_TERM_MEMORY.md) | Proposed durable-memory boundary; current and target ownership are explicit, no runtime promotion. |
 | [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
 | [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
 | [test-cards/README.md](test-cards/README.md) | Plain-language stage records: what changed, how it works, evidence, limitations and next work. |
@@ -150,7 +152,7 @@ These documents can still be useful, but they are narrower and may contain termi
 | [CODE_EXPLANATION.md](CODE_EXPLANATION.md) | Code-oriented explanation. May lag module refactors; verify against current source. |
 | [PROCEDURAL_ANCHORS.md](PROCEDURAL_ANCHORS.md) | Historical/current detail on procedural-anchor concept and skills. Do not infer that it creates a fourth semantic drawer. |
 | [CHEATSHEET.md](CHEATSHEET.md) | Operational/reference cheat sheet; verify commands/contracts against current CLI. |
-| [QUMEM-GAP-ANALYSIS.md](QUMEM-GAP-ANALYSIS.md) | Research/design gap analysis that influenced TESSERA. Treat as decision history, not current feature list. |
+| [QUMEM-GAP-ANALYSIS.md](QUMEM-GAP-ANALYSIS.md) | Canonical source-to-implementation fidelity map with dated code baseline, validation owners and preserved historical lessons. |
 
 ---
 
@@ -165,7 +167,7 @@ The following files preserve useful project history, demos or earlier architectu
 | [REFERENCES.md](REFERENCES.md) | Older compact reference list; prefer `research/REFERENCES.md` for current research decision trace. |
 | `archive/` | Explicit older implementation/version material when present. |
 
-Historical docs should preserve useful decision history, but they must not define the current public product contract. Project-specific legacy narratives are tracked for cleanup separately.
+Historical docs should preserve useful decision history, but they must not define the current public product contract. Legacy examples are project-neutral. Exact prior identifiers and presentation artwork remain available through pinned Git-history links; historical claims never override current contracts.
 
 ---
 

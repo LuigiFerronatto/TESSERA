@@ -4,6 +4,12 @@
 
 TESSERA is an agent-agnostic, text-first memory and evidence layer. Markdown/source records remain authoritative; indexes, caches, semantic vectors, context packets and benchmark artifacts are derived and rebuildable. The deterministic core must remain useful without a mandatory generative model.
 
+> #157 candidate (2026-10-02): typed model profiles are being implemented in a
+> draft candidate selected by the repository owner. The earlier WIP deferral is
+> historical for this candidate. No model execution, pipeline activation or
+> dependent capability is delivered on `main`; dependency states remain pending
+> canonical merge. See [the candidate stage record](test-cards/157-typed-model-profiles.md).
+
 Plain-language stage records live under `docs/test-cards/`; their index is `docs/test-cards/README.md`. Governance Issue #109 established that reusable stage-record layer; those records explain before/after behavior and evidence but never override current code, canonical merge evidence, or the authoritative routing below.
 
 > #118 post-merge reconciliation (2026-09-09): PR #225 merged as `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`; canonical CI and Benchmark Ledger passed. #118 is `VALIDATED / KEEP`, historical Queue 4. #134 is blocked only by #87.
@@ -15,6 +21,10 @@ Plain-language stage records live under `docs/test-cards/`; their index is `docs
 > #69 post-merge reconciliation (2026-09-15): PR #264 merged as canonical merge commit `c815a684e4c8cbd426a0d717e243a7dfb0f04395` (final candidate head `ddc1ff3a4394c89c7732357fc66168d6d599a2ac`). CI on the exact candidate head passed for Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer audit recorded `KEEP`. #69 is `VALIDATED / KEEP`; #70 had its final blocker satisfied and moves to `READY`. #13 and #71 remain `BLOCKED` on #70.
 
 > #70 post-merge reconciliation (2026-09-15): PR #270 merged as canonical merge commit `8ca854f14f8f57443784e6cf3524419a953c2ce6` (final candidate head `e14ef92e2891d8429539ec4a47174c76ab241839`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting, and the required LongMemEval V1 dev-50 gate. Maintainer Audit recorded `KEEP` with no P0/P1 findings and the Merge Governor authorized the candidate. #70 is `VALIDATED / KEEP`; #13 and #71 had their final blocker satisfied and move to `READY`. Queue order selects #13 as the next implementation; #71 remains LATER / Queue 31.
+
+> #13 post-merge reconciliation (2026-09-15): PR #277 merged into `main` as canonical merge commit `20814a47ec0f72d7bea0639e0b057df1ecf5cded` (final candidate head `dbcf5e737c4bd365f38915ae9e70a527713e6aa5`). Exact-head CI passed Python 3.9/3.12 tests and distribution, smoke, sanity evaluation, offline benchmark reporting (`SMOKE_ONLY`, `longmemeval-v1-dev-50` correctly skipped), and TESSERA Maintainer Audit/Merge Governor succeeded. The Maintainer Audit recorded `KEEP` with no supported P0/P1 findings and the Merge Governor authorized the exact candidate head. #13 is `VALIDATED / KEEP`. #19 has its #13 prerequisite satisfied but remains intentionally `DEFERRED` at Queue 45; no other issue was blocked solely on #13.
+
+> #263 candidate (2026-10-02): opt-in durable single-write receipts and deterministic local repair are in progress in [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290) (`fix/durable-write-receipts`). #92/#12/#11 are canonical prerequisites. No delivery or dependent promotion is claimed before merge; see [stage record](test-cards/263-durable-write-receipts.md).
 
 ## Status contract
 
@@ -50,7 +60,7 @@ A card may be technically executable but intentionally `DEFERRED` to keep archit
 Current reconciliation-matrix counts:
 
 ```text
-NOW executable                 1
+NOW executable                 0
 READY                          9 total / 5 executable
 BLOCKED                        27 full cards + #16 full phase
 TRACKER                        5 non-executable epics
@@ -122,10 +132,13 @@ noise (see the buckets after the queue).
 🥉 #16  Conflict resolver containment           P0 VALIDATED (`KEEP`; `708c973e...`)
 4  #118 Clean-room onboarding                   VALIDATED (`KEEP`; `0ee5bbfe...`)
 5  #120 MCP transport/runtime                   VALIDATED (`KEEP`; `b4ead4d...`)
+12 #13  Corpus Doctor                            VALIDATED (`KEEP`; `20814a47...`)
 ```
 
-Active implementation: #13 Corpus Doctor is `IN_PROGRESS` in PR #277. It is
-the only current executable NOW card.
+#13 Corpus Doctor merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`;
+exact-head CI, smoke/sanity/distribution and Maintainer Audit/Merge Governor
+passed. The audit recorded `KEEP` with no supported P0/P1 findings, so the
+canonical delivery is `VALIDATED`.
 
 `#155` and `#135` retain their historical Queue #1 and Queue #2 positions as
 canonical validated deliveries. `#135` (decomposer fallback integrity) merged
@@ -143,11 +156,15 @@ candidate `b83c18494f9a2bc5687010ee27f077ac81688b6f` has the same tree: one deli
 with green canonical CI/Benchmark Ledger and decision `KEEP`. Its final candidate
 `09dff4d0fdeda0e761e3f9a4d6cb7d66a3b0f211` has the same tree: one runtime delivery.
 
-These rows preserve Queue #1–#5 delivery history; they are not active `NOW`
+These rows preserve Queue #1–#5 and Queue #12 delivery history; they are not active `NOW`
 work. The single open Project item for #16 now represents only the remaining
 full slice and is routed by the canonical manifest to `LATER` / Queue #24.
 
 ## NOW
+
+No executable card is currently selected in this reconciled board. #13 has
+completed historical Queue 12; its completion does not select a successor.
+The next implementation requires an explicit selection under the WIP contract.
 
 #87 LICENSE / CONTRIBUTING is VALIDATED / KEEP at historical Queue 6. The owner
 [confirmed MIT and the notice](https://github.com/LuigiFerronatto/TESSERA/issues/87#issuecomment-5607594368)
@@ -187,7 +204,7 @@ NEXT — Real memory system
 9  #12  Incremental/idempotent indexing        VALIDATED (`KEEP`; `971801cd...`)
 10 #69  Text ingestion beyond Markdown          VALIDATED (`KEEP`; `c815a684...`)
 11 #70  Structural segmentation               VALIDATED (`KEEP`; `8ca854f1...`)
-12 #13  Corpus/metadata doctor                 IN_PROGRESS (PR #277)
+12 #13  Corpus/metadata doctor                 VALIDATED (`KEEP`; `20814a47...`)
 13 #157 Typed model profiles
 14 #163 Local model lifecycle
 15 #160 Capability pipeline
@@ -228,6 +245,9 @@ THEN — Trust and context
 -> Minimum sufficient, trusted current state.
 
 THEN — Agent integration
+#258 Typed recipe composition: opt-in read-only experiment, proposed ITERATE;
+     no canonical write/candidate recipes or automatic adoption.
+     [Evidence and boundaries](test-cards/258-typed-recipes.md).
 38 #171 Agent-facing semantic API (search/context/evidence/remember/inspect)
 39 #196 Hooks Core (project/runtime-agnostic lifecycle hook contract)
 40 #177 Runtime adapters (Claude/Codex/Gemini/Copilot/...)
@@ -491,7 +511,7 @@ Status: multiple experimental families exist, but they are dependency-routed and
 
 #69 broader text ingestion (VALIDATED; PR #264, `c815a684...`)
  -> #70 structural segmentation (VALIDATED; PR #270, `8ca854f1...`)
-     -> #13 corpus doctor (IN_PROGRESS; PR #277)
+     -> #13 corpus doctor (VALIDATED; `KEEP`; PR #277, `20814a47...`)
      -> #71 harness adapter registry (READY / LATER)
 
 #19 admission and #21 utility remain later layers.
@@ -671,7 +691,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) | closed | `VALIDATED` | FOUNDATION | Storage | `KEEP`; [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`; incremental/idempotent indexing. |
 | [#69](https://github.com/LuigiFerronatto/TESSERA/issues/69) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`; body-only plain-text ingestion. |
 | [#70](https://github.com/LuigiFerronatto/TESSERA/issues/70) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`; deterministic structural segmentation with parent-only retrieval. |
-| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | open | `IN_PROGRESS` | EXECUTABLE | Sources | #12/#69/#70 dependencies satisfied; read-only Corpus Doctor candidate is PR #277 at Queue 12. |
+| [#13](https://github.com/LuigiFerronatto/TESSERA/issues/13) | closed | `VALIDATED` | FOUNDATION | Sources | `KEEP`; PR #277 merged canonically as `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; exact-head CI, Maintainer Audit, and Merge Governor passed. |
 | [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73) | open | `READY` | EXECUTABLE | Storage | #12 and #94 dependencies now satisfied; source/memory revision history. |
 | [#15](https://github.com/LuigiFerronatto/TESSERA/issues/15) | open | `BLOCKED` | EXECUTABLE | Temporal | Depends on #73/#96; temporal/state semantics. `temporal_position` from #137 is not validity time. |
 | [#19](https://github.com/LuigiFerronatto/TESSERA/issues/19) | open | `DEFERRED` | EXECUTABLE | Durable Memory | Evidence-aware admission: `worth remembering?` remains distinct from #92 `safe to persist?`. |
@@ -708,7 +728,7 @@ The first matching row for an Issue is the authoritative roadmap classification.
 | [#143](https://github.com/LuigiFerronatto/TESSERA/issues/143) | open | `BLOCKED` | BENCHMARK | QUMem | Personalized-memory/preference-evolution benchmark after #136/#137/#138/#140/#141/#142/#96. |
 | [#144](https://github.com/LuigiFerronatto/TESSERA/issues/144) | open | `BLOCKED` | EXECUTABLE | Agent Integration | Expose only validated assisted contracts across Python/CLI/MCP; coordinate #120/#171. |
 | [#145](https://github.com/LuigiFerronatto/TESSERA/issues/145) | open | `TRACKER` | TRACKER | QUMem | QUMem epic; no direct implementation PR. |
-| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `READY` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. |
+| [#146](https://github.com/LuigiFerronatto/TESSERA/issues/146) | open | `IMPLEMENTED` | DOCUMENTATION | Docs | QUMem paper-vs-runtime truth correction; `NOT_APPLICABLE`. PR #284 final candidate `b5381e93df68006b02a32bf410398f0cfc49dc4c`, canonical merge `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`; decision still pending, not `VALIDATED`. |
 | [#153](https://github.com/LuigiFerronatto/TESSERA/issues/153) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #173 final candidate `72b2b0c44ecbdc6e5f45ed612f4eb9bb69c57cd4`, runtime commit `53f772cdd0fae369a2ed3954751667d5e4ea52c4`, canonical squash merge `2508676d472088733702b6ed920fc829df9a7681`. Candidate and merge are one delivery. |
 | [#154](https://github.com/LuigiFerronatto/TESSERA/issues/154) | closed | `VALIDATED` | FOUNDATION | Productization | `KEEP`; PR #175 final candidate `06521763b4c3cf033c4d1e6a771ae105aad98e37`, canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`; safe source discovery and `.tessera-ignore` are canonical. |
 | [#155](https://github.com/LuigiFerronatto/TESSERA/issues/155) | closed | `VALIDATED` | EXECUTABLE | Productization | Init UX delivered by #210 (`4c112195f1572bf352d1cc6a1042c69711381da8`), lifecycle #212. `KEEP`; no active blocker remains. |
@@ -899,7 +919,9 @@ External work changes the next experiment; citation does not equal implementatio
 | QUMem | #145 / #135–#144 | Which construction/planning/state mechanisms improve TESSERA while preserving provenance/core independence? |
 | Personalized-memory benchmarks | #143 | Do additions improve preference evolution/current-state tasks, not only factual recall? |
 
-#146 owns broader QUMem paper-fidelity documentation truth.
+#146 owns broader QUMem paper-fidelity documentation truth. The candidate
+[paper-to-runtime map](QUMEM-GAP-ANALYSIS.md) distinguishes current heuristics
+from source-paper behavior; it promotes no child capability.
 
 ---
 
@@ -1040,6 +1062,40 @@ GRAPH / MEASUREMENT
 ```
 
 This map is routing, not permission to bypass each Issue/Test Card's Definition of Ready, benchmark applicability, evidence requirement or lifecycle contract.
+
+## Long-Term Memory boundary candidate
+
+[#168](https://github.com/LuigiFerronatto/TESSERA/issues/168) has a proposed
+[durable/ephemeral contract](LONG_TERM_MEMORY.md). It documents current primitives
+and reserves future admission, temporal, lineage and context responsibilities.
+The candidate changes no queue status and does not implement its child contracts.
+
+### #137 selected candidate, 2026-10-02
+
+The [source-episode lineage stage record](test-cards/137-source-episode-lineage.md)
+tracks [draft #297](https://github.com/LuigiFerronatto/TESSERA/pull/297), a separately reviewed candidate from canonical `20814a47ec0f72d7bea0639e0b057df1ecf5cded`.
+Structural source/turn retention is implemented and under validation. The
+existing canonical queue/status rows remain unchanged until merge and lifecycle
+reconciliation; #136/#138/#15 and dependent state/quality cards are not unlocked
+by an unmerged candidate. Supporting-turn semantic precision/recall and
+preference-state accuracy remain unmeasured.
+
+### #139 unmerged experimental candidate (2026-10-02)
+
+An opt-in N1/N2 information-needs contract and frozen controlled experiment are
+under review in [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); see [the stage record](test-cards/139-bounded-information-needs.md).
+This is candidate evidence, separate from the frozen canonical portfolio table
+above. N0 remains the default, full provider-backed semantic/quality evaluation
+is pending, and #140/#141 dependency completion is not claimed. The canonical
+portfolio and issue decision require lifecycle reconciliation after review/merge.
+
+## Candidate evolution — #196 Hook Core
+
+The isolated #196 SDK candidate proposes a normalized lifecycle schema, bounded
+ephemeral journal, provider capability profiles and an offline semantic-parity
+benchmark. It is `IN_PROGRESS`, not merged or KEEP. The [stage record](test-cards/196-neutral-hook-core.md)
+records unavailable downstream effects and expanded-comment gaps. No existing
+queue, dependency status or runtime installation is changed by this candidate.
 
 ### #191 source-only candidate progress
 

@@ -1,5 +1,8 @@
 import copy
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -7,7 +10,7 @@ import yaml
 
 from benchmarks.longmemeval_v1 import DATASET_SHA256, RETRIEVAL_CONTRACT_COMMIT
 from benchmarks.longmemeval_v1.prepare_dataset import verify_dataset
-from benchmarks.reporting.applicability import parse_applicability
+from benchmarks.reporting.applicability import benchmark_contract_check_name, parse_applicability
 from benchmarks.reporting.compare import (
     compare_query_artifacts,
     compare_records,
@@ -498,6 +501,68 @@ def test_ci_workflow_syntax_and_least_privilege():
     assert 'python-version: "3.12.14"' in text
     assert 'pip install -c "$CONSTRAINTS_PATH"' in text
     assert "--issue 100" not in text
+    for job_id in ('benchmark-reporting', 'longmemeval-dev-50'):
+        name = workflow['jobs'][job_id]['name']
+        assert "github.event.changes.body == null" in name
+        assert '(ignored edit)' in name
+
+
+def test_benchmark_contract_hash_tracks_only_validated_metadata():
+    body = 'Benchmark applicability: NOT_APPLICABLE\nBenchmark rationale: docs only'
+    name = benchmark_contract_check_name(body)
+    assert name.startswith('benchmark-contract (')
+    assert len(name.removeprefix('benchmark-contract (').removesuffix(')')) == 64
+    assert benchmark_contract_check_name('A new title\n' + body + '\nUnrelated prose') == name
+    assert benchmark_contract_check_name(body.replace('docs only', 'governance only')) != name
+    assert benchmark_contract_check_name(body + '\nBenchmark issue: #194') != name
+    assert benchmark_contract_check_name(body.replace('NOT_APPLICABLE', 'SMOKE_ONLY')) != name
+    with pytest.raises(ValueError):
+        benchmark_contract_check_name('Benchmark applicability: REQUIRED')
+
+
+def test_benchmark_cli_emits_safe_contract_check_output(tmp_path):
+    body = 'Benchmark applicability: REQUIRED\nBenchmark issue: #194\nBenchmark rationale: punctuation: $() and café'
+    output = tmp_path / 'outputs'
+    result = subprocess.run(
+        [sys.executable, '-m', 'benchmarks.reporting.applicability', '--body-env', 'PR_BODY', '--github-output', str(output)],
+        cwd=ROOT, env={**os.environ, 'PR_BODY': body}, text=True, capture_output=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert output.read_text().splitlines() == [
+        'applicability=REQUIRED', 'benchmark_issue=194',
+        'contract_check=' + benchmark_contract_check_name(body),
+    ]
+
+
+@pytest.mark.parametrize('level,reporting,dev50,valid,success', [
+    ('REQUIRED', 'success', 'success', True, True),
+    ('REQUIRED', 'success', 'skipped', True, False),
+    ('REQUIRED', 'success', 'failure', True, False),
+    ('REQUIRED', 'success', 'cancelled', True, False),
+    ('REQUIRED', 'success', 'pending', True, False),
+    ('NOT_APPLICABLE', 'success', 'skipped', True, True),
+    ('SMOKE_ONLY', 'success', 'skipped', True, True),
+    ('NOT_APPLICABLE', 'success', 'failure', True, False),
+    ('NOT_APPLICABLE', 'success', 'success', True, False),
+    ('NOT_APPLICABLE', 'failure', 'skipped', True, False),
+    ('NOT_APPLICABLE', 'cancelled', 'skipped', True, False),
+    ('NOT_APPLICABLE', 'skipped', 'skipped', True, False),
+    ('NOT_APPLICABLE', 'success', 'skipped', False, False),
+    ('INVALID', 'success', 'skipped', True, False),
+])
+def test_terminal_contract_check_requires_same_run_success(level, reporting, dev50, valid, success):
+    workflow = yaml.load((ROOT / '.github/workflows/benchmark.yml').read_text(), Loader=yaml.BaseLoader)
+    job = workflow['jobs']['benchmark-contract']
+    assert set(job['needs']) == {'benchmark-reporting', 'longmemeval-dev-50'}
+    assert "always()" in job['if']
+    assert "github.event_name == 'pull_request'" in job['if']
+    assert 'needs.benchmark-reporting.outputs.contract_check' in job['name']
+    env = {
+        **os.environ, 'REPORTING_RESULT': reporting, 'DEV50_RESULT': dev50,
+        'APPLICABILITY': level, 'CONTRACT_CHECK': 'benchmark-contract (' + 'a' * 64 + ')' if valid else '',
+    }
+    result = subprocess.run(['bash', '-c', job['steps'][0]['run']], env=env, capture_output=True, text=True)
+    assert (result.returncode == 0) is success, result.stderr
 
 
 def test_artifact_path_validation_rejects_escape_and_symlink(tmp_path):

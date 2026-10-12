@@ -1,5 +1,9 @@
 # #112 — Make the terminal logo say TESSERA
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/test-cards/112-tessera-ascii-banner.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 | Field | Value |
 |---|---|
 | Issue | [#112](https://github.com/LuigiFerronatto/TESSERA/issues/112) |
@@ -59,7 +63,7 @@ The active terminal identity is now internally consistent and guarded by exact r
 
 ## What remains unimplemented?
 
-This card does not remove other LAO/Blip runtime coupling tracked by #95, redesign SVG assets, rewrite archives or change any retrieval behavior.
+This card does not remove other external-project runtime coupling tracked by #95, redesign SVG assets, rewrite archives or change any retrieval behavior.
 
 ## What is unlocked next?
 

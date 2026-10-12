@@ -1,0 +1,782 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-02",
+  "fixture_kind": "synthetic_documented_fields_not_captured_sessions",
+  "sources": {
+    "claude": "https://code.claude.com/docs/en/hooks",
+    "codex": "https://developers.openai.com/codex/hooks",
+    "gemini": "https://geminicli.com/docs/hooks/reference/",
+    "copilot": "https://docs.github.com/en/copilot/reference/hooks-reference"
+  },
+  "cases": [
+    {
+      "runtime": "claude",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "startup"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "resume"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "compact"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "UserPromptSubmit",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "UserPromptSubmit",
+        "prompt_id": "turn-1",
+        "prompt": "Find the documented release procedure."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "PreToolUse",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PreToolUse",
+        "prompt_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1"
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "claude",
+      "event": "PostToolUse",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostToolUse",
+        "prompt_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1",
+        "tool_response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Run the release checks first."
+            }
+          ],
+          "isError": false
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "claude",
+      "event": "PostToolUseFailure",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostToolUseFailure",
+        "prompt_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1",
+        "error": "The requested record is missing."
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "claude",
+      "event": "SubagentStart",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SubagentStart",
+        "prompt_id": "turn-1",
+        "agent_id": "child-1",
+        "agent_type": "Explore"
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child"
+      }
+    },
+    {
+      "runtime": "claude",
+      "event": "SubagentStop",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SubagentStop",
+        "prompt_id": "turn-1",
+        "agent_id": "child-1",
+        "agent_type": "Explore",
+        "agent_transcript_path": "/fixture/child.jsonl",
+        "stop_hook_active": false,
+        "last_assistant_message": "Run the release checks first."
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child",
+        "evidence_origin_id": "origin-child-result"
+      }
+    },
+    {
+      "runtime": "claude",
+      "event": "PreCompact",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PreCompact",
+        "prompt_id": "turn-1",
+        "trigger": "auto",
+        "custom_instructions": null
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "PostCompact",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostCompact",
+        "prompt_id": "turn-1",
+        "trigger": "auto",
+        "compact_summary": "This summary is derived."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "Stop",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "Stop",
+        "prompt_id": "turn-1",
+        "stop_hook_active": false,
+        "last_assistant_message": "I learned that release checks must run first."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "StopFailure",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "StopFailure",
+        "prompt_id": "turn-1",
+        "error": "api_error",
+        "error_details": "not retained"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "claude",
+      "event": "SessionEnd",
+      "payload": {
+        "session_id": "claude-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionEnd",
+        "reason": "other"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "startup"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "resume"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "source": "compact"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "UserPromptSubmit",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "UserPromptSubmit",
+        "turn_id": "turn-1",
+        "prompt": "Find the documented release procedure."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "PreToolUse",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PreToolUse",
+        "turn_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1"
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "codex",
+      "event": "PostToolUse",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostToolUse",
+        "turn_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1",
+        "tool_response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Run the release checks first."
+            }
+          ],
+          "isError": false
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "codex",
+      "event": "PostToolUse",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostToolUse",
+        "turn_id": "turn-1",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_use_id": "call-1",
+        "tool_response": {
+          "content": [
+            {
+              "type": "text",
+              "text": "The requested record is missing."
+            }
+          ],
+          "isError": true
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "codex",
+      "event": "SubagentStart",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SubagentStart",
+        "turn_id": "turn-1",
+        "agent_id": "child-1",
+        "agent_type": "Explore"
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child"
+      }
+    },
+    {
+      "runtime": "codex",
+      "event": "SubagentStop",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SubagentStop",
+        "turn_id": "turn-1",
+        "agent_id": "child-1",
+        "agent_type": "Explore",
+        "agent_transcript_path": "/fixture/child.jsonl",
+        "stop_hook_active": false,
+        "last_assistant_message": "Run the release checks first."
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child",
+        "evidence_origin_id": "origin-child-result"
+      }
+    },
+    {
+      "runtime": "codex",
+      "event": "PreCompact",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PreCompact",
+        "turn_id": "turn-1",
+        "trigger": "auto",
+        "custom_instructions": null
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "PostCompact",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PostCompact",
+        "turn_id": "turn-1",
+        "trigger": "auto"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "Stop",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "Stop",
+        "turn_id": "turn-1",
+        "stop_hook_active": false,
+        "last_assistant_message": "I learned that release checks must run first."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "Interrupt",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "Interrupt",
+        "turn_id": "turn-1",
+        "permission_mode": "default"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "codex",
+      "event": "SessionEnd",
+      "payload": {
+        "session_id": "codex-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionEnd",
+        "reason": "other"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "source": "startup"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "SessionStart",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionStart",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "source": "resume"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "BeforeAgent",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "BeforeAgent",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "prompt": "Find the documented release procedure."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "BeforeTool",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "BeforeTool",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "gemini",
+      "event": "AfterTool",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "AfterTool",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_response": {
+          "llmContent": "Run the release checks first.",
+          "returnDisplay": "ok"
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "gemini",
+      "event": "AfterTool",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "AfterTool",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "tool_name": "mcp__docs__lookup",
+        "tool_input": {
+          "query": "release procedure"
+        },
+        "tool_response": {
+          "llmContent": "The requested record is missing.",
+          "returnDisplay": "missing",
+          "error": {
+            "message": "missing"
+          }
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "gemini",
+      "event": "PreCompress",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "PreCompress",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "trigger": "auto",
+        "custom_instructions": null
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "AfterAgent",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "AfterAgent",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "stop_hook_active": false,
+        "prompt": "Find the documented release procedure.",
+        "prompt_response": "I learned that release checks must run first."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "gemini",
+      "event": "SessionEnd",
+      "payload": {
+        "session_id": "gemini-session",
+        "transcript_path": "/fixture/transcript.jsonl",
+        "cwd": "/fixture/project",
+        "hook_event_name": "SessionEnd",
+        "timestamp": "2026-10-02T00:00:00Z",
+        "reason": "other"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "sessionStart",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "source": "startup"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "sessionStart",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "source": "resume"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "userPromptSubmitted",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "prompt": "Find the documented release procedure."
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "preToolUse",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "toolName": "mcp__docs__lookup",
+        "toolArgs": {
+          "query": "release procedure"
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "copilot",
+      "event": "postToolUse",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "toolName": "mcp__docs__lookup",
+        "toolArgs": {
+          "query": "release procedure"
+        },
+        "toolResult": {
+          "resultType": "success",
+          "textResultForLlm": "Run the release checks first."
+        }
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "copilot",
+      "event": "postToolUseFailure",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "toolName": "mcp__docs__lookup",
+        "toolArgs": {
+          "query": "release procedure"
+        },
+        "error": "The requested record is missing."
+      },
+      "invocation": {
+        "tool_call_id": "call-1"
+      }
+    },
+    {
+      "runtime": "copilot",
+      "event": "subagentStart",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "agentName": "explore",
+        "transcriptPath": "/fixture/child.jsonl"
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child"
+      }
+    },
+    {
+      "runtime": "copilot",
+      "event": "subagentStop",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "agentName": "explore",
+        "transcriptPath": "/fixture/child.jsonl",
+        "agentId": "child-1",
+        "agentType": "explore",
+        "response": "Run the release checks first.",
+        "stopReason": "end_turn"
+      },
+      "invocation": {
+        "subagent_id": "child-1",
+        "child_run_id": "run-child",
+        "evidence_origin_id": "origin-child-result"
+      }
+    },
+    {
+      "runtime": "copilot",
+      "event": "preCompact",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "trigger": "auto",
+        "custom_instructions": null
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "agentStop",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "stop_hook_active": false,
+        "transcriptPath": "/fixture/transcript.jsonl",
+        "stopReason": "end_turn"
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "errorOccurred",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "error": {
+          "message": "not retained",
+          "name": "FixtureError"
+        },
+        "errorContext": "system",
+        "recoverable": true
+      },
+      "invocation": {}
+    },
+    {
+      "runtime": "copilot",
+      "event": "sessionEnd",
+      "payload": {
+        "sessionId": "copilot-session",
+        "timestamp": 1790899200000,
+        "cwd": "/fixture/project",
+        "reason": "complete"
+      },
+      "invocation": {}
+    }
+  ]
+}

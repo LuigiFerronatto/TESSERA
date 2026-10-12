@@ -225,6 +225,27 @@ which exact source version?
 which canonical source span?
 ```
 
+### Physical source paths and freshness
+
+`source.path` is relative to `ResolvedConfiguration.source_identity_root`
+(or `engine.source_identity_root`). A configured project corpus uses one
+project-root namespace for documents and generated memories, so `docs/guide.md`
+and `memories/docs/guide.md` are distinct sources. Legacy and store-only corpora
+retain their store-relative paths. Logical memory IDs and explicit relation
+targets remain independent of these physical keys.
+
+For freshness checks on a project corpus, pass its resolved configuration to
+`verify_evidence_freshness(record, configuration)`. A directory string remains
+supported and is treated as the explicit source-path base. Use
+`configuration.source_identity_root` when passing a string; do not assume every
+project source path is relative to the generated-memory store.
+
+Derived graph cache schema 3 invalidates older snapshots and reparses sources.
+Manifest identities are retained when their physical source can be recovered
+unambiguously. Previously conflated source identities are separated; an
+ambiguous legacy entry is not treated as proof that two sources are identical.
+Source files are never rewritten during this repair.
+
 ## `evidence`
 
 Query-specific record created only when `relevant_evidence` exists:
@@ -299,6 +320,9 @@ See #14, #25 and #26. Those future fields must not be documented as current runt
 ---
 
 # Human CLI vs machine-facing semantics
+
+Presentation flags, errors, empty results and terminal behavior are specified in
+[CLI output contract v1](CLI_OUTPUT.md). Query JSON remains this complete hit array.
 
 The human CLI is a presentation surface. Rich/plain rendering may choose labels, panels and formatting.
 
@@ -375,3 +399,65 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
+
+## Optional historical evidence lookup (#73 candidate)
+
+`revision_history=True` on the Python Engine preserves issued evidence IDs and
+full observed source revisions outside derived indexes. Current retrieval result
+fields and ranking are unchanged; historical versions are not live memories.
+`engine.revision_history.resolve_evidence(evidence_id)` separately returns the
+archived evidence record, source text and known span, or `None` for an unknown
+ID. `status: archived` denotes availability only, never freshness or temporal
+validity. See the [complete contract](REVISION_HISTORY.md).
+
+## Automatic-memory source lineage (#137)
+
+Automatically decomposed memories additionally expose `lineage`: the original
+source episode, ordered supporting positions, the last supporting position,
+version-aware source/turn evidence and a freshly verified linkage status.
+This is distinct from `provenance`/`evidence`, which still describe the atomic
+note itself. It does not alter relevance scores or imply validity/entailment.
+Legacy manual notes omit this field; section-only automatic inputs report
+`episode_only_no_source_turns` rather than inventing IDs. See the complete
+[episode lineage contract](EPISODE_LINEAGE.md) for fields and failure semantics.
+
+## Experimental graph expansion (#25)
+
+Python callers can opt into an A0/A1/A2 experiment without changing the shared
+result shape or the current CLI/MCP defaults:
+
+```python
+from tessera import GraphExpansionPolicy
+
+trace = {}
+hits = engine.retrieve_context_contract(
+    "What is the current runtime strategy?",
+    graph_expansion=GraphExpansionPolicy(mode="query_aware"),
+    expansion_debug=trace,
+)
+```
+
+Omitting `graph_expansion` preserves current indiscriminate one-hop behavior.
+`none` disables expansion but retains seed-induced graph ranking; `one_hop`
+explicitly selects the baseline. A2 `query_aware` defaults to max_hops=1,
+max_expansions=5, max_edges=128, token_budget=1500, min_edge_score=0.45.
+Invalid policies fail before retrieval. These budgets constrain added nodes
+and whitespace-token estimates, not seed evidence or the total returned context.
+
+`expansion_debug` is an optional caller-owned dict, reset for every call,
+including empty results. It records policy, seed IDs, source/target direction,
+relation utility (not confidence), score, token estimate, decision/rejection
+reason, selected IDs, actual expansion visits, truncation, added context and
+selected-subgraph size. It is separate from hit serialization and is not saved
+to source files or caches. Rebuild/load the Engine index after source changes;
+mutating the internal NetworkX graph directly bypasses derived-index contracts.
+See the [frozen ablation](../benchmarks/graph_expansion/README.md) and
+[open stage record](test-cards/25-budgeted-graph-expansion.md) for limits/results.
+
+## Optional assisted information needs
+
+Opt-in N1/N2 orchestrator results add `information_needs` with validated bounded
+needs, status, reason and call measurements. This is derived assisted analysis,
+not a field on deterministic retrieval hits. N0 serialization remains unchanged.
+See [the experimental contract](INFORMATION_NEEDS.md); no semantic deduplication
+or downstream quality improvement has been established by the offline fixtures.

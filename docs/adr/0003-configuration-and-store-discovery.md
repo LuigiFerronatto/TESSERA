@@ -1,13 +1,21 @@
 # ADR 0003: Configuration and store discovery
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/adr/0003-configuration-and-store-discovery.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 - Status: Accepted for the Issue #117 implementation candidate
 - Date: 2026-08-31
 - Issue: [#117](https://github.com/LuigiFerronatto/TESSERA/issues/117)
 
+> Historical compatibility note: the legacy alias in this accepted-candidate
+> record was removed in a later release. Use `TESSERA_STORAGE_DIR` and the current
+> configuration documentation; this cleanup does not restore that alias.
+
 ## Context
 
 TESSERA's validated runtime accepted an explicit storage path, then
-`TESSERA_STORAGE_DIR`, then deprecated `LAO_MEM_DIR`, and finally
+`TESSERA_STORAGE_DIR`, then deprecated `<legacy storage variable>`, and finally
 `./memories`. That contract made a chosen store consistent across current
 surfaces (#93), but did not let an installed product persist or explain how a
 project or named user store was chosen.
@@ -62,7 +70,7 @@ precedence is:
 
 1. explicit path (`--store`, positional compatibility, or API argument);
 2. `TESSERA_STORAGE_DIR`;
-3. deprecated warning-emitting `LAO_MEM_DIR`;
+3. deprecated warning-emitting `<legacy storage variable>`;
 4. nearest project config;
 5. an explicitly named global entry;
 6. actionable configuration failure.
@@ -94,7 +102,7 @@ authoritative configuration bootstrap.
 ## Migration policy
 
 Explicit storage arguments and `TESSERA_STORAGE_DIR` remain supported.
-`LAO_MEM_DIR` remains a lower-priority compatibility alias with its actionable
+`<legacy storage variable>` remains a lower-priority compatibility alias with its actionable
 deprecation warning. Direct library `resolve_storage_dir()` and the pre-#120
 MCP bootstrap retain historical `./memories` fallback for compatibility.
 Configuration-aware operational CLI commands do not silently create a store

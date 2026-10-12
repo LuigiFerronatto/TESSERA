@@ -1,5 +1,9 @@
 # 12 — Indexing only reparses what actually changed
 
+This record describes the canonical delivery at the audit date below. Its
+downstream routing is historical; use [ROADMAP.md](../ROADMAP.md) for current
+readiness and selected work.
+
 | Field | Value |
 |---|---|
 | Issue | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) |
@@ -123,7 +127,7 @@ tessera index                      # removed=1, node/edges/corpus entries for b.
 | Issue/Test Card | [#12](https://github.com/LuigiFerronatto/TESSERA/issues/12) |
 | Pull request | [#246](https://github.com/LuigiFerronatto/TESSERA/pull/246) |
 | Merge commit | [`971801cd89b6ce7b890df9ceb43b6afff9fa0964`](https://github.com/LuigiFerronatto/TESSERA/commit/971801cd89b6ce7b890df9ceb43b6afff9fa0964) |
-| Evidence/Learnings/Decision | Maintainer audit `KEEP` on final candidate head `def1c43c` (PR #246 review thread) |
+| Evidence/Learnings/Decision | [Maintainer audit](https://github.com/LuigiFerronatto/TESSERA/pull/246#issuecomment-5635092374) `KEEP` on final candidate head `def1c43c` (PR #246 review thread) |
 | Benchmark record | `SMOKE_ONLY`; `longmemeval-v1-dev-50` skipped |
 | PR Evolution Audit | Not a separate file by maintainer decision; scope ratification recorded in [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246) body and `CHANGELOG.md`. |
 
