@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#259](https://github.com/LuigiFerronatto/TESSERA/issues/259) |
-| Record status | `IN_PROGRESS` mechanics; `BLOCKED` full session integration |
+| Record status | `IMPLEMENTED` mechanics (merged; not yet `VALIDATED` pending canonical-merge CI/benchmark evidence); `BLOCKED` full session integration |
 | Capability type | Experimental Python runtime mechanics |
-| Pull request | [Draft PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) |
-| Head commit | [Runtime candidate `381b9edd`](https://github.com/LuigiFerronatto/TESSERA/commit/381b9edd8cda7725542642fe08f76f936ba38809); current documentation head is on PR #319 |
-| Merge commit | Not merged |
-| Decision | `PENDING`; proposed `ITERATE` for mechanics only |
+| Pull request | [PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) (merged 2026-10-12) |
+| Head commit | [Runtime candidate `381b9edd`](https://github.com/LuigiFerronatto/TESSERA/commit/381b9edd8cda7725542642fe08f76f936ba38809); final candidate head [`cc723c90`](https://github.com/LuigiFerronatto/TESSERA/commit/cc723c90b6912a1244e46ab1abd0a3041a2382f6) |
+| Merge commit | [`c6b37f367b8f4121ed3290a425690fa4c36fbe72`](https://github.com/LuigiFerronatto/TESSERA/commit/c6b37f367b8f4121ed3290a425690fa4c36fbe72) |
+| Decision | `PENDING`; proposed `ITERATE` for mechanics only (maintainer to confirm) |
 | Benchmark applicability | `SMOKE_ONLY` — no retrieval/ranking/admission behavior changes |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -106,8 +106,8 @@ review; no dependent product capability is declared unlocked by an unmerged PR.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#259](https://github.com/LuigiFerronatto/TESSERA/issues/259) |
-| Pull request | [Draft PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) |
-| Merge commit | Not merged |
+| Pull request | [PR #319](https://github.com/LuigiFerronatto/TESSERA/pull/319) |
+| Merge commit | [`c6b37f367b8f4121ed3290a425690fa4c36fbe72`](https://github.com/LuigiFerronatto/TESSERA/commit/c6b37f367b8f4121ed3290a425690fa4c36fbe72) |
 | Evidence/Learnings/Decision | Tests and smoke above; `PENDING` / proposed `ITERATE` |
 | Benchmark record | `benchmarks/operational/ledger_smoke.py` (synthetic, SMOKE_ONLY) |
 | PR Evolution Audit | #120 [PR #229](https://github.com/LuigiFerronatto/TESSERA/pull/229), canonical `b4ead4d7407b8caa2571e1e366616a468f2ef74f`; this candidate imports none of the unmerged lifecycle proposals |
