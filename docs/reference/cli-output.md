@@ -89,6 +89,15 @@ on other commands. `init --dry-run` remains zero-mutation; `quickstart` remains 
 plan unless `--apply` is supplied. Unsupported `--dry-run` uses fail before running
 a command instead of pretending the command is non-mutating.
 
+When quickstart discovers a project configuration, it reports the resolved store,
+source roots/include patterns, and index path. Its MCP block selects the project
+with `args: ["--project", "<root>"]` instead of overriding storage through the
+environment. `--apply` indexes the same configured sources and derived index.
+Explicit `--storage-dir` and `TESSERA_STORAGE_DIR` retain resolver precedence;
+without project configuration, the existing storage-only plan is unchanged.
+Invalid project configuration is reported instead of silently suggesting another
+store. JSON adds `config_path`, `sources` and `index_dir` for project-config plans.
+
 JSON never prompts. `update --json` requires `--check`; installation still requires
 explicit interactive confirmation. Ctrl+C/EOF during init prompts retain #155's
 pre-apply cancellation result. Interruption after apply has begun reports that
