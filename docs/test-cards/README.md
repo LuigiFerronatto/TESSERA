@@ -38,6 +38,7 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
+| #265 Vector backend mechanics | `IN_PROGRESS` | [265-vector-backend-mechanics.md](265-vector-backend-mechanics.md) | [Issue #265](https://github.com/LuigiFerronatto/TESSERA/issues/265), [audit](../PR_EVOLUTION_265.md), opt-in draft; real semantic/ANN gates remain open |
 | #263 Durable single-write receipts | `IN_PROGRESS` | [263-durable-write-receipts.md](263-durable-write-receipts.md) | [Issue #263](https://github.com/LuigiFerronatto/TESSERA/issues/263), [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290); opt-in candidate, not merged |
 | #194 CI review policy | `IN_PROGRESS` | [194-deterministic-ci-review.md](194-deterministic-ci-review.md) | Owner-requested retirement of automatic AI CI review and mandatory positive approval; active review blocks retained; exact-head CI and branch-protection migration pending |
 | #87 License and contribution entrypoints | `IN_PROGRESS` | [87-license-contribution.md](87-license-contribution.md) | [Issue #87](https://github.com/LuigiFerronatto/TESSERA/issues/87), [PR Evolution Audit](../PR_EVOLUTION_87.md), Queue 6; owner confirmation and merge pending |
