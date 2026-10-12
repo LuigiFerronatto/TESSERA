@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#265](https://github.com/LuigiFerronatto/TESSERA/issues/265) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; not yet lifecycle-validated, issue stays open) |
 | Capability type | `runtime` and `benchmark` |
-| Pull request | [Draft #293](https://github.com/LuigiFerronatto/TESSERA/pull/293) |
-| Head commit | Exact candidate and CI are recorded on the draft PR |
-| Merge commit | Not merged |
+| Pull request | [#293](https://github.com/LuigiFerronatto/TESSERA/pull/293), merged 2026-10-12 |
+| Head commit | Final candidate `f0457c653c4b7cca6109d059447db1788b00d6b3` |
+| Merge commit | `55f6bd983d8ff35621a93a35fa2d18e1c66d4666` |
 | Decision | `ITERATE` |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
@@ -120,8 +120,8 @@ silently incorporated. #153/#12 are already satisfied by canonical main.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#265](https://github.com/LuigiFerronatto/TESSERA/issues/265) |
-| Pull request | [Draft #293](https://github.com/LuigiFerronatto/TESSERA/pull/293) |
-| Merge commit | None |
+| Pull request | [#293](https://github.com/LuigiFerronatto/TESSERA/pull/293), merged 2026-10-12 |
+| Merge commit | `55f6bd983d8ff35621a93a35fa2d18e1c66d4666` (canonical implementation merge) |
 | Evidence/Learnings/Decision | [Contract](../VECTOR_BACKENDS.md), `ITERATE` |
 | Benchmark record | [Synthetic mechanics](../evidence/265-vectors/synthetic-mechanics.json) |
 | PR Evolution Audit | [Narrow audit](../PR_EVOLUTION_265.md) |
