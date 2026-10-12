@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Issue | [#204](https://github.com/LuigiFerronatto/TESSERA/issues/204) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (experimental; not VALIDATED) |
 | Capability type | experimental exchange adapter and synthetic evaluation |
-| Pull request | Draft candidate; linked from issue #204 |
-| Merge commit | Not merged |
+| Pull request | [#310](https://github.com/LuigiFerronatto/TESSERA/pull/310), merged 2026-10-12; final candidate head `1567927847b152b1ca34b9cee50a80f3cc7ec31f` |
+| Merge commit | `9e78c50` (canonical implementation merge on `main`) |
 | Decision | `ITERATE` |
 | Benchmark applicability | `SMOKE_ONLY` plus ROUND_TRIP |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -85,5 +85,5 @@ limits, preserved fields and remaining acceptance evidence.
 
 Baseline main: 20814a47ec0f72d7bea0639e0b057df1ecf5cded. This is an isolated
 new candidate, not a replacement for native ingestion or a claim of merged
-capability. After any eventual authorized merge, record the canonical commit,
-re-run gates and reconcile issue/roadmap status before promotion.
+capability at that time. PR #310 was later merged as `9e78c50`; the record is now
+IMPLEMENTED only. Canonical-merge CI/benchmark evidence and review gates remain required before promotion.
