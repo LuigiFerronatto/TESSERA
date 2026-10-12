@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#136](https://github.com/LuigiFerronatto/TESSERA/issues/136) |
-| Record status | `IN_PROGRESS` candidate mechanics / `BLOCKED` empirical decision |
+| Record status | `IMPLEMENTED` candidate mechanics (merged, not lifecycle-validated) / `BLOCKED` empirical decision |
 | Capability type | Experimental runtime and benchmark preparation |
-| Pull request | Dedicated draft candidate; not merged |
+| Pull request | [#313](https://github.com/LuigiFerronatto/TESSERA/pull/313), merged 2026-10-12 (final candidate head `62c79b85af08d42702291dd8edc7265287dc1ca4`) |
 | Base commit | `20814a47ec0f72d7bea0639e0b057df1ecf5cded` |
-| Merge commit | Not merged |
+| Merge commit | `59f46ee843b54a94bf35b60464a08e11f7f3518e` (canonical implementation merge) |
 | Decision | `PENDING`; no default adoption |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
@@ -101,4 +101,4 @@ marked ready or complete; no issue is closed by this candidate.
 
 Existing baseline → explicit candidate mechanics and draft packet → human label
 review → authorized provider runs and output adjudication → empirical decision.
-No merge, canonical delivery or changed default is asserted by this record.
+PR #313 merged the opt-in mechanics and draft packet into `main`. The issue stays open: no reviewed labels, provider comparison or default decision exist, and no changed default is asserted.
