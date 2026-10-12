@@ -1,0 +1,29 @@
+{
+  "benchmark_issue": 137,
+  "checkout_revision": "20814a47ec0f72d7bea0639e0b057df1ecf5cded",
+  "extraction_input": "frozen_test_double_candidates_not_model_predictions",
+  "fixture_kind": "frozen_synthetic_structural_contract_not_reviewed_semantic_labels",
+  "fixture_sha256": "ad0b2d601474919c153c972749bb807dd17979751548ad19094e9d8d2645a6a8",
+  "metrics": {
+    "atomic_memory_storage_bytes": 10779,
+    "decomposition_prompt_utf8_bytes": 4493,
+    "lineage_write_index_rebuild_result_parity": 1.0,
+    "memory_count": 5,
+    "post_persistence_lineage_loss_rate": 0.0,
+    "provable_support_span_completeness": 1.0,
+    "source_episode_linkage_completeness": 1.0,
+    "source_storage_bytes": 2413,
+    "support_reference_retention": 1.0,
+    "total_storage_bytes": 13192
+  },
+  "provider_calls": 0,
+  "quality_metrics": {
+    "downstream_preference_trajectory_accuracy": null,
+    "status": "not_measured_requires_reviewed_labels_and_real_extraction",
+    "supporting_turn_precision": null,
+    "supporting_turn_recall": null
+  },
+  "runtime_python_sha256": "476c4fe18f09b2534300d00516d792c39014c42e1aebf8ff431ee8e380858961",
+  "schema_version": 1,
+  "turn_aware_api": true
+}

@@ -1,5 +1,10 @@
 # Guia Técnico de Explicação de Código: Tessera
 
+> Historical narrative with project-neutral examples. Current contracts take
+> precedence through [the documentation map](README.md). Scientific-fidelity
+> claims follow [the dated source/runtime audit](QUMEM-GAP-ANALYSIS.md), not
+> anecdotal demonstrations or older implementation descriptions.
+
 > Nota (reorganização): este guia foi originalmente escrito sobre o arquivo
 > monolítico `memory_graph_retrieval_v2.py`. O código de produção atual vive
 > no pacote instalável `tessera/`, dividido em módulos (`models.py`,
@@ -12,7 +17,7 @@ Este documento apresenta o racional científico e uma explicação detalhada
 linha a linha do código-fonte do Tessera (Temporal Evolving State Synthesis with Explicit Relations and Atomic Memories).
 
 Este motor foi arquitetado para servir como o sistema de persistência
-inteligente de memórias de produção do LAO (Lab Autonomous Officer),
+inteligente de memórias de produção do example research agent,
 garantindo a execução de tarefas complexas sem o risco de timeouts,
 desalinhamento temporal ou vulnerabilidades de segurança por injeção de dados.
 
@@ -27,7 +32,7 @@ Write-Side Gating (State Contamination) Envenenamento de estado de agente via "l
 Temporal Alignment & Trajectory (FinPerMA) Rigidez em perfis consolidados que falham em capturar mudanças de escolhas do usuário ao longo do tempo [13]. Resolução ativa de conflitos baseada em cronologia fina e identificação de chaves temáticas para priorizar as escolhas vigentes [3, 10, 13]. tessera.conflict.ConflictResolver.resolve_temporal_conflicts
 ## 📁 Estrutura Lógica de Fluxo de Dados
 [Ingestão / Gravação]
- Conteúdo Bruto do LAO ──► WriteGatingEngine (Auditoria & Sanitização) ──► Geração do Frontmatter YAML ──► Gravação Física em .md
+ Conteúdo Bruto do ExampleAgent ──► WriteGatingEngine (Auditoria & Sanitização) ──► Geração do Frontmatter YAML ──► Gravação Física em .md
 
 [Recuperação / Retrieval]
  Consulta de IA ──► Busca Semântica (TF-IDF) ──► Seleção de Nós Semente ──► Expansão 1-Hop (Subgrafo)
@@ -36,7 +41,7 @@ Temporal Alignment & Trajectory (FinPerMA) Rigidez em perfis consolidados que fa
                    Cálculo do PageRank Dinâmico (DW-PR) com Boost Procedural ──► Ordenação de Memórias
                          │
                          ▼
-                   ConflictResolver (Filtro Cronológico e de Preferências Mutáveis) ──► Retorno do Contexto Limpo ao LAO
+                   ConflictResolver (Filtro Cronológico e de Preferências Mutáveis) ──► Retorno do Contexto Limpo ao ExampleAgent
 ## 🔍 Detalhamento das Classes e Métodos
 
 ### 1. Modelo de Domínio e Metadados (`tessera/models.py`)
@@ -73,13 +78,13 @@ retrieve_context(): Executa o fluxo de busca adaptativo inspirado no MemORAI [6]
 Busca Semântica Primal: Calcula a similaridade cosseno TF-IDF entre a consulta ativa e a representação textual de todos os nós para eleger os nós sementes.
 Filtro do Subgrafo Local: Executa uma expansão de vizinhança direta de 1 salto (sucessores e predecessores) a partir dos nós sementes, isolando um subgrafo focado e descartando nós ruidosos do restante do sistema de arquivos [6].
 Ponderação DW-PR: O peso de propagação das arestas é calculado de forma flutuante baseando-se na similaridade de cosseno com a intenção de consulta. Além disso, conexões com arestas procedimentais (como "stabilizes_service") recebem um multiplicador de boost de força (1.35) para priorizar diretrizes operacionais estáveis e robustas no ambiente [1, 2].
-PageRank Personalizado: Computa a distribuição estacionária do PageRank com personalização focada nos pesos das similaridades dos nós semente, resultando nos melhores caminhos lógicos para o LAO.
-## 🚀 Como Integrar o Tessera no Pipeline do LAO (Exemplo Conceitual)
-Em produção no repositório do LAO, o motor do Tessera funciona associado a um pipeline de agentes que interagem para executar e monitorar tarefas. Abaixo está um exemplo prático de como conectar o indexador de memórias a um loop de agente em Python:
+PageRank Personalizado: Computa a distribuição estacionária do PageRank com personalização focada nos pesos das similaridades dos nós semente, resultando nos melhores caminhos lógicos para o ExampleAgent.
+## 🚀 Como Integrar o Tessera no Pipeline do ExampleAgent (Exemplo Conceitual)
+Em produção no repositório do ExampleAgent, o motor do Tessera funciona associado a um pipeline de agentes que interagem para executar e monitorar tarefas. Abaixo está um exemplo prático de como conectar o indexador de memórias a um loop de agente em Python:
 
 from tessera import TesseraEngine, Entity, Connection
 
-class LAOAgent:
+class ExampleAgent:
     def __init__(self, workspace_path: str):
         # Inicializa o motor de memória apontando para a pasta física de Markdown
         self.memory_engine = TesseraEngine(storage_dir=f"{workspace_path}/memories")
@@ -98,7 +103,7 @@ class LAOAgent:
         for mem in retrieved_context:
             prompt_addition += f"[{mem['type'].upper()} - ID: {mem['id']}]\n{mem['body']}\n\n"
 
-        print("⚡ Injetando o seguinte contexto de longo prazo alinhado ao LAO:")
+        print("⚡ Injetando o seguinte contexto de longo prazo alinhado ao ExampleAgent:")
         print(prompt_addition)
 
         # [A IA Executa a tarefa aqui usando as ferramentas e âncoras procedimentais...]

@@ -36,9 +36,17 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 
 ## Current records
 
+[#25: Budgeted graph expansion](25-budgeted-graph-expansion.md) is an open
+experiment with proposed `ITERATE`; it does not change the current default.
+
 | Stage | Status | Plain-language record | Technical evidence |
 |---|---|---|---|
 | #204 OKF exchange experiment | `IN_PROGRESS` | [204-okf-exchange.md](204-okf-exchange.md) | [Issue #204](https://github.com/LuigiFerronatto/TESSERA/issues/204), `ITERATE`, synthetic evidence only |
+| #191 Conversation source import | `IN_PROGRESS` source-only candidate | [191-conversation-source-import.md](191-conversation-source-import.md) | [Issue #191](https://github.com/LuigiFerronatto/TESSERA/issues/191); expanded runtime/enrichment scope remains open |
+| #139 Bounded information needs | `IN_PROGRESS` | [139-bounded-information-needs.md](139-bounded-information-needs.md) | [Issue #139](https://github.com/LuigiFerronatto/TESSERA/issues/139), [draft PR #301](https://github.com/LuigiFerronatto/TESSERA/pull/301); empirical quality gate pending |
+| #265 Vector backend mechanics | `IN_PROGRESS` | [265-vector-backend-mechanics.md](265-vector-backend-mechanics.md) | [Issue #265](https://github.com/LuigiFerronatto/TESSERA/issues/265), [audit](../PR_EVOLUTION_265.md), opt-in draft; real semantic/ANN gates remain open |
+| #263 Durable single-write receipts | `IN_PROGRESS` | [263-durable-write-receipts.md](263-durable-write-receipts.md) | [Issue #263](https://github.com/LuigiFerronatto/TESSERA/issues/263), [PR #290](https://github.com/LuigiFerronatto/TESSERA/pull/290); opt-in candidate, not merged |
+| #194 CI review policy | `IN_PROGRESS` | [194-deterministic-ci-review.md](194-deterministic-ci-review.md) | Owner-requested retirement of automatic AI CI review and mandatory positive approval; active review blocks retained; exact-head CI and branch-protection migration pending |
 | #87 License and contribution entrypoints | `IN_PROGRESS` | [87-license-contribution.md](87-license-contribution.md) | [Issue #87](https://github.com/LuigiFerronatto/TESSERA/issues/87), [PR Evolution Audit](../PR_EVOLUTION_87.md), Queue 6; owner confirmation and merge pending |
 | #120 MCP transport/runtime | `VALIDATED` | [120-mcp-runtime-robustness.md](120-mcp-runtime-robustness.md) | [Issue #120](https://github.com/LuigiFerronatto/TESSERA/issues/120), [PR Evolution Audit](../PR_EVOLUTION_120.md), historical Queue 5; [PR #229](https://github.com/LuigiFerronatto/TESSERA/pull/229), canonical merge `b4ead4d7407b8caa2571e1e366616a468f2ef74f`, `KEEP` |
 | #118 Clean installed-artifact onboarding | `VALIDATED` | [118-clean-room-onboarding.md](118-clean-room-onboarding.md) | [Issue #118](https://github.com/LuigiFerronatto/TESSERA/issues/118), [PR Evolution Audit](../PR_EVOLUTION_118.md), historical Queue 4; [PR #225](https://github.com/LuigiFerronatto/TESSERA/pull/225), canonical merge `0ee5bbfe3a4b6cd9ecbcbfbcfdbfa65620700c3d`, `KEEP` |
@@ -59,12 +67,36 @@ Start new pages from [TEMPLATE.md](TEMPLATE.md).
 | #154 Safe project source discovery | `VALIDATED` | [154-safe-source-discovery.md](154-safe-source-discovery.md) | [Issue #154](https://github.com/LuigiFerronatto/TESSERA/issues/154), [PR #175](https://github.com/LuigiFerronatto/TESSERA/pull/175), canonical squash merge `05ce0dd234a7756d4a5ba315b77e4a6ec33c9429`, [ADR 0004](../adr/0004-safe-project-source-discovery.md), [PR Evolution Audit](../PR_EVOLUTION_154.md), `KEEP` |
 | #155 Initialization UX and source selection | `VALIDATED` | [155-init-ux.md](155-init-ux.md) | [Issue #155](https://github.com/LuigiFerronatto/TESSERA/issues/155), [PR #210](https://github.com/LuigiFerronatto/TESSERA/pull/210), canonical merge `4c112195f1572bf352d1cc6a1042c69711381da8`, `KEEP` |
 | #135 Deterministic decomposition fallback | `VALIDATED` | [135-decomposition-fallback.md](135-decomposition-fallback.md) | [Issue #135](https://github.com/LuigiFerronatto/TESSERA/issues/135), [PR #216](https://github.com/LuigiFerronatto/TESSERA/pull/216), canonical merge `c324ac2f46d48f7b49769b2fea9df0a2a93b42de`, `KEEP`, [PR Evolution Audit](../PR_EVOLUTION_135.md) |
+| #137 Source-episode lineage | `IN_PROGRESS` | [137-source-episode-lineage.md](137-source-episode-lineage.md) | [Issue #137](https://github.com/LuigiFerronatto/TESSERA/issues/137), [draft #297](https://github.com/LuigiFerronatto/TESSERA/pull/297); unmerged candidate, decision `PENDING`; structural retention only, semantic quality unmeasured |
 | #16 Non-destructive conflict containment | `VALIDATED` P0 / `BLOCKED` full | [16-conflict-resolver-containment.md](16-conflict-resolver-containment.md) | [Issue #16](https://github.com/LuigiFerronatto/TESSERA/issues/16), [PR #219](https://github.com/LuigiFerronatto/TESSERA/pull/219), canonical merge `708c973e23d5c4eb8a52d359a2cadc153e161a90`, [PR Evolution Audit](../PR_EVOLUTION_16.md), `KEEP` |
 | #95 Generic runtime / explicit legacy compatibility | `VALIDATED` | [95-remove-legacy-runtime-coupling.md](95-remove-legacy-runtime-coupling.md) | [Issue #95](https://github.com/LuigiFerronatto/TESSERA/issues/95), [PR #126](https://github.com/LuigiFerronatto/TESSERA/pull/126), [canonical merge `6d4a32b`](https://github.com/LuigiFerronatto/TESSERA/commit/6d4a32b021dba7cbd7ac40244eaf6a6f7ce99599), [KEEP evidence](https://github.com/LuigiFerronatto/TESSERA/issues/95#issuecomment-5480777109), [PR Evolution Audit](../PR_EVOLUTION_95.md) |
+| #12 Corpus equivalence repair | `IMPLEMENTED` | [12-corpus-equivalence-repair.md](12-corpus-equivalence-repair.md) | [PR #282](https://github.com/LuigiFerronatto/TESSERA/pull/282); reliability follow-up; canonical merge `89dec1e444e15bfa8b1361683a9b88a89402888e`, exact-head `KEEP`; canonical CI/benchmark cancelled, later-main pass recorded separately |
 | #12 Incremental/idempotent indexing | `VALIDATED` | [12-incremental-idempotent-indexing.md](12-incremental-idempotent-indexing.md) | [Issue #12](https://github.com/LuigiFerronatto/TESSERA/issues/12), [PR #246](https://github.com/LuigiFerronatto/TESSERA/pull/246), canonical merge `971801cd89b6ce7b890df9ceb43b6afff9fa0964`, `KEEP` |
 | #69 Plain-text source ingestion | `VALIDATED` | [69-text-ingestion.md](69-text-ingestion.md) | [Issue #69](https://github.com/LuigiFerronatto/TESSERA/issues/69), [PR #264](https://github.com/LuigiFerronatto/TESSERA/pull/264), canonical merge `c815a684e4c8cbd426a0d717e243a7dfb0f04395`, `KEEP` |
 | #70 Structural source segmentation | `VALIDATED` | [70-structural-segmentation.md](70-structural-segmentation.md) | [Issue #70](https://github.com/LuigiFerronatto/TESSERA/issues/70), [PR #270](https://github.com/LuigiFerronatto/TESSERA/pull/270), canonical merge `8ca854f14f8f57443784e6cf3524419a953c2ce6`, `KEEP` |
-| #13 Read-only Corpus Doctor | `IN_PROGRESS` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), decision pending |
+| #73 Observed source revisions | `IN_PROGRESS` | [73-revision-history.md](73-revision-history.md) | [Issue #73](https://github.com/LuigiFerronatto/TESSERA/issues/73), [draft PR #291](https://github.com/LuigiFerronatto/TESSERA/pull/291), opt-in R2 candidate; [lifecycle evidence](../../benchmarks/revisions/README.md) |
+| #157 Typed model profiles | `IN_PROGRESS` | [157-typed-model-profiles.md](157-typed-model-profiles.md) | [Issue #157](https://github.com/LuigiFerronatto/TESSERA/issues/157), [draft PR #286](https://github.com/LuigiFerronatto/TESSERA/pull/286); decision pending |
+| #13 Read-only Corpus Doctor | `VALIDATED` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), canonical merge `20814a47ec0f72d7bea0639e0b057df1ecf5cded`, `KEEP` |
+
+| #146 QUMem fidelity documentation | `IMPLEMENTED` | [146-qumem-fidelity-documentation.md](146-qumem-fidelity-documentation.md) | [PR #284](https://github.com/LuigiFerronatto/TESSERA/pull/284), canonical merge `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`; canonical CI passed, independent decision `PENDING`; no child implementation promoted |
+
+| #71 Harness adapter registry | `IN_PROGRESS` | [71-harness-adapter-registry.md](71-harness-adapter-registry.md) | Immutable format defaults; no authority/precedence change |
+
+| #121 Official agent Skills | `IN_PROGRESS` | [121-official-agent-skills.md](121-official-agent-skills.md) | Five thin current-capability instructions and artifact tests |
+
+| #168 Long-Term Memory boundary | `IN_PROGRESS` | [168-long-term-memory-boundary.md](168-long-term-memory-boundary.md) | Proposed current/target ownership; no runtime activation |
+
+| #166 / #119 Unified CLI presentation | `IN_PROGRESS` | [166-unified-cli-presentation.md](166-unified-cli-presentation.md) | [Issue #166](https://github.com/LuigiFerronatto/TESSERA/issues/166), [CLI output contract](../CLI_OUTPUT.md); candidate review pending |
+
+| #78 Project-neutral history | `IN_PROGRESS` | [78-project-neutral-history.md](78-project-neutral-history.md) | Public cleanup with pinned history retained |
+| #80 Architecture diagrams | `IN_PROGRESS` | [80-architecture-diagrams.md](80-architecture-diagrams.md) | Six source-mapped current/experimental SVGs |
+
+| #196 Provider-neutral lifecycle Hook Core | `IN_PROGRESS` | [196-neutral-hook-core.md](196-neutral-hook-core.md) | [Issue #196](https://github.com/LuigiFerronatto/TESSERA/issues/196), additive SDK candidate, ITERATE pending review |
+
+## Composition experiment
+
+- [#258 — safe composition of public reads](258-typed-recipes.md): `IN_PROGRESS`,
+  opt-in candidate; proposed `ITERATE`, no production reuse or adoption claimed
 
 ## Stage map
 

@@ -276,6 +276,7 @@ def test_write_once_read_everywhere_golden_contract(tmp_path, monkeypatch):
             "--top-n",
             "3",
             "--json",
+            "--verbose",
         ],
         cwd=project,
         env=_subprocess_env(generated_env),
@@ -290,7 +291,7 @@ def test_write_once_read_everywhere_golden_contract(tmp_path, monkeypatch):
 
     expected_store = str(storage.resolve())
     assert Path(engine.storage_dir).resolve().as_posix() == expected_store
-    assert f"storage_dir: {expected_store}" in cli.stderr
+    assert f"storage_dir={expected_store}" in cli.stderr
     assert mcp_payload["storage_dir"] == expected_store
     assert mcp_payload["provider_initialized"] is False
     assert mcp.stderr == ""
