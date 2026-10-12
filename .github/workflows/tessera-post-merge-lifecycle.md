@@ -92,11 +92,11 @@ Inspect:
 
 - the merged PR: final head SHA, canonical merge commit SHA, files changed;
 - the linked Issue/Test Card and its comments/evidence;
-- `docs/ROADMAP.md`;
-- the relevant `docs/test-cards/<issue>-*.md` stage record;
-- the relevant `docs/PR_EVOLUTION_<issue>.md`;
-- `CHANGELOG.md` and `docs/CHANGE_POLICY.md`;
-- `README.md` / `docs/ARCHITECTURE.md` / `docs/OVERVIEW.md` **only** if the
+- `docs/process/roadmap.md`;
+- the relevant `docs/process/test-cards/<issue>-*.md` stage record;
+- the relevant `docs/history/pr-evolution/<issue>.md`;
+- `CHANGELOG.md` and `docs/process/change-policy.md`;
+- `README.md` / `docs/architecture/architecture.md` / `docs/concepts/overview.md` **only** if the
   merged capability actually affects their claims;
 - issues that directly depend on this one (search ROADMAP's dependency graph);
 - the final CI run and Benchmark Ledger run for the canonical merge SHA.
@@ -116,10 +116,10 @@ canonical merge exists; otherwise use `IMPLEMENTED`.
 
 ```text
 issue closed but body/labels still say IN_PROGRESS
-docs/ROADMAP.md still says IN_PROGRESS for this issue
+docs/process/roadmap.md still says IN_PROGRESS for this issue
 a directly dependent issue remains BLOCKED on a prerequisite now satisfied
 the Test Card stage record still says "Not merged" / "Not started"
-docs/PR_EVOLUTION_<issue>.md lacks the canonical merge SHA
+docs/history/pr-evolution/<issue>.md lacks the canonical merge SHA
 CHANGELOG.md/README/ARCHITECTURE/OVERVIEW contradict actual merged behavior
 ```
 
@@ -148,7 +148,7 @@ treat OPEN as READY, and do not treat a TRACKER as executable.
 
 ### CHANGELOG policy
 
-Read `docs/CHANGE_POLICY.md` before touching `CHANGELOG.md`. Never derive an
+Read `docs/process/change-policy.md` before touching `CHANGELOG.md`. Never derive an
 authoritative changelog entry from commit messages or PR titles alone. You
 may propose a changelog entry only when grounded in the linked Test Card, the
 actual merged diff, affected contract surfaces, the final decision, and the

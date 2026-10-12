@@ -195,7 +195,7 @@ echo -e "${BOLD}Próximos passos:${RESET}"
 echo "  1. tessera quickstart --apply         # detecta seu projeto e cria o storage_dir de memórias"
 echo "  2. tessera doctor <storage_dir>       # roda o smoke test completo na sua memória real"
 echo "  3. tessera write <storage_dir> --id ... --type ... --episode start --content ...  # primeira nota"
-echo "  4. Ver Tessera/docs/CHEATSHEET.md      # referência completa de CLI, MCP e API Python"
+echo "  4. Ver Tessera/docs/guides/cheatsheet.md      # referência completa de CLI, MCP e API Python"
 if [[ "$USE_VENV" -eq 1 ]]; then
     echo
     warn "Lembre de ativar o venv em novas sessões de shell: source $VENV_NAME/bin/activate"

@@ -1,217 +1,147 @@
 # TESSERA — Documentation Map
 
-This directory contains several generations of TESSERA documentation. Use this page as the navigation source of truth so current architecture, research notes and historical/prototype material are not confused.
-
-## Executive takeaway
-
-If you are new to TESSERA, read:
+Docs are grouped by what you are trying to do. Folder names say what kind of document you are reading:
 
 ```text
-OVERVIEW
-  ↓
-FEATURES + CONCEPTS
-  ↓
-ARCHITECTURE
-  ↓
-QUERY EXAMPLES / OUTPUT CONTRACT
-  ↓
-ROADMAP
+docs/
+├── guides/        use TESSERA: commands, queries, walkthroughs
+├── concepts/      understand TESSERA: what it is, vocabulary, capabilities
+├── reference/     machine-facing contracts: output, write gate, MCP runtime, model profiles, harness adapters
+├── architecture/  how the code is built + accepted decisions (adr/)
+├── process/       how the project is run: roadmap, Test Cards, CI, governance, evidence
+├── research/      external papers, competitors, decision trace, fidelity map
+├── history/       per-issue evolution audits (pr-evolution/<issue>.md)
+└── assets/        brand assets
 ```
-
-If you are making an architecture decision, also read the relevant Test Card and `research/` notes before changing code.
 
 ---
 
-# Start here — current product reference
+## 1. Use it
 
 | Document | Use it for |
 |---|---|
-| [OVERVIEW.md](OVERVIEW.md) | What TESSERA is, why it exists, current vs planned architecture. |
-| [FEATURES.md](FEATURES.md) | Capabilities implemented on current Foundation. |
-| [CONCEPTS.md](CONCEPTS.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Technical current-main architecture and module/pipeline boundaries. |
-| [QUERY_EXAMPLES.md](QUERY_EXAMPLES.md) | Concrete current query/retrieval examples and known limitations. |
-| [OUTPUT_CONTRACT.md](OUTPUT_CONTRACT.md) | Machine-facing semantic retrieval-result contract. |
-| [ROADMAP.md](ROADMAP.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
-| [test-cards/README.md](test-cards/README.md) | Plain-language stage records: what changed, how it works, evidence, limitations and next work. |
-| [TEST_CARD_OPERATING_MODEL.md](TEST_CARD_OPERATING_MODEL.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
-| [BENCHMARK_CI.md](BENCHMARK_CI.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
-| [adr/README.md](adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
-| [AGENTIC_GOVERNANCE.md](AGENTIC_GOVERNANCE.md) | Repository-process automation: issue triage, independent PR audit, opt-in fixer, deterministic merge governor, post-merge lifecycle reconciliation, documentation drift audits. Not a TESSERA product/runtime feature. |
+| [guides/cheatsheet.md](guides/cheatsheet.md) | Operational cheat sheet: CLI commands, MCP tools, common flows. Verify against the current CLI. |
+| [guides/query-examples.md](guides/query-examples.md) | Concrete query/retrieval examples and known limitations. |
+| [reference/mcp-runtime.md](reference/mcp-runtime.md) | MCP runtime contract: startup, stdio, schema, errors and cancellation (#120). |
+| [reference/model-profiles.md](reference/model-profiles.md) | Model profiles for the optional LLM paths. |
 
-Current binding decision: [ADR 0001 — Core vs Optional LLM Orchestrator Boundary](adr/0001-core-vs-optional-llm-boundary.md).
+## 2. Understand it
 
----
-
-# Change history and governance
-
-TESSERA keeps product history, architecture rationale and experimental evidence separate on purpose.
-
-| Artifact | Question it answers |
-|---|---|
-| [`../CHANGELOG.md`](../CHANGELOG.md) | **What changed** in the product/public contract? |
-| [CHANGE_POLICY.md](CHANGE_POLICY.md) | **When and how** should a PR update the changelog? |
-| [research/DECISION_TRACE.md](research/DECISION_TRACE.md) | **Why** did a research/architecture signal influence a decision? |
-| [ROADMAP.md](ROADMAP.md) + linked Issues/Test Cards | **What are we trying to prove next?** |
-| [test-cards/](test-cards/) | **What does each stage mean in plain language, and what remains unfinished?** |
-| Pull request + CI/benchmark artifacts | **How was it implemented and what evidence passed?** |
-
-Canonical separation:
+Suggested reading order for newcomers:
 
 ```text
-CHANGELOG
-→ what changed
-
-DECISION TRACE
-→ why the direction changed
-
-TEST CARD
-→ what we tried to prove
-
-PR
-→ how it was implemented
-
-PLAIN-LANGUAGE STAGE RECORD
-→ understandable before/after, proof and limitations
-
-CI / BENCHMARK
-→ objective evidence
+concepts/overview → concepts/features + concepts/concepts → architecture/architecture
+  → guides/query-examples + reference/output-contract → process/roadmap
 ```
-
-The changelog is curated manually. CI may later enforce that a PR explicitly updated it or declared N/A, but CI should not synthesize product history from commits.
-
----
-
-# Research and competitive intelligence
-
-Directory: [`research/`](research/)
 
 | Document | Use it for |
 |---|---|
-| [research/REFERENCES.md](research/REFERENCES.md) | Primary papers/product references used by current project decisions. |
-| [research/PAPER_NOTES.md](research/PAPER_NOTES.md) | What each paper says, what TESSERA learned, and which Test Card it influenced. |
-| [research/MEMORY_PAPERS_2026-09-07.md](research/MEMORY_PAPERS_2026-09-07.md) | Dated review of 28 main AI-memory papers plus one supplementary source, with limitations and experiment crosswalk. |
-| [research/IMPROVEMENT_MAP_2026-09-07.md](research/IMPROVEMENT_MAP_2026-09-07.md) | 48 proposed opportunities checked against the 82-issue audit snapshot; research candidates, not a replacement roadmap. |
-| [research/COMPETITIVE_LANDSCAPE.md](research/COMPETITIVE_LANDSCAPE.md) | Mem0, Zep/Graphiti, Letta, LangGraph/LangMem, MemOS, MemPalace and research-system comparison. |
-| [research/DECISION_TRACE.md](research/DECISION_TRACE.md) | Source → insight → Test Card → decision trace. |
+| [concepts/overview.md](concepts/overview.md) | What TESSERA is, why it exists, current vs planned architecture. |
+| [concepts/features.md](concepts/features.md) | Capabilities implemented on the current Foundation. |
+| [concepts/concepts.md](concepts/concepts.md) | Canonical vocabulary: drawers, identity, evidence, provenance, relevance, confidence, authority, relations. |
+| [concepts/procedural-anchors.md](concepts/procedural-anchors.md) | Procedural-anchor concept and skills. It does not create a fourth semantic drawer. |
+| [architecture/architecture.md](architecture/architecture.md) | Technical current-main architecture and module/pipeline boundaries. |
+| [architecture/code-explanation.md](architecture/code-explanation.md) | Code-oriented walkthrough. May lag module refactors; verify against current source. |
+| [architecture/adr/README.md](architecture/adr/README.md) | Accepted architecture decisions and binding module/public-contract boundaries. |
+| [reference/output-contract.md](reference/output-contract.md) | Machine-facing semantic retrieval-result contract. |
+| [reference/write-gate-contract.md](reference/write-gate-contract.md) | Write-gate contract: what may be stored and how. |
+| [reference/harness-adapters.md](reference/harness-adapters.md) | Harness adapter registry: how instruction files (AGENTS.md, CLAUDE.md, …) are classified, and how to register a custom adapter (#71). |
 
-Research hygiene:
+Current binding decision: [ADR 0001 — Core vs Optional LLM Orchestrator Boundary](architecture/adr/0001-core-vs-optional-llm-boundary.md).
 
-```text
-external source claim
-≠ TESSERA interpretation
-≠ TESSERA implementation
-≠ TESSERA benchmark result
-```
+## 3. Contribute / project process
 
-Competitive claims should be revalidated against current primary sources before publication outside the project.
+Start with [`../CONTRIBUTING.md`](../CONTRIBUTING.md), then:
 
----
-
-# Experimental work lives in GitHub Issues
+| Document | Use it for |
+|---|---|
+| [process/roadmap.md](process/roadmap.md) | Experimental roadmap, Test Cards, priorities and future target architecture. |
+| [process/test-cards/README.md](process/test-cards/README.md) | Plain-language stage records: what changed, how it works, evidence, limitations and next work. |
+| [process/test-card-operating-model.md](process/test-card-operating-model.md) | Definition of Ready, WIP limits, execution waves, stop conditions and Codex handoff contract. |
+| [process/change-policy.md](process/change-policy.md) | When and how a PR updates the changelog. |
+| [process/benchmark-ci.md](process/benchmark-ci.md) | Versioned benchmark ledger, applicability levels, CI tiers, dataset integrity and artifact policy. |
+| [process/agentic-governance.md](process/agentic-governance.md) | Repository-process automation: issue triage, PR audit, opt-in fixer, merge governor, post-merge lifecycle reconciliation, documentation drift audits. Not a product/runtime feature. |
+| [process/project-board-sync.md](process/project-board-sync.md) | How the GitHub project board is kept in sync with issues and PRs. |
+| [process/evidence/](process/evidence/) | Raw evidence attached to Test Cards. |
 
 The repository follows:
 
 ```text
-1 task
-→ 1 Issue / Test Card
-→ 1 linked implementation PR
-→ evidence / CI / benchmark
-→ KEEP | ITERATE | REVERT | DROP | DEFER
+1 task → 1 Issue / Test Card → 1 linked implementation PR → evidence / CI / benchmark
+       → KEEP | ITERATE | REVERT | DROP | DEFER
 ```
 
-Use [ROADMAP.md](ROADMAP.md) for sequencing, but use the linked Issue as the living experiment record.
+Use the roadmap for sequencing, but the linked Issue is the living experiment record.
 
-Current examples include:
+### Where each kind of history lives
 
-```text
-#68 Engine / CLI / MCP Contract Parity (closed)
-#74 Core vs Optional LLM Boundary (accepted ADR 0001)
-#12 Incremental & Idempotent Indexing
-#69 Text Ingestion Coverage
-#70 Structural Segmentation
-#13 Metadata Doctor
-#18 LongMemEval
-#25 Query-aware Graph Expansion
-#26 Relation Confidence
-#27 Evidence Arbitration
-#20 Evidence Sufficiency / Abstention
-#32 Authority / Scope / Instruction Precedence
-```
-
----
-
-# Deep dives / implementation-oriented documents
-
-These documents can still be useful, but they are narrower and may contain terminology from earlier iterations. Validate architecture claims against `OVERVIEW.md`, `FEATURES.md`, `ARCHITECTURE.md` and current code.
-
-| Document | Role / caution |
+| Artifact | Question it answers |
 |---|---|
-| [CODE_EXPLANATION.md](CODE_EXPLANATION.md) | Code-oriented explanation. May lag module refactors; verify against current source. |
-| [PROCEDURAL_ANCHORS.md](PROCEDURAL_ANCHORS.md) | Historical/current detail on procedural-anchor concept and skills. Do not infer that it creates a fourth semantic drawer. |
-| [CHEATSHEET.md](CHEATSHEET.md) | Operational/reference cheat sheet; verify commands/contracts against current CLI. |
-| [QUMEM-GAP-ANALYSIS.md](QUMEM-GAP-ANALYSIS.md) | Canonical source-to-implementation fidelity map with dated code baseline, validation owners and preserved historical lessons. |
+| [`../CHANGELOG.md`](../CHANGELOG.md) | **What changed** in the product/public contract? |
+| [research/decision-trace.md](research/decision-trace.md) | **Why** did a research/architecture signal influence a decision? |
+| [process/roadmap.md](process/roadmap.md) + linked Issues/Test Cards | **What are we trying to prove next?** |
+| [process/test-cards/](process/test-cards/) | **What does each stage mean in plain language, and what remains unfinished?** |
+| [history/pr-evolution/](history/pr-evolution/) | **How did an issue evolve** across its PRs and reviews? |
+| Pull request + CI/benchmark artifacts | **How was it implemented and what evidence passed?** |
 
----
+The changelog is curated manually. CI may enforce that a PR updated it or declared N/A, but CI does not synthesize product history from commits.
 
-# Historical / narrative material
-
-The following files preserve useful project history, demos or earlier architecture narratives. They are **not** the current product/architecture source of truth:
-
-| Document | Classification |
-|---|---|
-| [COMO-FUNCIONA-E-PROXIMOS-PASSOS.md](COMO-FUNCIONA-E-PROXIMOS-PASSOS.md) | Historical/project narrative; may describe older roadmap assumptions. |
-| [ROTEIRO-DEMO-VIDEO.md](ROTEIRO-DEMO-VIDEO.md) | Demo/presentation material, not technical contract. |
-| [REFERENCES.md](REFERENCES.md) | Older compact reference list; prefer `research/REFERENCES.md` for current research decision trace. |
-| `archive/` | Explicit older implementation/version material when present. |
-
-Historical docs should preserve useful decision history, but they must not define the current public product contract. Project-specific legacy narratives are tracked for cleanup separately.
-
----
-
-# Which document wins when docs disagree?
-
-Use this precedence for **project-status claims**:
-
-```text
-current code + tests
-        ↓
-current linked Issue/Test Card / merged PR evidence
-        ↓
-FEATURES.md / ARCHITECTURE.md / OUTPUT_CONTRACT.md
-        ↓
-OVERVIEW.md / ROADMAP.md
-        ↓
-deep-dive docs
-        ↓
-historical/demo docs
-```
-
-For **external research/product claims**, current primary sources win over repository prose; update the research docs when discrepancies are found.
-
----
-
-# Documentation maintenance rule
-
-When a feature changes:
+### Documentation maintenance rule
 
 ```text
 implementation PR
-  ↓
-update CHANGELOG or explicitly mark N/A
-  ↓
-update its Test Card with evidence/learnings
-  ↓
-create/update its plain-language stage record
-  ↓
-update FEATURES/ARCHITECTURE/OUTPUT_CONTRACT if public semantics changed
-  ↓
-update ROADMAP if the decision changes sequencing
-  ↓
-update research decision trace if an external idea materially influenced the change
+  → update CHANGELOG or explicitly mark N/A
+  → update its Test Card with evidence/learnings and its plain-language stage record
+  → update concepts/features, architecture/architecture, reference/output-contract if public semantics changed
+  → update process/roadmap if the decision changes sequencing
+  → update research/decision-trace if an external idea materially influenced the change
 ```
 
-Do not let a feature become “implemented” only in a PR description. If it changes the product contract, current documentation and product history should move with it.
+Do not let a feature become "implemented" only in a PR description.
 
-- [MCP runtime contract](MCP_RUNTIME.md): #120 validated startup, stdio, schema, errors and cancellation.
-- [#120 Test Card](test-cards/120-mcp-runtime-robustness.md) and [evolution audit](PR_EVOLUTION_120.md).
+## 4. Research
+
+| Document | Use it for |
+|---|---|
+| [research/qumem-gap-analysis.md](research/qumem-gap-analysis.md) | Canonical source-to-implementation fidelity map with dated code baseline and validation owners. |
+| [research/references.md](research/references.md) | Primary papers/product references used by current project decisions. |
+| [research/paper-notes.md](research/paper-notes.md) | What each paper says, what TESSERA learned, and which Test Card it influenced. |
+| [research/memory-papers-2026-09-07.md](research/memory-papers-2026-09-07.md) | Dated review of 28 main AI-memory papers plus one supplementary source. |
+| [research/improvement-map-2026-09-07.md](research/improvement-map-2026-09-07.md) | 48 proposed opportunities checked against the 82-issue audit snapshot; candidates, not a roadmap. |
+| [research/competitive-landscape.md](research/competitive-landscape.md) | Mem0, Zep/Graphiti, Letta, LangGraph/LangMem, MemOS, MemPalace and research-system comparison. |
+| [research/decision-trace.md](research/decision-trace.md) | Source → insight → Test Card → decision trace. |
+
+Research hygiene:
+
+```text
+external source claim ≠ TESSERA interpretation ≠ TESSERA implementation ≠ TESSERA benchmark result
+```
+
+Revalidate competitive claims against current primary sources before publishing them outside the project.
+
+## 5. History and older narratives
+
+Not the current product/architecture source of truth:
+
+| Document | Classification |
+|---|---|
+| [history/pr-evolution/](history/pr-evolution/) | Per-issue evolution audits, e.g. [#120](history/pr-evolution/120.md). |
+| [guides/how-it-works-pt.md](guides/how-it-works-pt.md) | Portuguese project narrative; may describe older roadmap assumptions. |
+| [research/references-pt.md](research/references-pt.md) | Older compact Portuguese reference list; prefer [research/references.md](research/references.md). |
+
+---
+
+## Which document wins when docs disagree?
+
+For **project-status claims**:
+
+```text
+current code + tests
+  → current linked Issue/Test Card / merged PR evidence
+  → concepts/features, architecture/architecture, reference/output-contract
+  → concepts/overview, process/roadmap
+  → deep-dive docs
+  → history and narrative docs
+```
+
+For **external research/product claims**, current primary sources win over repository prose; update the research docs when they disagree.

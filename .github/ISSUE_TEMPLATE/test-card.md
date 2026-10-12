@@ -109,11 +109,11 @@ trigger/input -> current result -> expected result
 <!-- Name the expected ROADMAP status or dependency change. -->
 
 ## Plain-language stage record
-- **Path:** `docs/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
+- **Path:** `docs/process/test-cards/<issue>-<slug>.md | NOT_APPLICABLE`
 - **Record status:** `PLANNED | IN_PROGRESS | IMPLEMENTED | VALIDATED | BLOCKED | SUPERSEDED`
 
 <!--
-Create applicable records from docs/test-cards/TEMPLATE.md. Keep current and
+Create applicable records from docs/process/test-cards/TEMPLATE.md. Keep current and
 target behavior, evidence, and limitations separate. An open PR is never
 IMPLEMENTED or VALIDATED.
 -->

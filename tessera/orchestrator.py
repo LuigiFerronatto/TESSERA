@@ -10,7 +10,7 @@ Issue #139 owns multiple needs, #140 retrieval planning and #141 structured
 state. Conflict containment preserves candidates without proving supersession.
 Deterministic Engine retrieval remains independent and needs no provider.
 Hooks are explicit library entrypoints, not an automatically installed runtime
-integration. See docs/QUMEM-GAP-ANALYSIS.md and ADR 0001.
+integration. See docs/research/qumem-gap-analysis.md and ADR 0001.
 """
 
 import re

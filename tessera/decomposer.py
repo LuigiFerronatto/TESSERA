@@ -10,7 +10,7 @@ All persistence uses the canonical write gate.
 
 Issue #135 validated the failure boundary, not semantic extraction fidelity.
 Issue #136 owns type semantics and one-pass/three-pass evaluation; #137 owns
-source episode/supporting-turn lineage. See docs/QUMEM-GAP-ANALYSIS.md.
+source episode/supporting-turn lineage. See docs/research/qumem-gap-analysis.md.
 """
 
 from __future__ import annotations
