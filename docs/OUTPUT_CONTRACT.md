@@ -406,3 +406,14 @@ fields and ranking are unchanged; historical versions are not live memories.
 archived evidence record, source text and known span, or `None` for an unknown
 ID. `status: archived` denotes availability only, never freshness or temporal
 validity. See the [complete contract](REVISION_HISTORY.md).
+
+## Automatic-memory source lineage (#137)
+
+Automatically decomposed memories additionally expose `lineage`: the original
+source episode, ordered supporting positions, the last supporting position,
+version-aware source/turn evidence and a freshly verified linkage status.
+This is distinct from `provenance`/`evidence`, which still describe the atomic
+note itself. It does not alter relevance scores or imply validity/entailment.
+Legacy manual notes omit this field; section-only automatic inputs report
+`episode_only_no_source_turns` rather than inventing IDs. See the complete
+[episode lineage contract](EPISODE_LINEAGE.md) for fields and failure semantics.

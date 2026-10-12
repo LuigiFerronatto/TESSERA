@@ -21,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .conflict import ConflictResolver
+from .canonical import LineageMetadata
 from .config import source_identity_base
 from .models import (
     NODE_TYPE_TO_STORE,
@@ -407,6 +408,8 @@ class TesseraEngine:
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
         operation_id: Optional[str] = None,
+        *,
+        lineage: Optional[LineageMetadata] = None,
     ) -> WriteResult:
         """Write with an optional durable operation ID and shared outcome receipt.
 
@@ -416,6 +419,8 @@ class TesseraEngine:
                          content=content, tags=tags, entities=entities, description=description,
                          provenance_turns=provenance_turns, active_connections=active_connections,
                          persist_format=persist_format)
+        if lineage is not None:
+            arguments["lineage"] = lineage
         if operation_id is None:
             return self._write_memory_note_result(**arguments)
         from .write_receipts import write_with_receipt
@@ -450,6 +455,7 @@ class TesseraEngine:
         persist_format: Literal["md"] = "md",
         _write_operation=None,
         _before_persist=None,
+        lineage: Optional[LineageMetadata] = None,
     ) -> WriteResult:
         """
         Canonical write flow returning the complete gate/persistence contract.
@@ -479,6 +485,18 @@ class TesseraEngine:
             decision = self.gating_engine.reject_invalid_memory_id(content)
             return WriteResult(mem_id, None, False, decision)
 
+        episode_root = (Path(self.storage_dir) / "_episodes").resolve(strict=False)
+        if mem_id.split("/")[0].casefold() == "_episodes" or episode_root in path_validation.destination.parents:
+            raise ValueError("_episodes is reserved for immutable source episode records")
+        if lineage is not None:
+            from .lineage import validate_lineage
+
+            validate_lineage(self.storage_dir, mem_id, lineage)
+            if lineage.source_episode_id != episode_id:
+                raise ValueError("episode_id conflicts with source episode lineage")
+            if provenance_turns is not None and list(provenance_turns) != lineage.supporting_turns:
+                raise ValueError("provenance_turns conflicts with source episode lineage")
+            provenance_turns = list(lineage.supporting_turns)
         provenance_turns = provenance_turns or []
         active_connections = active_connections or []
         decision = self.gating_engine.evaluate(content, tags)
@@ -528,6 +546,9 @@ class TesseraEngine:
             reasons=list(decision.reasons),
             original_hash=decision.original_hash,
             persisted_hash=decision.persisted_hash or "",
+            temporal_position=lineage.temporal_position if lineage else None,
+            episode_source=lineage.episode_source if lineage else None,
+            source_evidence=lineage.source_evidence if lineage else [],
         )
 
         frontmatter_dict = frontmatter_data.to_dict()
@@ -604,6 +625,8 @@ class TesseraEngine:
         provenance_turns: Optional[List[int]] = None,
         active_connections: Optional[List[Connection]] = None,
         persist_format: Literal["md"] = "md",
+        *,
+        lineage: Optional[LineageMetadata] = None,
     ) -> str:
         """Compatibility API returning a filepath for accepted writes.
 
@@ -622,6 +645,7 @@ class TesseraEngine:
             provenance_turns=provenance_turns,
             active_connections=active_connections,
             persist_format=persist_format,
+            lineage=lineage,
         )
         if not result.persisted:
             raise WriteGatingViolationError(result)
@@ -749,6 +773,18 @@ class TesseraEngine:
             entities=entities or [],
             active_connections=active_connections,
         )
+
+    def persist_source_episode(self, episode_id: str, episode: Episode) -> Any:
+        """Persist a no-overwrite source record independently of atomic memories."""
+        from .lineage import persist_source_episode
+
+        return persist_source_episode(self, episode_id, episode)
+
+    def inspect_source_episode(self, episode_id: str) -> Dict[str, Any]:
+        """Read ordered source turns, roles, timestamps and exact version evidence."""
+        from .lineage import inspect_source_episode
+
+        return inspect_source_episode(self.storage_dir, episode_id).to_dict()
 
     def decompose_and_write_episode(
         self,
@@ -1234,6 +1270,8 @@ class TesseraEngine:
                     "document_id": data.get("document_id"),
                     "source_span": data.get("source_span"),
                     "heading": data.get("heading"),
+                    "lineage": data["canonical_metadata"].lineage.to_dict()
+                    if data.get("canonical_metadata") and data["canonical_metadata"].lineage else None,
                 }
                 for node_id, data in self.graph.nodes(data=True)
             },

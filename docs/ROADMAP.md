@@ -1066,3 +1066,13 @@ This map is routing, not permission to bypass each Issue/Test Card's Definition 
 [durable/ephemeral contract](LONG_TERM_MEMORY.md). It documents current primitives
 and reserves future admission, temporal, lineage and context responsibilities.
 The candidate changes no queue status and does not implement its child contracts.
+
+### #137 selected candidate, 2026-10-02
+
+The [source-episode lineage stage record](test-cards/137-source-episode-lineage.md)
+tracks [draft #297](https://github.com/LuigiFerronatto/TESSERA/pull/297), a separately reviewed candidate from canonical `20814a47ec0f72d7bea0639e0b057df1ecf5cded`.
+Structural source/turn retention is implemented and under validation. The
+existing canonical queue/status rows remain unchanged until merge and lifecycle
+reconciliation; #136/#138/#15 and dependent state/quality cards are not unlocked
+by an unmerged candidate. Supporting-turn semantic precision/recall and
+preference-state accuracy remain unmeasured.

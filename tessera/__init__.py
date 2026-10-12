@@ -30,6 +30,7 @@ from .models import (
     Entity,
     Connection,
     Episode,
+    EpisodeTurn,
     MemoryFrontmatter,
     InvalidFrontmatterError,
     WriteGatingViolationError,
@@ -44,6 +45,8 @@ from .security import (
     WriteResult,
     content_sha256,
 )
+from .canonical import LineageMetadata
+from .lineage import LineageValidationError, SourceEpisode
 from .write_receipts import WriteReceipt, RECEIPT_SCHEMA_VERSION
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
@@ -88,6 +91,10 @@ __all__ = [
     "Entity",
     "Connection",
     "Episode",
+    "EpisodeTurn",
+    "LineageMetadata",
+    "LineageValidationError",
+    "SourceEpisode",
     "MemoryFrontmatter",
     "WriteGatingEngine",
     "WriteAdmission",

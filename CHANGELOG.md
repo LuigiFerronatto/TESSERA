@@ -10,6 +10,12 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
 
 ### Experimental
 
+- Automatic decomposition retains an independently inspectable Markdown source
+  episode, validated supporting-turn references, exact source-version/span
+  evidence and episode-local temporal position through write/index/rebuild.
+  Legacy section-only inputs remain usable with explicitly unavailable turn
+  support; no semantic entailment, validity time or state accuracy is claimed.
+  ([#137](https://github.com/LuigiFerronatto/TESSERA/issues/137))
 - Added opt-in, model-independent vector backend contracts, an exact-flat
   correctness oracle, a dependency-free SQLite persistent candidate and an
   explicitly imported SciPy cKDTree exact/approximate candidate. A preregistered
