@@ -1,5 +1,9 @@
 # 95 — TESSERA stops assuming it lives inside one project
 
+> Public-history normalization (#78): legacy project names below use neutral
+> descriptions. The [unchanged original record](https://github.com/LuigiFerronatto/TESSERA/blob/20814a47ec0f72d7bea0639e0b057df1ecf5cded/docs/test-cards/95-remove-legacy-runtime-coupling.md)
+> preserves exact historical identifiers and audit evidence. This does not change a runtime contract.
+
 | Field | Value |
 |---|---|
 | Issue | [#95](https://github.com/LuigiFerronatto/TESSERA/issues/95) |
@@ -29,7 +33,7 @@ made provider failure look like successful raw-prompt output.
 
 ```text
 no CLI path
-→ LAO_MEM_DIR
+→ <legacy storage variable>
 → maybe .claude/memory during quickstart
 
 optional assisted call
@@ -48,8 +52,8 @@ require explicit configuration and raise actionable errors.
 ## How does it work now?
 
 **CURRENT ON MAIN.** Deterministic import, indexing, retrieval, help, doctor and
-quickstart do not activate or probe LAO/Blip behavior. A legacy user
-can temporarily keep `LAO_MEM_DIR` with one warning or explicitly select the
+quickstart do not activate or probe external-project behavior. A legacy user
+can temporarily keep `<legacy storage variable>` with one warning or explicitly select the
 deprecated compatibility adapter and supply its endpoint/router path.
 
 ## Concrete example
@@ -60,7 +64,7 @@ tessera doctor
 tessera quickstart
 ```
 
-Both surfaces use the canonical generic storage. If `LAO_MEM_DIR` is the only
+Both surfaces use the canonical generic storage. If `<legacy storage variable>` is the only
 variable, it still works for migration but prints an actionable deprecation
 warning to stderr, leaving JSON stdout valid.
 

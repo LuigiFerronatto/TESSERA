@@ -152,10 +152,10 @@ Optional generative components may exist for higher-level workflows, but the bas
 | Project/global store configuration and explainable discovery | Validated | Issue #117 / ADR 0003 |
 | Store/source/index boundary separation | In-progress candidate | Issue #153 |
 | Engine/CLI/MCP contract parity | Validated direct-query contract | Issue #68 |
-| Incremental/idempotent indexing | Planned Foundation experiment | Issue #12 |
-| Plain-text ingestion beyond Markdown | Planned experiment | Issue #69 |
-| Structural segmentation | Planned experiment | Issue #70 |
-| Metadata Doctor | Planned | Issue #13 |
+| Incremental/idempotent indexing | Validated | [Issue #12 / PR #246](test-cards/12-incremental-idempotent-indexing.md) |
+| Plain-text ingestion beyond Markdown | Validated: body-only `.txt` | [Issue #69 / PR #264](test-cards/69-text-ingestion.md) |
+| Structural segmentation | Validated: derived segments, parent-only retrieval | [Issue #70 / PR #270](test-cards/70-structural-segmentation.md) |
+| Read-only Corpus Doctor | Validated: `tessera corpus doctor` | [Issue #13 / PR #277](test-cards/13-corpus-doctor.md) |
 | Temporal state / state keys | Planned experiment | Issue #15 |
 | Evidence Arbitration | Planned experiment | Issues #16 / #27 |
 | Query-aware graph expansion | Planned experiment | Issues #14 / #25 |

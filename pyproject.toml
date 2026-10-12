@@ -45,4 +45,4 @@ packages = ["tessera"]
 include-package-data = false
 
 [tool.setuptools.package-data]
-tessera = ["skills_library/*.md"]
+tessera = ["skills_library/*.md", "agent_skills/*/SKILL.md"]

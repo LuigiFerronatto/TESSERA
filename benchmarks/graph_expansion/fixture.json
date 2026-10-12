@@ -1,0 +1,1236 @@
+{
+  "schema_version": 1,
+  "name": "relational-one-hop-v1",
+  "frozen_before_evaluation": true,
+  "top_k": 5,
+  "reader": null,
+  "policy_tuning": "none; one fixed policy across all cases",
+  "notes": [
+    {
+      "id": "atlas/overview",
+      "body": "The atlas runtime strategy is documented in the operating register. It links the adopted revision and its predecessor.",
+      "connections": [
+        {
+          "target_memory_id": "atlas/earlier",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/revision",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "atlas/misc-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "atlas/earlier",
+      "body": "atlas runtime strategy: Ephemeral workers handled each request.",
+      "connections": [
+        {
+          "target_memory_id": "atlas/overview",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "atlas/revision",
+      "body": "Persistent pools reuse initialized workers.",
+      "connections": [
+        {
+          "target_memory_id": "atlas/earlier",
+          "relation_type": "supersedes"
+        }
+      ]
+    },
+    {
+      "id": "atlas/misc-00",
+      "body": "Administrative appendix 0: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-01",
+      "body": "Administrative appendix 1: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-02",
+      "body": "Administrative appendix 2: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-03",
+      "body": "Administrative appendix 3: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-04",
+      "body": "Administrative appendix 4: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-05",
+      "body": "Administrative appendix 5: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-06",
+      "body": "Administrative appendix 6: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-07",
+      "body": "Administrative appendix 7: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-08",
+      "body": "Administrative appendix 8: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-09",
+      "body": "Administrative appendix 9: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-10",
+      "body": "Administrative appendix 10: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "atlas/misc-11",
+      "body": "Administrative appendix 11: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/overview",
+      "body": "The birch delivery policy is documented in the operating register. It links the adopted revision and its predecessor.",
+      "connections": [
+        {
+          "target_memory_id": "birch/earlier",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/revision",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "birch/misc-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "birch/earlier",
+      "body": "birch delivery policy: Couriers left parcels unattended.",
+      "connections": [
+        {
+          "target_memory_id": "birch/overview",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "birch/revision",
+      "body": "A signature is mandatory for every parcel.",
+      "connections": [
+        {
+          "target_memory_id": "birch/earlier",
+          "relation_type": "supersedes"
+        }
+      ]
+    },
+    {
+      "id": "birch/misc-00",
+      "body": "Administrative appendix 0: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-01",
+      "body": "Administrative appendix 1: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-02",
+      "body": "Administrative appendix 2: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-03",
+      "body": "Administrative appendix 3: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-04",
+      "body": "Administrative appendix 4: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-05",
+      "body": "Administrative appendix 5: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-06",
+      "body": "Administrative appendix 6: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-07",
+      "body": "Administrative appendix 7: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-08",
+      "body": "Administrative appendix 8: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-09",
+      "body": "Administrative appendix 9: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-10",
+      "body": "Administrative appendix 10: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "birch/misc-11",
+      "body": "Administrative appendix 11: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/overview",
+      "body": "The coral backup approach is documented in the operating register. It links the adopted revision and its predecessor.",
+      "connections": [
+        {
+          "target_memory_id": "coral/earlier",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/revision",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "coral/misc-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "coral/earlier",
+      "body": "coral backup approach: Snapshots ran every weekend.",
+      "connections": [
+        {
+          "target_memory_id": "coral/overview",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "coral/revision",
+      "body": "Incremental copies run each midnight.",
+      "connections": [
+        {
+          "target_memory_id": "coral/earlier",
+          "relation_type": "supersedes"
+        }
+      ]
+    },
+    {
+      "id": "coral/misc-00",
+      "body": "Administrative appendix 0: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-01",
+      "body": "Administrative appendix 1: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-02",
+      "body": "Administrative appendix 2: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-03",
+      "body": "Administrative appendix 3: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-04",
+      "body": "Administrative appendix 4: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-05",
+      "body": "Administrative appendix 5: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-06",
+      "body": "Administrative appendix 6: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-07",
+      "body": "Administrative appendix 7: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-08",
+      "body": "Administrative appendix 8: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-09",
+      "body": "Administrative appendix 9: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-10",
+      "body": "Administrative appendix 10: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "coral/misc-11",
+      "body": "Administrative appendix 11: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/overview",
+      "body": "The delta release process is documented in the operating register. It links the adopted revision and its predecessor.",
+      "connections": [
+        {
+          "target_memory_id": "delta/earlier",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/revision",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "delta/misc-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "delta/earlier",
+      "body": "delta release process: Operators switched all traffic at once.",
+      "connections": [
+        {
+          "target_memory_id": "delta/overview",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "delta/revision",
+      "body": "Canary cohorts precede gradual traffic shifts.",
+      "connections": [
+        {
+          "target_memory_id": "delta/earlier",
+          "relation_type": "supersedes"
+        }
+      ]
+    },
+    {
+      "id": "delta/misc-00",
+      "body": "Administrative appendix 0: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-01",
+      "body": "Administrative appendix 1: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-02",
+      "body": "Administrative appendix 2: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-03",
+      "body": "Administrative appendix 3: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-04",
+      "body": "Administrative appendix 4: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-05",
+      "body": "Administrative appendix 5: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-06",
+      "body": "Administrative appendix 6: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-07",
+      "body": "Administrative appendix 7: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-08",
+      "body": "Administrative appendix 8: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-09",
+      "body": "Administrative appendix 9: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-10",
+      "body": "Administrative appendix 10: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "delta/misc-11",
+      "body": "Administrative appendix 11: Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. Lunch seating rotation, inventory labels, meeting-room signage, archived stationery orders. ",
+      "connections": []
+    },
+    {
+      "id": "ember/incident",
+      "body": "The ember outage was recorded during the morning review. The diagnosis is attached separately.",
+      "connections": [
+        {
+          "target_memory_id": "ember/cause",
+          "relation_type": "caused_by"
+        },
+        {
+          "target_memory_id": "ember/attachment-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "ember/attachment-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "ember/cause",
+      "body": "A stale certificate blocked the handshake.",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-00",
+      "body": "Attachment 0: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-01",
+      "body": "Attachment 1: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-02",
+      "body": "Attachment 2: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-03",
+      "body": "Attachment 3: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-04",
+      "body": "Attachment 4: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-05",
+      "body": "Attachment 5: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-06",
+      "body": "Attachment 6: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-07",
+      "body": "Attachment 7: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-08",
+      "body": "Attachment 8: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-09",
+      "body": "Attachment 9: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-10",
+      "body": "Attachment 10: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "ember/attachment-11",
+      "body": "Attachment 11: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/incident",
+      "body": "The fjord shipping delay was recorded during the morning review. The diagnosis is attached separately.",
+      "connections": [
+        {
+          "target_memory_id": "fjord/cause",
+          "relation_type": "caused_by"
+        },
+        {
+          "target_memory_id": "fjord/attachment-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "fjord/attachment-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "fjord/cause",
+      "body": "Flooding closed the only access bridge.",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-00",
+      "body": "Attachment 0: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-01",
+      "body": "Attachment 1: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-02",
+      "body": "Attachment 2: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-03",
+      "body": "Attachment 3: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-04",
+      "body": "Attachment 4: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-05",
+      "body": "Attachment 5: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-06",
+      "body": "Attachment 6: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-07",
+      "body": "Attachment 7: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-08",
+      "body": "Attachment 8: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-09",
+      "body": "Attachment 9: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-10",
+      "body": "Attachment 10: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "fjord/attachment-11",
+      "body": "Attachment 11: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/incident",
+      "body": "The grove test failure was recorded during the morning review. The diagnosis is attached separately.",
+      "connections": [
+        {
+          "target_memory_id": "grove/cause",
+          "relation_type": "caused_by"
+        },
+        {
+          "target_memory_id": "grove/attachment-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "grove/attachment-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "grove/cause",
+      "body": "A rounding mismatch rejected the boundary value.",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-00",
+      "body": "Attachment 0: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-01",
+      "body": "Attachment 1: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-02",
+      "body": "Attachment 2: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-03",
+      "body": "Attachment 3: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-04",
+      "body": "Attachment 4: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-05",
+      "body": "Attachment 5: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-06",
+      "body": "Attachment 6: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-07",
+      "body": "Attachment 7: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-08",
+      "body": "Attachment 8: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-09",
+      "body": "Attachment 9: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-10",
+      "body": "Attachment 10: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "grove/attachment-11",
+      "body": "Attachment 11: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/incident",
+      "body": "The harbor quality incident was recorded during the morning review. The diagnosis is attached separately.",
+      "connections": [
+        {
+          "target_memory_id": "harbor/cause",
+          "relation_type": "caused_by"
+        },
+        {
+          "target_memory_id": "harbor/attachment-00",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-01",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-02",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-03",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-04",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-05",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-06",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-07",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-08",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-09",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-10",
+          "relation_type": "related_to"
+        },
+        {
+          "target_memory_id": "harbor/attachment-11",
+          "relation_type": "related_to"
+        }
+      ]
+    },
+    {
+      "id": "harbor/cause",
+      "body": "Contamination originated in a cracked storage seal.",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-00",
+      "body": "Attachment 0: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-01",
+      "body": "Attachment 1: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-02",
+      "body": "Attachment 2: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-03",
+      "body": "Attachment 3: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-04",
+      "body": "Attachment 4: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-05",
+      "body": "Attachment 5: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-06",
+      "body": "Attachment 6: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-07",
+      "body": "Attachment 7: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-08",
+      "body": "Attachment 8: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-09",
+      "body": "Attachment 9: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-10",
+      "body": "Attachment 10: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "harbor/attachment-11",
+      "body": "Attachment 11: Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. Office parking, supply catalog, staff directory, decoration planning. ",
+      "connections": []
+    },
+    {
+      "id": "iris/event",
+      "body": "Iris reconciliation finished with a discrepancy.",
+      "connections": [
+        {
+          "target_memory_id": "iris/detail",
+          "relation_type": "documents"
+        }
+      ]
+    },
+    {
+      "id": "iris/detail",
+      "body": "The journal omitted three invoices.",
+      "connections": []
+    },
+    {
+      "id": "juniper/event",
+      "body": "Juniper provisioning failed.",
+      "connections": [
+        {
+          "target_memory_id": "juniper/bridge",
+          "relation_type": "caused_by"
+        }
+      ]
+    },
+    {
+      "id": "juniper/bridge",
+      "body": "The diagnosis refers to an attachment.",
+      "connections": [
+        {
+          "target_memory_id": "juniper/root",
+          "relation_type": "caused_by"
+        }
+      ]
+    },
+    {
+      "id": "juniper/root",
+      "body": "A quota ceiling prevented resource creation.",
+      "connections": []
+    }
+  ],
+  "queries": [
+    {
+      "id": "atlas-current",
+      "kind": "temporal",
+      "query": "What is the current atlas runtime strategy?",
+      "relevant_ids": [
+        "atlas/revision"
+      ]
+    },
+    {
+      "id": "atlas-neutral",
+      "kind": "neutral",
+      "query": "What does the atlas operating register document?",
+      "relevant_ids": [
+        "atlas/overview"
+      ]
+    },
+    {
+      "id": "birch-current",
+      "kind": "temporal",
+      "query": "What is the current birch delivery policy?",
+      "relevant_ids": [
+        "birch/revision"
+      ]
+    },
+    {
+      "id": "birch-neutral",
+      "kind": "neutral",
+      "query": "What does the birch operating register document?",
+      "relevant_ids": [
+        "birch/overview"
+      ]
+    },
+    {
+      "id": "coral-current",
+      "kind": "temporal",
+      "query": "What is the current coral backup approach?",
+      "relevant_ids": [
+        "coral/revision"
+      ]
+    },
+    {
+      "id": "coral-neutral",
+      "kind": "neutral",
+      "query": "What does the coral operating register document?",
+      "relevant_ids": [
+        "coral/overview"
+      ]
+    },
+    {
+      "id": "delta-current",
+      "kind": "temporal",
+      "query": "What is the current delta release process?",
+      "relevant_ids": [
+        "delta/revision"
+      ]
+    },
+    {
+      "id": "delta-neutral",
+      "kind": "neutral",
+      "query": "What does the delta operating register document?",
+      "relevant_ids": [
+        "delta/overview"
+      ]
+    },
+    {
+      "id": "ember-cause",
+      "kind": "multi_evidence",
+      "query": "What happened in the ember outage and why?",
+      "relevant_ids": [
+        "ember/incident",
+        "ember/cause"
+      ]
+    },
+    {
+      "id": "fjord-cause",
+      "kind": "multi_evidence",
+      "query": "What happened in the fjord shipping delay and why?",
+      "relevant_ids": [
+        "fjord/incident",
+        "fjord/cause"
+      ]
+    },
+    {
+      "id": "grove-cause",
+      "kind": "multi_evidence",
+      "query": "What happened in the grove test failure and why?",
+      "relevant_ids": [
+        "grove/incident",
+        "grove/cause"
+      ]
+    },
+    {
+      "id": "harbor-cause",
+      "kind": "multi_evidence",
+      "query": "What happened in the harbor quality incident and why?",
+      "relevant_ids": [
+        "harbor/incident",
+        "harbor/cause"
+      ]
+    },
+    {
+      "id": "iris-unmodeled",
+      "kind": "unmodeled_relation",
+      "query": "What explains the Iris reconciliation discrepancy?",
+      "relevant_ids": [
+        "iris/event",
+        "iris/detail"
+      ]
+    },
+    {
+      "id": "juniper-two-hop",
+      "kind": "two_hop_limit",
+      "query": "Why did Juniper provisioning fail?",
+      "relevant_ids": [
+        "juniper/event",
+        "juniper/root"
+      ]
+    },
+    {
+      "id": "unknown",
+      "kind": "no_match",
+      "query": "zyxquuxwombat",
+      "relevant_ids": []
+    }
+  ]
+}
