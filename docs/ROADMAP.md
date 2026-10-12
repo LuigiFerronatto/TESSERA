@@ -252,7 +252,7 @@ THEN — Agent integration
 39 #196 Hooks Core (project/runtime-agnostic lifecycle hook contract)
 40 #177 Runtime adapters (Claude/Codex/Gemini/Copilot/...)
 41 #190 Integration UX (`tessera integrate <runtime>` / `tessera mcp setup`)
-   Experimental plan/transaction candidate only; real-client/semantic/hook gates remain open.
+   IMPLEMENTED via #317 (merge c90f69f); not VALIDATED: real-client/semantic/hook gates remain open.
    Record: docs/test-cards/190-reversible-integration-plans.md
 42 #191 Historical conversation import
 43 #121 Official TESSERA Skills             READY (unselected)

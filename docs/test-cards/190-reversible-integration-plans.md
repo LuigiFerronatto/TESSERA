@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | runtime |
-| Pull request | [Draft PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
-| Head commit | See draft PR exact head; not canonical |
-| Merge commit | Not merged |
+| Pull request | [PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
+| Head commit | `7d83df7fe0ffb08bfc568b471d28c724c7df58cd` (final candidate; not canonical) |
+| Merge commit | `c90f69faa6b3b06c7396855222e7bee83e2e9d88` (canonical, merged 2026-10-12) |
 | Decision | `PENDING` |
 | Benchmark applicability | `SMOKE_ONLY` |
 | Last audited | 2026-10-02 |
@@ -99,8 +99,8 @@ semantic/hook dependency is marked satisfied.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#190](https://github.com/LuigiFerronatto/TESSERA/issues/190), including Copilot/portability comments |
-| Pull request | [Draft PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
-| Merge commit | Not merged |
+| Pull request | [PR #317](https://github.com/LuigiFerronatto/TESSERA/pull/317) |
+| Merge commit | `c90f69faa6b3b06c7396855222e7bee83e2e9d88` (canonical, merged 2026-10-12) |
 | Evidence/Learnings/Decision | [Boundaries and source pins](../INTEGRATION_SETUP.md); `PENDING` |
 | Benchmark record | `SMOKE_ONLY`; deterministic sanity, no retrieval changes |
 | PR Evolution Audit | Existing #120 retained; #317 first adds previews/transactions, then hash-bound CLI and provider planning; no canonical #190 delivery claimed |
