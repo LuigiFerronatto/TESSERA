@@ -262,20 +262,28 @@ class WriteResult:
     filepath: Optional[str]
     persisted: bool
     decision: WriteGateDecision
+    write_receipt: Optional[Any] = None
 
     def __post_init__(self) -> None:
         accepted = self.decision.admission in {
             WriteAdmission.ACCEPT,
             WriteAdmission.ACCEPT_SANITIZED,
         }
-        if self.persisted != accepted:
+        if (self.persisted and not accepted) or (accepted and not self.persisted and self.write_receipt is None):
             raise ValueError("persisted must match an accepted admission")
+        if self.write_receipt is not None and (
+            self.write_receipt.persisted != self.persisted
+            or self.write_receipt.memory_id != self.memory_id
+        ):
+            raise ValueError("receipt and write result must describe the same outcome")
         if self.persisted != (self.filepath is not None):
             raise ValueError("filepath must exist if and only if persistence succeeded")
 
     def to_dict(self) -> Dict[str, Any]:
         payload = {"memory_id": self.memory_id, "filepath": self.filepath, "persisted": self.persisted}
         payload.update(self.decision.to_dict())
+        if self.write_receipt is not None:
+            payload["write_receipt"] = self.write_receipt.to_dict()
         return payload
 
 

@@ -11,3 +11,5 @@ dist/
 .benchmark-data/
 artifacts/longmemeval-v1/
 artifacts/benchmark-reporting/
+
+artifacts/rendering/
