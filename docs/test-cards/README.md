@@ -86,6 +86,9 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | #166 / #119 Unified CLI presentation | `IN_PROGRESS` | [166-unified-cli-presentation.md](166-unified-cli-presentation.md) | [Issue #166](https://github.com/LuigiFerronatto/TESSERA/issues/166), [CLI output contract](../CLI_OUTPUT.md); candidate review pending |
 
+| #78 Project-neutral history | `IN_PROGRESS` | [78-project-neutral-history.md](78-project-neutral-history.md) | Public cleanup with pinned history retained |
+| #80 Architecture diagrams | `IN_PROGRESS` | [80-architecture-diagrams.md](80-architecture-diagrams.md) | Six source-mapped current/experimental SVGs |
+
 ## Stage map
 
 The [roadmap](../ROADMAP.md) remains the sequencing source of truth. This directory is the explanation layer.
