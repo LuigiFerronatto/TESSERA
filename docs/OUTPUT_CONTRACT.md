@@ -225,6 +225,27 @@ which exact source version?
 which canonical source span?
 ```
 
+### Physical source paths and freshness
+
+`source.path` is relative to `ResolvedConfiguration.source_identity_root`
+(or `engine.source_identity_root`). A configured project corpus uses one
+project-root namespace for documents and generated memories, so `docs/guide.md`
+and `memories/docs/guide.md` are distinct sources. Legacy and store-only corpora
+retain their store-relative paths. Logical memory IDs and explicit relation
+targets remain independent of these physical keys.
+
+For freshness checks on a project corpus, pass its resolved configuration to
+`verify_evidence_freshness(record, configuration)`. A directory string remains
+supported and is treated as the explicit source-path base. Use
+`configuration.source_identity_root` when passing a string; do not assume every
+project source path is relative to the generated-memory store.
+
+Derived graph cache schema 3 invalidates older snapshots and reparses sources.
+Manifest identities are retained when their physical source can be recovered
+unambiguously. Previously conflated source identities are separated; an
+ambiguous legacy entry is not treated as proof that two sources are identical.
+Source files are never rewritten during this repair.
+
 ## `evidence`
 
 Query-specific record created only when `relevant_evidence` exists:
@@ -378,3 +399,24 @@ For a high-stakes or conflicting future scenario, the agent should use provenanc
   [`ADR 0001`](adr/0001-core-vs-optional-llm-boundary.md).
 
 These are documented so future PRs can improve them without pretending the current contract is stronger than it is.
+
+## Optional historical evidence lookup (#73 candidate)
+
+`revision_history=True` on the Python Engine preserves issued evidence IDs and
+full observed source revisions outside derived indexes. Current retrieval result
+fields and ranking are unchanged; historical versions are not live memories.
+`engine.revision_history.resolve_evidence(evidence_id)` separately returns the
+archived evidence record, source text and known span, or `None` for an unknown
+ID. `status: archived` denotes availability only, never freshness or temporal
+validity. See the [complete contract](REVISION_HISTORY.md).
+
+## Automatic-memory source lineage (#137)
+
+Automatically decomposed memories additionally expose `lineage`: the original
+source episode, ordered supporting positions, the last supporting position,
+version-aware source/turn evidence and a freshly verified linkage status.
+This is distinct from `provenance`/`evidence`, which still describe the atomic
+note itself. It does not alter relevance scores or imply validity/entailment.
+Legacy manual notes omit this field; section-only automatic inputs report
+`episode_only_no_source_turns` rather than inventing IDs. See the complete
+[episode lineage contract](EPISODE_LINEAGE.md) for fields and failure semantics.
