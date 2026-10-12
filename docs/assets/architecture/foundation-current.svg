@@ -11,7 +11,7 @@
   <text x="44" y="53" font-size="32" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Current Foundation architecture</text>
   <text x="44" y="89" font-size="18" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">These components exist on the dated baseline. Optional assistance is separate.</text>
   <text x="44" y="489" font-size="18" fill="#23506c" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">CURRENT FOUNDATION: audited canonical baseline</text>
-  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md</text>
+  <text x="44" y="520" font-size="14" fill="#516a7e" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Baseline 20814a47 / 2026-10-02     Sources and limits: docs/architecture/architecture-diagrams.md</text>
   <rect x="44" y="145" width="350" height="110" rx="6" fill="#edf5fb" stroke="#28597a" stroke-width="2" stroke-dasharray="none" />
   <text x="62" y="179" font-size="22" fill="#142b45" font-weight="bold" font-family="DejaVu Sans, Arial, sans-serif">Configuration</text>
   <text x="62" y="211" font-size="18" fill="#142b45" font-weight="normal" font-family="DejaVu Sans, Arial, sans-serif">Generated store, readable</text>

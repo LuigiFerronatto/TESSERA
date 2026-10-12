@@ -2,7 +2,7 @@
 
 The exported Markdown is source evidence, not a memory admission. The original
 export is never rewritten; its hash and line references remain in the envelope.
-See docs/CONVERSATION_IMPORT.md for the versioned, deliberately narrow adapters.
+See docs/reference/conversation-import.md for the versioned, deliberately narrow adapters.
 """
 from __future__ import annotations
 

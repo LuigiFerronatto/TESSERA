@@ -4,7 +4,7 @@ All notable TESSERA product changes are recorded here.
 
 This is a **curated product history**, not an automatically generated commit log. Pull requests should update `Unreleased` when they change product behavior, public contracts, configuration, supported inputs or user-visible capabilities. Documentation-only changes may mark changelog impact as N/A when they do not alter the product contract.
 
-See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
+See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the update rules.
 
 ## Unreleased
 
@@ -91,7 +91,7 @@ _Nothing yet._
   delayed line-based progress and PTY/ASCII/cancellation coverage. Ordinary
   commands no longer perform advisory update checks; use `update --check`.
 - Documented versioned exit-code compatibility and remaining integration,
-  intelligence, enrichment and review boundaries in `docs/CLI_OUTPUT.md`.
+  intelligence, enrichment and review boundaries in `docs/reference/cli-output.md`.
 ### Experimental
 
 - Automatic decomposition retains an independently inspectable Markdown source
@@ -118,7 +118,7 @@ _Nothing yet._
 - Added opt-in Python `revision_history=True`: durable observed full-source
   revisions and issued evidence IDs outside the disposable index, with old-body
   preservation before overwrites and explicit archive failures. Historical
-  revisions do not become live memories. See [revision history](docs/REVISION_HISTORY.md)
+  revisions do not become live memories. See [revision history](docs/reference/revision-history.md)
   and [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73); temporal validity
   and default activation remain separate decisions.
 ### Added
@@ -184,7 +184,7 @@ _Nothing yet._
   Python/CLI deterministic decomposition fallback remains unchanged.
 - Raised the optional MCP SDK minimum to 1.30.0 (v1; Python 3.10+), with real
   installed-wheel stdio protocol validation on Python 3.12. Base Python 3.9
-  support remains. See [runtime contract](docs/MCP_RUNTIME.md).
+  support remains. See [runtime contract](docs/reference/mcp-runtime.md).
 
 ### Architecture Decisions
 - Removed the positive human-approval prerequisite from the deterministic Merge
@@ -197,7 +197,7 @@ _Nothing yet._
 - Retired automatic AI pull-request reviews and their CI gate. Deterministic
   tests, builds, offline benchmarks, conflict/thread checks and active review objections
   remain; GitHub branch-protection migration is a separate admin step.
-  See [current governance](docs/AGENTIC_GOVERNANCE.md).
+  See [current governance](docs/process/agentic-governance.md).
 - Added a deterministic, idempotent sync tool
   (`scripts/sync_project_board.py`) that reflects each open issue's own
   authoritative `## Portfolio routing` block onto GitHub Project #9's
@@ -205,7 +205,7 @@ _Nothing yet._
   `governance/portfolio_execution.yaml` manifest as the canonical source for
   the board's Execution (`HORIZON`) and `Queue` ordering. This is
   repository-process tooling, not a TESSERA product/runtime capability; see
-  [`docs/PROJECT_BOARD_SYNC.md`](docs/PROJECT_BOARD_SYNC.md). Benchmark
+  [`docs/process/project-board-sync.md`](docs/process/project-board-sync.md). Benchmark
   applicability: NOT_APPLICABLE (governance tooling only, no runtime
   behavior changed). ([#203](https://github.com/LuigiFerronatto/TESSERA/issues/203))
 - Added an agentic repository-governance system (issue triage, independent
@@ -213,7 +213,7 @@ _Nothing yet._
   lifecycle reconciliation, weekly documentation-drift audit) built on
   GitHub Agentic Workflows. This is repository-process automation, not a
   TESSERA product/runtime capability; see
-  [`docs/AGENTIC_GOVERNANCE.md`](docs/AGENTIC_GOVERNANCE.md). Benchmark
+  [`docs/process/agentic-governance.md`](docs/process/agentic-governance.md). Benchmark
   applicability: NOT_APPLICABLE (workflow/docs/governance-test only, no
   runtime behavior changed).
 

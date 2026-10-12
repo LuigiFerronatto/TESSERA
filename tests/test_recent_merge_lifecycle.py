@@ -2,7 +2,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RECORDS = ROOT / "docs/test-cards"
+RECORDS = ROOT / "docs/process/test-cards"
 
 
 def test_corpus_repair_records_merge_and_exact_head_keep_without_false_pass():

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_paper_code_status_and_owner_are_explicit():
-    text = (ROOT / "docs/QUMEM-GAP-ANALYSIS.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs/research/qumem-gap-analysis.md").read_text(encoding="utf-8")
     assert "20814a47ec0f72d7bea0639e0b057df1ecf5cded" in text
     assert "https://arxiv.org/html/2608.16168v1" in text
     assert "| Concept | Paper behavior | TESSERA main" in text
@@ -25,8 +25,8 @@ def test_paper_code_status_and_owner_are_explicit():
 
 
 def test_current_entrypoints_link_the_fidelity_map():
-    for name in ("README.md", "docs/README.md", "docs/research/REFERENCES.md", "docs/ROADMAP.md"):
-        assert "QUMEM-GAP-ANALYSIS.md" in (ROOT / name).read_text(encoding="utf-8"), name
+    for name in ("README.md", "docs/README.md", "docs/research/references.md", "docs/process/roadmap.md"):
+        assert "qumem-gap-analysis.md" in (ROOT / name).read_text(encoding="utf-8"), name
 
 
 def test_docstrings_name_the_actual_baseline_without_changing_prompts():
@@ -34,14 +34,14 @@ def test_docstrings_name_the_actual_baseline_without_changing_prompts():
     for name in ("decomposer", "episode_boundary", "orchestrator"):
         tree = ast.parse((ROOT / f"tessera/{name}.py").read_text(encoding="utf-8"))
         docs[name] = ast.get_docstring(tree)
-        assert "QUMEM-GAP-ANALYSIS.md" in docs[name]
+        assert "qumem-gap-analysis.md" in docs[name]
     assert "one mixed-type extraction call" in docs["decomposer"]
     assert "does not distinguish user" in docs["episode_boundary"]
     assert "free text" in docs["orchestrator"]
 
 
 def test_merged_documentation_record_cannot_promote_runtime_fidelity():
-    text = (ROOT / "docs/test-cards/146-qumem-fidelity-documentation.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs/process/test-cards/146-qumem-fidelity-documentation.md").read_text(encoding="utf-8")
     header = text.split("## In one sentence", 1)[0]
     assert "| Record status | `IMPLEMENTED` |" in header
     assert "| Decision | `PENDING`" in header

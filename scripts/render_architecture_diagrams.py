@@ -41,7 +41,7 @@ def canvas(title,subtitle,status='current'):
     text(s,44,53,title,32,weight='bold');text(s,44,89,subtitle,18,'#516a7e')
     label='EXPERIMENTAL TARGET: conditional, not delivered' if status=='experimental' else 'CURRENT FOUNDATION: audited canonical baseline'
     text(s,44,489,label,18,'#a44b00' if status=='experimental' else '#23506c',weight='bold')
-    text(s,44,520,'Baseline '+BASELINE+'     Sources and limits: docs/ARCHITECTURE_DIAGRAMS.md',14,'#516a7e')
+    text(s,44,520,'Baseline '+BASELINE+'     Sources and limits: docs/architecture/architecture-diagrams.md',14,'#516a7e')
     return s
 
 

@@ -310,7 +310,7 @@ def test_required_semantic_parity_benchmark_and_negative_controls():
 
 
 def test_machine_readable_schema_matches_python_envelope():
-    schema = json.loads((ROOT / "docs/schemas/lifecycle-event-v1.json").read_text())
+    schema = json.loads((ROOT / "docs/reference/schemas/lifecycle-event-v1.json").read_text())
     data = event().to_dict()
     assert set(schema["required"]) == set(data)
     assert schema["properties"]["canonical_type"]["enum"] == [kind.value for kind in EventType]

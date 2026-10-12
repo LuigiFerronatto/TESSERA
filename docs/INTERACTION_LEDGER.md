@@ -173,4 +173,4 @@ synthetic mechanics and overhead evidence. The benchmark prints observed local
 latencies; it establishes no production overhead SLA or retrieval-quality gain.
 Session resume/compaction, subagent lineage, context packets, HTTP parity,
 end-to-end failure classification and diagnostic-time reduction remain untested
-and gated. See the [stage record](test-cards/259-private-operational-ledger.md).
+and gated. See the [stage record](process/test-cards/259-private-operational-ledger.md).

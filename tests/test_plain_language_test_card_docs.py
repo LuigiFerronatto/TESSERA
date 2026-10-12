@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RECORDS_DIR = ROOT / "docs" / "test-cards"
+RECORDS_DIR = ROOT / "docs" / "process" / "test-cards"
 INDEX = RECORDS_DIR / "README.md"
 TEMPLATE = RECORDS_DIR / "TEMPLATE.md"
 
@@ -82,7 +82,7 @@ def test_issue_and_pr_templates_require_stage_record() -> None:
     ).read_text(encoding="utf-8")
 
     assert "## Plain-language stage record" in issue_template
-    assert "docs/test-cards/<issue>-<slug>.md" in issue_template
+    assert "docs/process/test-cards/<issue>-<slug>.md" in issue_template
     assert "**Plain-language stage record:**" in pr_template
     assert "Plain-language stage record created/updated" in pr_template
 
@@ -95,7 +95,7 @@ def test_issue_and_pr_templates_require_clear_english_authoring() -> None:
         ROOT / ".github" / "pull_request_template.md"
     ).read_text(encoding="utf-8")
     contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
-    operating_model = (ROOT / "docs" / "TEST_CARD_OPERATING_MODEL.md").read_text(
+    operating_model = (ROOT / "docs" / "process" / "test-card-operating-model.md").read_text(
         encoding="utf-8"
     )
 
@@ -124,10 +124,10 @@ def test_issue_and_pr_templates_require_clear_english_authoring() -> None:
 
 def test_documentation_map_and_roadmap_link_stage_records() -> None:
     docs_map = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
-    roadmap = (ROOT / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "docs" / "process" / "roadmap.md").read_text(encoding="utf-8")
 
     assert "test-cards/README.md" in docs_map
-    assert "docs/test-cards/" in roadmap
+    assert "docs/process/test-cards/" in roadmap
     assert "#109" in roadmap
     assert "0c0b6385f67ff5451d8a6884f3b7764cb4b7e4e2" in roadmap
 

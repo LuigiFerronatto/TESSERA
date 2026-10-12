@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EVIDENCE = ROOT / "docs" / "evidence" / "179-memory-lifecycle"
+EVIDENCE = ROOT / "docs" / "process" / "evidence" / "179-memory-lifecycle"
 ALLOWED_OWNERS = {120, 121, 137, 138, 167, 168, 169, 171, 177, 178, 15, 16}
 LABELS = {"code", "docs", "inference", "unknown"}
 
@@ -97,7 +97,7 @@ def test_owner_snapshot_and_historical_boundaries_are_explicit():
     owners = load("owners.json")
     assert {o["issue"] for o in owners["owners"]} == ALLOWED_OWNERS
     assert next(o for o in owners["owners"] if o["issue"] == 120)["state"] == "closed"
-    report = (ROOT / "docs/research/MEMORY_LIFECYCLE_2026-10-02.md").read_text()
+    report = (ROOT / "docs/research/memory-lifecycle-2026-10-02.md").read_text()
     for marker in (
         "unreleased", "v3.6.0", "extraction-only", "archive", "reference_time",
         "FEEDBACK_RECEIVED", "NOT_APPLICABLE", "PENDING", "No new issue",
@@ -109,7 +109,7 @@ def test_owner_snapshot_and_historical_boundaries_are_explicit():
 
 
 def test_rendered_matrix_preserves_each_claim_and_source_link():
-    report = (ROOT / "docs/research/MEMORY_LIFECYCLE_2026-10-02.md").read_text()
+    report = (ROOT / "docs/research/memory-lifecycle-2026-10-02.md").read_text()
     sources = {s["id"]: s for s in load("sources.json")["sources"]}
     with (EVIDENCE / "matrix.csv").open(encoding="utf-8", newline="") as stream:
         exported = {r["system"]: r for r in csv.DictReader(stream)}

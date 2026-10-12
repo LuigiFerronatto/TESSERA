@@ -99,7 +99,7 @@ Recall@5/nDCG@5; its density remains below A0. Selected graph evidence can still
 rank below lexical distractors, and weak lexical seeds can trigger irrelevant
 relation expansions. This does **not** meet the quality-over-both gate. It is
 reason to retain the existing default and iterate, not claim a production gain.
-See [the Test Card record](../../docs/test-cards/25-budgeted-graph-expansion.md).
+See [the Test Card record](../../docs/process/test-cards/25-budgeted-graph-expansion.md).
 
 The existing `REQUIRED` Benchmark Ledger remains the independent exact-head
 LongMemEval V1 dev-50 regression gate against immediate parent and #96. Its
