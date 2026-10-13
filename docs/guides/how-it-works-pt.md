@@ -238,7 +238,7 @@ sobre ExampleAgent ou sobre a Example Organization.
 ### O que falta para o "plug-and-play" de verdade (próximas evoluções):
 1. ✅ **Publicar no PyPI** (`pip install tessera-agent-memory` ou `uv pip install
    tessera-agent-memory` de qualquer lugar, sem clonar o repo). O próximo release planejado é
-   `tessera-agent-memory==0.0.4`; `0.0.1` e `0.0.3` já estão publicados.
+   `tessera-agent-memory==0.0.5`; `0.0.1`, `0.0.3` e `0.0.4` já estão publicados.
 2. ✅ **Um wizard de setup** (`tessera quickstart`) — implementado
    2026-08-25: detecta o projeto atual (node/python/rust/go/genérico),
    reaproveita um `.claude/memory` existente ou sugere `./memories`, gera

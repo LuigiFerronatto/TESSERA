@@ -27,13 +27,13 @@ CLI remain `tessera`.
 Install the released package with:
 
 ```bash
-python -m pip install "tessera-agent-memory==0.0.4"
+python -m pip install "tessera-agent-memory==0.0.5"
 ```
 
 Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 
 ```bash
-uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.4"
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.5"
 ```
 
 To upgrade from PyPI:
@@ -43,7 +43,7 @@ uv pip install \
   --index-url https://pypi.org/simple \
   --refresh \
   --upgrade \
-  tessera-agent-memory==0.0.4
+  tessera-agent-memory==0.0.5
 ```
 
 If you do not have an environment yet, create one first with `uv venv`.
@@ -67,10 +67,10 @@ checkout:
 
 ```bash
 uv build
-python -m pip install ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
-python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
+python -m pip install ./dist/tessera_agent_memory-0.0.5-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.5-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.5-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.5-py3-none-any.whl
 python -m pip uninstall tessera-agent-memory
 ```
 
