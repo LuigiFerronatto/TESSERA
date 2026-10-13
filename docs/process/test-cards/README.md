@@ -87,7 +87,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 
 | #146 QUMem fidelity documentation | `IMPLEMENTED` | [146-qumem-fidelity-documentation.md](146-qumem-fidelity-documentation.md) | [PR #284](https://github.com/LuigiFerronatto/TESSERA/pull/284), canonical merge `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`; canonical CI passed, independent decision `PENDING`; no child implementation promoted |
 
-| #71 Harness adapter registry | `IN_PROGRESS` | [71-harness-adapter-registry.md](71-harness-adapter-registry.md) | Immutable format defaults; no authority/precedence change |
+| #71 Harness adapter registry | `IMPLEMENTED` | [71-harness-adapter-registry.md](71-harness-adapter-registry.md) | PR #289 merged as `f149ff292238e2a6f5cdd95894e9c11c365457f2`; canonical CI green; lifecycle decision pending |
 
 | #121 Official agent Skills | `IN_PROGRESS` | [121-official-agent-skills.md](121-official-agent-skills.md) | Five thin current-capability instructions and artifact tests |
 
