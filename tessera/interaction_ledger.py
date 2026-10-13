@@ -196,12 +196,27 @@ class InteractionLedger:
             path = Path(str(self.path) + suffix)
             try:
                 info = path.lstat()
+                if suffix == "-journal" and stat.S_ISREG(info.st_mode) and info.st_nlink == 0:
+                    # Linux may stat a rollback journal just as SQLite unlinks
+                    # it. Validate the current name once more; never accept the
+                    # zero-link snapshot itself or skip checks on a replacement.
+                    info = path.lstat()
                 if info.st_nlink > 1 and stat.S_ISREG(info.st_mode):
                     # Atomic bootstrap publication briefly has two links until
-                    # its temporary name is removed. Recheck without opening it;
-                    # persistent hard links still fail closed.
-                    time.sleep(0.001)
-                    info = path.lstat()
+                    # its temporary name is removed. A single 1 ms sleep is not
+                    # sufficient when the publisher is scheduled out. Wait only
+                    # within a bounded monotonic window, never opening the file
+                    # while linked; persistent links still fail closed below.
+                    deadline = time.monotonic() + 0.25
+                    identity = (info.st_dev, info.st_ino)
+                    while stat.S_ISREG(info.st_mode) and info.st_nlink > 1:
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            break
+                        time.sleep(min(0.001, remaining))
+                        info = path.lstat()
+                        if (info.st_dev, info.st_ino) != identity:
+                            raise LedgerError("unsafe_ledger_path")
             except FileNotFoundError:
                 continue
             if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:

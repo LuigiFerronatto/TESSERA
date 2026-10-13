@@ -483,3 +483,117 @@ def test_wal_mode_is_refused_before_any_sqlite_connection(tmp_path, monkeypatch,
         assert files(tmp_path) == before
     finally:
         connection.close()
+
+
+def test_bootstrap_publication_waits_for_delayed_temporary_unlink(tmp_path, monkeypatch):
+    """A scheduled-out publisher may retain its second link beyond 1 ms."""
+    import threading
+    import tessera.interaction_ledger as module
+
+    instance = ledger(tmp_path)
+    published = threading.Event()
+    release = threading.Event()
+    original_link = os.link
+    original_sleep = module.time.sleep
+    retries = []
+
+    def paused_link(source, destination):
+        original_link(source, destination)
+        published.set()
+        assert release.wait(5)
+
+    def observed_sleep(seconds):
+        retries.append(seconds)
+        if len(retries) == 3:
+            release.set()
+        original_sleep(seconds)
+
+    monkeypatch.setattr(module.os, "link", paused_link)
+    monkeypatch.setattr(module.time, "sleep", observed_sleep)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        publisher = pool.submit(instance._initialize)
+        try:
+            assert published.wait(5)
+            assert instance.path.stat().st_nlink == 2
+            assert instance.append(event(), now_ms=NOW) == "recorded"
+        finally:
+            release.set()
+            publisher.result(timeout=5)
+    assert len(retries) >= 3
+    assert instance.path.stat().st_nlink == 1
+    assert len(instance.events(now_ms=NOW)) == 1
+
+
+def test_persistent_ledger_hardlink_wait_is_bounded_and_read_only(tmp_path, monkeypatch):
+    import tessera.interaction_ledger as module
+
+    instance = ledger(tmp_path)
+    instance.append(event(), now_ms=NOW)
+    alias = tmp_path / "persistent-alias"
+    os.link(instance.path, alias)
+    before = files(tmp_path)
+    ticks = iter(n / 100 for n in range(100))
+    sleeps = []
+    monkeypatch.setattr(module.time, "monotonic", lambda: next(ticks))
+    monkeypatch.setattr(module.time, "sleep", sleeps.append)
+    with pytest.raises(LedgerError, match="unsafe_ledger_path"):
+        instance.append(event(101), now_ms=NOW)
+    assert 1 < len(sleeps) <= 25
+    assert files(tmp_path) == before
+
+
+def test_bootstrap_wait_rejects_replaced_inode(tmp_path, monkeypatch):
+    import tessera.interaction_ledger as module
+
+    instance = ledger(tmp_path)
+    instance.append(event(), now_ms=NOW)
+    alias = tmp_path / "original-alias"
+    os.link(instance.path, alias)
+    original = alias.read_bytes()
+
+    def swap_path(seconds):
+        instance.path.unlink()
+        instance.path.write_bytes(original)
+
+    monkeypatch.setattr(module.time, "sleep", swap_path)
+    with pytest.raises(LedgerError, match="unsafe_ledger_path"):
+        instance.append(event(101), now_ms=NOW)
+    assert alias.read_bytes() == original
+    assert instance.path.read_bytes() == original
+
+
+@pytest.mark.parametrize("replacement", ["absent", "regular", "symlink", "hardlink", "zero"])
+def test_unlinked_rollback_journal_snapshot_is_rechecked(tmp_path, monkeypatch, replacement):
+    instance = ledger(tmp_path)
+    instance.append(event(), now_ms=NOW)
+    journal = Path(str(instance.path) + "-journal")
+    victim = tmp_path / "victim"
+    victim.write_bytes(b"unchanged synthetic victim")
+    if replacement == "symlink":
+        journal.symlink_to(victim)
+    elif replacement == "hardlink":
+        os.link(victim, journal)
+    elif replacement in {"regular", "zero"}:
+        journal.write_bytes(b"")
+    # Model a real Linux lstat snapshot observed during SQLite journal unlink.
+    snapshot = list(victim.stat())
+    snapshot[3] = 0  # st_nlink
+    zero_links = os.stat_result(snapshot)
+    original_lstat = Path.lstat
+    calls = []
+
+    def raced_lstat(path, *args, **kwargs):
+        if path == journal:
+            calls.append(path)
+            if len(calls) == 1 or replacement == "zero":
+                return zero_links
+        return original_lstat(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "lstat", raced_lstat)
+    if replacement in {"absent", "regular"}:
+        instance._check_path()
+    else:
+        with pytest.raises(LedgerError, match="unsafe_ledger_path"):
+            instance._check_path()
+    assert len(calls) >= 2
+    assert victim.read_bytes() == b"unchanged synthetic victim"

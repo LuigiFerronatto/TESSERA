@@ -120,3 +120,15 @@ MCP runtime and evidence provenance, no operational ledger
 → human review and exact-head CI; no merge/closure claim
 → lifecycle identity validation before real session integration
 ```
+
+## Bootstrap race follow-up (2026-10-12)
+
+The merged mechanics can falsely reject a concurrent initializer when its
+publication link survives the previous single 1 ms retry. A focused candidate
+uses a bounded 250 ms monotonic recheck without opening linked files, preserves
+persistent-hardlink rejection, and rejects an inode replacement during the wait.
+Sustained stress also reproduced a zero-link rollback-journal stat during
+SQLite unlink. A single fresh stat now validates that current path instead of
+accepting the stale snapshot. Deterministic delayed-publication, bounded-timeout,
+inode replacement and journal replacement safety tests cover these corrections. Full session integration and lifecycle acceptance
+remain separate; this follow-up does not close #259.
