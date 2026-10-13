@@ -15,7 +15,7 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
   exact supporting-span validation and frozen synthetic A1/A2/A3 replay. No
   provider execution, source/index mutation or durable-memory admission is
   enabled; default indexing/retrieval remains deterministic. See
-  [experiment protocol](docs/ENRICHMENT_EXPERIMENT.md) ([#176](https://github.com/LuigiFerronatto/TESSERA/issues/176)).
+  [experiment protocol](docs/process/enrichment-experiment.md) ([#176](https://github.com/LuigiFerronatto/TESSERA/issues/176)).
 _Nothing yet._
 
 ## 0.0.4 — 2026-10-12

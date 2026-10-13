@@ -77,7 +77,7 @@ can later compare E0–E4 while #192 owns execution and #19 owns admission.
 
 ## Technical provenance
 
-- [Experiment protocol](../ENRICHMENT_EXPERIMENT.md)
+- [Experiment protocol](../enrichment-experiment.md)
 - `tessera/enrichment.py`, `tests/test_issue_176_enrichment.py`
 - `benchmarks/enrichment_176/synthetic-v1.json` and `synthetic-result-v1.json`
 - Canonical base: `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
