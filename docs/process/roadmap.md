@@ -1134,3 +1134,13 @@ canonical `20814a4`; it exposes generic JSONL v1 and a strict, fail-closed Claud
 linear subset. Preview/manifests, bounded reads, redaction and source identity are
 separate from episode construction, derivation/admission and live capture. This
 is not a full #191 KEEP or canonical delivery. See the [stage record](test-cards/191-conversation-source-import.md).
+
+
+### #176 offline experiment candidate (2026-10-02)
+
+The [#176 stage record](test-cards/176-source-enrichment-experiment.md) describes
+an unmerged source-preserving preview/capture-validation slice and a frozen
+synthetic protocol exercise. This does not promote the semantic experiment to
+KEEP or change portfolio routing. Human labels, authorized model execution,
+quality/cost comparisons, #192 runtime, #137 canonical lineage and #19 admission
+remain separate gates. Default deterministic indexing is unchanged.

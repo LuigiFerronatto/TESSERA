@@ -83,6 +83,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 | #73 Observed source revisions | `IN_PROGRESS` | [73-revision-history.md](73-revision-history.md) | [Issue #73](https://github.com/LuigiFerronatto/TESSERA/issues/73), [draft PR #291](https://github.com/LuigiFerronatto/TESSERA/pull/291), opt-in R2 candidate; [lifecycle evidence](../../../benchmarks/revisions/README.md) |
 | #157 Typed model profiles | `IN_PROGRESS` | [157-typed-model-profiles.md](157-typed-model-profiles.md) | [Issue #157](https://github.com/LuigiFerronatto/TESSERA/issues/157), [draft PR #286](https://github.com/LuigiFerronatto/TESSERA/pull/286); decision pending |
 | #13 Read-only Corpus Doctor | `VALIDATED` | [13-corpus-doctor.md](13-corpus-doctor.md) | [Issue #13](https://github.com/LuigiFerronatto/TESSERA/issues/13), [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), canonical merge `20814a47ec0f72d7bea0639e0b057df1ecf5cded`, `KEEP` |
+| #106 V2 protocol and synthetic preparation | `IN_PROGRESS` preparation / `BLOCKED` full | [106-v2-conformance-preparation.md](106-v2-conformance-preparation.md) | [Issue #106](https://github.com/LuigiFerronatto/TESSERA/issues/106); draft preparation, no official acceptance |
 
 | #146 QUMem fidelity documentation | `IMPLEMENTED` | [146-qumem-fidelity-documentation.md](146-qumem-fidelity-documentation.md) | [PR #284](https://github.com/LuigiFerronatto/TESSERA/pull/284), canonical merge `0a4a22c3b356c191a6f30c555eb01677ac2b85a4`; canonical CI passed, independent decision `PENDING`; no child implementation promoted |
 
@@ -101,11 +102,21 @@ experiment with proposed `ITERATE`; it does not change the current default.
 | #349 One source-selection authority (ADR 0005) | `IMPLEMENTED` architecture decision | [349-single-source-selection-authority.md](349-single-source-selection-authority.md) | [Issue #349](https://github.com/LuigiFerronatto/TESSERA/issues/349), [ADR 0005](../../architecture/adr/0005-single-source-selection-authority.md); Accepted and merged; `.gitignore` participates as a convenience-ignore layer; runtime pending #352/#353/#354 |
 | #350 Explicit-ID collision diagnostics (ADR 0006) | `IMPLEMENTED` architecture decision | [350-explicit-id-collision-diagnostics.md](350-explicit-id-collision-diagnostics.md) | [Issue #350](https://github.com/LuigiFerronatto/TESSERA/issues/350), [ADR 0006](../../architecture/adr/0006-explicit-id-collision-diagnostics.md); Accepted and merged; conflicting copies are quarantined; runtime pending #355 |
 | #361 MCP startup readiness (ADR 0008) | `IMPLEMENTED` architecture decision | [361-mcp-startup-readiness.md](361-mcp-startup-readiness.md) | [Issue #361](https://github.com/LuigiFerronatto/TESSERA/issues/361), [ADR 0008](../../architecture/adr/0008-mcp-startup-readiness.md); Accepted and merged; pre-ready calls wait within the request timeout, then `NOT_READY`; runtime pending #362 |
+| #176 Source-preserving enrichment experiment | `IN_PROGRESS` | [176-source-enrichment-experiment.md](176-source-enrichment-experiment.md) | [Issue #176](https://github.com/LuigiFerronatto/TESSERA/issues/176), offline mechanics only; semantic KEEP pending |
 
 ## Composition experiment
 
 - [#258 — safe composition of public reads](258-typed-recipes.md): `IN_PROGRESS`,
   opt-in candidate; proposed `ITERATE`, no production reuse or adoption claimed
+
+## Reader/judge/full-500 preparation candidates
+
+- [#103 pinned-reader preparation](103-pinned-reader-preparation.md): `IN_PROGRESS` offline preparation; real dev-50 reader execution remains `BLOCKED`
+- [#104 independent-human judge review](104-judge-calibration-preparation.md): `IN_PROGRESS` unlabeled review packet; actual calibration remains `BLOCKED`
+- [#105 full-500 preregistration](105-full500-preregistration-preparation.md): `IN_PROGRESS` ID/hash manifest and gate; full-set execution remains `BLOCKED`
+
+These linked draft stages do not supersede the roadmap's dependencies or imply a
+canonical delivery, quality acceptance, model selection or KEEP decision.
 
 ## Stage map
 
