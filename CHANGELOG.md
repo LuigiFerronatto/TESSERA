@@ -16,6 +16,11 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
   processor budgeting, visual query understanding, save/load and evaluation
   remain unsupported; synthetic costs are not model tokens. No runtime,
   dependencies, canonical ledger or quality claims change. (#106)
+- Add repository-only offline preparation for reader captures, independent-human
+  judge calibration review and full-500 preregistration. Model selections,
+  budgets, thresholds and human labels remain unaccepted; synthetic controls do
+  not execute or establish LongMemEval answer quality. Runtime and retrieval-only
+  ledger behavior are unchanged. (#103, #104, #105)
 _Nothing yet._
 
 ## 0.0.4 — 2026-10-12
