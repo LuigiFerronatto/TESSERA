@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) |
-| Record status | `IN_PROGRESS` preparation / `BLOCKED` full card |
+| Record status | `IMPLEMENTED` preparation (merged; canonical-merge CI/benchmark evidence not yet confirmed, so not `VALIDATED`) / `BLOCKED` full card |
 | Capability type | benchmark |
-| Pull request | [Draft PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323) |
-| Head commit | Exact candidate identified by the PR and local manifest |
-| Merge commit | Not merged |
+| Pull request | [PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323), merged 2026-10-13 |
+| Head commit | `99f47dd9e6a42ce307394dc3dbfaa85de3f4c7e1` (final candidate) |
+| Merge commit | `e9cfb46b54b4330caa3c0ced009f88a72bbb3c1d` (canonical) |
 | Decision | `ITERATE` |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-12 |
@@ -79,8 +79,8 @@ medium additionally needs a separate readiness and approved resource decision.
 | Artifact | Link or identifier |
 |---|---|
 | Issue/Test Card | [#106](https://github.com/LuigiFerronatto/TESSERA/issues/106) |
-| Pull request | [Draft PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323), not merged |
-| Merge commit | None |
+| Pull request | [PR #323](https://github.com/LuigiFerronatto/TESSERA/pull/323), merged |
+| Merge commit | `e9cfb46b54b4330caa3c0ced009f88a72bbb3c1d` |
 | Evidence/Learnings/Decision | Protocol audit and synthetic tests; ITERATE |
 | Benchmark record | Separate synthetic preparation profile; V1 ledger unchanged |
 | PR Evolution Audit | Canonical base `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; originally unmerged #315/#321 inspected, not imported; #315 later merged as `e420f6296ac06d01da7f3f3f3a11640e2034d90b` |
