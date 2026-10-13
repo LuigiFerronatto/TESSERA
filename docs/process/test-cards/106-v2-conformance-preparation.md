@@ -10,7 +10,7 @@
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
 | Benchmark applicability | `REQUIRED` |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -83,9 +83,23 @@ medium additionally needs a separate readiness and approved resource decision.
 | Merge commit | None |
 | Evidence/Learnings/Decision | Protocol audit and synthetic tests; ITERATE |
 | Benchmark record | Separate synthetic preparation profile; V1 ledger unchanged |
-| PR Evolution Audit | Canonical base `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; unmerged #315/#321 inspected, not imported |
+| PR Evolution Audit | Canonical base `20814a47ec0f72d7bea0639e0b057df1ecf5cded`; originally unmerged #315/#321 inspected, not imported; #315 later merged as `e420f6296ac06d01da7f3f3f3a11640e2034d90b` |
 
 ## Evolution
 
 V1 retrieval-only main → isolated V2 preparation candidate → review and canonical
 dependency acceptance → separately authorized official V2 conformance/evaluation.
+
+## Integration refresh — 2026-10-12
+
+The candidate incorporates canonical main `6228ecb` and follows its
+`docs/process/test-cards/` layout. Released changelog entries and current runtime
+contracts are preserved; the V2 preparation remains an Unreleased experiment.
+The original source/protocol audit is still dated 2026-10-02; this refresh is not
+a new upstream protocol audit or an official V2 run. Exact-head checks and
+remaining empirical gates are recorded in PR #323.
+
+Next: review the synthetic boundary, then satisfy canonical dependency
+acceptance and pin the real processor/reader/judge, dataset and approved resource
+budget before separately authorized small-tier work. Until then, official
+conformance stays false, evaluation stays NOT_RUN, and the full card stays BLOCKED.
