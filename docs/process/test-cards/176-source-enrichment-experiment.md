@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | Issue | [#176](https://github.com/LuigiFerronatto/TESSERA/issues/176) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (merged; semantic experiment open, not VALIDATED) |
 | Capability type | Optional offline experiment infrastructure |
-| Pull request | [Draft PR #322](https://github.com/LuigiFerronatto/TESSERA/pull/322) |
-| Merge commit | Not merged |
+| Pull request | [PR #322](https://github.com/LuigiFerronatto/TESSERA/pull/322) (merged 2026-10-13) |
+| Merge commit | `5f853e2778e3f09a837741a7c6f25143a940fc6d` (final candidate `7b30cde6e54b31dadc0f0f034ec25709807389d0`) |
 | Decision | `ITERATE`; semantic KEEP unmeasured |
 | Benchmark applicability | `REQUIRED` |
 | Last audited | 2026-10-02 |
