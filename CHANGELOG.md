@@ -8,6 +8,10 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.0.5 — 2026-10-12
+
 ### Experimental
 
 - Prepare a pinned LongMemEval-V2 source/schema audit and isolated synthetic
