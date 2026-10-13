@@ -10,6 +10,12 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ### Experimental
 
+- Prepare a pinned LongMemEval-V2 source/schema audit and isolated synthetic
+  adapter mechanics: complete trajectories, text/source-image context plumbing,
+  provenance, lifecycle isolation and evaluator-metadata guards. Official Qwen
+  processor budgeting, visual query understanding, save/load and evaluation
+  remain unsupported; synthetic costs are not model tokens. No runtime,
+  dependencies, canonical ledger or quality claims change. (#106)
 - Added an offline, review-only legacy enrichment preview/capture protocol:
   explicit safe source selection, source/profile hashes, bounded cost disclosure,
   exact supporting-span validation and frozen synthetic A1/A2/A3 replay. No
