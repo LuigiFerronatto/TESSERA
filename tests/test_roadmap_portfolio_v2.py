@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Portfolio routing is intentionally frozen by governance-only lifecycle cards.
 ROOT = Path(__file__).resolve().parents[1]
-ROADMAP = ROOT / "docs" / "ROADMAP.md"
+ROADMAP = ROOT / "docs" / "process" / "roadmap.md"
 
 
 def _row(text: str, issue: str) -> str:

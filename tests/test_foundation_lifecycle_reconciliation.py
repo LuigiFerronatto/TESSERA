@@ -42,7 +42,7 @@ def _table_row(text: str, first_cell: str) -> list[str]:
 def test_stage_and_index_record_exact_canonical_evidence(
     issue: int, pr: int, filename: str, head: str, merge: str, audit: str,
 ) -> None:
-    text = (DOCS / "test-cards" / filename).read_text(encoding="utf-8")
+    text = (DOCS / "process" / "test-cards" / filename).read_text(encoding="utf-8")
     # Inspect header fields, not a later historical mention of the desired state.
     header = text.split("## In one sentence", 1)[0]
     assert _table_row(header, "Record status")[1] == "`VALIDATED`"
@@ -51,7 +51,7 @@ def test_stage_and_index_record_exact_canonical_evidence(
     assert merge in _table_row(header, "Merge commit")[1]
     assert f"/pull/{pr}#issuecomment-{audit}" in text
 
-    index = (DOCS / "test-cards" / "README.md").read_text(encoding="utf-8")
+    index = (DOCS / "process" / "test-cards" / "README.md").read_text(encoding="utf-8")
     rows = [line for line in index.splitlines() if f"]({filename})" in line]
     assert len(rows) == 1
     assert "`VALIDATED`" in rows[0]
@@ -62,14 +62,14 @@ def test_stage_and_index_record_exact_canonical_evidence(
 def test_evolution_audit_distinguishes_candidate_from_merge(
     issue: int, pr: int, filename: str, head: str, merge: str, audit: str,
 ) -> None:
-    path = DOCS / f"PR_EVOLUTION_{issue}.md"
+    path = DOCS / "history" / "pr-evolution" / f"{issue}.md"
     assert path.is_file(), f"Missing canonical evolution evidence: {path.name}"
     text = path.read_text(encoding="utf-8")
     assert head != merge
     assert head in text and merge in text
     assert "`VALIDATED`" in text and "`KEEP`" in text
     assert f"/pull/{pr}#issuecomment-{audit}" in text
-    record = (DOCS / "test-cards" / filename).read_text(encoding="utf-8")
+    record = (DOCS / "process" / "test-cards" / filename).read_text(encoding="utf-8")
     assert path.name in _table_row(record, "PR Evolution Audit")[1]
 
 
@@ -83,11 +83,11 @@ def test_evolution_audit_distinguishes_candidate_from_merge(
 def test_implemented_foundation_is_not_listed_as_planned(
     issue: int, capability: str,
 ) -> None:
-    overview = (DOCS / "OVERVIEW.md").read_text(encoding="utf-8")
+    overview = (DOCS / "concepts" / "overview.md").read_text(encoding="utf-8")
     row = _table_row(overview, capability)
     assert "Validated" in row[1]
     assert f"#{issue}" in row[2]
-    architecture = (DOCS / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    architecture = (DOCS / "architecture" / "architecture.md").read_text(encoding="utf-8")
     implemented, planned = architecture.split("Implemented Foundation:", 1)[1].split(
         "Planned / experimental:", 1
     )
@@ -97,7 +97,7 @@ def test_implemented_foundation_is_not_listed_as_planned(
 
 
 def test_completed_corpus_doctor_keeps_queue_12_and_no_new_now_selection() -> None:
-    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "process" / "roadmap.md").read_text(encoding="utf-8")
     completed = roadmap.split("## Completed NOW positions", 1)[1].split("## NOW", 1)[0]
     code_blocks = re.findall(r"```text\n(.*?)```", completed, re.DOTALL)
     doctor_rows = [

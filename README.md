@@ -27,13 +27,13 @@ CLI remain `tessera`.
 Install the released package with:
 
 ```bash
-python -m pip install "tessera-agent-memory==0.0.3"
+python -m pip install "tessera-agent-memory==0.0.4"
 ```
 
 Using [uv](https://docs.astral.sh/uv/) with an existing virtual environment:
 
 ```bash
-uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.3"
+uv pip install --python .venv/bin/python "tessera-agent-memory==0.0.4"
 ```
 
 To upgrade from PyPI:
@@ -43,7 +43,7 @@ uv pip install \
   --index-url https://pypi.org/simple \
   --refresh \
   --upgrade \
-  tessera-agent-memory==0.0.3
+  tessera-agent-memory==0.0.4
 ```
 
 If you do not have an environment yet, create one first with `uv venv`.
@@ -67,10 +67,10 @@ checkout:
 
 ```bash
 uv build
-python -m pip install ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
-python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[mcp]"  # optional MCP transport
-python -m pip install "./dist/tessera_agent_memory-0.0.3-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
-python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.3-py3-none-any.whl
+python -m pip install ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
+python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[mcp]"  # optional MCP transport
+python -m pip install "./dist/tessera_agent_memory-0.0.4-py3-none-any.whl[llm]"  # optional HTTP LLM bridge
+python -m pip install --upgrade ./dist/tessera_agent_memory-0.0.4-py3-none-any.whl
 python -m pip uninstall tessera-agent-memory
 ```
 
@@ -82,6 +82,11 @@ reinstalling to rebuild it. Keep the config, source files and generated store.
 
 
 ## Quickstart
+
+Experimental runtime setup previews are documented in
+[Integration setup plans](docs/guides/integration-setup.md). Direct and guided commands
+share one preview-by-default plan; explicit JSON mutation requires its exact hash.
+Real client/version/OS acceptance remains pending.
 
 Configure this project, write one fact, index it, and query it. The config is
 human-readable and contains no credential:
@@ -134,7 +139,7 @@ project config, then an explicitly named global entry. Otherwise product CLI
 operations fail with an actionable configuration error. The direct Python
 compatibility resolver and no-configuration MCP fallback retain historical
 `./memories` fallback; existing callers do not migrate automatically. See
-[ADR 0003](docs/adr/0003-configuration-and-store-discovery.md).
+[ADR 0003](docs/architecture/adr/0003-configuration-and-store-discovery.md).
 
 Source files remain the source of truth. New project configuration is schema v2:
 `store.path` is the generated-memory destination, `sources.roots` is an
@@ -231,7 +236,7 @@ unchanged and is never labeled sanitized. Direct known hostile instructions are
 rejected; empty input is rejected; quoted/documentary examples and
 suspicious-tag-only inputs go to `review`. Those non-accepting outcomes have no
 canonical persistence side effects. See
-[`docs/WRITE_GATE_CONTRACT.md`](docs/WRITE_GATE_CONTRACT.md).
+[`docs/reference/write-gate-contract.md`](docs/reference/write-gate-contract.md).
 
 ### Query existing project knowledge
 
@@ -283,7 +288,7 @@ evidence span
 related memory IDs
 ```
 
-See [`docs/OUTPUT_CONTRACT.md`](docs/OUTPUT_CONTRACT.md) for field semantics and nullability.
+See [`docs/reference/output-contract.md`](docs/reference/output-contract.md) for field semantics and nullability.
 
 ## Why TESSERA
 
@@ -327,7 +332,7 @@ TESSERA is memory infrastructure, not the final reasoning agent. It does not:
 - use source-code indexing as its primary memory model.
 
 The binding boundary is recorded in
-[`ADR 0001`](docs/adr/0001-core-vs-optional-llm-boundary.md): deterministic
+[`ADR 0001`](docs/architecture/adr/0001-core-vs-optional-llm-boundary.md): deterministic
 TESSERA retrieval ends at structured evidence with provenance; cognition and
 the final response belong to the consuming agent. The repository also contains
 a legacy, explicitly assisted orchestration path for LLM planning and context
@@ -385,7 +390,7 @@ retrieval, not final-answer correctness; reader and judge evaluation remain
 separate future layers.
 
 See [`benchmarks/results/README.md`](benchmarks/results/README.md) for the local
-comparison command and [`docs/BENCHMARK_CI.md`](docs/BENCHMARK_CI.md) for the CI
+comparison command and [`docs/process/benchmark-ci.md`](docs/process/benchmark-ci.md) for the CI
 and applicability contract.
 
 ## How it works
@@ -421,7 +426,7 @@ Consuming agent
 
 The current Foundation is intentionally deterministic and auditable before more adaptive behavior is introduced.
 
-For implementation details, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For implementation details, see [`docs/architecture/architecture.md`](docs/architecture/architecture.md).
 
 ## Design principles
 
@@ -438,11 +443,18 @@ For implementation details, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 ## Project status
 
 TESSERA is an evolving Foundation. The current implementation is usable, but several long-term-memory capabilities are still being tested.
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the experimental sequence and linked Test Cards.
+See [`docs/process/roadmap.md`](docs/process/roadmap.md) for the experimental sequence and linked Test Cards.
+
+## Responsibility boundary
+
+![Agent and TESSERA responsibility boundary](docs/assets/architecture/agent-boundary.svg)
+
+See the [diagram guide](docs/architecture/architecture-diagrams.md) for current lifecycle,
+structured evidence and explicitly experimental targets.
 
 ## Research references
 
-TESSERA is research-driven, but a cited paper is a **reference signal**, not proof that its approach is implemented or validated here. The detailed source → interpretation → Test Card trace lives in [`docs/research/REFERENCES.md`](docs/research/REFERENCES.md).
+TESSERA is research-driven, but a cited paper is a **reference signal**, not proof that its approach is implemented or validated here. The detailed source → interpretation → Test Card trace lives in [`docs/research/references.md`](docs/research/references.md).
 
 | Reference | What it informs in TESSERA |
 | --- | --- |
@@ -462,6 +474,10 @@ TESSERA is research-driven, but a cited paper is a **reference signal**, not pro
 | [Mem0 paper](https://arxiv.org/abs/2504.19413) | Scalable long-term memory and hybrid retrieval comparison |
 | [Zep / Graphiti paper](https://arxiv.org/abs/2501.13956) | Temporal context graphs, fact validity, provenance, incremental graph updates |
 
+For QUMem specifically, see the [paper-to-runtime fidelity map](docs/research/qumem-gap-analysis.md).
+Current heuristics and optional one-pass/single-query assistance are not a
+validated reproduction of the paper's full pipeline.
+
 ## Acknowledgements
 
 TESSERA is informed by a broader ecosystem of memory systems, agent runtimes, benchmarks, and retrieval architectures. In addition to the papers above, the project actively studies and compares ideas from:
@@ -479,13 +495,13 @@ These references are acknowledgements of useful research and engineering ideas. 
 
 | If you need | Read |
 | --- | --- |
-| Product overview | [`docs/OVERVIEW.md`](docs/OVERVIEW.md) |
-| Current capabilities | [`docs/FEATURES.md`](docs/FEATURES.md) |
-| Core vocabulary | [`docs/CONCEPTS.md`](docs/CONCEPTS.md) |
-| Current architecture | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
-| Query examples | [`docs/QUERY_EXAMPLES.md`](docs/QUERY_EXAMPLES.md) |
-| Retrieval result contract | [`docs/OUTPUT_CONTRACT.md`](docs/OUTPUT_CONTRACT.md) |
-| Experimental roadmap | [`docs/ROADMAP.md`](docs/ROADMAP.md) |
+| Product overview | [`docs/concepts/overview.md`](docs/concepts/overview.md) |
+| Current capabilities | [`docs/concepts/features.md`](docs/concepts/features.md) |
+| Core vocabulary | [`docs/concepts/concepts.md`](docs/concepts/concepts.md) |
+| Current architecture | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
+| Query examples | [`docs/guides/query-examples.md`](docs/guides/query-examples.md) |
+| Retrieval result contract | [`docs/reference/output-contract.md`](docs/reference/output-contract.md) |
+| Experimental roadmap | [`docs/process/roadmap.md`](docs/process/roadmap.md) |
 | Research and comparisons | [`docs/research/`](docs/research/) |
 | Change history | [`CHANGELOG.md`](CHANGELOG.md) |
 
@@ -500,7 +516,7 @@ python -m pip install -e ".[dev]"
 pytest -ra
 ```
 
-Repository changes follow an Issue/Test Card → PR → evaluation → decision workflow. See [`.github/pull_request_template.md`](.github/pull_request_template.md) and [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md).
+Repository changes follow an Issue/Test Card → PR → evaluation → decision workflow. See [`.github/pull_request_template.md`](.github/pull_request_template.md) and [`docs/process/change-policy.md`](docs/process/change-policy.md).
 
 ## Contributing
 
@@ -517,3 +533,11 @@ copyright and license notices supplied with third-party code and assets.
 TESSERA is currently maintained by [Luigi Ferronatto](https://github.com/LuigiFerronatto).
 
 See the repository's [contributor graph](https://github.com/LuigiFerronatto/TESSERA/graphs/contributors) for everyone who has contributed code or documentation.
+
+### CLI presentation and automation
+
+Run `tessera` or `tessera status` for a read-only project dashboard. All commands
+support `--json`, `--plain`, `--no-color`, `--quiet`, `--verbose`, and `--debug`.
+Query JSON retains complete evidence; human results use compact previews with
+`--full` and `--explain` for detail. See the [CLI output contract](docs/reference/cli-output.md)
+for error categories, compatibility exceptions and safe non-interactive usage.

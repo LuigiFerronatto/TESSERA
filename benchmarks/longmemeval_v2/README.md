@@ -90,4 +90,4 @@ V2 outcomes to the closed #100 V1 retrieval ledger. Any future V2 reader bridge
 must carry the upstream multimodal prompt unchanged after proper token counting.
 
 See [protocol audit](protocol-audit.md), [source pins](protocol.json), and the
-[plain-language record](../../docs/test-cards/106-v2-conformance-preparation.md).
+[plain-language record](../../docs/process/test-cards/106-v2-conformance-preparation.md).

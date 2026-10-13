@@ -4,7 +4,7 @@ All notable TESSERA product changes are recorded here.
 
 This is a **curated product history**, not an automatically generated commit log. Pull requests should update `Unreleased` when they change product behavior, public contracts, configuration, supported inputs or user-visible capabilities. Documentation-only changes may mark changelog impact as N/A when they do not alter the product contract.
 
-See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
+See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the update rules.
 
 ## Unreleased
 
@@ -16,6 +16,146 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   processor budgeting, visual query understanding, save/load and evaluation
   remain unsupported; synthetic costs are not model tokens. No runtime,
   dependencies, canonical ledger or quality claims change. (#106)
+_Nothing yet._
+
+## 0.0.4 — 2026-10-12
+
+### Experimental
+
+- Add an explicitly enabled, privacy-minimized Python operational ledger with
+  bounded project/run events, deterministic deduplication, aggregate analytics,
+  read-only export plans and stale-safe retention/clear plans. Collection stays
+  OFF by default, with no CLI/MCP hooks, raw content capture or ranking feedback.
+  Full session integration remains gated by lifecycle identity (#196/#177).
+  ([#259](https://github.com/LuigiFerronatto/TESSERA/issues/259))
+- Add direct `tessera integrate` and guided `tessera mcp setup` read-only plans
+  with explicit scope/store bindings, strict Claude/Gemini/Copilot JSON adapters,
+  hash-bound CLI apply/remove/semantic rollback, and byte-exact in-process
+  rollback tested only on synthetic configs. Codex exposes a verified user-scope
+  native command plan without TOML rewrites or client execution. Real provider/
+  version acceptance and semantic/lifecycle hooks remain unverified. (#190)
+- Added repository-only frozen-evidence capture/replay controls for R0 raw,
+  R1 selected-span/provenance and R2 structured presentation. Deterministic
+  offline budgets expose evidence/provenance retention and overhead without
+  provider calls or changes to default retrieval. Synthetic controls do not
+  establish downstream QA benefit; renderer selection remains `ITERATE`.
+  ([#28](https://github.com/LuigiFerronatto/TESSERA/issues/28))
+- Add explicitly opt-in D0/D1/D2 typed decomposition experiments with versioned
+  F/P/I semantics, strict one-pass/three-pass contracts and canonical write
+  admission. Add a draft annotation packet and human-review-gated capture,
+  replay and scoring harness. Existing defaults remain unchanged; no provider
+  quality result or default adoption is claimed. ([#136](https://github.com/LuigiFerronatto/TESSERA/issues/136))
+- Added an opt-in repository-only episode-boundary comparison harness for #138,
+  with unchanged E0, explicit-role E1/E3, lossless source memberships, separate
+  timeout traces and a frozen synthetic draft plus blinded annotation packet.
+  Human review and downstream quality gates remain pending; installed runtime
+  behavior and canonical turn models are unchanged.
+- Add opt-in Open Knowledge Format import/export plans, explicit standalone
+  source-copy/export transactions and a pinned
+  synthetic round-trip experiment. Typed relations, temporal truth and provenance
+  use a namespaced canonical extension; imported attestations never execute.
+  Transactions use reviewed source/destination hashes, the current security
+  gate and atomic no-overwrite publication; semantic admission and promotion
+  remain pending (#204). Versioned JSON, human Markdown, target-safe Obsidian
+  and explicitly lossy CSV projections share canonical records and explicit
+  selection/manifests; no encryption/access-control policy is inferred.
+- Explicit historical conversation files can be previewed and imported into
+  inspectable, redacted source evidence, with ordered roles/timestamps/tool
+  references, stable session identity and idempotent retries. Generic JSONL v1
+  and a strict linear Claude Code JSONL subset are opt-in; no home scanning,
+  provider calls or durable-memory admission occurs. Indexing is a separate
+  explicit step. Full runtime discovery, live convergence and enrichment remain
+  unimplemented. ([#191](https://github.com/LuigiFerronatto/TESSERA/issues/191))
+- Added an opt-in, read-only typed recipe composition experiment with explicit
+  effects, bounded validation, dry-run plans and structured partial outcomes.
+  Adoption is `ITERATE`; direct APIs remain the default and canonical writes,
+  providers, automatic discovery and checkpoint resume remain unavailable.
+  ([#258](https://github.com/LuigiFerronatto/TESSERA/issues/258))
+- Add a provider-neutral lifecycle Hook Core SDK with explicit project/run
+  identity, redacted bounded ephemeral capture, prepared-context budgets and
+  frozen Claude/Codex/Gemini/Copilot mappings. Response boundaries never save
+  memory; downstream handlers and installation remain unimplemented. Includes
+  an offline semantic parity experiment. ([#196](https://github.com/LuigiFerronatto/TESSERA/issues/196))
+- Added opt-in bounded N1/N2 historical information needs to the assisted
+  orchestrator, with strict validation, explicit no-memory/ambiguous empty
+  outcomes and inspectable generation measurements. N0 remains the default;
+  deterministic retrieval is unchanged. The frozen controlled experiment and
+  exact-prompt capture/replay support mechanics evaluation, while provider-backed
+  semantic/quality and consumer-effort gates remain pending. (#139)
+- Added opt-in query-aware one-hop graph expansion with node, edge-slot and
+  added-context budgets plus caller-owned decision traces. A frozen A0/A1/A2
+  ablation records quality and costs; current default expansion remains
+  unchanged because the candidate does not beat no expansion on quality.
+  ([#25](https://github.com/LuigiFerronatto/TESSERA/issues/25))
+### CLI presentation (#166 / #119)
+
+- Added shared human/plain/JSON presentation, global output flags, structured
+  operational errors and read-only no-args/status dashboards. Empty query JSON
+  now returns `[]`; existing successful JSON payloads remain intact.
+- Human queries default to compact evidence previews, with `--full` and
+  `--explain` for detail. Existing init foregrounds the saved configuration and
+  preserves it through an explicit Keep/update choice.
+- Added safe literal terminal rendering, English-only catalog selection,
+  delayed line-based progress and PTY/ASCII/cancellation coverage. Ordinary
+  commands no longer perform advisory update checks; use `update --check`.
+- Documented versioned exit-code compatibility and remaining integration,
+  intelligence, enrichment and review boundaries in `docs/reference/cli-output.md`.
+### Experimental
+
+- Automatic decomposition retains an independently inspectable Markdown source
+  episode, validated supporting-turn references, exact source-version/span
+  evidence and episode-local temporal position through write/index/rebuild.
+  Legacy section-only inputs remain usable with explicitly unavailable turn
+  support; no semantic entailment, validity time or state accuracy is claimed.
+  ([#137](https://github.com/LuigiFerronatto/TESSERA/issues/137))
+- Added opt-in, model-independent vector backend contracts, an exact-flat
+  correctness oracle, a dependency-free SQLite persistent candidate and an
+  explicitly imported SciPy cKDTree exact/approximate candidate. A preregistered
+  synthetic size sweep records native RSS, cold/warm timings and ANN misses.
+  Atomic/source/segment lanes retain canonical identity; typed filters,
+  compatibility manifests, atomic source replacement and crash recovery are
+  covered by frozen-vector mechanics tests. No semantic Engine default or
+  embedding provider is enabled; real-corpus/default selection remains an open
+  experiment. ([#265](https://github.com/LuigiFerronatto/TESSERA/issues/265))
+### Added
+- Package five provider-neutral agent Skills for existing init, write, query, read-only corpus diagnostics and benchmark workflows, with a read-only resource API; keep procedural-anchor notes separate. ([#121](https://github.com/LuigiFerronatto/TESSERA/issues/121))
+
+
+### Experimental
+
+- Added opt-in Python `revision_history=True`: durable observed full-source
+  revisions and issued evidence IDs outside the disposable index, with old-body
+  preservation before overwrites and explicit archive failures. Historical
+  revisions do not become live memories. See [revision history](docs/reference/revision-history.md)
+  and [#73](https://github.com/LuigiFerronatto/TESSERA/issues/73); temporal validity
+  and default activation remain separate decisions.
+### Added
+
+- Opt-in operation IDs provide versioned, content-free single-write receipts
+  across Python, CLI and MCP. Retries and crash recovery preserve canonical
+  bytes; deterministic local inspection/repair reports and rebuilds incomplete
+  index/graph/manifest and Evidence Ledger stages without provider calls.
+  Existing calls without operation IDs retain their behavior.
+  ([#263](https://github.com/LuigiFerronatto/TESSERA/issues/263))
+### Experimental
+- Add an immutable instruction-format adapter registry with inspectable filename defaults and generic fallback; preserve existing canonical metadata and retrieval semantics. ([#71](https://github.com/LuigiFerronatto/TESSERA/issues/71))
+
+
+- Add opt-in, capability-typed embedding, generation and reranking profiles to
+  project and named-global configuration, with environment-only credential
+  references, inspectable model identity and explicit application adapter
+  resolution. No default model, provider SDK, download or retrieval change is
+  introduced. ([#157](https://github.com/LuigiFerronatto/TESSERA/issues/157))
+
+### Fixed
+
+- Keep configured source allow lists and recursion boundaries intact across
+  fresh, cached and incremental builds. Updating a relation target now restores
+  inbound links from unchanged sources. Project documents and generated-memory
+  files use distinct physical source keys, preventing path collisions from
+  hiding edits or conflating provenance. The derived graph cache moves to
+  schema 3 and rebuilds automatically; legacy store-only source paths and
+  logical memory IDs retain their existing conventions.
 
 ### Changed
 
@@ -52,9 +192,20 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   Python/CLI deterministic decomposition fallback remains unchanged.
 - Raised the optional MCP SDK minimum to 1.30.0 (v1; Python 3.10+), with real
   installed-wheel stdio protocol validation on Python 3.12. Base Python 3.9
-  support remains. See [runtime contract](docs/MCP_RUNTIME.md).
+  support remains. See [runtime contract](docs/reference/mcp-runtime.md).
 
 ### Architecture Decisions
+- Removed the positive human-approval prerequisite from the deterministic Merge
+  Governor at the owner's request. Active requested changes, unresolved threads,
+  drafts, conflicts, exact-head tests and benchmark evidence remain blocking.
+  Repository protection changes remain a separate administrator operation. (#287)
+- Bound benchmark readiness to parsed PR metadata and refreshed it on body edits,
+  preventing older green checks on the same commit from satisfying a changed
+  applicability, issue or rationale. Deterministic gates and workflow permissions are unchanged. (#194)
+- Retired automatic AI pull-request reviews and their CI gate. Deterministic
+  tests, builds, offline benchmarks, conflict/thread checks and active review objections
+  remain; GitHub branch-protection migration is a separate admin step.
+  See [current governance](docs/process/agentic-governance.md).
 - Added a deterministic, idempotent sync tool
   (`scripts/sync_project_board.py`) that reflects each open issue's own
   authoritative `## Portfolio routing` block onto GitHub Project #9's
@@ -62,7 +213,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   `governance/portfolio_execution.yaml` manifest as the canonical source for
   the board's Execution (`HORIZON`) and `Queue` ordering. This is
   repository-process tooling, not a TESSERA product/runtime capability; see
-  [`docs/PROJECT_BOARD_SYNC.md`](docs/PROJECT_BOARD_SYNC.md). Benchmark
+  [`docs/process/project-board-sync.md`](docs/process/project-board-sync.md). Benchmark
   applicability: NOT_APPLICABLE (governance tooling only, no runtime
   behavior changed). ([#203](https://github.com/LuigiFerronatto/TESSERA/issues/203))
 - Added an agentic repository-governance system (issue triage, independent
@@ -70,7 +221,7 @@ See [`docs/CHANGE_POLICY.md`](docs/CHANGE_POLICY.md) for the update rules.
   lifecycle reconciliation, weekly documentation-drift audit) built on
   GitHub Agentic Workflows. This is repository-process automation, not a
   TESSERA product/runtime capability; see
-  [`docs/AGENTIC_GOVERNANCE.md`](docs/AGENTIC_GOVERNANCE.md). Benchmark
+  [`docs/process/agentic-governance.md`](docs/process/agentic-governance.md). Benchmark
   applicability: NOT_APPLICABLE (workflow/docs/governance-test only, no
   runtime behavior changed).
 

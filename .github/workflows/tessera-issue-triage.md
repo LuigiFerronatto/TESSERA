@@ -59,7 +59,7 @@ indexes, caches, vectors and benchmark artifacts are derived).
 Your only job this run is to triage the single issue that triggered this
 workflow (`${{ github.event.issue.number }}` when available). You are
 **read-only** with respect to repository state: you may only read issues,
-comments, `docs/ROADMAP.md`, `docs/test-cards/**`, labels and recent
+comments, `docs/process/roadmap.md`, `docs/process/test-cards/**`, labels and recent
 PRs/commits. You must not write code, open PRs, close issues or merge
 anything. Your entire effect on the repository is one maintainer-facing
 comment and, at most, a small set of labels via safe outputs.
@@ -78,10 +78,10 @@ different bot.
 This prompt is written ahead of time and may become stale. Before making any
 classification, actually inspect the live repository:
 
-1. Read `docs/ROADMAP.md` for the current portfolio, lane taxonomy,
+1. Read `docs/process/roadmap.md` for the current portfolio, lane taxonomy,
    dependency graph, and `NOW` / `READY` / `BLOCKED` / `TRACKER` /
    `DEFERRED` status contract.
-2. Read `docs/test-cards/README.md` and the specific Test Card pages that
+2. Read `docs/process/test-cards/README.md` and the specific Test Card pages that
    look relevant to this issue.
 3. Search open and recently-closed issues for duplicates, related work, and
    existing ownership (trackers, parent issues, ADRs).
@@ -126,7 +126,7 @@ For the triggering issue, determine the most strongly evidenced values for:
 - **Priority** — based on demonstrated repository impact (breaks a contract,
   blocks a READY card, corrupts data) rather than the reporter's own urgency
   language.
-- **Lane** — the portfolio area from `docs/ROADMAP.md` (for example
+- **Lane** — the portfolio area from `docs/process/roadmap.md` (for example
   storage, retrieval, temporal, measurement, governance) that already owns
   this space, if one exists.
 - **Existing owner** — cite the specific issue/Test Card number that already
