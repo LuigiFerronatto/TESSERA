@@ -6,7 +6,7 @@
 | Record status | `IN_PROGRESS` preparation; empirical execution `BLOCKED` |
 | Capability type | `benchmark infrastructure` |
 | Pull request | [#321](https://github.com/LuigiFerronatto/TESSERA/pull/321); merged |
-| Merge commit | Not merged |
+| Merge commit | `bf7963e06c70aecf0205a050a47f92c6eaed1d0c` (PR #321 canonical merge; final candidate `18432d574561c7d4431b5ee3f480c6bfb8b7231e`) |
 | Decision | `ITERATE` |
 | Benchmark applicability | `SMOKE_ONLY` for this offline preparation |
 | Last audited | 2026-10-02 |
@@ -69,7 +69,7 @@ are accepted. Models, budget decisions, thresholds and human labels remain null.
 - [Protocol and commands](../../../benchmarks/answer_protocols/README.md)
 - [Independent-human instructions](../../../benchmarks/answer_protocols/HUMAN_REVIEW.md)
 - Proposed #28 interface: unmerged [PR #315](https://github.com/LuigiFerronatto/TESSERA/pull/315), head `85638e1320ca68bfdd15efbfaed14a1791218120`
-- Exact candidate/head and CI URLs: [PR #321](https://github.com/LuigiFerronatto/TESSERA/pull/321); no canonical merge claimed
+- Exact candidate/head and CI URLs: [PR #321](https://github.com/LuigiFerronatto/TESSERA/pull/321); canonical merge `bf7963e06c70aecf0205a050a47f92c6eaed1d0c`; preparation only, empirical gates remain unmet
 
 ## Evolution
 
