@@ -102,6 +102,7 @@ experiment with proposed `ITERATE`; it does not change the current default.
 | #349 One source-selection authority (ADR 0005) | `IN_PROGRESS` architecture decision | [349-single-source-selection-authority.md](349-single-source-selection-authority.md) | [Issue #349](https://github.com/LuigiFerronatto/TESSERA/issues/349), [ADR 0005](../../architecture/adr/0005-single-source-selection-authority.md); Accepted; `.gitignore` participates as a convenience-ignore layer; runtime pending #352/#353/#354 |
 | #350 Explicit-ID collision diagnostics (ADR 0006) | `IN_PROGRESS` architecture decision | [350-explicit-id-collision-diagnostics.md](350-explicit-id-collision-diagnostics.md) | [Issue #350](https://github.com/LuigiFerronatto/TESSERA/issues/350), [ADR 0006](../../architecture/adr/0006-explicit-id-collision-diagnostics.md); Accepted; conflicting copies are quarantined; runtime pending #355 |
 | #361 MCP startup readiness (ADR 0008) | `IN_PROGRESS` architecture decision | [361-mcp-startup-readiness.md](361-mcp-startup-readiness.md) | [Issue #361](https://github.com/LuigiFerronatto/TESSERA/issues/361), [ADR 0008](../../architecture/adr/0008-mcp-startup-readiness.md); Accepted; pre-ready calls wait within the request timeout, then `NOT_READY`; runtime pending #362 |
+| #176 Source-preserving enrichment experiment | `IN_PROGRESS` | [176-source-enrichment-experiment.md](176-source-enrichment-experiment.md) | [Issue #176](https://github.com/LuigiFerronatto/TESSERA/issues/176), offline mechanics only; semantic KEEP pending |
 
 ## Composition experiment
 
