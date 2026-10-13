@@ -3,14 +3,14 @@
 | Field | Value |
 |---|---|
 | Issue | [#166](https://github.com/LuigiFerronatto/TESSERA/issues/166), parent [#119](https://github.com/LuigiFerronatto/TESSERA/issues/119) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` |
 | Capability type | `runtime`, CLI presentation |
-| Pull request | [Draft PR #298](https://github.com/LuigiFerronatto/TESSERA/pull/298) |
-| Head commit | Implementation candidate [`1ab9d1f`](https://github.com/LuigiFerronatto/TESSERA/commit/1ab9d1fd0627fc5087aaa4729594cf49f8b890b7); latest documentation/review head in PR #298 |
-| Merge commit | Not merged |
-| Decision | `PENDING` human review |
+| Pull request | [PR #298](https://github.com/LuigiFerronatto/TESSERA/pull/298) (merged) |
+| Head commit | Final candidate `d40833c2a3293fc52ad508509936e5b98a207f3a` |
+| Merge commit | `7566fc701a5227de18995cd8c01e556547bf886a` |
+| Decision | `PENDING` lifecycle adoption |
 | Benchmark applicability | `SMOKE_ONLY`, no retrieval/storage semantics changed |
-| Last audited | 2026-10-02 |
+| Last audited | 2026-10-12 |
 
 ## In one sentence
 
@@ -43,7 +43,7 @@ source, provider, permission or persistence policy is hidden in the UI.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. Command results pass through a shared presentation
+IMPLEMENTED ON `main`. Command results pass through a shared presentation
 policy. JSON serializes existing semantic data; Rich/plain share message text.
 Initialization consumes the unchanged #155 plan. Dashboard consumes read-only
 Corpus Doctor diagnostics, without constructing an Engine or activating providers.
@@ -70,11 +70,32 @@ no-color, cancellation, repeated init and zero-mutation dry-run.
 
 Local Python 3.12 regression passed: **624 passed, 8 skipped**; the new output
 acceptance matrix accounts for 62 tests. Built wheel/sdist and installed-wheel
-checks are recorded in the draft PR, alongside final exact-head CI. The unchanged
+checks are recorded in the implementation PR; final candidate and canonical
+CI are separately linked below. The unchanged
 sanity gate reports Hit@1 0.75, Hit@3/5 1.0, MRR 0.875 and evidence hit rate 1.0.
 No retrieval-quality improvement is claimed. The same-environment startup smoke
 measured 1.146 s baseline / 1.100 s candidate median across five `--version` runs;
 this is descriptive, not a statistically supported performance claim.
+
+## Canonical delivery and check evidence
+
+[PR #298](https://github.com/LuigiFerronatto/TESSERA/pull/298) merged on 2026-10-12. Final candidate
+`d40833c2a3293fc52ad508509936e5b98a207f3a` and canonical merge
+`7566fc701a5227de18995cd8c01e556547bf886a` are distinct identities for one delivery.
+
+- Final-candidate [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38205377624)
+  and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38205377619)
+  completed successfully on `d40833c2a3293fc52ad508509936e5b98a207f3a`.
+- Exact-canonical [CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38205379993)
+  and [Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38205379999)
+  completed successfully on `7566fc701a5227de18995cd8c01e556547bf886a`.
+
+These are historical engineering checks, not newly run benchmarks. The reviewed
+PR discussion has no final-head formal reviews or accepted final-head KEEP
+record. Earlier automatic BLOCK comments concern older candidates and are not
+current-head defects. Current governance does not require a positive human or
+automatic AI review. This correction records delivery and available validation;
+it does not invent a retrospective approval or a new capability-adoption decision.
 
 ## What improved?
 
@@ -87,15 +108,16 @@ PT-BR translation remains explicitly unsupported rather than mixed accidentally.
 
 #119's integration/enrichment/review/intelligence taxonomy targets remain owned
 by #177/#176/#19/#157–#165. No future capability is simulated in this delivery.
-Full-screen selectors are not necessary: the numbered picker is the supported
-parity path. Progress is deliberately a delayed stable line, without animation.
+The numbered picker remains the supported parity path; optional full-screen
+selection is separately owned by #351/#357. Progress is deliberately a delayed stable line, without animation.
 
 ## What is unlocked next?
 
-Revert this presentation-only candidate if the output contract fails review.
-No data migration, source rewrite, model download or index schema change is needed.
-After merge and canonical validation, future owning cards can emit this shared
-result/event contract, while #119 retains its cross-capability taxonomy work.
+The presentation contract is merged with successful exact candidate/canonical
+checks. #119 retains its cross-capability taxonomy work; the newly reported
+actionable-error/debug fixes belong to #356 and optional selection to #351/#357.
+No dependent capability is promoted by this correction. Rollback requires no
+data migration, source rewrite, model download or index schema change.
 
 ## Technical provenance
 
@@ -106,11 +128,11 @@ result/event contract, while #119 retains its cross-capability taxonomy work.
 | Prior Corpus Doctor delivery | [PR #277](https://github.com/LuigiFerronatto/TESSERA/pull/277), canonical base above |
 | Output and scope contracts | [CLI_OUTPUT.md](../../reference/cli-output.md) |
 | Terminal evidence | [captures](../evidence/166/terminal-snapshots.txt), [inventory](../evidence/166/command-inventory.json) |
-| Decision / canonical merge | Pending review / not merged |
+| Decision / canonical merge | Adoption pending / `7566fc701a5227de18995cd8c01e556547bf886a` |
 
 ## Evolution
 
 #112 banner + #117 configuration + #155 init + #13 read-only corpus diagnostics
-→ this presentation candidate
-→ human review and exact-head CI
-→ canonical lifecycle reconciliation before dependent capability adoption
+→ canonical shared presentation implementation
+→ successful exact candidate and canonical CI/ledger
+→ lifecycle adoption and separately owned product follow-ups remain explicit
