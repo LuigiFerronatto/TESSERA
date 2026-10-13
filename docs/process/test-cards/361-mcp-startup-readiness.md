@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Issue | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
-| Record status | `IN_PROGRESS` |
+| Record status | `IMPLEMENTED` (architecture decision only) |
 | Capability type | `architecture decision` |
 | Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) (ADR 0008, Accepted) |
-| Head commit | See the pull request |
-| Merge commit | Not merged |
+| Head commit | `5e004f1e26a305ad09d5c3eda86a275fde7eefef` (final candidate) |
+| Merge commit | `6228ecb4f88deff1e1c445b10c29250108a8ccb6` |
 | Decision | `KEEP` (ADR accepted; runtime not implemented) |
 | Benchmark applicability | `NOT_APPLICABLE` |
 | Last audited | 2026-10-12 |
@@ -36,7 +36,7 @@ tessera-mcp --project .   (18 MB corpus)
 
 ## What changed or is being tested?
 
-This stage records an architecture decision only. ADR 0008 proposes answering
+This stage records an architecture decision only. ADR 0008 adopts answering
 the protocol handshake right away, building the index in a background worker,
 exposing readiness and progress through the health tool, letting tool calls
 wait for readiness within their timeout and then answer `NOT_READY`
@@ -46,7 +46,7 @@ handshake. No runtime code changes in this stage.
 
 ## How does it work now?
 
-TARGET — NOT YET ON MAIN. Until #362 merges, startup still blocks on the
+The ADR is accepted and merged on `main`; its runtime target is not implemented. Until #362 merges, startup still blocks on the
 index build.
 
 ## Concrete example
@@ -59,11 +59,18 @@ target: initialize answered in < 1 s
 
 ## How was it validated?
 
-The current latency was measured on canonical `main` 7e7b20e with the
-`initialize` probe and corpora recorded in
-[#361](https://github.com/LuigiFerronatto/TESSERA/issues/361). The decision is
-validated by review; documentation consistency is covered by the existing docs
-test suite.
+The baseline observations above were recorded in issue #361 on `main`
+`7e7b20e`; they are historical evidence, not a new runtime measurement.
+The [owner decision](https://github.com/LuigiFerronatto/TESSERA/issues/361#issuecomment-6118667212)
+records `KEEP`. PR #369's merge and final candidate were verified against
+GitHub and the merge's second parent; the candidate and merge trees match.
+
+[Final-candidate CI](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217397451)
+passed.
+[Benchmark Ledger](https://github.com/LuigiFerronatto/TESSERA/actions/runs/38217397400)
+passed with documentation-only `NOT_APPLICABLE` applicability. This record
+uses `IMPLEMENTED`, not a claim that the proposed runtime or its performance
+has been validated. No new human approval is inferred from merge or CI.
 
 ## What improved?
 
@@ -77,8 +84,9 @@ All runtime behaviour remains unimplemented and is owned by #362, including the
 
 ## What is unlocked next?
 
-Once this ADR merges, #362 is unblocked and #190 can rely on default client
-timeouts.
+The ADR prerequisite for #362 is satisfied. #362 still must coordinate with
+#355/#356 and prove the latency and concurrency gates. #190 cannot rely on
+default-timeout startup until that runtime delivery is validated.
 
 ## Technical provenance
 
@@ -86,16 +94,16 @@ timeouts.
 |---|---|
 | Issue/Test Card | [#361](https://github.com/LuigiFerronatto/TESSERA/issues/361) |
 | Pull request | [#369](https://github.com/LuigiFerronatto/TESSERA/pull/369) |
-| Merge commit | Not merged |
+| Merge commit | `6228ecb4f88deff1e1c445b10c29250108a8ccb6` |
 | Evidence/Learnings/Decision | Issue #361 Evidence section |
 | Benchmark record | Not applicable (architecture decision) |
-| PR Evolution Audit | Pull request body |
+| PR Evolution Audit | [Verified delivery](../../history/pr-evolution/361.md) |
 
 ## Evolution
 
 ```text
 #120 startup contract: build the index before tools can run
 → ADR 0008 proposed: handshake first, background indexing, explicit readiness
-→ current state: Accepted in review, runtime unchanged
-→ next validated dependency: #362 implementation
+→ current state: Accepted and merged on main, runtime unchanged
+→ next implementation: #362 implementation
 ```
