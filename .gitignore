@@ -26,3 +26,4 @@ sites/
 artifacts/rendering/
 # Reader/judge capture content must not be versioned.
 artifacts/answer-protocols/
+

@@ -10,6 +10,12 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ### Experimental
 
+- Added an offline, review-only legacy enrichment preview/capture protocol:
+  explicit safe source selection, source/profile hashes, bounded cost disclosure,
+  exact supporting-span validation and frozen synthetic A1/A2/A3 replay. No
+  provider execution, source/index mutation or durable-memory admission is
+  enabled; default indexing/retrieval remains deterministic. See
+  [experiment protocol](docs/process/enrichment-experiment.md) ([#176](https://github.com/LuigiFerronatto/TESSERA/issues/176)).
 - Add repository-only offline preparation for reader captures, independent-human
   judge calibration review and full-500 preregistration. Model selections,
   budgets, thresholds and human labels remain unaccepted; synthetic controls do
