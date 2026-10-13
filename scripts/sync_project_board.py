@@ -2,7 +2,7 @@
 """Deterministic, auditable sync of TESSERA issue portfolio routing to
 GitHub Projects v2 (https://github.com/users/LuigiFerronatto/projects/9).
 
-See docs/PROJECT_BOARD_SYNC.md for the full field model and architecture
+See docs/process/project-board-sync.md for the full field model and architecture
 decision. Summary:
 
     Status     -- operational state (Backlog/Blocked/Ready/In progress/
@@ -12,7 +12,7 @@ decision. Summary:
                   (closed/open, linked PR draft/review state).
     HORIZON    -- when we intend to pull the work (NOW/NEXT/LATER/
                   UNSCHEDULED). Derived from governance/portfolio_execution.yaml,
-                  NOT from issue bodies and NOT from regex-parsing ROADMAP.md.
+                  NOT from issue bodies and NOT from regex-parsing docs/process/roadmap.md.
     Queue      -- ordinal position within HORIZON. Same source as HORIZON.
     Priority   -- P0/P1/P2 (P3 has no native Project option; see
                   PRIORITY_P3_FALLBACK_TO_P2). Derived from the issue's own

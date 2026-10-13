@@ -23,13 +23,14 @@ Quick usage:
     engine.build_index()
     results = engine.retrieve_context("How does Alex want reports delivered?")
 
-See docs/ARCHITECTURE.md for the full design rationale.
+See docs/architecture/architecture.md for the full design rationale.
 """
 
 from .models import (
     Entity,
     Connection,
     Episode,
+    EpisodeTurn,
     MemoryFrontmatter,
     InvalidFrontmatterError,
     WriteGatingViolationError,
@@ -44,8 +45,12 @@ from .security import (
     WriteResult,
     content_sha256,
 )
+from .canonical import LineageMetadata
+from .lineage import LineageValidationError, SourceEpisode
+from .write_receipts import WriteReceipt, RECEIPT_SCHEMA_VERSION
 from .conflict import ConflictResolver
 from .engine import TesseraEngine
+from .graph_expansion import GraphExpansionPolicy
 from .skills import SKILL_IDS, install_default_skills, list_default_skill_files
 from .init_flow import (
     InitRequest,
@@ -76,10 +81,11 @@ from .segmentation import (
     segment_source_document,
 )
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 __all__ = [
     "TesseraEngine",
+    "GraphExpansionPolicy",
     "TesseraOrchestrator",
     "OrchestratorResult",
     "TesseraTaskHook",
@@ -87,11 +93,17 @@ __all__ = [
     "Entity",
     "Connection",
     "Episode",
+    "EpisodeTurn",
+    "LineageMetadata",
+    "LineageValidationError",
+    "SourceEpisode",
     "MemoryFrontmatter",
     "WriteGatingEngine",
     "WriteAdmission",
     "WriteGateDecision",
     "WriteResult",
+    "WriteReceipt",
+    "RECEIPT_SCHEMA_VERSION",
     "content_sha256",
     "ConflictResolver",
     "InvalidFrontmatterError",

@@ -1,6 +1,6 @@
 # Canonical Execution/Queue ordering source for `scripts/sync_project_board.py`.
 #
-# ARCHITECTURE DECISION (see docs/PROJECT_BOARD_SYNC.md "Sources of truth"):
+# ARCHITECTURE DECISION (see docs/process/project-board-sync.md "Sources of truth"):
 #
 #   Status / Priority / Milestone
 #     -> derived from each issue's own "## Portfolio routing" /
@@ -10,10 +10,10 @@
 #
 #   Execution (NOW/NEXT/LATER/UNSCHEDULED) / Queue (ordinal position)
 #     -> derived from THIS file, not from issue bodies and not by
-#        regex-scraping docs/ROADMAP.md prose. Issue bodies do not declare
-#        an Execution/Queue value today, and ROADMAP.md's prose is meant for
+#        regex-scraping docs/process/roadmap.md prose. Issue bodies do not declare
+#        an Execution/Queue value today, and docs/process/roadmap.md's prose is meant for
 #        humans, not a parser contract. This file is the single ordering
-#        source of truth; docs/ROADMAP.md's "Canonical execution board"
+#        source of truth; docs/process/roadmap.md's "Canonical execution board"
 #        section is the human-readable narrative of the same ordering and
 #        must be kept consistent with it, but is never machine-parsed.
 #

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "review_status": "proposed_not_independently_reviewed",
+  "scenarios": [
+    {"id":"simple-fact","task":"Which city hosted the project kickoff?","status":"memory_required","facets":["kickoff location"],"critical_facets":["kickoff location"],"evidence_ids":["kickoff"]},
+    {"id":"preference-evolution","task":"How did the preferred report format change, and why?","status":"memory_required","facets":["earlier report preference","later report preference","feedback explaining the change"],"critical_facets":["earlier report preference","later report preference"],"evidence_ids":["earlier-format","later-format","format-feedback"]},
+    {"id":"compound","task":"Prepare for the project review using its location, current report preference, and lessons from earlier reviews.","status":"memory_required","facets":["review location","current report preference","transferable review lessons"],"critical_facets":["review location","current report preference","transferable review lessons"],"evidence_ids":["review-location","later-format","review-lesson"]},
+    {"id":"no-memory","task":"What is 2 plus 2?","status":"no_memory_needed","facets":[],"critical_facets":[],"evidence_ids":[]},
+    {"id":"ambiguous","task":"What did they prefer then?","status":"insufficient_context","facets":[],"critical_facets":[],"evidence_ids":[]},
+    {"id":"broad","task":"Summarize every decision, preference and lesson across the entire project history for planning the next review.","status":"memory_required","facets":["review-relevant decisions","review-relevant preferences","transferable review lessons"],"critical_facets":["review-relevant decisions","review-relevant preferences","transferable review lessons"],"evidence_ids":["review-location","later-format","review-lesson"]}
+  ],
+  "corpus": [
+    {"id":"kickoff","type":"factual","text":"The project kickoff was held in Bergen."},
+    {"id":"earlier-format","type":"preference","text":"In January the report preference was a detailed slide deck."},
+    {"id":"later-format","type":"preference","text":"In March the report preference changed to a concise written brief."},
+    {"id":"format-feedback","type":"factual","text":"March feedback explained the report format change: slides hid decision context; written briefs made rationale easier to review."},
+    {"id":"review-location","type":"factual","text":"The next project review will be held in Oslo."},
+    {"id":"review-lesson","type":"procedural_anchor","text":"Review lesson: circulate evidence and open decisions before the meeting so participants can inspect assumptions."}
+  ]
+}
