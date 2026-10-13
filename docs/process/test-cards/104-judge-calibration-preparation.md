@@ -66,8 +66,8 @@ are accepted. Models, budget decisions, thresholds and human labels remain null.
 ## Technical provenance
 
 - Base main: `20814a47ec0f72d7bea0639e0b057df1ecf5cded`
-- [Protocol and commands](../../benchmarks/answer_protocols/README.md)
-- [Independent-human instructions](../../benchmarks/answer_protocols/HUMAN_REVIEW.md)
+- [Protocol and commands](../../../benchmarks/answer_protocols/README.md)
+- [Independent-human instructions](../../../benchmarks/answer_protocols/HUMAN_REVIEW.md)
 - Proposed #28 interface: unmerged [PR #315](https://github.com/LuigiFerronatto/TESSERA/pull/315), head `85638e1320ca68bfdd15efbfaed14a1791218120`
 - Exact candidate/head and CI URLs: [PR #321](https://github.com/LuigiFerronatto/TESSERA/pull/321); no canonical merge claimed
 

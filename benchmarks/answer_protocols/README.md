@@ -6,7 +6,7 @@ repository-only offline preparation for [#103](https://github.com/LuigiFerronatt
 [#105](https://github.com/LuigiFerronatto/TESSERA/issues/105). It does not execute
 or accept any of those Test Cards. No reader or judge has been selected, no
 human calibration label or quality threshold is accepted, and no full-500 run
-has occurred. The accepted [#74 boundary](../../docs/adr/0001-core-vs-optional-llm-boundary.md)
+has occurred. The accepted [#74 boundary](../../docs/architecture/adr/0001-core-vs-optional-llm-boundary.md)
 continues to keep these concerns outside `tessera/` and base installation.
 
 ## Why this can be prepared before dependencies are accepted
