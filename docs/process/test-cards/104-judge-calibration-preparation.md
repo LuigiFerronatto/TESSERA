@@ -5,7 +5,7 @@
 | Issue | [#104](https://github.com/LuigiFerronatto/TESSERA/issues/104) |
 | Record status | `IN_PROGRESS` preparation; empirical execution `BLOCKED` |
 | Capability type | `benchmark infrastructure` |
-| Pull request | [#321](https://github.com/LuigiFerronatto/TESSERA/pull/321); exact head recorded by GitHub checks |
+| Pull request | [#321](https://github.com/LuigiFerronatto/TESSERA/pull/321); merged |
 | Merge commit | Not merged |
 | Decision | `ITERATE` |
 | Benchmark applicability | `SMOKE_ONLY` for this offline preparation |
