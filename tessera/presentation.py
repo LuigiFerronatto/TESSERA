@@ -404,7 +404,52 @@ def say(message="", *, file=None):
 def prompt_input(message):
     if not policy().interactive:
         raise CliFailure("interaction_required", "This operation needs an interactive terminal.", exit_code=2)
-    return input(safe_text(message))
+    message = safe_text(message)
+    if os.name == "posix" and sys.stdin.isatty():
+        try:
+            terminal = os.isatty(sys.stdin.fileno())
+        except (AttributeError, OSError, ValueError):
+            terminal = False  # Embedded/test streams may have no native fd.
+        if terminal:
+            return _terminal_input(message)
+    return input(message)
+
+
+def _terminal_input(message):
+    """Read a canonical POSIX terminal without an uninterruptible stdio gap.
+
+    CPython's input() can receive SIGINT after displaying its prompt but before
+    entering fgets(), leaving the pending exception behind a blocking read.
+    Keep reads nonblocking and return to Python at least every 100 ms, including
+    when a native worker thread receives the process signal. The terminal still
+    owns line editing/echo; no raw-mode or signal-handler changes are needed.
+    """
+    import select
+
+    fd = sys.stdin.fileno()
+    blocking = os.get_blocking(fd)
+    line = bytearray()
+    try:
+        os.set_blocking(fd, False)
+        print(message, end="", flush=True)
+        while True:
+            if not select.select([fd], [], [], 0.1)[0]:
+                continue
+            try:
+                # Do not consume the next prompt's line or bypass a buffer that
+                # we created ourselves: keep this reader unbuffered throughout.
+                chunk = os.read(fd, 1)
+            except BlockingIOError:
+                # Ctrl+C can flush canonical input after select reports ready.
+                continue
+            if chunk == b"\n" or not chunk:
+                if not chunk and not line:
+                    raise EOFError()
+                return line.decode(sys.stdin.encoding or "utf-8",
+                                   errors=sys.stdin.errors or "strict")
+            line.extend(chunk)
+    finally:
+        os.set_blocking(fd, blocking)
 
 
 @contextmanager

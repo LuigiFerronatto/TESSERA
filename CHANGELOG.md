@@ -8,7 +8,11 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ## Unreleased
 
-_Nothing yet._
+### Fixed
+
+- Keep POSIX terminal prompts cancellable when Ctrl+C arrives immediately after
+  the prompt appears. Preserve terminal settings and cancel init before mutation.
+  ([#166](https://github.com/LuigiFerronatto/TESSERA/issues/166))
 
 ## 0.0.5 — 2026-10-12
 

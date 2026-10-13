@@ -438,3 +438,151 @@ def test_dashboard_honors_environment_precedence_without_inventing_project(tmp_p
     assert result["project"] is None and result["config_path"] is None
     assert result["storage_dir"] == str(env_store)
     assert bytes_in(tmp_path) == before and not env_store.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+@pytest.mark.parametrize("initial_blocking", [True, False])
+def test_terminal_input_preserves_lines_encoding_and_descriptor_state(monkeypatch, capsys, initial_blocking):
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        os.set_blocking(reader, initial_blocking)
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        os.write(writer, "ação\nsecond\n".encode())
+        os.close(writer)
+        writer = None
+        assert _terminal_input("First: ") == "ação"
+        assert os.get_blocking(reader) is initial_blocking
+        assert _terminal_input("Second: ") == "second"
+        with pytest.raises(EOFError):
+            _terminal_input("EOF: ")
+        assert os.get_blocking(reader) is initial_blocking
+        assert capsys.readouterr().out == "First: Second: EOF: "
+    finally:
+        os.close(reader)
+        if writer is not None:
+            os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+@pytest.mark.parametrize("boundary", ["prompt", "wait", "read"])
+def test_terminal_input_cancellation_restores_descriptor_at_every_boundary(monkeypatch, capsys, boundary):
+    import select
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        def interrupt(*args, **kwargs):
+            assert not os.get_blocking(reader)
+            raise KeyboardInterrupt()
+        if boundary == "prompt":
+            monkeypatch.setattr("builtins.print", interrupt)
+        elif boundary == "wait":
+            monkeypatch.setattr(select, "select", interrupt)
+        else:
+            os.write(writer, b"1\n")
+            monkeypatch.setattr(os, "read", interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            _terminal_input("Selection: ")
+        assert os.get_blocking(reader)
+    finally:
+        os.close(reader)
+        os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX terminal reader")
+def test_terminal_input_handles_readiness_flushed_before_read(monkeypatch):
+    import select
+    from types import SimpleNamespace
+    from tessera.presentation import _terminal_input
+
+    reader, writer = os.pipe()
+    try:
+        monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+            fileno=lambda: reader, encoding="utf-8", errors="strict"))
+        os.write(writer, b"yes\n")
+        real_read = os.read
+        calls = []
+        def flushed_once(fd, count):
+            calls.append(fd)
+            if len(calls) == 1:
+                raise BlockingIOError()
+            return real_read(fd, count)
+        monkeypatch.setattr(os, "read", flushed_once)
+        assert _terminal_input("Continue: ") == "yes"
+        assert len(calls) == 5
+        assert os.get_blocking(reader)
+    finally:
+        os.close(reader)
+        os.close(writer)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX controlling terminal")
+@pytest.mark.parametrize("reader", ["input", "_terminal_input"])
+@pytest.mark.parametrize("payload,expected", [
+    (b"\x04", ["EOF"]),
+    (b"yes\x04\n", ['RESULT "yes"']),
+    ("ação\nsecond\n".encode(), ['RESULT "a\\u00e7\\u00e3o"', 'RESULT "second"']),
+])
+def test_real_pty_terminal_eof_and_pasted_lines_match_input(reader, payload, expected):
+    import pty
+    import select
+
+    # Compare with input() on the actual canonical line discipline. A pipe
+    # closing its writer does not model terminal VEOF, especially after text.
+    # input() keeps a partial VEOF record until Enter (or a later, separately
+    # delivered VEOF); consecutive EOF bytes in one write can coalesce.
+    program = (
+        "import json, os\n"
+        "from tessera.presentation import _terminal_input\n"
+        f"reader = {reader}\n"
+        "before = os.get_blocking(0)\n"
+        "try:\n"
+        f" for _ in range({len(expected)}):\n"
+        "  print('RESULT ' + json.dumps(reader('PROMPT: ')), flush=True)\n"
+        "except EOFError:\n"
+        " print('EOF', flush=True)\n"
+        "finally:\n"
+        " print('RESTORED ' + str(os.get_blocking(0) == before), flush=True)\n"
+    )
+    pid, master = pty.fork()
+    if pid == 0:
+        os.execv(sys.executable, [sys.executable, "-c", program])
+    output = bytearray()
+    reaped = False
+    try:
+        deadline = time.monotonic() + 20
+        while b"PROMPT: " not in output and time.monotonic() < deadline:
+            if select.select([master], [], [], 0.1)[0]:
+                output.extend(os.read(master, 65536))
+        assert b"PROMPT: " in output
+        os.write(master, payload)
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            if select.select([master], [], [], 0.1)[0]:
+                try:
+                    output.extend(os.read(master, 65536))
+                except OSError as exc:
+                    if exc.errno != errno.EIO:
+                        raise
+            waited, status = os.waitpid(pid, os.WNOHANG)
+            if waited:
+                reaped = True
+                assert os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+                break
+        assert reaped, output.decode(errors="replace")
+        text = output.decode()
+        for result in expected:
+            assert result in text
+        assert "RESTORED True" in text
+    finally:
+        if not reaped:
+            os.kill(pid, signal.SIGKILL)
+            os.waitpid(pid, 0)
+        os.close(master)
