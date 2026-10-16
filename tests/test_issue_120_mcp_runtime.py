@@ -56,6 +56,7 @@ def forbidden(*args, **kwargs):
 socket.socket.connect = forbidden
 from tessera.config import ConfigurationResolver
 from tessera.mcp_server import create_server
+from tessera.mcp_sdk import structured_content
 
 async def run():
     roots = [Path(sys.argv[1]) / name for name in ("first", "second")]
@@ -67,10 +68,10 @@ async def run():
         "mem_id": "project/only-first", "mem_type": "factual", "episode_id": "factory",
         "content": "SQLite is only in the first store.",
     })
-    assert result.structuredContent["data"]["persisted"]
+    assert structured_content(result)["data"]["persisted"]
     first, second = await asyncio.gather(*(server.call_tool("query_memories", {"query": "SQLite"}) for server in servers))
-    assert first.structuredContent["data"]
-    assert second.structuredContent["data"] == []
+    assert structured_content(first)["data"]
+    assert structured_content(second)["data"] == []
     assert "tessera.orchestrator" not in sys.modules
     assert "tessera.llm_bridge" not in sys.modules
 asyncio.run(run())

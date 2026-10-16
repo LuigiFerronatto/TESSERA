@@ -343,12 +343,13 @@ def test_installed_mcp_adapter_preserves_turn_lineage(tmp_path):
 import asyncio, json, socket, sys
 from tessera.config import ConfigurationResolver
 from tessera.mcp_server import create_server
+from tessera.mcp_sdk import structured_content
 socket.socket.connect = lambda *args: (_ for _ in ()).throw(AssertionError("No network allowed"))
 async def main():
     server = create_server(ConfigurationResolver(environ={}).resolve(explicit=sys.argv[1]))
     await server.runtime.start()
     result = await server.call_tool("query_memories", {"query": "SQLite", "top_n": 1})
-    print(json.dumps(result.structuredContent["data"]))
+    print(json.dumps(structured_content(result)["data"]))
 asyncio.run(main())
 '''
     actual = subprocess.run([sys.executable, "-c", code, str(tmp_path)], check=True, capture_output=True, text=True)

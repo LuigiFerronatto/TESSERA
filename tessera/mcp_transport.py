@@ -1,4 +1,4 @@
-"""Versioned stdio transport over the optional MCP Python SDK (v1)."""
+"""Versioned stdio transport over the optional MCP Python SDK (1.x or 2.x)."""
 from contextlib import asynccontextmanager
 from copy import deepcopy
 import json
@@ -6,12 +6,13 @@ from urllib.parse import unquote
 
 try:
     import jsonschema
-    from mcp import types
-    from mcp.server.fastmcp import FastMCP
-    from mcp.server.fastmcp.server import ReadResourceContents
-    from mcp.shared.exceptions import McpError
 except ImportError as exc:  # pragma: no cover - exercised by installed base artifact
-    raise ImportError("Install the MCP extra: pip install 'tessera[mcp]'") from exc
+    raise ImportError("Install the MCP extra: pip install 'tessera-agent-memory[mcp]'") from exc
+
+from .mcp_sdk import (
+    ReadResourceContents, ServerBase, protocol_error, server_options, set_server_version,
+    set_tool_input_schema, set_tool_output_schema, tool_input_schema, types,
+)
 
 from . import __version__
 from .mcp_runtime import SCHEMA_VERSION, RuntimeFailure
@@ -50,7 +51,7 @@ def failure(exc):
     return {"code": "INTERNAL_ERROR", "message": "Operation failed; inspect server health before retrying."}
 
 
-class TesseraMCP(FastMCP):
+class TesseraMCP(ServerBase):
     """Keep SDK handshake/cancellation; own only TESSERA's transport contracts."""
 
     def __init__(self, runtime):
@@ -65,8 +66,9 @@ class TesseraMCP(FastMCP):
                 runtime.state = "closed"
 
         super().__init__("tessera", lifespan=lifespan, log_level="WARNING",
-                         instructions="TESSERA MCP runtime contract 1.0; stdio; see server://health.")
-        self._mcp_server.version = __version__
+                         instructions="TESSERA MCP runtime contract 1.0; stdio; see server://health.",
+                         **server_options(__version__))
+        set_server_version(self, __version__)
 
     def run(self, transport="stdio", **kwargs):
         if transport != "stdio":
@@ -76,16 +78,18 @@ class TesseraMCP(FastMCP):
     async def list_tools(self):
         tools = await super().list_tools()
         for tool in tools:
-            tool.inputSchema = deepcopy(tool.inputSchema)
-            tool.inputSchema["$id"] = f"urn:tessera:mcp:1.0:{tool.name}:request"
-            tool.inputSchema["additionalProperties"] = False
-            properties = tool.inputSchema.get("properties", {})
+            schema = deepcopy(tool_input_schema(tool))
+            schema["$id"] = f"urn:tessera:mcp:1.0:{tool.name}:request"
+            schema["additionalProperties"] = False
+            set_tool_input_schema(tool, schema)
+            properties = schema.get("properties", {})
             if "top_n" in properties:
                 properties["top_n"].update(minimum=1, maximum=100)
             if tool.name == "query_store":
                 properties["store"]["enum"] = ["facts", "preferences", "insights"]
-            tool.outputSchema = deepcopy(ENVELOPE_SCHEMA)
-            tool.outputSchema["oneOf"] = [
+            output_schema = deepcopy(ENVELOPE_SCHEMA)
+            set_tool_output_schema(tool, output_schema)
+            output_schema["oneOf"] = [
                 {"properties": {"error": {"type": "null"}, "data": {
                     "type": "array" if tool.name in {"query_memories", "query_store"} else "object",
                 }}},
@@ -101,12 +105,12 @@ class TesseraMCP(FastMCP):
             )
         return tools
 
-    async def call_tool(self, name, arguments):
+    async def call_tool(self, name, arguments, context=None):
         try:
             definitions = {tool.name: tool for tool in await self.list_tools()}
             if name not in definitions:
                 raise RuntimeFailure("UNKNOWN_TOOL", "Unknown tool name.")
-            if not jsonschema.Draft202012Validator(definitions[name].inputSchema).is_valid(arguments):
+            if not jsonschema.Draft202012Validator(tool_input_schema(definitions[name])).is_valid(arguments):
                 raise RuntimeFailure("INVALID_ARGUMENT", "Arguments do not match the advertised request schema.")
             # Validation above is strict (no coercion); the SDK model supplies defaults.
             tool = self._tool_manager.get_tool(name)
@@ -123,7 +127,7 @@ class TesseraMCP(FastMCP):
             structuredContent=payload, isError=payload["error"] is not None,
         )
 
-    async def read_resource(self, uri):
+    async def read_resource(self, uri, context=None):
         from . import mcp_server as handlers
 
         address = str(uri)
@@ -137,9 +141,9 @@ class TesseraMCP(FastMCP):
             data = await self.runtime.invoke(name, {})
             return [ReadResourceContents(content=json.dumps(envelope(name, data=data)), mime_type="application/json")]
         except Exception as exc:
-            raise McpError(types.ErrorData(
-                code=-32002, message="Resource request failed", data=envelope("resources/read", error=failure(exc)),
-            )) from None
+            raise protocol_error(
+                -32002, "Resource request failed", envelope("resources/read", error=failure(exc)),
+            ) from None
 
 
 def build_server(runtime):
