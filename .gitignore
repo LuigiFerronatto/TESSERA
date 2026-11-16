@@ -24,3 +24,7 @@ skills-lock.json
 # Local checkout of the optional mobile site (former submodule, hosted outside GitHub)
 sites/
 artifacts/rendering/
+# Reader/judge capture content must not be versioned.
+artifacts/answer-protocols/
+# Local synthetic/official V2 artifacts are not distribution inputs.
+artifacts/longmemeval-v2/

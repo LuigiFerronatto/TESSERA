@@ -1,0 +1,109 @@
+{
+  "coverage_slots": [
+    {
+      "case_refs": [],
+      "category": "correct",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "partially_correct",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "unsupported",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "explicit_abstention",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "incorrect_abstention",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "temporally_stale",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "conflicting_claims",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    },
+    {
+      "case_refs": [],
+      "category": "malformed",
+      "disagreement_resolution": null,
+      "human_labels": null,
+      "human_rationales": null
+    }
+  ],
+  "judge_selection": {
+    "calibration_fixture_revision": null,
+    "calibration_fixture_sha256": null,
+    "created_at": null,
+    "dataset_revision": null,
+    "dataset_sha256": null,
+    "endpoint_class": null,
+    "environment_fingerprint": null,
+    "judge_contract_version": null,
+    "max_output_tokens": null,
+    "model": null,
+    "model_revision": null,
+    "prompt_sha256": null,
+    "prompt_version": null,
+    "provider": null,
+    "reader_artifact_sha256": null,
+    "response_schema_version": null,
+    "retry_policy": null,
+    "rubric_sha256": null,
+    "rubric_version": null,
+    "seed": null,
+    "temperature": null,
+    "timeout_seconds": null,
+    "top_p": null
+  },
+  "packet_sha256": "af633bbf3ddee624ba1cfbcf690ae8eab952d3af64e6ef2af988bd2efc510915",
+  "review": {
+    "adjudicator": null,
+    "approval_evidence": null,
+    "reader_author": null,
+    "reviewer_one": null,
+    "reviewer_two": null
+  },
+  "sampling": {
+    "fixture_revision": null,
+    "fixture_sha256": null,
+    "license_review": null,
+    "sample_size": null,
+    "split_membership_sha256": null
+  },
+  "schema_version": "judge-human-calibration-draft/1",
+  "status": "DRAFT",
+  "thresholds": {
+    "accuracy_min": null,
+    "kappa_min": null,
+    "macro_f1_min": null,
+    "parse_failure_max": null,
+    "repeat_agreement_min": null
+  }
+}

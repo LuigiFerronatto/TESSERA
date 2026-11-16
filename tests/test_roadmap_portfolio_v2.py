@@ -121,7 +121,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
             ready_executable.append(line)
 
     assert len(ready_executable) <= 8, ready_executable
-    assert len(ready_executable) == 5, ready_executable
+    assert len(ready_executable) == 4, ready_executable
     assert not any("[#154]" in line for line in ready_executable)
     assert not any("[#155]" in line for line in ready_executable)
     assert not any("[#135]" in line for line in ready_executable)
@@ -129,7 +129,7 @@ def test_ready_executable_backlog_stays_within_declared_wip_limit() -> None:
     assert any("[#136]" in line for line in ready_executable)
     assert any("[#137]" in line for line in ready_executable)
     assert not any("[#13]" in line for line in ready_executable)
-    assert any("[#71]" in line for line in ready_executable)
+    assert not any("[#71]" in line for line in ready_executable)
 
     issue_16 = _row(text, "#16")
     assert "`VALIDATED` containment" in issue_16
@@ -177,8 +177,9 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert "`IN_PROGRESS`" not in issue_13
 
     issue_71 = _row(text, "#71")
-    assert "`READY`" in issue_71
-    assert "#69/#70 dependencies satisfied" in issue_71
+    assert "`IMPLEMENTED`" in issue_71
+    assert "PR #289 canonical" in issue_71
+    assert "lifecycle decision pending" in issue_71
 
     now_section = text.split("## Completed NOW positions", 1)[1].split("## NEXT", 1)[0]
     assert "historical delivery record" in text
@@ -199,7 +200,7 @@ def test_post_merge_lifecycle_and_wip_invariants_are_static() -> None:
     assert len(now_executable) == 0
 
     assert "NOW executable                 0" in text
-    assert "READY                          9 total / 5 executable" in text
+    assert "READY                          8 total / 4 executable" in text
     blocked_full_cards = [line for line in rows if line.split("|")[3].strip() == "`BLOCKED`"]
     assert len(blocked_full_cards) == 27
     assert "BLOCKED                        27 full cards + #16 full phase" in text

@@ -46,7 +46,7 @@ Those five old anchor resources and their behavior remain unchanged.
 
 ## Compatibility and boundaries
 
-The bundle targets the current public `0.0.4` contracts; feature detection is
+The bundle targets the current public `0.0.5` contracts; feature detection is
 required because a version string alone does not identify a particular build.
 Check command help and required result fields, and handle errors explicitly.
 The presence of `tessera.agent_skills` plus bundle version `1` identifies this
