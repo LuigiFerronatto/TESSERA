@@ -8,7 +8,11 @@ See [`docs/process/change-policy.md`](docs/process/change-policy.md) for the upd
 
 ## Unreleased
 
-_Nothing yet._
+### Fixed
+
+- Quickstart now honors resolved project stores, sources and index paths, emits
+  an MCP `--project` block, and preserves those boundaries when applying the plan.
+  No-config planning stays unchanged. ([#358](https://github.com/LuigiFerronatto/TESSERA/issues/358))
 
 ## 0.0.5 — 2026-10-12
 

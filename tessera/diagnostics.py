@@ -30,8 +30,10 @@ from typing import Any, Dict, List, Optional
 
 from .config import (
     CANONICAL_STORAGE_ENV,
+    ConfigurationResolver,
     LEGACY_STORAGE_ENV,
     ResolvedConfiguration,
+    discover_project_config,
     resolve_storage_dir,
 )
 
@@ -197,15 +199,20 @@ class QuickstartPlan:
     detected_project_type: str
     mcp_config_block: Dict[str, Any]
     actions_taken: List[str] = field(default_factory=list)
+    configuration: Optional[ResolvedConfiguration] = field(default=None, repr=False)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        result = {
             "storage_dir": self.storage_dir,
             "project_root": self.project_root,
             "detected_project_type": self.detected_project_type,
             "mcp_config_block": self.mcp_config_block,
             "actions_taken": self.actions_taken,
         }
+        if self.configuration is not None:
+            resolved = self.configuration.to_dict()
+            result.update({key: resolved[key] for key in ("config_path", "sources", "index_dir")})
+        return result
 
 
 def _detect_project_type(project_root: str) -> str:
@@ -235,31 +242,38 @@ def build_quickstart_plan(project_root: Optional[str] = None, storage_dir: Optio
     on it.
     """
     project_root = os.path.abspath(project_root or os.getcwd())
-    project_type = _detect_project_type(project_root)
-    if storage_dir:
+    resolver = ConfigurationResolver(cwd=project_root)
+    configuration = None
+    if discover_project_config(resolver.cwd, home=resolver.home) is not None:
+        selection = resolver.resolve(explicit=storage_dir)
+        resolved_storage_dir = selection.storage_dir
+        if selection.source == "project_config":
+            configuration = selection
+            project_root = selection.project_root
+    elif storage_dir:
         resolved_storage_dir = os.path.abspath(resolve_storage_dir(storage_dir))
     elif os.environ.get(CANONICAL_STORAGE_ENV) or os.environ.get(LEGACY_STORAGE_ENV):
         resolved_storage_dir = os.path.abspath(resolve_storage_dir())
     else:
         resolved_storage_dir = _suggest_storage_dir(project_root)
 
+    project_type = _detect_project_type(project_root)
     tessera_mcp_bin = shutil.which("tessera-mcp") or os.path.join(
         os.path.dirname(sys.executable), "tessera-mcp"
     )
-    mcp_config_block = {
-        "mcpServers": {
-            "tessera": {
-                "command": tessera_mcp_bin,
-                "env": {"TESSERA_STORAGE_DIR": resolved_storage_dir},
-            }
-        }
-    }
+    server = {"command": tessera_mcp_bin}
+    if configuration is not None:
+        server["args"] = ["--project", project_root]
+    else:
+        server["env"] = {"TESSERA_STORAGE_DIR": resolved_storage_dir}
+    mcp_config_block = {"mcpServers": {"tessera": server}}
 
     return QuickstartPlan(
         storage_dir=resolved_storage_dir,
         project_root=project_root,
         detected_project_type=project_type,
         mcp_config_block=mcp_config_block,
+        configuration=configuration,
     )
 
 
@@ -274,7 +288,10 @@ def apply_quickstart_plan(plan: QuickstartPlan) -> QuickstartPlan:
     os.makedirs(plan.storage_dir, exist_ok=True)
     plan.actions_taken.append(f"mkdir -p {plan.storage_dir}")
 
-    engine = TesseraEngine(storage_dir=plan.storage_dir)
+    if plan.configuration is not None:
+        engine = TesseraEngine(configuration=plan.configuration)
+    else:
+        engine = TesseraEngine(storage_dir=plan.storage_dir)
     engine.build_index()
     plan.actions_taken.append(
         f"tessera index {plan.storage_dir}  ({engine.graph.number_of_nodes()} nodes indexados)"

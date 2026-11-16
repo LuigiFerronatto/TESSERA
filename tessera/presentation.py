@@ -333,6 +333,11 @@ def human_lines(result: CommandResult, output: OutputPolicy) -> Iterable[str]:
     elif kind == "quickstart":
         yield f"Project: {data['project_root']}"
         yield f"Store: {data['storage_dir']}"
+        if data.get("config_path"):
+            yield f"Configuration: {data['config_path']}"
+            for source in data["sources"]:
+                yield f"Source: {source['path']} (include: {', '.join(source['include'])})"
+            yield f"Index: {data['index_dir']}"
         yield "MCP configuration (not installed automatically):"
         yield json.dumps(data['mcp_config_block'], indent=2, ensure_ascii=False)
         yield from (line.replace('nodes indexados', 'nodes indexed') for line in data['actions_taken'])
