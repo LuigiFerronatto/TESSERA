@@ -42,3 +42,7 @@
 {"id":"evidence_backed","question":"Did every reported drift item identify concrete canonical evidence?","answer":"YES","model":"evals","timestamp":"2026-11-14T11:01:50.980Z","runid":"43587772974"}
 {"id":"false_positive_control","question":"Did the audit avoid reporting stylistic differences as factual drift?","answer":"YES","model":"evals","timestamp":"2026-11-14T11:01:50.980Z","runid":"43587772974"}
 {"id":"consolidated_output","question":"Did the run produce one concise, actionable repository-level report?","answer":"YES","model":"evals","timestamp":"2026-11-14T11:01:50.980Z","runid":"43587772974"}
+{"id":"operational_value","question":"Did the audit identify concrete documentation drift between canonical TESSERA behavior/lifecycle and repository documentation?","answer":"NO","model":"evals","timestamp":"2026-11-21T11:52:43.001Z","runid":"44900912485"}
+{"id":"evidence_backed","question":"Did every reported drift item identify concrete canonical evidence?","answer":"NO","model":"evals","timestamp":"2026-11-21T11:52:43.001Z","runid":"44900912485"}
+{"id":"false_positive_control","question":"Did the audit avoid reporting stylistic differences as factual drift?","answer":"YES","model":"evals","timestamp":"2026-11-21T11:52:43.001Z","runid":"44900912485"}
+{"id":"consolidated_output","question":"Did the run produce one concise, actionable repository-level report?","answer":"YES","model":"evals","timestamp":"2026-11-21T11:52:43.001Z","runid":"44900912485"}
